@@ -1,6 +1,6 @@
 
 <!doctype html>
-<html lang="zh" class="no-js">
+<html lang="en" class="no-js">
   <head>
     
       <meta charset="utf-8">
@@ -18,7 +18,7 @@
         <link rel="prev" href="../sybasereader/">
       
       
-        <link rel="next" href="../txtfilereader/">
+        <link rel="next" href="../../writer/accesswriter/">
       
       
       <link rel="icon" href="../../images/favicon.ico">
@@ -89,7 +89,7 @@
       
         
         <a href="#tdengine-reader" class="md-skip">
-          跳转至
+          Skip to content
         </a>
       
     </div>
@@ -107,7 +107,7 @@
   
 
 <header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
-  <nav class="md-header__inner md-grid" aria-label="页眉">
+  <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="../.." title="Addax Documentation" class="md-header__button md-logo" aria-label="Addax Documentation" data-md-component="logo">
       
   <img src="../../images/logo.png" alt="logo">
@@ -164,6 +164,32 @@
       <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
     
     
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Select language">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04M18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12m-2.62 7 1.62-4.33L19.12 17h-3.24Z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="/en" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="/" hreflang="zh" class="md-select__link">
+              中文
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
     
       <label class="md-header__button md-icon" for="__search">
         
@@ -173,21 +199,21 @@
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
     <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
       <label class="md-search__icon md-icon" for="__search">
         
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
         
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
       </label>
-      <nav class="md-search__options" aria-label="查找">
+      <nav class="md-search__options" aria-label="Search">
         
-          <a href="javascript:void(0)" class="md-search__icon md-icon" title="分享" aria-label="分享" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
             
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08Z"/></svg>
           </a>
         
-        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
           
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
         </button>
@@ -200,7 +226,7 @@
       <div class="md-search__scrollwrap" data-md-scrollfix>
         <div class="md-search-result" data-md-component="search-result">
           <div class="md-search-result__meta">
-            正在初始化搜索引擎
+            Initializing search
           </div>
           <ol class="md-search-result__list" role="presentation"></ol>
         </div>
@@ -211,7 +237,7 @@
     
     
       <div class="md-header__source">
-        <a href="https://github.com/wgzhao/Addax" title="前往仓库" class="md-source" data-md-component="source">
+        <a href="https://github.com/wgzhao/Addax" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
@@ -226,7 +252,7 @@
   
     
       
-<nav class="md-tabs" aria-label="标签" data-md-component="tabs">
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
   <div class="md-grid">
     <ul class="md-tabs__list">
       
@@ -257,7 +283,7 @@
   
     
   
-  快速使用
+  Quick Start
 
       </a>
     </li>
@@ -274,7 +300,7 @@
   
     
   
-  任务配置
+  Job Configuration
 
       </a>
     </li>
@@ -291,7 +317,7 @@
   
     
   
-  命令行工具
+  Command Line
 
       </a>
     </li>
@@ -312,7 +338,7 @@
   
     
   
-  读取插件
+  Reader Plugins
 
         </a>
       </li>
@@ -332,7 +358,7 @@
   
     
   
-  写入插件
+  Writer Plugins
 
         </a>
       </li>
@@ -350,7 +376,7 @@
   
     
   
-  如何调试项目
+  Debug
 
       </a>
     </li>
@@ -367,7 +393,7 @@
   
     
   
-  加密配置文件的中密码
+  Password Encryption
 
       </a>
     </li>
@@ -384,7 +410,7 @@
   
     
   
-  任务结果上报
+  Statistics Report
 
       </a>
     </li>
@@ -401,7 +427,7 @@
   
     
   
-  数据转换
+  Transformer
 
       </a>
     </li>
@@ -418,7 +444,7 @@
   
     
   
-  插件开发
+  Plugin Development
 
       </a>
     </li>
@@ -451,7 +477,7 @@
   
 
 
-<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="导航栏" data-md-level="0">
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
     <a href="../.." title="Addax Documentation" class="md-nav__button md-logo" aria-label="Addax Documentation" data-md-component="logo">
       
@@ -462,7 +488,7 @@
   </label>
   
     <div class="md-nav__source">
-      <a href="https://github.com/wgzhao/Addax" title="前往仓库" class="md-source" data-md-component="source">
+      <a href="https://github.com/wgzhao/Addax" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
@@ -506,7 +532,7 @@
         
   
   <span class="md-ellipsis">
-    快速使用
+    Quick Start
   </span>
   
 
@@ -526,7 +552,7 @@
         
   
   <span class="md-ellipsis">
-    任务配置
+    Job Configuration
   </span>
   
 
@@ -546,7 +572,7 @@
         
   
   <span class="md-ellipsis">
-    命令行工具
+    Command Line
   </span>
   
 
@@ -658,7 +684,7 @@
             
   
   <span class="md-ellipsis">
-    读取插件
+    Reader Plugins
   </span>
   
 
@@ -668,7 +694,7 @@
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
-            读取插件
+            Reader Plugins
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -684,6 +710,153 @@
   
   <span class="md-ellipsis">
     Access Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mysqlreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    MySQL Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../postgresqlreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    PostgreSQL Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../oraclereader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Oracle Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rdbmsreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    RDBMS Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../txtfilereader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Text File Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../elasticsearchreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ElasticSearchReader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mongodbreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    MongoDB Reader
   </span>
   
 
@@ -805,27 +978,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../elasticsearchreader/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    ElasticSearchReader
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../excelreader/" class="md-nav__link">
         
   
@@ -851,7 +1003,7 @@
         
   
   <span class="md-ellipsis">
-    Ftp Reader
+    FTP Reader
   </span>
   
 
@@ -1141,111 +1293,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../mongodbreader/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    MongoDB Reader
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../mysqlreader/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    MySQL Reader
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../oraclereader/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Oracle Reader
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../postgresqlreader/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    PostgreSQL Reader
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../rdbmsreader/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    RDBMS Reader
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../redisreader/" class="md-nav__link">
         
   
@@ -1404,7 +1451,7 @@
       
         
 
-<nav class="md-nav md-nav--secondary" aria-label="目录">
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
   
@@ -1413,33 +1460,33 @@
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
-      目录
+      Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#_1" class="md-nav__link">
+  <a href="#prerequisites" class="md-nav__link">
     <span class="md-ellipsis">
-      前置条件
+      Prerequisites
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
+  <a href="#example" class="md-nav__link">
     <span class="md-ellipsis">
-      示例
+      Example
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="示例">
+    <nav class="md-nav" aria-label="Example">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
+  <a href="#execute-collection-command" class="md-nav__link">
     <span class="md-ellipsis">
-      执行采集命令
+      Execute Collection Command
     </span>
   </a>
   
@@ -1451,13 +1498,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
+  <a href="#parameters" class="md-nav__link">
     <span class="md-ellipsis">
-      参数说明
+      Parameters
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="参数说明">
+    <nav class="md-nav" aria-label="Parameters">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1470,9 +1517,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#jdbc-restful" class="md-nav__link">
+  <a href="#using-jdbc-restful-interface" class="md-nav__link">
     <span class="md-ellipsis">
-      使用 JDBC-RESTful 接口
+      Using JDBC-RESTful Interface
     </span>
   </a>
   
@@ -1484,27 +1531,27 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
+  <a href="#type-conversion" class="md-nav__link">
     <span class="md-ellipsis">
-      类型转换
+      Type Conversion
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_6" class="md-nav__link">
+  <a href="#currently-supported-versions" class="md-nav__link">
     <span class="md-ellipsis">
-      当前支持版本
+      Currently Supported Versions
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_7" class="md-nav__link">
+  <a href="#notes" class="md-nav__link">
     <span class="md-ellipsis">
-      注意事项
+      Notes
     </span>
   </a>
   
@@ -1514,27 +1561,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../txtfilereader/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    TxtFile Reader
-  </span>
-  
-
-      </a>
     </li>
   
 
@@ -1624,6 +1650,8 @@
       
         
       
+        
+      
     
     
       
@@ -1643,7 +1671,7 @@
             
   
   <span class="md-ellipsis">
-    写入插件
+    Writer Plugins
   </span>
   
 
@@ -1653,7 +1681,7 @@
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_6">
             <span class="md-nav__icon md-icon"></span>
-            写入插件
+            Writer Plugins
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -1669,6 +1697,153 @@
   
   <span class="md-ellipsis">
     Access Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/mysqlwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    MySQL Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/postgresqlwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Postgresql Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/oraclewriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Oracle Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/rdbmswriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    RDBMS Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/txtfilewriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    TxtFile Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/elasticsearchwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ElasticSearch Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/mongodbwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    MongoDB Writer
   </span>
   
 
@@ -1727,6 +1902,27 @@
   
   
     <li class="md-nav__item">
+      <a href="../../writer/databendwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    DatabendWriter
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../writer/dbfwriter/" class="md-nav__link">
         
   
@@ -1769,48 +1965,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../writer/databendwriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    DatabendWriter
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../writer/elasticsearchwriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    ElasticSearch Writer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../writer/excelwriter/" class="md-nav__link">
         
   
@@ -1836,7 +1990,7 @@
         
   
   <span class="md-ellipsis">
-    Ftp Writer
+    FTP Writer
   </span>
   
 
@@ -1857,7 +2011,7 @@
         
   
   <span class="md-ellipsis">
-    Greenplum Writer
+    GreenPlum Writer
   </span>
   
 
@@ -1920,7 +2074,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11X Writer
+    HBase11x Writer
   </span>
   
 
@@ -1963,6 +2117,27 @@
   
   <span class="md-ellipsis">
     HDFS Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/icebergwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Iceberg Writer
   </span>
   
 
@@ -2063,116 +2238,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../../writer/mongodbwriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    MongoDB Writer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../writer/mysqlwriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    MySQL Writer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../writer/oraclewriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Oracle Writer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../writer/paimonwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
     Paimon Writer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../writer/postgresqlwriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Postgresql Writer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../writer/rdbmswriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    RDBMS Writer
   </span>
   
 
@@ -2350,27 +2420,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../writer/txtfilewriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    TxtFile Writer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -2389,7 +2438,7 @@
         
   
   <span class="md-ellipsis">
-    如何调试项目
+    Debug
   </span>
   
 
@@ -2409,7 +2458,7 @@
         
   
   <span class="md-ellipsis">
-    加密配置文件的中密码
+    Password Encryption
   </span>
   
 
@@ -2429,7 +2478,7 @@
         
   
   <span class="md-ellipsis">
-    任务结果上报
+    Statistics Report
   </span>
   
 
@@ -2449,7 +2498,7 @@
         
   
   <span class="md-ellipsis">
-    数据转换
+    Transformer
   </span>
   
 
@@ -2469,7 +2518,7 @@
         
   
   <span class="md-ellipsis">
-    插件开发
+    Plugin Development
   </span>
   
 
@@ -2491,7 +2540,7 @@
                   <div class="md-sidebar__inner">
                     
 
-<nav class="md-nav md-nav--secondary" aria-label="目录">
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
   
@@ -2500,33 +2549,33 @@
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
-      目录
+      Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#_1" class="md-nav__link">
+  <a href="#prerequisites" class="md-nav__link">
     <span class="md-ellipsis">
-      前置条件
+      Prerequisites
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
+  <a href="#example" class="md-nav__link">
     <span class="md-ellipsis">
-      示例
+      Example
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="示例">
+    <nav class="md-nav" aria-label="Example">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
+  <a href="#execute-collection-command" class="md-nav__link">
     <span class="md-ellipsis">
-      执行采集命令
+      Execute Collection Command
     </span>
   </a>
   
@@ -2538,13 +2587,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
+  <a href="#parameters" class="md-nav__link">
     <span class="md-ellipsis">
-      参数说明
+      Parameters
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="参数说明">
+    <nav class="md-nav" aria-label="Parameters">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -2557,9 +2606,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#jdbc-restful" class="md-nav__link">
+  <a href="#using-jdbc-restful-interface" class="md-nav__link">
     <span class="md-ellipsis">
-      使用 JDBC-RESTful 接口
+      Using JDBC-RESTful Interface
     </span>
   </a>
   
@@ -2571,27 +2620,27 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
+  <a href="#type-conversion" class="md-nav__link">
     <span class="md-ellipsis">
-      类型转换
+      Type Conversion
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_6" class="md-nav__link">
+  <a href="#currently-supported-versions" class="md-nav__link">
     <span class="md-ellipsis">
-      当前支持版本
+      Currently Supported Versions
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_7" class="md-nav__link">
+  <a href="#notes" class="md-nav__link">
     <span class="md-ellipsis">
-      注意事项
+      Notes
     </span>
   </a>
   
@@ -2613,16 +2662,16 @@
 
 
 <h1 id="tdengine-reader">TDengine Reader<a class="headerlink" href="#tdengine-reader" title="Permanent link">&para;</a></h1>
-<p>TDengine Reader 插件用于从涛思公司的 <a href="https://www.taosdata.com/cn/">TDengine</a> 读取数据。</p>
-<h2 id="_1">前置条件<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
-<p>考虑到性能问题，该插件使用了 TDengine 的 JDBC-JNI 驱动， 该驱动直接调用客户端 API（<code>libtaos.so</code> 或 <code>taos.dll</code>）将写入和查询请求发送到 taosd 实例。因此在使用之前需要配置好动态库链接文件。</p>
-<p>首先将 <code>plugin/reader/tdenginereader/libs/libtaos.so.2.0.16.0</code> 拷贝到 <code>/usr/lib64</code> 目录，然后执行下面的命令创建软链接</p>
+<p>TDengine Reader plugin is used to read data from TDengine by TaosData <a href="https://www.taosdata.com/cn/">TDengine</a>.</p>
+<h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h2>
+<p>Considering performance issues, this plugin uses TDengine's JDBC-JNI driver, which directly calls the client API (<code>libtaos.so</code> or <code>taos.dll</code>) to send write and query requests to taosd instances. Therefore, dynamic library link files need to be configured before use.</p>
+<p>First copy <code>plugin/reader/tdenginereader/libs/libtaos.so.2.0.16.0</code> to <code>/usr/lib64</code> directory, then execute the following commands to create soft links:</p>
 <div class="highlight"><pre><span></span><code>ln<span class="w"> </span>-sf<span class="w"> </span>/usr/lib64/libtaos.so.2.0.16.0<span class="w"> </span>/usr/lib64/libtaos.so.1
 ln<span class="w"> </span>-sf<span class="w"> </span>/usr/lib64/libtaos.so.1<span class="w"> </span>/usr/lib64/libtaos.so
 </code></pre></div>
-<h2 id="_2">示例<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
-<p>TDengine 数据自带了一个演示数据库 <a href="https://www.taosdata.com/cn/getting-started/">taosdemo</a> , 我们从演示数据库读取部分数据并打印到终端</p>
-<p>以下是配置文件</p>
+<h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h2>
+<p>TDengine comes with a demo database <a href="https://www.taosdata.com/cn/getting-started/">taosdemo</a>. We read some data from the demo database and print to terminal.</p>
+<p>The following is the configuration file:</p>
 <div class="tabbed-set" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">job/tdengine2stream.json</label><div class="tabbed-content"></div>
 </div>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
@@ -2663,12 +2712,12 @@ ln<span class="w"> </span>-sf<span class="w"> </span>/usr/lib64/libtaos.so.1<spa
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>将上述配置文件保存为   <code>job/tdengine2stream.json</code></p>
-<h3 id="_3">执行采集命令<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
-<p>执行以下命令进行数据采集</p>
+<p>Save the above configuration file as <code>job/tdengine2stream.json</code></p>
+<h3 id="execute-collection-command">Execute Collection Command<a class="headerlink" href="#execute-collection-command" title="Permanent link">&para;</a></h3>
+<p>Execute the following command for data collection</p>
 <div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>job/tdengine2stream.json
 </code></pre></div>
-<p>命令输出类似如下：</p>
+<p>Command output is similar to the following:</p>
 <div class="highlight"><pre><span></span><code>2021-02-20 15:32:23.161 [main] INFO  VMInfo - VMInfo# operatingSystem class =&gt; sun.management.OperatingSystemImpl
 2021-02-20 15:32:23.229 [main] INFO  Engine -
 {
@@ -2740,106 +2789,106 @@ java.library.path:/usr/java/packages/lib/amd64:/usr/lib64:/lib64:/lib:/usr/lib
 读出记录总数                    :                 100
 读写失败总数                    :                   0
 </code></pre></div>
-<h2 id="_4">参数说明<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th style="text-align: left;">配置项</th>
-<th style="text-align: center;">是否必须</th>
-<th>类型</th>
-<th>默认值</th>
-<th>描述</th>
+<th style="text-align: left;">Configuration</th>
+<th style="text-align: center;">Required</th>
+<th>Type</th>
+<th>Default Value</th>
+<th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align: left;">jdbcUrl</td>
-<td style="text-align: center;">是</td>
+<td style="text-align: center;">Yes</td>
 <td>list</td>
-<td>无</td>
-<td>对端数据库的JDBC连接信息，注意这里的 <code>TAOS</code> 必须大写</td>
+<td>None</td>
+<td>JDBC connection information of target database, note that <code>TAOS</code> here must be uppercase</td>
 </tr>
 <tr>
 <td style="text-align: left;">username</td>
-<td style="text-align: center;">是</td>
+<td style="text-align: center;">Yes</td>
 <td>string</td>
-<td>无</td>
-<td>数据源的用户名</td>
+<td>None</td>
+<td>Username of data source</td>
 </tr>
 <tr>
 <td style="text-align: left;">password</td>
-<td style="text-align: center;">否</td>
+<td style="text-align: center;">No</td>
 <td>string</td>
-<td>无</td>
-<td>数据源指定用户名的密码</td>
+<td>None</td>
+<td>Password for specified username of data source</td>
 </tr>
 <tr>
 <td style="text-align: left;">table</td>
-<td style="text-align: center;">是</td>
+<td style="text-align: center;">Yes</td>
 <td>list</td>
-<td>无</td>
-<td>所选取的需要同步的表名,使用JSON数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构</td>
+<td>None</td>
+<td>Selected table names to be synchronized, using JSON data format. When configured for multiple tables, users need to ensure multiple tables have the same structure</td>
 </tr>
 <tr>
 <td style="text-align: left;">column</td>
-<td style="text-align: center;">是</td>
+<td style="text-align: center;">Yes</td>
 <td>list</td>
-<td>无</td>
-<td>所配置的表中需要同步的列名集合，详细描述<a href="../rdbmsreader">rdbmreader</a></td>
+<td>None</td>
+<td>Collection of column names to be synchronized in configured table, detailed description <a href="../rdbmsreader">rdbmreader</a></td>
 </tr>
 <tr>
 <td style="text-align: left;">where</td>
-<td style="text-align: center;">否</td>
+<td style="text-align: center;">No</td>
 <td>string</td>
-<td>无</td>
-<td>针对表的筛选条件</td>
+<td>None</td>
+<td>Filtering conditions for the table</td>
 </tr>
 <tr>
 <td style="text-align: left;">querySql</td>
-<td style="text-align: center;">否</td>
+<td style="text-align: center;">No</td>
 <td>list</td>
-<td>无</td>
-<td>使用自定义的SQL而不是指定表来获取数据，当配置了这一项之后，Addax系统就会忽略 <code>table</code>，<code>column</code>这些配置项</td>
+<td>None</td>
+<td>Use custom SQL instead of specified table to get data. When this item is configured, Addax system will ignore <code>table</code>, <code>column</code> configuration items</td>
 </tr>
 <tr>
 <td style="text-align: left;">beginDateTime</td>
-<td style="text-align: center;">是</td>
+<td style="text-align: center;">Yes</td>
 <td>string</td>
-<td>无</td>
-<td>数据的开始时间，Job迁移从 <code>begineDateTime</code> 到 <code>endDateTime</code> 的数据，格式为 <code>yyyy-MM-dd HH:mm:ss</code></td>
+<td>None</td>
+<td>Data start time, Job migrates data from <code>beginDateTime</code> to <code>endDateTime</code>, format is <code>yyyy-MM-dd HH:mm:ss</code></td>
 </tr>
 <tr>
 <td style="text-align: left;">endDateTime</td>
-<td style="text-align: center;">是</td>
+<td style="text-align: center;">Yes</td>
 <td>string</td>
-<td>无</td>
-<td>数据的结束时间，Job迁移从 <code>begineDateTime</code> 到 <code>endDateTime</code> 的数据，格式为 <code>yyyy-MM-dd HH:mm:ss</code></td>
+<td>None</td>
+<td>Data end time, Job migrates data from <code>beginDateTime</code> to <code>endDateTime</code>, format is <code>yyyy-MM-dd HH:mm:ss</code></td>
 </tr>
 <tr>
 <td style="text-align: left;">splitInterval</td>
-<td style="text-align: center;">是</td>
+<td style="text-align: center;">Yes</td>
 <td>string</td>
-<td>无</td>
-<td>按照 <code>splitInterval</code> 来划分 <code>task</code>, 每 <code>splitInterval</code> 创建一个 <code>task</code></td>
+<td>None</td>
+<td>Divide <code>task</code> according to <code>splitInterval</code>, create one <code>task</code> per <code>splitInterval</code></td>
 </tr>
 </tbody>
 </table>
 <h3 id="splitinterval">splitInterval<a class="headerlink" href="#splitinterval" title="Permanent link">&para;</a></h3>
-<p>用来划分 <code>task</code>。 例如，<code>20d</code> 代表按照每 20 天的数据划分为 1 个 <code>task</code>。 可以配置的时间</p>
+<p>Used to divide <code>task</code>. For example, <code>20d</code> represents dividing data into 1 <code>task</code> every 20 days. Configurable time units:</p>
 <ul>
-<li><code>d</code>（天）</li>
-<li><code>h</code>（小时）</li>
-<li><code>m</code>（分钟）</li>
-<li><code>s</code>（秒）</li>
+<li><code>d</code> (day)</li>
+<li><code>h</code> (hour)</li>
+<li><code>m</code> (minute)</li>
+<li><code>s</code> (second)</li>
 </ul>
-<h3 id="jdbc-restful">使用 JDBC-RESTful 接口<a class="headerlink" href="#jdbc-restful" title="Permanent link">&para;</a></h3>
-<p>如果不想依赖本地库，或者没有权限，则可以使用 <code>JDBC-RESTful</code> 接口来写入表，相比 JDBC-JNI 而言，配置区别是：</p>
+<h3 id="using-jdbc-restful-interface">Using JDBC-RESTful Interface<a class="headerlink" href="#using-jdbc-restful-interface" title="Permanent link">&para;</a></h3>
+<p>If you don't want to depend on local libraries or don't have permissions, you can use the <code>JDBC-RESTful</code> interface to write to tables. Compared to JDBC-JNI, the configuration differences are:</p>
 <ul>
-<li>driverClass 指定为 <code>com.taosdata.jdbc.rs.RestfulDriver</code></li>
-<li>jdbcUrl 以 <code>jdbc:TAOS-RS://</code> 开头；</li>
-<li>使用 <code>6041</code> 作为连接端口</li>
+<li>driverClass specified as <code>com.taosdata.jdbc.rs.RestfulDriver</code></li>
+<li>jdbcUrl starts with <code>jdbc:TAOS-RS://</code></li>
+<li>Use <code>6041</code> as connection port</li>
 </ul>
-<p>所以上述配置中的 <code>connection</code> 应该修改为如下：</p>
+<p>So the <code>connection</code> in the above configuration should be modified as follows:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;connection&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">    </span><span class="p">{</span>
@@ -2854,12 +2903,12 @@ java.library.path:/usr/java/packages/lib/amd64:/usr/lib64:/lib64:/lib:/usr/lib
 <span class="w">  </span><span class="p">]</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="_5">类型转换<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<h2 id="type-conversion">Type Conversion<a class="headerlink" href="#type-conversion" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Addax 内部类型</th>
-<th>TDengine 数据类型</th>
+<th>Addax Internal Type</th>
+<th>TDengine Data Type</th>
 </tr>
 </thead>
 <tbody>
@@ -2881,11 +2930,11 @@ java.library.path:/usr/java/packages/lib/amd64:/usr/lib64:/lib64:/lib:/usr/lib
 </tr>
 </tbody>
 </table>
-<h2 id="_6">当前支持版本<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<h2 id="currently-supported-versions">Currently Supported Versions<a class="headerlink" href="#currently-supported-versions" title="Permanent link">&para;</a></h2>
 <p>TDengine 2.0.16</p>
-<h2 id="_7">注意事项<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
+<h2 id="notes">Notes<a class="headerlink" href="#notes" title="Permanent link">&para;</a></h2>
 <ul>
-<li>TDengine JDBC-JNI 驱动和动态库版本要求一一匹配，因此如果你的数据版本并不是 <code>2.0.16</code>，则需要同时替换动态库和插件目录中的JDBC驱动</li>
+<li>TDengine JDBC-JNI driver and dynamic library versions must match one-to-one. Therefore, if your data version is not <code>2.0.16</code>, you need to replace both the dynamic library and JDBC driver in the plugin directory.</li>
 </ul>
 
 
@@ -2912,7 +2961,7 @@ java.library.path:/usr/java/packages/lib/amd64:/usr/lib64:/lib64:/lib:/usr/lib
           <button type="button" class="md-top md-icon" data-md-component="top" hidden>
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
-  回到页面顶部
+  Back to top
 </button>
         
       </main>
@@ -2921,17 +2970,17 @@ java.library.path:/usr/java/packages/lib/amd64:/usr/lib64:/lib64:/lib:/usr/lib
   
     
       
-      <nav class="md-footer__inner md-grid" aria-label="页脚" >
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../sybasereader/" class="md-footer__link md-footer__link--prev" aria-label="上一页: Sybase Reader">
+          <a href="../sybasereader/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Sybase Reader">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
             </div>
             <div class="md-footer__title">
               <span class="md-footer__direction">
-                上一页
+                Previous
               </span>
               <div class="md-ellipsis">
                 Sybase Reader
@@ -2941,13 +2990,13 @@ java.library.path:/usr/java/packages/lib/amd64:/usr/lib64:/lib64:/lib:/usr/lib
         
         
           
-          <a href="../txtfilereader/" class="md-footer__link md-footer__link--next" aria-label="下一页: TxtFile Reader">
+          <a href="../../writer/accesswriter/" class="md-footer__link md-footer__link--next" aria-label="Next: Access Writer">
             <div class="md-footer__title">
               <span class="md-footer__direction">
-                下一页
+                Next
               </span>
               <div class="md-ellipsis">
-                TxtFile Reader
+                Access Writer
               </div>
             </div>
             <div class="md-footer__button md-icon">
@@ -3011,7 +3060,7 @@ java.library.path:/usr/java/packages/lib/amd64:/usr/lib64:/lib64:/lib:/usr/lib
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "../..", "features": ["announce.dismiss", "content.action.edit", "content.action.view", "content.code.annotate", "content.code.copy", "content.tooltips", "navigation.footer", "navigation.indexes", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "toc.follow"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": {"provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["announce.dismiss", "content.action.edit", "content.action.view", "content.code.annotate", "content.code.copy", "content.tooltips", "navigation.footer", "navigation.indexes", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "toc.follow"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.081f42fc.min.js"></script>

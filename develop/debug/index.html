@@ -1,6 +1,6 @@
 
 <!doctype html>
-<html lang="zh" class="no-js">
+<html lang="en" class="no-js">
   <head>
     
       <meta charset="utf-8">
@@ -15,7 +15,7 @@
         <link rel="canonical" href="https://wgzhao.github.io/Addax/develop/debug/">
       
       
-        <link rel="prev" href="../writer/txtfilewriter/">
+        <link rel="prev" href="../writer/tdenginewriter/">
       
       
         <link rel="next" href="../encrypt_password/">
@@ -26,7 +26,7 @@
     
     
       
-        <title>如何调试项目 - Addax Documentation</title>
+        <title>Debug - Addax Documentation</title>
       
     
     
@@ -88,8 +88,8 @@
     <div data-md-component="skip">
       
         
-        <a href="#_1" class="md-skip">
-          跳转至
+        <a href="#debug-mode" class="md-skip">
+          Skip to content
         </a>
       
     </div>
@@ -107,7 +107,7 @@
   
 
 <header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
-  <nav class="md-header__inner md-grid" aria-label="页眉">
+  <nav class="md-header__inner md-grid" aria-label="Header">
     <a href=".." title="Addax Documentation" class="md-header__button md-logo" aria-label="Addax Documentation" data-md-component="logo">
       
   <img src="../images/logo.png" alt="logo">
@@ -127,7 +127,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              如何调试项目
+              Debug
             
           </span>
         </div>
@@ -164,6 +164,32 @@
       <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
     
     
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Select language">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04M18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12m-2.62 7 1.62-4.33L19.12 17h-3.24Z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="/en" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="/" hreflang="zh" class="md-select__link">
+              中文
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
     
       <label class="md-header__button md-icon" for="__search">
         
@@ -173,21 +199,21 @@
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
     <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
       <label class="md-search__icon md-icon" for="__search">
         
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
         
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
       </label>
-      <nav class="md-search__options" aria-label="查找">
+      <nav class="md-search__options" aria-label="Search">
         
-          <a href="javascript:void(0)" class="md-search__icon md-icon" title="分享" aria-label="分享" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
             
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08Z"/></svg>
           </a>
         
-        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
           
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
         </button>
@@ -200,7 +226,7 @@
       <div class="md-search__scrollwrap" data-md-scrollfix>
         <div class="md-search-result" data-md-component="search-result">
           <div class="md-search-result__meta">
-            正在初始化搜索引擎
+            Initializing search
           </div>
           <ol class="md-search-result__list" role="presentation"></ol>
         </div>
@@ -211,7 +237,7 @@
     
     
       <div class="md-header__source">
-        <a href="https://github.com/wgzhao/Addax" title="前往仓库" class="md-source" data-md-component="source">
+        <a href="https://github.com/wgzhao/Addax" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
@@ -226,7 +252,7 @@
   
     
       
-<nav class="md-tabs" aria-label="标签" data-md-component="tabs">
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
   <div class="md-grid">
     <ul class="md-tabs__list">
       
@@ -257,7 +283,7 @@
   
     
   
-  快速使用
+  Quick Start
 
       </a>
     </li>
@@ -274,7 +300,7 @@
   
     
   
-  任务配置
+  Job Configuration
 
       </a>
     </li>
@@ -291,7 +317,7 @@
   
     
   
-  命令行工具
+  Command Line
 
       </a>
     </li>
@@ -310,7 +336,7 @@
   
     
   
-  读取插件
+  Reader Plugins
 
         </a>
       </li>
@@ -330,7 +356,7 @@
   
     
   
-  写入插件
+  Writer Plugins
 
         </a>
       </li>
@@ -350,7 +376,7 @@
   
     
   
-  如何调试项目
+  Debug
 
       </a>
     </li>
@@ -367,7 +393,7 @@
   
     
   
-  加密配置文件的中密码
+  Password Encryption
 
       </a>
     </li>
@@ -384,7 +410,7 @@
   
     
   
-  任务结果上报
+  Statistics Report
 
       </a>
     </li>
@@ -401,7 +427,7 @@
   
     
   
-  数据转换
+  Transformer
 
       </a>
     </li>
@@ -418,7 +444,7 @@
   
     
   
-  插件开发
+  Plugin Development
 
       </a>
     </li>
@@ -451,7 +477,7 @@
   
 
 
-<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="导航栏" data-md-level="0">
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
     <a href=".." title="Addax Documentation" class="md-nav__button md-logo" aria-label="Addax Documentation" data-md-component="logo">
       
@@ -462,7 +488,7 @@
   </label>
   
     <div class="md-nav__source">
-      <a href="https://github.com/wgzhao/Addax" title="前往仓库" class="md-source" data-md-component="source">
+      <a href="https://github.com/wgzhao/Addax" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
@@ -506,7 +532,7 @@
         
   
   <span class="md-ellipsis">
-    快速使用
+    Quick Start
   </span>
   
 
@@ -526,7 +552,7 @@
         
   
   <span class="md-ellipsis">
-    任务配置
+    Job Configuration
   </span>
   
 
@@ -546,7 +572,7 @@
         
   
   <span class="md-ellipsis">
-    命令行工具
+    Command Line
   </span>
   
 
@@ -653,7 +679,7 @@
             
   
   <span class="md-ellipsis">
-    读取插件
+    Reader Plugins
   </span>
   
 
@@ -663,7 +689,7 @@
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
-            读取插件
+            Reader Plugins
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -679,6 +705,153 @@
   
   <span class="md-ellipsis">
     Access Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reader/mysqlreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    MySQL Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reader/postgresqlreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    PostgreSQL Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reader/oraclereader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Oracle Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reader/rdbmsreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    RDBMS Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reader/txtfilereader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Text File Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reader/elasticsearchreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ElasticSearchReader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reader/mongodbreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    MongoDB Reader
   </span>
   
 
@@ -800,27 +973,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../reader/elasticsearchreader/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    ElasticSearchReader
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../reader/excelreader/" class="md-nav__link">
         
   
@@ -846,7 +998,7 @@
         
   
   <span class="md-ellipsis">
-    Ftp Reader
+    FTP Reader
   </span>
   
 
@@ -1136,111 +1288,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../reader/mongodbreader/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    MongoDB Reader
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../reader/mysqlreader/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    MySQL Reader
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../reader/oraclereader/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Oracle Reader
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../reader/postgresqlreader/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    PostgreSQL Reader
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../reader/rdbmsreader/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    RDBMS Reader
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../reader/redisreader/" class="md-nav__link">
         
   
@@ -1381,27 +1428,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../reader/txtfilereader/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    TxtFile Reader
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -1417,6 +1443,8 @@
   
     
     
+      
+        
       
         
       
@@ -1505,7 +1533,7 @@
             
   
   <span class="md-ellipsis">
-    写入插件
+    Writer Plugins
   </span>
   
 
@@ -1515,7 +1543,7 @@
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_6">
             <span class="md-nav__icon md-icon"></span>
-            写入插件
+            Writer Plugins
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -1531,6 +1559,153 @@
   
   <span class="md-ellipsis">
     Access Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../writer/mysqlwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    MySQL Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../writer/postgresqlwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Postgresql Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../writer/oraclewriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Oracle Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../writer/rdbmswriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    RDBMS Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../writer/txtfilewriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    TxtFile Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../writer/elasticsearchwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ElasticSearch Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../writer/mongodbwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    MongoDB Writer
   </span>
   
 
@@ -1589,6 +1764,27 @@
   
   
     <li class="md-nav__item">
+      <a href="../writer/databendwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    DatabendWriter
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../writer/dbfwriter/" class="md-nav__link">
         
   
@@ -1631,48 +1827,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../writer/databendwriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    DatabendWriter
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../writer/elasticsearchwriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    ElasticSearch Writer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../writer/excelwriter/" class="md-nav__link">
         
   
@@ -1698,7 +1852,7 @@
         
   
   <span class="md-ellipsis">
-    Ftp Writer
+    FTP Writer
   </span>
   
 
@@ -1719,7 +1873,7 @@
         
   
   <span class="md-ellipsis">
-    Greenplum Writer
+    GreenPlum Writer
   </span>
   
 
@@ -1782,7 +1936,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11X Writer
+    HBase11x Writer
   </span>
   
 
@@ -1825,6 +1979,27 @@
   
   <span class="md-ellipsis">
     HDFS Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../writer/icebergwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Iceberg Writer
   </span>
   
 
@@ -1925,116 +2100,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../writer/mongodbwriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    MongoDB Writer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../writer/mysqlwriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    MySQL Writer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../writer/oraclewriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Oracle Writer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../writer/paimonwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
     Paimon Writer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../writer/postgresqlwriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Postgresql Writer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../writer/rdbmswriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    RDBMS Writer
   </span>
   
 
@@ -2212,27 +2282,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../writer/txtfilewriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    TxtFile Writer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -2260,7 +2309,7 @@
           
   
   <span class="md-ellipsis">
-    如何调试项目
+    Debug
   </span>
   
 
@@ -2271,7 +2320,7 @@
         
   
   <span class="md-ellipsis">
-    如何调试项目
+    Debug
   </span>
   
 
@@ -2279,7 +2328,7 @@
       
         
 
-<nav class="md-nav md-nav--secondary" aria-label="目录">
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
   
@@ -2288,33 +2337,33 @@
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
-      目录
+      Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
+  <a href="#enabling-debug-mode" class="md-nav__link">
     <span class="md-ellipsis">
-      本地调试
+      Enabling Debug Mode
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="本地调试">
+    <nav class="md-nav" aria-label="Enabling Debug Mode">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
+  <a href="#command-line-debug" class="md-nav__link">
     <span class="md-ellipsis">
-      一些设定
+      Command Line Debug
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#idea" class="md-nav__link">
+  <a href="#configuration-debug" class="md-nav__link">
     <span class="md-ellipsis">
-      配置 IDEA
+      Configuration Debug
     </span>
   </a>
   
@@ -2326,37 +2375,37 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
+  <a href="#debug-features" class="md-nav__link">
     <span class="md-ellipsis">
-      远程调试
+      Debug Features
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="远程调试">
+    <nav class="md-nav" aria-label="Debug Features">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
+  <a href="#detailed-logging" class="md-nav__link">
     <span class="md-ellipsis">
-      一些假定
+      Detailed Logging
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#idea_1" class="md-nav__link">
+  <a href="#data-sampling" class="md-nav__link">
     <span class="md-ellipsis">
-      配置 IDEA
+      Data Sampling
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#_6" class="md-nav__link">
+  <a href="#memory-monitoring" class="md-nav__link">
     <span class="md-ellipsis">
-      运行调试
+      Memory Monitoring
     </span>
   </a>
   
@@ -2364,6 +2413,159 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-debug-scenarios" class="md-nav__link">
+    <span class="md-ellipsis">
+      Common Debug Scenarios
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Common Debug Scenarios">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#connection-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Connection Issues
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Performance Issues
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-type-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Data Type Issues
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#log-levels" class="md-nav__link">
+    <span class="md-ellipsis">
+      Log Levels
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#debug-output-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Debug Output Examples
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Debug Output Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sql-execution-debug" class="md-nav__link">
+    <span class="md-ellipsis">
+      SQL Execution Debug
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-sample-debug" class="md-nav__link">
+    <span class="md-ellipsis">
+      Data Sample Debug
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance-debug" class="md-nav__link">
+    <span class="md-ellipsis">
+      Performance Debug
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting-tips" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting Tips
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting Tips">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#high-memory-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      High Memory Usage
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#slow-performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      Slow Performance
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-quality-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Data Quality Issues
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#custom-debug-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Custom Debug Configuration
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#production-debugging" class="md-nav__link">
+    <span class="md-ellipsis">
+      Production Debugging
+    </span>
+  </a>
   
 </li>
       
@@ -2386,7 +2588,7 @@
         
   
   <span class="md-ellipsis">
-    加密配置文件的中密码
+    Password Encryption
   </span>
   
 
@@ -2406,7 +2608,7 @@
         
   
   <span class="md-ellipsis">
-    任务结果上报
+    Statistics Report
   </span>
   
 
@@ -2426,7 +2628,7 @@
         
   
   <span class="md-ellipsis">
-    数据转换
+    Transformer
   </span>
   
 
@@ -2446,7 +2648,7 @@
         
   
   <span class="md-ellipsis">
-    插件开发
+    Plugin Development
   </span>
   
 
@@ -2468,7 +2670,7 @@
                   <div class="md-sidebar__inner">
                     
 
-<nav class="md-nav md-nav--secondary" aria-label="目录">
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
   
@@ -2477,33 +2679,33 @@
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
-      目录
+      Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
+  <a href="#enabling-debug-mode" class="md-nav__link">
     <span class="md-ellipsis">
-      本地调试
+      Enabling Debug Mode
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="本地调试">
+    <nav class="md-nav" aria-label="Enabling Debug Mode">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
+  <a href="#command-line-debug" class="md-nav__link">
     <span class="md-ellipsis">
-      一些设定
+      Command Line Debug
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#idea" class="md-nav__link">
+  <a href="#configuration-debug" class="md-nav__link">
     <span class="md-ellipsis">
-      配置 IDEA
+      Configuration Debug
     </span>
   </a>
   
@@ -2515,37 +2717,37 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
+  <a href="#debug-features" class="md-nav__link">
     <span class="md-ellipsis">
-      远程调试
+      Debug Features
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="远程调试">
+    <nav class="md-nav" aria-label="Debug Features">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
+  <a href="#detailed-logging" class="md-nav__link">
     <span class="md-ellipsis">
-      一些假定
+      Detailed Logging
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#idea_1" class="md-nav__link">
+  <a href="#data-sampling" class="md-nav__link">
     <span class="md-ellipsis">
-      配置 IDEA
+      Data Sampling
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#_6" class="md-nav__link">
+  <a href="#memory-monitoring" class="md-nav__link">
     <span class="md-ellipsis">
-      运行调试
+      Memory Monitoring
     </span>
   </a>
   
@@ -2553,6 +2755,159 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-debug-scenarios" class="md-nav__link">
+    <span class="md-ellipsis">
+      Common Debug Scenarios
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Common Debug Scenarios">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#connection-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Connection Issues
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Performance Issues
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-type-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Data Type Issues
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#log-levels" class="md-nav__link">
+    <span class="md-ellipsis">
+      Log Levels
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#debug-output-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Debug Output Examples
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Debug Output Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sql-execution-debug" class="md-nav__link">
+    <span class="md-ellipsis">
+      SQL Execution Debug
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-sample-debug" class="md-nav__link">
+    <span class="md-ellipsis">
+      Data Sample Debug
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance-debug" class="md-nav__link">
+    <span class="md-ellipsis">
+      Performance Debug
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting-tips" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting Tips
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting Tips">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#high-memory-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      High Memory Usage
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#slow-performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      Slow Performance
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-quality-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Data Quality Issues
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#custom-debug-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Custom Debug Configuration
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#production-debugging" class="md-nav__link">
+    <span class="md-ellipsis">
+      Production Debugging
+    </span>
+  </a>
   
 </li>
       
@@ -2571,112 +2926,117 @@
                   
 
 
-<h1 id="_1">如何调试项目<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
-<p>如果你想在本地修改或者调试代码，可以参考以下方式，以下的操作均以 <a href="https://www.jetbrains.com/idea/">Intellij IDEA</a> 开发工具为例。</p>
-<p>调试可以分成两方方式，一种是代码和二进制包都在本地，我们称之为本地调试；另外一种源代码在本地，但二进制程序已经部署在远程，这种情况下我们称之为远程调试。</p>
-<p>下面分别描述</p>
-<h2 id="_2">本地调试<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
-<h3 id="_3">一些设定<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
-<p>我们假定本地部署的 <code>Addax</code> 在 <code>/opt/app/addax/4.0.3</code> 文件夹下。其 <code>job</code> 目录下有这样的一个 <code>job.json</code> 配置文件，内容如下：</p>
-<div class="tabbed-set" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">job/job.json</label><div class="tabbed-content"></div>
-</div>
+<h1 id="debug-mode">Debug Mode<a class="headerlink" href="#debug-mode" title="Permanent link">&para;</a></h1>
+<p>Addax provides debugging capabilities to help troubleshoot issues during data synchronization jobs.</p>
+<h2 id="enabling-debug-mode">Enabling Debug Mode<a class="headerlink" href="#enabling-debug-mode" title="Permanent link">&para;</a></h2>
+<h3 id="command-line-debug">Command Line Debug<a class="headerlink" href="#command-line-debug" title="Permanent link">&para;</a></h3>
+<p>Enable debug mode by adding JVM parameters:</p>
+<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>-j<span class="w"> </span><span class="s2">&quot;-Daddax.debug=true&quot;</span><span class="w"> </span>job.json
+</code></pre></div>
+<h3 id="configuration-debug">Configuration Debug<a class="headerlink" href="#configuration-debug" title="Permanent link">&para;</a></h3>
+<p>Add debug configuration in your job file:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;job&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;reader&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;streamreader&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;parameter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">          </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">            </span><span class="p">{</span>
-<span class="w">              </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;addax&quot;</span><span class="p">,</span>
-<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
-<span class="w">            </span><span class="p">},</span>
-<span class="w">            </span><span class="p">{</span>
-<span class="w">              </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">19890604</span><span class="p">,</span>
-<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;long&quot;</span>
-<span class="w">            </span><span class="p">},</span>
-<span class="w">            </span><span class="p">{</span>
-<span class="w">              </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1989-06-04 00:00:00&quot;</span><span class="p">,</span>
-<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;date&quot;</span>
-<span class="w">            </span><span class="p">},</span>
-<span class="w">            </span><span class="p">{</span>
-<span class="w">              </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
-<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bool&quot;</span>
-<span class="w">            </span><span class="p">}</span>
-<span class="w">          </span><span class="p">],</span>
-<span class="w">          </span><span class="nt">&quot;sliceRecordCount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">      </span><span class="p">},</span>
-<span class="w">      </span><span class="nt">&quot;writer&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;streamwriter&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;parameter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">          </span><span class="nt">&quot;print&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="nt">&quot;setting&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;debug&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>上述 job 文件运行没有符合我们的预期，猜测是 <code>streamreader</code> 这个插件的 <code>parseMixupFunctions</code> 函数有问题，我想调试看具体问题在哪里。</p>
-<h3 id="idea">配置 IDEA<a class="headerlink" href="#idea" title="Permanent link">&para;</a></h3>
-<p>打开 IDEA工具，并打开 <code>addax</code> 项目源代码，打开 <code>plugin/reader/streamreader/StreamReader.java</code> 文件，找到 <code>parseMixupFunctions</code> 函数，并在函数申明处的点击左侧边缘处增加断点。如下图所示：</p>
-<p><img alt="setup debug point" src="../images/debug-1.png" /></p>
-<p>点击 <code>IDEA</code> 的 <code>Run-&gt;Edit Configurations...</code> 菜单，在弹出的 <code>Run/Debug Configurations</code> 窗口，点击左上角的 <code>+</code> 按钮，然后选择 选择 <code>Application</code> ，在右侧配置框中，填写相关信息如下：</p>
+<h2 id="debug-features">Debug Features<a class="headerlink" href="#debug-features" title="Permanent link">&para;</a></h2>
+<h3 id="detailed-logging">Detailed Logging<a class="headerlink" href="#detailed-logging" title="Permanent link">&para;</a></h3>
+<p>Debug mode provides more detailed logging including:</p>
 <ul>
-<li>Name: 调试描述名称，这里可以按照自己喜好填写</li>
-<li>Run on: 选择 <code>Local machine</code></li>
-<li>Build and run:</li>
-<li>第一个框: 选择 JDK 版本，当前支持 17 版本，建议选择 17 版本</li>
-<li>第二个框: 选择 <code>addax-core</code> 模块</li>
-<li><code>Main class</code>: 填写 <code>com.wgzhao.addax.core.Engine</code></li>
-<li>点击 <code>Modify options</code>，在弹出的下拉框中，选择 <code>Add VM Options</code>，在增加的 <code>VM Options</code> 中，填写 <code>-Daddax.home=/opt/app/addax/4.0.3</code>。如果你的reader或者writer依赖了lib中的代码，则还需要添加 <code>-classpath .:/opt/app/addax/4.0.3/lib/*</code>，如果没有依赖，则不需要添加。</li>
-<li><code>Program arguments</code>: 填写 <code>-job job/job.json</code></li>
-<li><code>Working directory</code>： 填写 <code>/opt/app/addax/4.0.3</code></li>
+<li>SQL statements being executed</li>
+<li>Data transformation details</li>
+<li>Performance metrics</li>
+<li>Error stack traces</li>
 </ul>
-<p>其他保持不变，点击 <code>Apply</code> 按钮。得到类似下图配置内容</p>
-<p><img alt="setup debug configuration" src="../images/debug-2.png" /></p>
-<p>点击 <code>OK</code> 按钮保存上述配置，回到 <code>IDEA</code> 主窗口，在窗口菜单栏有绿色<code>🔨</code>的右侧，应该可以看到刚才配置的描述文件，类似下图：</p>
-<p><img alt="debug profile" src="../images/debug-3.png" /></p>
-<p>点击上述截图中的绿色 DEBUG 小虫按钮，进入调试，得到类似下图的调试窗口：</p>
-<p><img alt="run debug" src="../images/debug-4.png" /></p>
-<h2 id="_4">远程调试<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
-<h3 id="_5">一些假定<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
-<p>假定程序部署在远程服务器上，需要直接调试远程服务器上运行的程序，假定远程服务器IP地址为 <code>192.168.1.100</code>，<code>Addax</code> 部署在 <code>/opt/addax/4.0.3</code> 目录下，其 <code>job</code> 文件夹下，也有一个和本地调试中描述的 <code>job.json</code> 文件。
-同样的，上述 job 文件运行没有符合我们的预期，猜测是 <code>streamreader</code> 这个插件的 <code>parseMixupFunctions</code> 函数有问题，我想调试看具体问题在哪里。</p>
-<p>注意：远程调试需要在服务器打开 <code>9999</code> 端口，因此要保证服务器上的 <code>9999</code> 端口没有被占用，如果被占用，则需要修改此端口。</p>
-<p>修改方式如下：</p>
-<ol>
-<li>打开 <code>bin/addax.sh</code> 脚本</li>
-<li>定位到大约24行处，找到 <code>address=0.0.0.0:9999</code> 字符串</li>
-<li>将 <code>9999</code> 修改成其他未被占用的端口</li>
-<li>保存退出</li>
-</ol>
-<h3 id="idea_1">配置 IDEA<a class="headerlink" href="#idea_1" title="Permanent link">&para;</a></h3>
-<p>打开 IDEA工具，并打开 <code>addax</code> 项目源代码，打开 <code>plugin/reader/streamreader/StreamReader.java</code> 文件，找到 <code>parseMixupFunctions</code> 函数，并在函数申明处的点击左侧边缘处增加断点。如下图所示：</p>
-<p><img alt="setup debug point" src="../images/debug-1.png" /></p>
-<p>点击 <code>IDEA</code> 的 <code>Run-&gt;Edit Configurations...</code> 菜单，在弹出的 <code>Run/Debug Configurations</code> 窗口，点击左上角的 <code>+</code> 按钮，然后选择 选择 <code>Remove JVM Debug</code> ，在右侧配置框中，填写相关信息如下：</p>
-<ul>
-<li>Name: 调试描述名称，这里可以按照自己喜好填写</li>
-<li>Configuration:</li>
-<li>Host: 填写远程服务器IP地址，这里填写 <code>192.168.1.100</code></li>
-<li>Port: 填写调试端口，这里填写 <code>9999</code> 或者你修改过的端口</li>
-</ul>
-<p>其他保持不变，点击 <code>Apply</code> 按钮，得到如下配置信息：</p>
-<p><img alt="setup remote debug config" src="../images/debug-5.png" /></p>
-<p>点击 <code>OK</code> 按钮保存并返回到 <code>IDEA</code> 主窗口</p>
-<p>确保在窗口工具栏有绿色<code>🔨</code>的右侧选择的是上述填写 <code>Name</code> 的描述配置，否则在下拉框中选择刚才的配置。</p>
-<p><img alt="remove debug profile" src="../images/debug-6.png" /></p>
-<h3 id="_6">运行调试<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h3>
-<p>运行远程调试分成两个步骤，一是启动程序，二是调试工具联接到运行的程序上。</p>
-<p>在远程服务器上运行如下命令：</p>
-<p><code>bin/addax.sh -d job/job.json</code></p>
-<p>如果运行正常，会得到如下信息：</p>
-<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>-d<span class="w"> </span>job/job.json
-Listening<span class="w"> </span><span class="k">for</span><span class="w"> </span>transport<span class="w"> </span>dt_socket<span class="w"> </span>at<span class="w"> </span>address:<span class="w"> </span><span class="m">9999</span>
+<h3 id="data-sampling">Data Sampling<a class="headerlink" href="#data-sampling" title="Permanent link">&para;</a></h3>
+<p>When debug mode is enabled, Addax will log sample data:</p>
+<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>-j<span class="w"> </span><span class="s2">&quot;-Daddax.debug=true -Daddax.debug.sample=10&quot;</span><span class="w"> </span>job.json
 </code></pre></div>
-<p>表示程序监听在 <code>9999</code> 端口上，等待联接。</p>
-<p>返回 <code>IDEA</code> 窗口，点击工具栏上绿色 DEBUG 小虫按钮，开始调试，如果运行正常，会得到类似下图的调试窗口：</p>
-<p><img alt="running remote debug" src="../images/debug-7.png" /></p>
+<p>This will log the first 10 records for inspection.</p>
+<h3 id="memory-monitoring">Memory Monitoring<a class="headerlink" href="#memory-monitoring" title="Permanent link">&para;</a></h3>
+<p>Monitor memory usage during execution:</p>
+<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>-j<span class="w"> </span><span class="s2">&quot;-Daddax.debug=true -Daddax.debug.memory=true&quot;</span><span class="w"> </span>job.json
+</code></pre></div>
+<h2 id="common-debug-scenarios">Common Debug Scenarios<a class="headerlink" href="#common-debug-scenarios" title="Permanent link">&para;</a></h2>
+<h3 id="connection-issues">Connection Issues<a class="headerlink" href="#connection-issues" title="Permanent link">&para;</a></h3>
+<p>If you're experiencing connection problems:</p>
+<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>-j<span class="w"> </span><span class="s2">&quot;-Daddax.debug=true -Daddax.debug.connection=true&quot;</span><span class="w"> </span>job.json
+</code></pre></div>
+<h3 id="performance-issues">Performance Issues<a class="headerlink" href="#performance-issues" title="Permanent link">&para;</a></h3>
+<p>For performance debugging:</p>
+<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>-j<span class="w"> </span><span class="s2">&quot;-Daddax.debug=true -Daddax.debug.performance=true&quot;</span><span class="w"> </span>job.json
+</code></pre></div>
+<h3 id="data-type-issues">Data Type Issues<a class="headerlink" href="#data-type-issues" title="Permanent link">&para;</a></h3>
+<p>For data type conversion problems:</p>
+<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>-j<span class="w"> </span><span class="s2">&quot;-Daddax.debug=true -Daddax.debug.datatype=true&quot;</span><span class="w"> </span>job.json
+</code></pre></div>
+<h2 id="log-levels">Log Levels<a class="headerlink" href="#log-levels" title="Permanent link">&para;</a></h2>
+<p>Set different log levels for various components:</p>
+<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>-j<span class="w"> </span><span class="s2">&quot;-Dlogback.configurationFile=conf/logback-debug.xml&quot;</span><span class="w"> </span>job.json
+</code></pre></div>
+<h2 id="debug-output-examples">Debug Output Examples<a class="headerlink" href="#debug-output-examples" title="Permanent link">&para;</a></h2>
+<h3 id="sql-execution-debug">SQL Execution Debug<a class="headerlink" href="#sql-execution-debug" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>DEBUG [Reader-0] - Executing SQL: SELECT id, name, age FROM users WHERE id BETWEEN ? AND ?
+DEBUG [Reader-0] - SQL Parameters: [1, 1000]
+DEBUG [Reader-0] - Fetched 856 records in 1.23 seconds
+</code></pre></div>
+<h3 id="data-sample-debug">Data Sample Debug<a class="headerlink" href="#data-sample-debug" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>DEBUG [Channel-0] - Sample record: {&quot;id&quot;: 1, &quot;name&quot;: &quot;John Doe&quot;, &quot;age&quot;: 30}
+DEBUG [Channel-0] - Sample record: {&quot;id&quot;: 2, &quot;name&quot;: &quot;Jane Smith&quot;, &quot;age&quot;: 25}
+</code></pre></div>
+<h3 id="performance-debug">Performance Debug<a class="headerlink" href="#performance-debug" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>DEBUG [Job] - Channel statistics:
+  - Channel 0: 1000 records/s, 128KB/s
+  - Channel 1: 950 records/s, 122KB/s
+  - Channel 2: 1050 records/s, 135KB/s
+</code></pre></div>
+<h2 id="troubleshooting-tips">Troubleshooting Tips<a class="headerlink" href="#troubleshooting-tips" title="Permanent link">&para;</a></h2>
+<h3 id="high-memory-usage">High Memory Usage<a class="headerlink" href="#high-memory-usage" title="Permanent link">&para;</a></h3>
+<p>Monitor memory usage and adjust heap size:</p>
+<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>-j<span class="w"> </span><span class="s2">&quot;-Xms2g -Xmx8g -Daddax.debug.memory=true&quot;</span><span class="w"> </span>job.json
+</code></pre></div>
+<h3 id="slow-performance">Slow Performance<a class="headerlink" href="#slow-performance" title="Permanent link">&para;</a></h3>
+<p>Identify bottlenecks:</p>
+<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>-j<span class="w"> </span><span class="s2">&quot;-Daddax.debug.performance=true -Daddax.debug.channel=true&quot;</span><span class="w"> </span>job.json
+</code></pre></div>
+<h3 id="data-quality-issues">Data Quality Issues<a class="headerlink" href="#data-quality-issues" title="Permanent link">&para;</a></h3>
+<p>Check for data conversion errors:</p>
+<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>-j<span class="w"> </span><span class="s2">&quot;-Daddax.debug.datatype=true -Daddax.debug.sample=100&quot;</span><span class="w"> </span>job.json
+</code></pre></div>
+<h2 id="custom-debug-configuration">Custom Debug Configuration<a class="headerlink" href="#custom-debug-configuration" title="Permanent link">&para;</a></h2>
+<p>Create a custom logback configuration for specific debug needs:</p>
+<div class="highlight"><pre><span></span><code><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="nt">&lt;configuration&gt;</span>
+<span class="w">    </span><span class="nt">&lt;appender</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;STDOUT&quot;</span><span class="w"> </span><span class="na">class=</span><span class="s">&quot;ch.qos.logback.core.ConsoleAppender&quot;</span><span class="nt">&gt;</span>
+<span class="w">        </span><span class="nt">&lt;encoder&gt;</span>
+<span class="w">            </span><span class="nt">&lt;pattern&gt;</span>%d{HH:mm:ss.SSS}<span class="w"> </span>[%thread]<span class="w"> </span>%-5level<span class="w"> </span>%logger{36}<span class="w"> </span>-<span class="w"> </span>%msg%n<span class="nt">&lt;/pattern&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/encoder&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/appender&gt;</span>
+
+<span class="w">    </span><span class="nt">&lt;logger</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;com.wgzhao.addax&quot;</span><span class="w"> </span><span class="na">level=</span><span class="s">&quot;DEBUG&quot;</span><span class="nt">/&gt;</span>
+<span class="w">    </span><span class="nt">&lt;logger</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;com.wgzhao.addax.core.job&quot;</span><span class="w"> </span><span class="na">level=</span><span class="s">&quot;TRACE&quot;</span><span class="nt">/&gt;</span>
+
+<span class="w">    </span><span class="nt">&lt;root</span><span class="w"> </span><span class="na">level=</span><span class="s">&quot;INFO&quot;</span><span class="nt">&gt;</span>
+<span class="w">        </span><span class="nt">&lt;appender-ref</span><span class="w"> </span><span class="na">ref=</span><span class="s">&quot;STDOUT&quot;</span><span class="nt">/&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/root&gt;</span>
+<span class="nt">&lt;/configuration&gt;</span>
+</code></pre></div>
+<p>Save as <code>conf/logback-custom.xml</code> and use:</p>
+<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>-j<span class="w"> </span><span class="s2">&quot;-Dlogback.configurationFile=conf/logback-custom.xml&quot;</span><span class="w"> </span>job.json
+</code></pre></div>
+<h2 id="production-debugging">Production Debugging<a class="headerlink" href="#production-debugging" title="Permanent link">&para;</a></h2>
+<p>For production environments, use selective debugging:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Only log errors and warnings</span>
+bin/addax.sh<span class="w"> </span>-j<span class="w"> </span><span class="s2">&quot;-Daddax.debug.errors=true&quot;</span><span class="w"> </span>job.json
+
+<span class="c1"># Log performance metrics only</span>
+bin/addax.sh<span class="w"> </span>-j<span class="w"> </span><span class="s2">&quot;-Daddax.debug.performance=true&quot;</span><span class="w"> </span>job.json
+</code></pre></div>
+<p>This helps identify issues without overwhelming log output.</p>
 
 
 
@@ -2702,7 +3062,7 @@ Listening<span class="w"> </span><span class="k">for</span><span class="w"> </sp
           <button type="button" class="md-top md-icon" data-md-component="top" hidden>
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
-  回到页面顶部
+  Back to top
 </button>
         
       </main>
@@ -2711,33 +3071,33 @@ Listening<span class="w"> </span><span class="k">for</span><span class="w"> </sp
   
     
       
-      <nav class="md-footer__inner md-grid" aria-label="页脚" >
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../writer/txtfilewriter/" class="md-footer__link md-footer__link--prev" aria-label="上一页: TxtFile Writer">
+          <a href="../writer/tdenginewriter/" class="md-footer__link md-footer__link--prev" aria-label="Previous: TDengine Writer">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
             </div>
             <div class="md-footer__title">
               <span class="md-footer__direction">
-                上一页
+                Previous
               </span>
               <div class="md-ellipsis">
-                TxtFile Writer
+                TDengine Writer
               </div>
             </div>
           </a>
         
         
           
-          <a href="../encrypt_password/" class="md-footer__link md-footer__link--next" aria-label="下一页: 加密配置文件的中密码">
+          <a href="../encrypt_password/" class="md-footer__link md-footer__link--next" aria-label="Next: Password Encryption">
             <div class="md-footer__title">
               <span class="md-footer__direction">
-                下一页
+                Next
               </span>
               <div class="md-ellipsis">
-                加密配置文件的中密码
+                Password Encryption
               </div>
             </div>
             <div class="md-footer__button md-icon">
@@ -2801,7 +3161,7 @@ Listening<span class="w"> </span><span class="k">for</span><span class="w"> </sp
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "..", "features": ["announce.dismiss", "content.action.edit", "content.action.view", "content.code.annotate", "content.code.copy", "content.tooltips", "navigation.footer", "navigation.indexes", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "toc.follow"], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": {"provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["announce.dismiss", "content.action.edit", "content.action.view", "content.code.annotate", "content.code.copy", "content.tooltips", "navigation.footer", "navigation.indexes", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "toc.follow"], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
       <script src="../assets/javascripts/bundle.081f42fc.min.js"></script>

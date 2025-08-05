@@ -1,6 +1,6 @@
 
 <!doctype html>
-<html lang="zh" class="no-js">
+<html lang="en" class="no-js">
   <head>
     
       <meta charset="utf-8">
@@ -24,7 +24,7 @@
     
     
       
-        <title>插件开发 - Addax Documentation</title>
+        <title>Plugin Development - Addax Documentation</title>
       
     
     
@@ -86,8 +86,8 @@
     <div data-md-component="skip">
       
         
-        <a href="#_1" class="md-skip">
-          跳转至
+        <a href="#plugin-development" class="md-skip">
+          Skip to content
         </a>
       
     </div>
@@ -105,7 +105,7 @@
   
 
 <header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
-  <nav class="md-header__inner md-grid" aria-label="页眉">
+  <nav class="md-header__inner md-grid" aria-label="Header">
     <a href=".." title="Addax Documentation" class="md-header__button md-logo" aria-label="Addax Documentation" data-md-component="logo">
       
   <img src="../images/logo.png" alt="logo">
@@ -125,7 +125,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              插件开发
+              Plugin Development
             
           </span>
         </div>
@@ -162,6 +162,32 @@
       <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
     
     
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Select language">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04M18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12m-2.62 7 1.62-4.33L19.12 17h-3.24Z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="/en" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="/" hreflang="zh" class="md-select__link">
+              中文
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
     
       <label class="md-header__button md-icon" for="__search">
         
@@ -171,21 +197,21 @@
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
     <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
       <label class="md-search__icon md-icon" for="__search">
         
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
         
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
       </label>
-      <nav class="md-search__options" aria-label="查找">
+      <nav class="md-search__options" aria-label="Search">
         
-          <a href="javascript:void(0)" class="md-search__icon md-icon" title="分享" aria-label="分享" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
             
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08Z"/></svg>
           </a>
         
-        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
           
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
         </button>
@@ -198,7 +224,7 @@
       <div class="md-search__scrollwrap" data-md-scrollfix>
         <div class="md-search-result" data-md-component="search-result">
           <div class="md-search-result__meta">
-            正在初始化搜索引擎
+            Initializing search
           </div>
           <ol class="md-search-result__list" role="presentation"></ol>
         </div>
@@ -209,7 +235,7 @@
     
     
       <div class="md-header__source">
-        <a href="https://github.com/wgzhao/Addax" title="前往仓库" class="md-source" data-md-component="source">
+        <a href="https://github.com/wgzhao/Addax" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
@@ -224,7 +250,7 @@
   
     
       
-<nav class="md-tabs" aria-label="标签" data-md-component="tabs">
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
   <div class="md-grid">
     <ul class="md-tabs__list">
       
@@ -255,7 +281,7 @@
   
     
   
-  快速使用
+  Quick Start
 
       </a>
     </li>
@@ -272,7 +298,7 @@
   
     
   
-  任务配置
+  Job Configuration
 
       </a>
     </li>
@@ -289,7 +315,7 @@
   
     
   
-  命令行工具
+  Command Line
 
       </a>
     </li>
@@ -308,7 +334,7 @@
   
     
   
-  读取插件
+  Reader Plugins
 
         </a>
       </li>
@@ -328,7 +354,7 @@
   
     
   
-  写入插件
+  Writer Plugins
 
         </a>
       </li>
@@ -346,7 +372,7 @@
   
     
   
-  如何调试项目
+  Debug
 
       </a>
     </li>
@@ -363,7 +389,7 @@
   
     
   
-  加密配置文件的中密码
+  Password Encryption
 
       </a>
     </li>
@@ -380,7 +406,7 @@
   
     
   
-  任务结果上报
+  Statistics Report
 
       </a>
     </li>
@@ -397,7 +423,7 @@
   
     
   
-  数据转换
+  Transformer
 
       </a>
     </li>
@@ -416,7 +442,7 @@
   
     
   
-  插件开发
+  Plugin Development
 
       </a>
     </li>
@@ -449,7 +475,7 @@
   
 
 
-<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="导航栏" data-md-level="0">
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
     <a href=".." title="Addax Documentation" class="md-nav__button md-logo" aria-label="Addax Documentation" data-md-component="logo">
       
@@ -460,7 +486,7 @@
   </label>
   
     <div class="md-nav__source">
-      <a href="https://github.com/wgzhao/Addax" title="前往仓库" class="md-source" data-md-component="source">
+      <a href="https://github.com/wgzhao/Addax" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
@@ -504,7 +530,7 @@
         
   
   <span class="md-ellipsis">
-    快速使用
+    Quick Start
   </span>
   
 
@@ -524,7 +550,7 @@
         
   
   <span class="md-ellipsis">
-    任务配置
+    Job Configuration
   </span>
   
 
@@ -544,7 +570,7 @@
         
   
   <span class="md-ellipsis">
-    命令行工具
+    Command Line
   </span>
   
 
@@ -651,7 +677,7 @@
             
   
   <span class="md-ellipsis">
-    读取插件
+    Reader Plugins
   </span>
   
 
@@ -661,7 +687,7 @@
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
-            读取插件
+            Reader Plugins
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -677,6 +703,153 @@
   
   <span class="md-ellipsis">
     Access Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reader/mysqlreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    MySQL Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reader/postgresqlreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    PostgreSQL Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reader/oraclereader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Oracle Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reader/rdbmsreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    RDBMS Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reader/txtfilereader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Text File Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reader/elasticsearchreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ElasticSearchReader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reader/mongodbreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    MongoDB Reader
   </span>
   
 
@@ -798,27 +971,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../reader/elasticsearchreader/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    ElasticSearchReader
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../reader/excelreader/" class="md-nav__link">
         
   
@@ -844,7 +996,7 @@
         
   
   <span class="md-ellipsis">
-    Ftp Reader
+    FTP Reader
   </span>
   
 
@@ -1134,111 +1286,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../reader/mongodbreader/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    MongoDB Reader
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../reader/mysqlreader/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    MySQL Reader
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../reader/oraclereader/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Oracle Reader
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../reader/postgresqlreader/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    PostgreSQL Reader
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../reader/rdbmsreader/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    RDBMS Reader
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../reader/redisreader/" class="md-nav__link">
         
   
@@ -1379,27 +1426,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../reader/txtfilereader/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    TxtFile Reader
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -1415,6 +1441,8 @@
   
     
     
+      
+        
       
         
       
@@ -1503,7 +1531,7 @@
             
   
   <span class="md-ellipsis">
-    写入插件
+    Writer Plugins
   </span>
   
 
@@ -1513,7 +1541,7 @@
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_6">
             <span class="md-nav__icon md-icon"></span>
-            写入插件
+            Writer Plugins
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -1529,6 +1557,153 @@
   
   <span class="md-ellipsis">
     Access Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../writer/mysqlwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    MySQL Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../writer/postgresqlwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Postgresql Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../writer/oraclewriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Oracle Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../writer/rdbmswriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    RDBMS Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../writer/txtfilewriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    TxtFile Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../writer/elasticsearchwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ElasticSearch Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../writer/mongodbwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    MongoDB Writer
   </span>
   
 
@@ -1587,6 +1762,27 @@
   
   
     <li class="md-nav__item">
+      <a href="../writer/databendwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    DatabendWriter
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../writer/dbfwriter/" class="md-nav__link">
         
   
@@ -1629,48 +1825,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../writer/databendwriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    DatabendWriter
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../writer/elasticsearchwriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    ElasticSearch Writer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../writer/excelwriter/" class="md-nav__link">
         
   
@@ -1696,7 +1850,7 @@
         
   
   <span class="md-ellipsis">
-    Ftp Writer
+    FTP Writer
   </span>
   
 
@@ -1717,7 +1871,7 @@
         
   
   <span class="md-ellipsis">
-    Greenplum Writer
+    GreenPlum Writer
   </span>
   
 
@@ -1780,7 +1934,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11X Writer
+    HBase11x Writer
   </span>
   
 
@@ -1823,6 +1977,27 @@
   
   <span class="md-ellipsis">
     HDFS Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../writer/icebergwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Iceberg Writer
   </span>
   
 
@@ -1923,116 +2098,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../writer/mongodbwriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    MongoDB Writer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../writer/mysqlwriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    MySQL Writer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../writer/oraclewriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Oracle Writer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../writer/paimonwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
     Paimon Writer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../writer/postgresqlwriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Postgresql Writer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../writer/rdbmswriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    RDBMS Writer
   </span>
   
 
@@ -2210,27 +2280,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../writer/txtfilewriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    TxtFile Writer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -2249,7 +2298,7 @@
         
   
   <span class="md-ellipsis">
-    如何调试项目
+    Debug
   </span>
   
 
@@ -2269,7 +2318,7 @@
         
   
   <span class="md-ellipsis">
-    加密配置文件的中密码
+    Password Encryption
   </span>
   
 
@@ -2289,7 +2338,7 @@
         
   
   <span class="md-ellipsis">
-    任务结果上报
+    Statistics Report
   </span>
   
 
@@ -2309,7 +2358,7 @@
         
   
   <span class="md-ellipsis">
-    数据转换
+    Transformer
   </span>
   
 
@@ -2338,7 +2387,7 @@
           
   
   <span class="md-ellipsis">
-    插件开发
+    Plugin Development
   </span>
   
 
@@ -2349,7 +2398,7 @@
         
   
   <span class="md-ellipsis">
-    插件开发
+    Plugin Development
   </span>
   
 
@@ -2357,7 +2406,7 @@
       
         
 
-<nav class="md-nav md-nav--secondary" aria-label="目录">
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
   
@@ -2366,42 +2415,42 @@
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
-      目录
+      Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#addax" class="md-nav__link">
+  <a href="#addax-flow" class="md-nav__link">
     <span class="md-ellipsis">
-      Addax 流程
+      Addax Flow
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
+  <a href="#plugin-mechanism" class="md-nav__link">
     <span class="md-ellipsis">
-      插件机制
+      Plugin Mechanism
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
+  <a href="#framework-from-a-plugins-perspective" class="md-nav__link">
     <span class="md-ellipsis">
-      插件视角看框架
+      Framework from a Plugin's Perspective
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="插件视角看框架">
+    <nav class="md-nav" aria-label="Framework from a Plugin's Perspective">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
+  <a href="#logical-execution-model" class="md-nav__link">
     <span class="md-ellipsis">
-      逻辑执行模型
+      Logical Execution Model
     </span>
   </a>
   
@@ -2413,28 +2462,28 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
+  <a href="#programming-interface" class="md-nav__link">
     <span class="md-ellipsis">
-      编程接口
+      Programming Interface
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="编程接口">
+    <nav class="md-nav" aria-label="Programming Interface">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_6" class="md-nav__link">
+  <a href="#plugin-definition" class="md-nav__link">
     <span class="md-ellipsis">
-      插件定义
+      Plugin Definition
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#_7" class="md-nav__link">
+  <a href="#packaging-and-publishing" class="md-nav__link">
     <span class="md-ellipsis">
-      打包发布
+      Packaging and Publishing
     </span>
   </a>
   
@@ -2446,28 +2495,28 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_8" class="md-nav__link">
+  <a href="#configuration-file" class="md-nav__link">
     <span class="md-ellipsis">
-      配置文件
+      Configuration File
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="配置文件">
+    <nav class="md-nav" aria-label="Configuration File">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_9" class="md-nav__link">
+  <a href="#how-to-design-configuration-parameters" class="md-nav__link">
     <span class="md-ellipsis">
-      如何设计配置参数
+      How to Design Configuration Parameters
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
+  <a href="#how-to-use-the-configuration-class" class="md-nav__link">
     <span class="md-ellipsis">
-      如何使用 Configuration 类
+      How to Use the Configuration Class
     </span>
   </a>
   
@@ -2479,46 +2528,46 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_10" class="md-nav__link">
+  <a href="#plugin-data-transfer" class="md-nav__link">
     <span class="md-ellipsis">
-      插件数据传输
+      Plugin Data Transfer
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_11" class="md-nav__link">
+  <a href="#type-conversion" class="md-nav__link">
     <span class="md-ellipsis">
-      类型转换
+      Type Conversion
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_12" class="md-nav__link">
+  <a href="#dirty-data-handling" class="md-nav__link">
     <span class="md-ellipsis">
-      脏数据处理
+      Dirty Data Handling
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="脏数据处理">
+    <nav class="md-nav" aria-label="Dirty Data Handling">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_13" class="md-nav__link">
+  <a href="#what-is-dirty-data" class="md-nav__link">
     <span class="md-ellipsis">
-      什么是脏数据
+      What is Dirty Data
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#_14" class="md-nav__link">
+  <a href="#how-to-handle-dirty-data" class="md-nav__link">
     <span class="md-ellipsis">
-      如何处理脏数据
+      How to Handle Dirty Data
     </span>
   </a>
   
@@ -2530,9 +2579,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_15" class="md-nav__link">
+  <a href="#loading-principle" class="md-nav__link">
     <span class="md-ellipsis">
-      加载原理
+      Loading Principle
     </span>
   </a>
   
@@ -2559,7 +2608,7 @@
                   <div class="md-sidebar__inner">
                     
 
-<nav class="md-nav md-nav--secondary" aria-label="目录">
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
   
@@ -2568,42 +2617,42 @@
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
-      目录
+      Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#addax" class="md-nav__link">
+  <a href="#addax-flow" class="md-nav__link">
     <span class="md-ellipsis">
-      Addax 流程
+      Addax Flow
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
+  <a href="#plugin-mechanism" class="md-nav__link">
     <span class="md-ellipsis">
-      插件机制
+      Plugin Mechanism
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
+  <a href="#framework-from-a-plugins-perspective" class="md-nav__link">
     <span class="md-ellipsis">
-      插件视角看框架
+      Framework from a Plugin's Perspective
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="插件视角看框架">
+    <nav class="md-nav" aria-label="Framework from a Plugin's Perspective">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
+  <a href="#logical-execution-model" class="md-nav__link">
     <span class="md-ellipsis">
-      逻辑执行模型
+      Logical Execution Model
     </span>
   </a>
   
@@ -2615,28 +2664,28 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
+  <a href="#programming-interface" class="md-nav__link">
     <span class="md-ellipsis">
-      编程接口
+      Programming Interface
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="编程接口">
+    <nav class="md-nav" aria-label="Programming Interface">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_6" class="md-nav__link">
+  <a href="#plugin-definition" class="md-nav__link">
     <span class="md-ellipsis">
-      插件定义
+      Plugin Definition
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#_7" class="md-nav__link">
+  <a href="#packaging-and-publishing" class="md-nav__link">
     <span class="md-ellipsis">
-      打包发布
+      Packaging and Publishing
     </span>
   </a>
   
@@ -2648,28 +2697,28 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_8" class="md-nav__link">
+  <a href="#configuration-file" class="md-nav__link">
     <span class="md-ellipsis">
-      配置文件
+      Configuration File
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="配置文件">
+    <nav class="md-nav" aria-label="Configuration File">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_9" class="md-nav__link">
+  <a href="#how-to-design-configuration-parameters" class="md-nav__link">
     <span class="md-ellipsis">
-      如何设计配置参数
+      How to Design Configuration Parameters
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
+  <a href="#how-to-use-the-configuration-class" class="md-nav__link">
     <span class="md-ellipsis">
-      如何使用 Configuration 类
+      How to Use the Configuration Class
     </span>
   </a>
   
@@ -2681,46 +2730,46 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_10" class="md-nav__link">
+  <a href="#plugin-data-transfer" class="md-nav__link">
     <span class="md-ellipsis">
-      插件数据传输
+      Plugin Data Transfer
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_11" class="md-nav__link">
+  <a href="#type-conversion" class="md-nav__link">
     <span class="md-ellipsis">
-      类型转换
+      Type Conversion
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_12" class="md-nav__link">
+  <a href="#dirty-data-handling" class="md-nav__link">
     <span class="md-ellipsis">
-      脏数据处理
+      Dirty Data Handling
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="脏数据处理">
+    <nav class="md-nav" aria-label="Dirty Data Handling">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_13" class="md-nav__link">
+  <a href="#what-is-dirty-data" class="md-nav__link">
     <span class="md-ellipsis">
-      什么是脏数据
+      What is Dirty Data
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#_14" class="md-nav__link">
+  <a href="#how-to-handle-dirty-data" class="md-nav__link">
     <span class="md-ellipsis">
-      如何处理脏数据
+      How to Handle Dirty Data
     </span>
   </a>
   
@@ -2732,9 +2781,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_15" class="md-nav__link">
+  <a href="#loading-principle" class="md-nav__link">
     <span class="md-ellipsis">
-      加载原理
+      Loading Principle
     </span>
   </a>
   
@@ -2755,57 +2804,54 @@
                   
 
 
-<h1 id="_1">插件开发<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
-<p>本指南主要面向那些需要开发符合自己需求的 Addax 插件开发人员。</p>
-<h2 id="addax">Addax 流程<a class="headerlink" href="#addax" title="Permanent link">&para;</a></h2>
-<p>Addax 运行一个任务的大致流程如下：</p>
+<h1 id="plugin-development">Plugin Development<a class="headerlink" href="#plugin-development" title="Permanent link">&para;</a></h1>
+<p>This guide is primarily for developers who need to develop Addax plugins to meet their specific needs.</p>
+<h2 id="addax-flow">Addax Flow<a class="headerlink" href="#addax-flow" title="Permanent link">&para;</a></h2>
+<p>The general process for running a task in Addax is as follows:</p>
 <p><img alt="addax-flowchart" src="../images/addax-flowchart.png" /></p>
-<p>启动步骤为：</p>
+<p>The startup steps are:</p>
 <ol>
-<li>解析配置，包括 <code>job.json</code>、<code>core.json</code>、<code>plugin.json</code> 三个配置</li>
-<li>设置 <code>jobId</code> 到 <code>configuration</code> 当中</li>
-<li>启动 Engine，通过 <code>Engine.start()</code> 进入启动程序</li>
-<li>设置 <code>RUNTIME_MODE</code> 到 <code>configuration</code> 当中</li>
-<li>通过 JobContainer 的 <code>start()</code> 方法启动</li>
-<li>依次执行 job 的 <code>preHandler()</code>、<code>init()</code>、<code>prepare()</code>、<code>split()</code>、<code>schedule()</code>、<code>post()</code>、<code>postHandle()</code> 等方法。</li>
-<li><code>init()</code> 方法涉及到根据 configuration 来初始化 reader 和 writer 插件，这里涉及到 jar 包热加载以及调用插件 <code>init()</code> 操作方法，同时设置 reader 和 writer 的 configuration 信息</li>
-<li><code>prepare()</code> 方法涉及到初始化 reader 和 writer 插件的初始化，通过调用插件的 <code>prepare()</code> 方法实现，每个插件都有自己的 jarLoader，通过集成 <code>URLClassloader</code> 实现而来</li>
-<li><code>split()</code> 方法通过 <code>adjustChannelNumber()</code> 方法调整 channel 个数，同时执行 reader 和 writer 最细粒度的切分，需要注意的是，writer 的切分结果要参照 reader
-   的切分结果，达到切分后数目相等，才能满足 1：1 的通道模型</li>
-<li>channel 的计数主要是根据 byte 和 record 的限速来实现的，在 <code>split()</code> 的函数中第一步就是计算 channel 的大小</li>
-<li><code>split()</code> 方法 reader 插件会根据 channel 的值进行拆分，但是有些 reader 插件可能不会参考 channel 的值，writer 插件会完全根据 reader 的插件 1:1 进行返回</li>
-<li><code>split()</code> 方法内部的 <code>mergeReaderAndWriterTaskConfigs()</code> 负责合并 reader、writer、以及 transformer 三者关系，生成 task 的配置，并且重写 <code>job.content</code> 的配置</li>
-<li><code>schedule()</code> 方法根据 <code>split()</code> 拆分生成的 task 配置分配生成 taskGroup 对象，根据 task 的数量和单个 taskGroup 支持的 task 数量进行配置，两者相除就可以得出 taskGroup 的数量</li>
-<li><code>schedule()</code> 内部通过 AbstractScheduler 的 <code>schedule()</code> 执行，继续执行<code>startAllTaskGroup()</code> 方法创建所有的 TaskGroupContainer 组织相关的
-    task，TaskGroupContainerRunner 负责运行 TaskGroupContainer 执行分配的 task。scheduler 的具体实现类为 <code>ProcessInnerScheduler</code>。</li>
-<li><code>taskGroupContainerExecutorService</code> 启动固定的线程池用以执行 <code>TaskGroupContainerRunner</code> 对象，TaskGroupContainerRunner 的 <code>run()</code> 方法调用 <code>taskGroupContainer.
-start()</code> 方法，针对每个 channel 创建一个 TaskExecutor，通过 <code>taskExecutor.doStart()</code> 启动任务。</li>
+<li>Parse configurations, including <code>job.json</code>, <code>core.json</code>, and <code>plugin.json</code>.</li>
+<li>Set the <code>jobId</code> in the <code>configuration</code>.</li>
+<li>Start the Engine via <code>Engine.start()</code> to enter the startup procedure.</li>
+<li>Set the <code>RUNTIME_MODE</code> in the <code>configuration</code>.</li>
+<li>Start via the <code>JobContainer</code>'s <code>start()</code> method.</li>
+<li>Execute the job's <code>preHandler()</code>, <code>init()</code>, <code>prepare()</code>, <code>split()</code>, <code>schedule()</code>, <code>post()</code>, and <code>postHandle()</code> methods in sequence.</li>
+<li>The <code>init()</code> method involves initializing the reader and writer plugins based on the configuration. This includes hot-loading JAR packages and calling the plugin's <code>init()</code> method, as well as setting the reader and writer's configuration.</li>
+<li>The <code>prepare()</code> method involves initializing the reader and writer plugins by calling their respective <code>prepare()</code> methods. Each plugin has its own <code>jarLoader</code>, which inherits from <code>URLClassLoader</code>.</li>
+<li>The <code>split()</code> method adjusts the number of channels via <code>adjustChannelNumber()</code> and performs the most granular splitting for the reader and writer. It's important to note that the writer's split result must reference the reader's split result to ensure an equal number of splits, satisfying the 1:1 channel model.</li>
+<li>The channel count is mainly determined by byte and record rate limiting, which is calculated as the first step in the <code>split()</code> function.</li>
+<li>In the <code>split()</code> method, the reader plugin will split based on the channel value, but some reader plugins might not use this value. The writer plugin will always split 1:1 based on the reader's splits.</li>
+<li>The <code>mergeReaderAndWriterTaskConfigs()</code> method inside <code>split()</code> is responsible for merging the configurations of the reader, writer, and transformer to generate task configurations and override the <code>job.content</code> configuration.</li>
+<li>The <code>schedule()</code> method allocates and generates <code>TaskGroup</code> objects based on the task configurations generated by <code>split()</code>. The number of task groups is determined by dividing the total number of tasks by the number of tasks a single <code>TaskGroup</code> can support.</li>
+<li><code>schedule()</code> is executed internally by <code>AbstractScheduler</code>'s <code>schedule()</code> method, which then calls <code>startAllTaskGroup()</code> to create all <code>TaskGroupContainer</code>s to organize the related tasks. <code>TaskGroupContainerRunner</code> is responsible for running the <code>TaskGroupContainer</code> to execute the assigned tasks. The concrete implementation class for the scheduler is <code>ProcessInnerScheduler</code>.</li>
+<li><code>taskGroupContainerExecutorService</code> starts a fixed thread pool to execute <code>TaskGroupContainerRunner</code> objects. The <code>run()</code> method of <code>TaskGroupContainerRunner</code> calls <code>taskGroupContainer.start()</code>, which creates a <code>TaskExecutor</code> for each channel and starts the task via <code>taskExecutor.doStart()</code>.</li>
 </ol>
-<h2 id="_2">插件机制<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
-<p><code>Addax</code> 为了应对不同数据源的差异、同时提供一致地同步原语和扩展能力，采用了 <code>框架</code> + <code>插件</code> 的模式：</p>
+<h2 id="plugin-mechanism">Plugin Mechanism<a class="headerlink" href="#plugin-mechanism" title="Permanent link">&para;</a></h2>
+<p>To handle the differences between various data sources while providing consistent synchronization primitives and extensibility, <code>Addax</code> uses a <code>Framework</code> + <code>Plugin</code> model:</p>
 <ul>
-<li>插件只需关心数据的读取或者写入本身。</li>
-<li>而同步的共性问题，比如：类型转换、性能、统计，则交由框架来处理。</li>
+<li>Plugins only need to care about reading from or writing to the data source itself.</li>
+<li>Common synchronization issues, such as type conversion, performance, and statistics, are handled by the framework.</li>
 </ul>
-<p>作为插件开发人员，则需要关注两个问题：</p>
+<p>As a plugin developer, you need to focus on two issues:</p>
 <ol>
-<li>数据源本身的读写数据正确性。</li>
-<li>如何与框架沟通、合理正确地使用框架。</li>
+<li>The correctness of reading and writing data from the specific data source.</li>
+<li>How to communicate with the framework and use it correctly.</li>
 </ol>
-<h2 id="_3">插件视角看框架<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<h3 id="_4">逻辑执行模型<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
-<p>插件开发者不用关心太多，基本只需要关注特定系统读和写，以及自己的代码在逻辑上是怎样被执行的，哪一个方法是在什么时候被调用的。在此之前，需要明确以下概念：</p>
+<h2 id="framework-from-a-plugins-perspective">Framework from a Plugin's Perspective<a class="headerlink" href="#framework-from-a-plugins-perspective" title="Permanent link">&para;</a></h2>
+<h3 id="logical-execution-model">Logical Execution Model<a class="headerlink" href="#logical-execution-model" title="Permanent link">&para;</a></h3>
+<p>Plugin developers don't need to worry about too much; they mainly need to focus on reading from and writing to specific systems, and how their code is logically executed—which method is called and when. Before that, you need to understand the following concepts:</p>
 <ul>
-<li><code>Job</code>: 用以描述从一个源头到一个目的端的同步作业，是数据同步的最小业务单元。比如：从一张 MySQL 的表同步到 PostgreSQL 的一个表。</li>
-<li><code>Task</code>: 为最性能大化而把 <code>Job</code> 拆分得到的最小执行单元。比如：读一张有 1024 个分表的 MySQL 分库分表的 <code>Job</code>，拆分成 1024 个读 <code>Task</code>，用若干个并发执行。</li>
-<li><code>TaskGroup</code>: 一组 <code>Task</code> 集合。在同一个 <code>TaskGroupContainer</code> 执行下的 <code>Task</code> 集合称之为 <code>TaskGroup</code></li>
-<li><code>JobContainer</code>: <code>Job</code> 执行器，负责 <code>Job</code> 全局拆分、调度、前置语句和后置语句等工作的工作单元。类似 <a href="https://hadoop.apache.org/docs/stable/hadoop-yarn/hadoop-yarn-site/YARN.html">Yarn</a> 中的 JobTracker</li>
-<li><code>TaskGroupContainer</code>: <code>TaskGroup</code> 执行器，负责执行一组 <code>Task</code> 的工作单元，类似 <a href="https://hadoop.apache.org/docs/stable/hadoop-yarn/hadoop-yarn-site/YARN.html">Yarn</a> 中的 TaskTracker。</li>
+<li><code>Job</code>: Describes a synchronization job from a source to a destination, representing the smallest business unit of data synchronization. For example, synchronizing a table from MySQL to a table in PostgreSQL.</li>
+<li><code>Task</code>: The smallest execution unit, obtained by splitting a <code>Job</code> to maximize performance. For example, a <code>Job</code> reading from a sharded MySQL database with 1024 sub-tables can be split into 1024 read <code>Tasks</code>, executed concurrently.</li>
+<li><code>TaskGroup</code>: A collection of <code>Tasks</code>. A set of <code>Tasks</code> executed within the same <code>TaskGroupContainer</code> is called a <code>TaskGroup</code>.</li>
+<li><code>JobContainer</code>: The <code>Job</code> executor, a work unit responsible for the global splitting, scheduling, pre- and post-statements of a <code>Job</code>. Similar to the JobTracker in <a href="https://hadoop.apache.org/docs/stable/hadoop-yarn/hadoop-yarn-site/YARN.html">Yarn</a>.</li>
+<li><code>TaskGroupContainer</code>: The <code>TaskGroup</code> executor, a work unit responsible for executing a group of <code>Tasks</code>. Similar to the TaskTracker in <a href="https://hadoop.apache.org/docs/stable/hadoop-yarn/hadoop-yarn-site/YARN.html">Yarn</a>.</li>
 </ul>
-<p>简而言之， <code>Job</code>拆分成<code>Task</code>，分别在框架提供的容器中执行，插件只需要实现 <code>Job</code> 和 <code>Task</code> 两部分逻辑。</p>
-<h2 id="_5">编程接口<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
-<p>那么，<code>Job</code> 和 <code>Task</code> 的逻辑应是怎么对应到具体的代码中的？</p>
-<p>首先，插件的入口类必须扩展 <code>Reader</code> 或 <code>Writer</code> 抽象类，并且实现分别实现 <code>Job</code> 和 <code>Task</code> 两个内部抽象类，<code>Job</code> 和 <code>Task</code> 的实现必须是 <strong>内部类</strong> 的形式，原因见 <strong>加载原理</strong> 一节。以 <code>Reader</code> 为例：</p>
+<p>In short, a <code>Job</code> is split into <code>Tasks</code>, which are executed in containers provided by the framework. The plugin only needs to implement the logic for <code>Job</code> and <code>Task</code>.</p>
+<h2 id="programming-interface">Programming Interface<a class="headerlink" href="#programming-interface" title="Permanent link">&para;</a></h2>
+<p>So, how should the logic of <code>Job</code> and <code>Task</code> be mapped to specific code?</p>
+<p>First, the entry class of a plugin must extend the <code>Reader</code> or <code>Writer</code> abstract class and implement their respective <code>Job</code> and <code>Task</code> inner abstract classes. The implementations of <code>Job</code> and <code>Task</code> must be in the form of <strong>inner classes</strong>.</p>
 <div class="highlight"><pre><span></span><code><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">SomeReader</span>
 <span class="w">        </span><span class="kd">extends</span><span class="w"> </span><span class="n">Reader</span>
 <span class="p">{</span>
@@ -2870,29 +2916,29 @@ start()</code> 方法，针对每个 channel 创建一个 TaskExecutor，通过 
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<p><code>Job</code> 接口功能如下：</p>
+<p>The <code>Job</code> interface functions are as follows:</p>
 <ul>
-<li><code>init</code>: Job 对象初始化工作，此时可以通过 <code>super.getPluginJobConf()</code> 获取与本插件相关的配置。读插件获得配置中 <code>reader</code> 部分，写插件获得 <code>writer</code> 部分。</li>
-<li><code>prepare</code>: 全局准备工作，比如 MySQL 清空目标表。</li>
-<li><code>split</code>: 拆分 <code>Task</code>。参数 <code>adviceNumber</code> 框架建议的拆分数，一般是运行时所配置的并发度。值返回的是 <code>Task</code> 的配置列表。</li>
-<li><code>post</code>: 全局的后置工作，比如 MySQL writer 同步完影子表后的 <code>rename</code> 操作。</li>
-<li><code>destroy</code>: Job 对象自身的销毁工作。</li>
+<li><code>init</code>: Initialization work for the Job object. At this point, you can get the plugin-related configuration via <code>super.getPluginJobConf()</code>. The read plugin gets the <code>reader</code> section of the configuration, and the write plugin gets the <code>writer</code> section.</li>
+<li><code>prepare</code>: Global preparation work, such as clearing the target table in MySQL.</li>
+<li><code>split</code>: Splits the job into <code>Tasks</code>. The <code>adviceNumber</code> parameter is the number of splits suggested by the framework, usually the concurrency level configured at runtime. The return value is a list of <code>Task</code> configurations.</li>
+<li><code>post</code>: Global post-processing work, such as the <code>rename</code> operation for a MySQL writer after synchronizing to a shadow table.</li>
+<li><code>destroy</code>: Destruction work for the Job object itself.</li>
 </ul>
-<p><code>Task</code> 接口功能如下：</p>
+<p>The <code>Task</code> interface functions are as follows:</p>
 <ul>
-<li><code>init</code>：Task 对象的初始化。此时可以通过 <code>super.getPluginJobConf()</code> 获取与本 <code>Task</code> 相关的配置。这里的配置是 <code>Job#split</code> 方法返回的配置列表中的其中一个。</li>
-<li><code>prepare</code>：局部的准备工作。</li>
-<li><code>startRead</code>: 从数据源读数据，写入到 <code>RecordSender</code> 中。<code>RecordSender</code> 会把数据写入连接 <code>Reader</code> 和 <code>Writer</code> 的缓存队列。</li>
-<li><code>startWrite</code>：从 <code>RecordReceiver</code> 中读取数据，写入目标数据源。<code>RecordReceiver</code> 中的数据来自 <code>Reader</code> 和 <code>Writer</code> 之间的缓存队列。</li>
-<li><code>post</code>: 局部的后置工作。</li>
-<li><code>destroy</code>: Task 对象自身的销毁工作。</li>
+<li><code>init</code>: Initialization of the Task object. At this point, you can get the <code>Task</code>-related configuration via <code>super.getPluginJobConf()</code>. This configuration is one of the configurations returned by the <code>Job#split</code> method.</li>
+<li><code>prepare</code>: Local preparation work.</li>
+<li><code>startRead</code>: Reads data from the data source and writes it to the <code>RecordSender</code>. The <code>RecordSender</code> writes the data to the buffer queue connecting the <code>Reader</code> and <code>Writer</code>.</li>
+<li><code>startWrite</code>: Reads data from the <code>RecordReceiver</code> and writes it to the target data source. The data in the <code>RecordReceiver</code> comes from the buffer queue between the <code>Reader</code> and <code>Writer</code>.</li>
+<li><code>post</code>: Local post-processing work.</li>
+<li><code>destroy</code>: Destruction work for the Task object itself.</li>
 </ul>
-<p>需要注意的是：</p>
+<p>Please note:</p>
 <ul>
-<li><code>Job</code> 和 <code>Task</code> 之间一定不能有共享变量，因为分布式运行时不能保证共享变量会被正确初始化。两者之间只能通过配置文件进行依赖。</li>
-<li><code>prepare</code> 和 <code>post</code> 在 <code>Job</code> 和 <code>Task</code> 中都存在，插件需要根据实际情况确定在什么地方执行操作。</li>
+<li>There must be no shared variables between <code>Job</code> and <code>Task</code>, because in a distributed runtime, there is no guarantee that shared variables will be initialized correctly. They can only depend on each other through configuration files.</li>
+<li><code>prepare</code> and <code>post</code> exist in both <code>Job</code> and <code>Task</code>. The plugin needs to determine where to perform operations based on the actual situation.</li>
 </ul>
-<p>框架按照如下的顺序执行 <code>Job</code> 和 <code>Task</code> 的接口：</p>
+<p>The framework executes the <code>Job</code> and <code>Task</code> interfaces in the following order:</p>
 <pre class="mermaid"><code>stateDiagram-v2
 direction TB
 Init:::job --&gt; Prepare:::job
@@ -2907,8 +2953,8 @@ Schedule --&gt; Post:::job
 classDef job fill:yellow
 classDef fw fill:#c6fac4
 classDef ctask fill:blue</code></pre>
-<p>上图中，黄色表示 <code>Job</code> 部分的执行阶段，灰色表示 <code>Task</code> 部分的执行阶段，绿色表示框架执行阶段。</p>
-<p>相关类关系如下：</p>
+<p>In the diagram above, yellow represents the execution phase of the <code>Job</code> part, gray represents the execution phase of the <code>Task</code> part, and green represents the framework's execution phase.</p>
+<p>The related class relationships are as follows:</p>
 <pre class="mermaid"><code>%%{init: {"theme": "neutral"}}%%
 classDiagram
     class Pluginable {
@@ -2957,8 +3003,8 @@ classDiagram
 
     Pluginable &lt;|-- AbstractPlugin
 </code></pre>
-<h3 id="_6">插件定义<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h3>
-<p>在每个插件的项目中，都有一个<code>plugin.json</code>文件，这个文件定义了插件的相关信息，包括入口类。例如：</p>
+<h3 id="plugin-definition">Plugin Definition<a class="headerlink" href="#plugin-definition" title="Permanent link">&para;</a></h3>
+<p>In each plugin's project, there is a <code>plugin.json</code> file that defines the plugin's information, including its entry class. For example:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;mysqlwriter&quot;</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;class&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;com.wgzhao.addax.plugin.writer.mysqlwriter.MysqlWriter&quot;</span><span class="p">,</span>
@@ -2967,17 +3013,17 @@ classDiagram
 <span class="p">}</span>
 </code></pre></div>
 <ul>
-<li><code>name</code>: 插件名称，大小写敏感。框架根据用户在配置文件中指定的名称来搜寻插件。 <strong>十分重要</strong> 。</li>
-<li><code>class</code>: 入口类的全限定名称，框架通过反射创建入口类的实例。<strong>十分重要</strong> 。</li>
-<li><code>description</code>: 描述信息。</li>
-<li><code>developer</code>: 开发人员。</li>
+<li><code>name</code>: The plugin name, case-sensitive. The framework searches for the plugin based on the name specified by the user in the configuration file. <strong>Very important</strong>.</li>
+<li><code>class</code>: The fully qualified name of the entry class. The framework creates an instance of the entry class via reflection. <strong>Very important</strong>.</li>
+<li><code>description</code>: Descriptive information.</li>
+<li><code>developer</code>: The developer.</li>
 </ul>
-<h3 id="_7">打包发布<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
-<p><code>Addax</code> 使用 <code>assembly</code> 打包，打包命令如下：</p>
+<h3 id="packaging-and-publishing">Packaging and Publishing<a class="headerlink" href="#packaging-and-publishing" title="Permanent link">&para;</a></h3>
+<p><code>Addax</code> uses <code>assembly</code> for packaging. The packaging commands are as follows:</p>
 <div class="highlight"><pre><span></span><code>mvn<span class="w"> </span>clean<span class="w"> </span>package
 mvn<span class="w"> </span>package<span class="w"> </span>assembly:single
 </code></pre></div>
-<p><code>Addax</code> 插件需要遵循统一的目录结构：</p>
+<p><code>Addax</code> plugins need to follow a uniform directory structure:</p>
 <div class="highlight"><pre><span></span><code><span class="na">${ADDAX_HOME}</span>
 <span class="na">├── bin</span>
 <span class="na">│     ├── addax.sh</span>
@@ -3009,25 +3055,25 @@ mvn<span class="w"> </span>package<span class="w"> </span>assembly:single
 <span class="na">├── shared</span>
 </code></pre></div>
 <ul>
-<li><code>${ADDAX_HOME}/bin</code>: 可执行程序目录</li>
-<li><code>${ADDAX_HOME}/conf</code>: 框架配置目录</li>
-<li><code>${ADDAX_HOME}/lib</code>: 框架依赖库目录</li>
-<li><code>${ADDAX_HOME}/shared</code>: 插件依赖目录</li>
-<li><code>${ADDAX_HOME}/plugin</code>: 插件目录</li>
+<li><code>${ADDAX_HOME}/bin</code>: Executable program directory</li>
+<li><code>${ADDAX_HOME}/conf</code>: Framework configuration directory</li>
+<li><code>${ADDAX_HOME}/lib</code>: Framework dependency library directory</li>
+<li><code>${ADDAX_HOME}/shared</code>: Plugin dependency directory</li>
+<li><code>${ADDAX_HOME}/plugin</code>: Plugin directory</li>
 </ul>
-<p>插件目录分为 <code>reader</code> 和 <code>writer</code> 子目录，读写插件分别存放。插件目录规范如下：</p>
+<p>The plugin directory is divided into <code>reader</code> and <code>writer</code> subdirectories, where read and write plugins are stored respectively. The plugin directory structure is as follows:</p>
 <ul>
-<li><code>${PLUGIN_HOME}/libs</code>: 插件的依赖库，为了减少程序包大小，这些依赖包都是指向 <code>shared</code> 目录的符号链接</li>
-<li><code>${PLUGIN_HOME}/plugin-name-version.jar</code>: 插件本身的 jar。</li>
-<li><code>${PLUGIN_HOME}/plugin.json</code>: 插件描述文件。</li>
+<li><code>${PLUGIN_HOME}/libs</code>: The plugin's dependency libraries. To reduce package size, these dependencies are symbolic links to the <code>shared</code> directory.</li>
+<li><code>${PLUGIN_HOME}/plugin-name-version.jar</code>: The plugin's own jar file.</li>
+<li><code>${PLUGIN_HOME}/plugin.json</code>: The plugin description file.</li>
 </ul>
-<p>尽管框架加载插件时，会把 <code>${PLUGIN_HOME}</code> 下所有的 jar 包添加到 <code>classpath</code> 环境变量中，但还是推荐依赖库的 jar 和插件本身的 jar 分开存放。</p>
-<div class="admonition 特别提醒">
-<p class="admonition-title">特别提醒</p>
-<p>插件的目录名字必须和 <code>plugin.json</code> 中定义的插件名称一致。</p>
+<p>Although the framework adds all jar files under <code>${PLUGIN_HOME}</code> to the <code>classpath</code> when loading the plugin, it is recommended to keep dependency library jars and the plugin's own jar separate.</p>
+<div class="admonition special reminder">
+<p class="admonition-title">Special</p>
+<p>The plugin's directory name must be consistent with the plugin name defined in <code>plugin.json</code>.</p>
 </div>
-<h2 id="_8">配置文件<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
-<p><code>Addax</code> 使用 <code>json</code> 作为配置文件的格式。一个典型的 <code>Addax</code> 任务配置如下：</p>
+<h2 id="configuration-file">Configuration File<a class="headerlink" href="#configuration-file" title="Permanent link">&para;</a></h2>
+<p><code>Addax</code> uses <code>json</code> as the format for configuration files. A typical <code>Addax</code> task configuration is as follows:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;job&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;setting&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
@@ -3056,6 +3102,9 @@ mvn<span class="w"> </span>package<span class="w"> </span>assembly:single
 <span class="w">      </span><span class="nt">&quot;writer&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;postgresqlwriter&quot;</span><span class="p">,</span>
 <span class="w">        </span><span class="nt">&quot;parameter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;pgtest&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;password&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;pgtest&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;writeMode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;insert&quot;</span><span class="p">,</span>
 <span class="w">          </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">            </span><span class="s2">&quot;*&quot;</span>
 <span class="w">          </span><span class="p">],</span>
@@ -3067,31 +3116,29 @@ mvn<span class="w"> </span>package<span class="w"> </span>assembly:single
 <span class="w">            </span><span class="nt">&quot;table&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">              </span><span class="s2">&quot;addax_tbl1&quot;</span>
 <span class="w">            </span><span class="p">]</span>
-<span class="w">          </span><span class="p">},</span>
-<span class="w">          </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;pgtest&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;password&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;pgtest&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;writeMode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;insert&quot;</span>
+<span class="w">          </span><span class="p">}</span>
 <span class="w">        </span><span class="p">}</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<p><code>Addax</code> 框架有 <code>core.json</code> 配置文件，指定了框架的默认行为。任务的配置里头可以指定框架中已经存在的配置项，而且具有更高的优先级，会覆盖 <code>core.json</code> 中的默认值。</p>
-<p>配置中<code>job.content.reader.parameter</code> 的 <code>value</code> 部分会传给 <code>Reader.Job</code>；<code>job.content.writer.parameter</code> 的 <code>value</code> 部分会传给<code>Writer.Job</code> ，
-<code>Reader.Job</code> 和 <code>Writer.Job</code> 可以通过 <code>super.getPluginJobConf()</code> 来获取。</p>
-<h3 id="_9">如何设计配置参数<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h3>
+<p>The <code>Addax</code> framework has a <code>core.json</code> configuration file that specifies the framework's default behavior. A task's configuration can specify configuration items that already exist in the framework, and these will have a higher priority, overriding the settings in <code>core.json</code>.</p>
+<p>The <code>value</code> part of <code>job.content.reader.parameter</code> in the configuration is passed to <code>Reader.Job</code>; the <code>value</code> part of <code>job.content.writer.parameter</code> is passed to <code>Writer.Job</code>. <code>Reader.Job</code> and <code>Writer.Job</code> can retrieve them using <code>super.getPluginJobConf()</code>.</p>
+<h3 id="how-to-design-configuration-parameters">How to Design Configuration Parameters<a class="headerlink" href="#how-to-design-configuration-parameters" title="Permanent link">&para;</a></h3>
 <blockquote>
-<p>配置文件的设计是插件开发的第一步！</p>
+<p>Designing the configuration file is the first step in plugin development!</p>
 </blockquote>
-<p>任务配置中 <code>reader</code> 和 <code>writer</code> 下 <code>parameter</code> 部分是插件的配置参数，插件的配置参数应当遵循以下原则：</p>
+<p>The <code>parameter</code> section under <code>reader</code> and <code>writer</code> in the task configuration contains the plugin's configuration parameters. These parameters should follow these principles:</p>
 <ul>
-<li>驼峰命名：所有配置项采用小驼峰命名法，首字母小写。</li>
-<li>正交原则：配置项必须正交，功能没有重复，没有潜规则。</li>
-<li>富类型：合理使用 json 的类型，减少无谓的处理逻辑，减少出错的可能。</li>
-<li>使用正确的数据类型。比如，<code>bool</code> 类型的值使用 <code>true</code>/<code>false</code>，而非 <code>"yes"</code>/<code>"true"</code>/<code>0</code> 等。</li>
-<li>合理使用集合类型，比如，用数组替代有分隔符的字符串。</li>
-<li>类似通用：遵守同一类型的插件的习惯，比如关系型数据库的 <code>connection</code> 参数都是如下结构：</li>
+<li>Camel Case: All configuration items should use lower camel case, with the first letter being lowercase.</li>
+<li>Orthogonality Principle: Configuration items must be orthogonal, with no overlapping functionality or hidden rules.</li>
+<li>Rich Types: Use JSON types appropriately to reduce unnecessary processing logic and the possibility of errors.<ul>
+<li>Use the correct data types. For example, for a <code>bool</code> type, use <code>true</code>/<code>false</code> instead of <code>"yes"</code>/<code>"true"</code>/<code>0</code>.</li>
+<li>Use collection types reasonably, for example, use an array instead of a delimited string.</li>
+</ul>
+</li>
+<li>Consistency with Similar Plugins: Follow the conventions of similar plugin types. For example, the <code>connection</code> parameter for relational databases usually has the following structure:</li>
 </ul>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;connection&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
@@ -3112,14 +3159,14 @@ mvn<span class="w"> </span>package<span class="w"> </span>assembly:single
 <span class="w">  </span><span class="p">]</span>
 <span class="p">}</span>
 </code></pre></div>
-<h3 id="configuration">如何使用 <code>Configuration</code> 类<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h3>
-<p>为了简化对 <code>json</code> 的操作，<code>Addax</code> 提供了简单的 DSL 配合 <code>Configuration</code> 类使用。</p>
-<p><code>Configuration</code> 提供了常见的 <code>get</code>, <code>带类型get</code>，<code>带默认值get</code>，<code>set</code> 等读写配置项的操作，以及 <code>clone</code>, <code>toJSON</code> 等方法。配置项读写操作都需要传入一个 <code>path</code> 做为参数， 这个 <code>path</code> 就是 <code>Addax</code> 定义的 DSL。语法有两条：</p>
+<h3 id="how-to-use-the-configuration-class">How to Use the <code>Configuration</code> Class<a class="headerlink" href="#how-to-use-the-configuration-class" title="Permanent link">&para;</a></h3>
+<p>To simplify operations on <code>json</code>, <code>Addax</code> provides a simple DSL to be used with the <code>Configuration</code> class.</p>
+<p><code>Configuration</code> provides common operations for reading and writing configuration items, such as <code>get</code>, <code>get with type</code>, <code>get with default value</code>, and <code>set</code>, as well as methods like <code>clone</code> and <code>toJSON</code>. Read and write operations require a <code>path</code> parameter.</p>
 <ol>
-<li>子 map 用 <code>.key</code> 表示，<code>path</code> 的第一个点省略。</li>
-<li>数组元素用 <code>[index]</code> 表示。</li>
+<li>A child map is represented by <code>.key</code>. The first dot in the <code>path</code> is omitted.</li>
+<li>An array element is represented by <code>[index]</code>.</li>
 </ol>
-<p>比如操作如下 json：</p>
+<p>For example, to operate on the following json:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;a&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;b&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
@@ -3138,57 +3185,57 @@ mvn<span class="w"> </span>package<span class="w"> </span>assembly:single
 <span class="w">  </span><span class="nt">&quot;x&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>比如调用 <code>configuration.get(path)</code> 方法，当 path 为如下值的时候得到的结果为：</p>
+<p>When calling the <code>configuration.get(path)</code> method, the results for the following path values are:</p>
 <ul>
-<li><code>x</code>：<code>4</code></li>
-<li><code>a.b.c</code>：<code>2</code></li>
-<li><code>a.b.c.d</code>：<code>null</code></li>
-<li><code>a.b.f[0]</code>：<code>1</code></li>
-<li><code>a.b.f[2].g</code>：<code>true</code></li>
+<li><code>x</code>: <code>4</code></li>
+<li><code>a.b.c</code>: <code>2</code></li>
+<li><code>a.b.c.d</code>: <code>null</code></li>
+<li><code>a.f[0]</code>: <code>1</code></li>
+<li><code>a.f[2].g</code>: <code>true</code></li>
 </ul>
-<p>注意，因为插件看到的配置只是整个配置的一部分。使用 <code>Configuration</code> 对象时，需要注意当前的根路径是什么。</p>
-<p>更多 <code>Configuration</code> 的操作请参考 <a href="https://github.com/wgzhao/Addax/blob/master/common/src/main/java/com/wgzhao/addax/common/util/Configuration.java">Configuration.java</a> 。</p>
-<h2 id="_10">插件数据传输<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h2>
-<p>跟一般的 <code>生产者-消费者</code> 模式一样，<code>Reader</code> 插件和 <code>Writer</code> 插件之间也是通过 <code>channel</code> 来实现数据的传输的。<code>channel</code> 可以是内存的，也可能是持久化的，插件不必关心。 插件通过 <code>RecordSender</code> 往 <code>channel</code> 写入数据，通过 <code>RecordReceiver</code> 从 <code>channel</code> 读取数据。</p>
-<p><code>channel</code> 中的一条数据为一个 <code>Record</code> 的对象，<code>Record</code> 中可以放多个 <code>Column</code> 对象，这可以简单理解为数据库中的记录和列。</p>
-<p><code>Record</code> 有如下方法：</p>
+<p>Note that because the configuration seen by the plugin is only a part of the whole configuration, you need to be aware of the current root path when using a <code>Configuration</code> object.</p>
+<p>For more operations on <code>Configuration</code>, please refer to <a href="https://github.com/wgzhao/Addax/blob/master/common/src/main/java/com/wgzhao/addax/common/util/Configuration.java">Configuration.java</a>.</p>
+<h2 id="plugin-data-transfer">Plugin Data Transfer<a class="headerlink" href="#plugin-data-transfer" title="Permanent link">&para;</a></h2>
+<p>Like the general <code>producer-consumer</code> model, <code>Reader</code> and <code>Writer</code> plugins also transfer data through a <code>channel</code>. The <code>channel</code> can be in-memory or persistent.</p>
+<p>A piece of data in the <code>channel</code> is a <code>Record</code> object. A <code>Record</code> can contain multiple <code>Column</code> objects, which can be simply understood as records and columns in a database.</p>
+<p><code>Record</code> has the following methods:</p>
 <div class="highlight"><pre><span></span><code><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">Record</span>
 <span class="p">{</span>
-<span class="w">    </span><span class="c1">// 加入一个列，放在最后的位置</span>
+<span class="w">    </span><span class="c1">// Add a column to the end</span>
 <span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">addColumn</span><span class="p">(</span><span class="n">Column</span><span class="w"> </span><span class="n">column</span><span class="p">);</span>
 
-<span class="w">    </span><span class="c1">// 在指定下标处放置一个列</span>
+<span class="w">    </span><span class="c1">// Set a column at a specific index</span>
 <span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">setColumn</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">Column</span><span class="w"> </span><span class="n">column</span><span class="p">);</span>
 
-<span class="w">    </span><span class="c1">// 获取一个列</span>
+<span class="w">    </span><span class="c1">// Get a column</span>
 <span class="w">    </span><span class="n">Column</span><span class="w"> </span><span class="nf">getColumn</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">);</span>
 
-<span class="w">    </span><span class="c1">// 转换为json String</span>
+<span class="w">    </span><span class="c1">// Convert to a JSON String</span>
 <span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="nf">toString</span><span class="p">();</span>
 
-<span class="w">    </span><span class="c1">// 获取总列数</span>
+<span class="w">    </span><span class="c1">// Get the total number of columns</span>
 <span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="nf">getColumnNumber</span><span class="p">();</span>
 
-<span class="w">    </span><span class="c1">// 计算整条记录在内存中占用的字节数</span>
+<span class="w">    </span><span class="c1">// Calculate the byte size of the entire record in memory</span>
 <span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="nf">getByteSize</span><span class="p">();</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>因为 <code>Record</code> 是一个接口，<code>Reader</code> 插件首先调用 <code>RecordSender.createRecord()</code> 创建一个 <code>Record</code> 实例，然后把 <code>Column</code> 一个个添加到 <code>Record</code> 中。</p>
-<p><code>Writer</code> 插件调用 <code>RecordReceiver.getFromReader()</code> 方法获取 <code>Record</code>，然后把 <code>Column</code> 遍历出来，写入目标存储中。当 <code>Reader</code> 尚未退出，传输还在进行时，如果暂时没有数据 <code>RecordReceiver.getFromReader()</code> 方法会阻塞直到有数据。
-如果传输已经结束，会返回<code>null</code>，<code>Writer</code> 插件可以据此判断是否结束 <code>startWrite</code> 方法。</p>
-<h2 id="_11">类型转换<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h2>
-<p>为了规范源端和目的端类型转换操作，保证数据不失真，Addax 支持六种内部数据类型：</p>
+<p>Since <code>Record</code> is an interface, the <code>Reader</code> plugin first calls <code>RecordSender.createRecord()</code> to create a <code>Record</code> instance, and then adds <code>Column</code>s one by one to the <code>Record</code>.</p>
+<p>The <code>Writer</code> plugin calls the <code>RecordReceiver.getFromReader()</code> method to get a <code>Record</code>, then iterates through the <code>Column</code>s and writes them to the target storage. When the <code>Reader</code> has not yet exited and the transfer is still in progress, if <code>getFromReader()</code> returns <code>null</code>, it means there is currently no data in the channel.
+If the transfer has already ended, it will return <code>null</code>, and the <code>Writer</code> plugin can use this to determine whether to end the <code>startWrite</code> method.</p>
+<h2 id="type-conversion">Type Conversion<a class="headerlink" href="#type-conversion" title="Permanent link">&para;</a></h2>
+<p>To standardize type conversion operations between the source and destination and ensure data integrity, Addax supports six internal data types:</p>
 <ul>
-<li><code>Long</code>：定点数(Int、Short、Long、BigInteger 等)。</li>
-<li><code>Double</code>：浮点数(Float、Double、BigDecimal(无限精度)等)。</li>
-<li><code>String</code>：字符串类型，底层不限长，使用通用字符集(Unicode)。</li>
-<li><code>Date</code>：日期类型。</li>
-<li><code>Timestamp</code>: 时间戳</li>
-<li><code>Bool</code>：布尔值。</li>
-<li><code>Bytes</code>：二进制，可以存放诸如 MP3 等非结构化数据。</li>
+<li><code>Long</code>: Fixed-point numbers (Int, Short, Long, BigInteger, etc.).</li>
+<li><code>Double</code>: Floating-point numbers (Float, Double, BigDecimal (infinite precision), etc.).</li>
+<li><code>String</code>: String type, with no length limit, using a universal character set (Unicode).</li>
+<li><code>Date</code>: Date type.</li>
+<li><code>Timestamp</code>: Timestamp type.</li>
+<li><code>Bool</code>: Boolean value.</li>
+<li><code>Bytes</code>: Binary data, which can store unstructured data such as MP3s.</li>
 </ul>
-<p>对应地，有 <code>DateColumn</code>、<code>LongColumn</code>、<code>DoubleColumn</code>、<code>BytesColumn</code>、<code>StringColumn</code> 、<code>BoolColumn</code> 和 <code>TimestampColumn</code> 七种 <code>Column</code> 的实现。</p>
-<p><code>Column</code> 除了提供数据相关的方法外，还提供一系列以 <code>as</code> 开头的数据类型转换转换方法。</p>
+<p>Correspondingly, there are seven <code>Column</code> implementations: <code>DateColumn</code>, <code>LongColumn</code>, <code>DoubleColumn</code>, <code>BytesColumn</code>, <code>StringColumn</code>, <code>BoolColumn</code>, and <code>TimestampColumn</code>.</p>
+<p>In addition to providing data-related methods, <code>Column</code> also provides a series of type conversion methods starting with <code>as</code>.</p>
 <pre class="mermaid"><code>%%{init: {"theme": "neutral"}}%%
 classDiagram
 direction TB
@@ -3213,13 +3260,13 @@ Column &lt;|-- Longcolumn
 Column &lt;|-- Datecolumn
 Column &lt;|-- Boolcolumn
 Column &lt;|-- Bytescolumn</code></pre>
-<p>Addax 的内部类型在实现上会选用不同的 java 类型：</p>
+<p>Addax's internal types use different Java types in their implementation:</p>
 <table>
 <thead>
 <tr>
-<th>内部类型</th>
-<th>实现类型</th>
-<th>备注</th>
+<th>Internal Type</th>
+<th>Implementation Type</th>
+<th>Notes</th>
 </tr>
 </thead>
 <tbody>
@@ -3231,17 +3278,17 @@ Column &lt;|-- Bytescolumn</code></pre>
 <tr>
 <td>Timestamp</td>
 <td>java.sql.Timestamp</td>
-<td>可以精确到纳秒</td>
+<td>Can be precise to the nanosecond</td>
 </tr>
 <tr>
 <td>Long</td>
 <td>java.math.BigInteger</td>
-<td>使用无限精度的大整数，保证不失真</td>
+<td>Uses infinite-precision integers to ensure no loss of precision</td>
 </tr>
 <tr>
 <td>Double</td>
 <td>java.lang.String</td>
-<td>用 String 表示，保证不失真</td>
+<td>Represented as a String to ensure no loss of precision</td>
 </tr>
 <tr>
 <td>Bytes</td>
@@ -3260,7 +3307,7 @@ Column &lt;|-- Bytescolumn</code></pre>
 </tr>
 </tbody>
 </table>
-<p>类型之间相互转换的关系如下：</p>
+<p>The relationships for converting between types are as follows:</p>
 <table>
 <thead>
 <tr>
@@ -3277,86 +3324,85 @@ Column &lt;|-- Bytescolumn</code></pre>
 <tr>
 <td>Date</td>
 <td>-</td>
-<td>使用毫秒时间戳</td>
-<td>不支持</td>
-<td>不支持</td>
-<td>按配置格式转换</td>
-<td>不支持</td>
+<td>Use millisecond timestamp</td>
+<td>Not supported</td>
+<td>Not supported</td>
+<td>Convert according to configured format</td>
+<td>Not supported</td>
 </tr>
 <tr>
 <td>Long</td>
-<td>作为毫秒时间戳构造 Date</td>
+<td>Construct Date from ms</td>
 <td>-</td>
 <td><code>BigDecimal.doubleValue()</code></td>
-<td>不支持</td>
+<td>Not supported</td>
 <td><code>BigInteger.toString()</code></td>
-<td>0 为 <code>false</code>，其他为 <code>true</code></td>
+<td>0 is <code>false</code>, others are <code>true</code></td>
 </tr>
 <tr>
 <td>Double</td>
-<td>不支持</td>
+<td>Not supported</td>
 <td><code>BigDecimal.longValue()</code></td>
 <td>-</td>
-<td>不支持</td>
-<td>直接返回内部 String</td>
-<td>不支持</td>
+<td>Not supported</td>
+<td>Return internal String directly</td>
+<td>Not supported</td>
 </tr>
 <tr>
 <td>Bytes</td>
-<td>不支持</td>
-<td>不支持</td>
-<td>不支持</td>
+<td>Not supported</td>
+<td>Not supported</td>
+<td>Not supported</td>
 <td>-</td>
-<td>按utf-8编码转换为 <code>byte[]</code></td>
-<td>不支持</td>
+<td>Convert to <code>byte[]</code> with UTF-8 encoding</td>
+<td>Not supported</td>
 </tr>
 <tr>
 <td>String</td>
-<td>按配置的 格式解析</td>
+<td>Parse with configured format</td>
 <td><code>BigDecimal.longValue</code></td>
 <td><code>BigDecimal.doubleValue</code><sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup></td>
-<td>按 utf-8 编码<sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup>转换为 <code>byte[]</code></td>
+<td>Convert to <code>byte[]</code> with UTF-8 encoding<sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup></td>
 <td>-</td>
-<td>"true"为<code>true</code>, "false"为<code>false</code>，不区分大小写。其他不支持</td>
+<td>"true" is <code>true</code>, "false" is <code>false</code></td>
 </tr>
 <tr>
 <td>Bool</td>
-<td>不支持</td>
-<td><code>true</code>为<code>1L</code>，否则<code>0L</code></td>
-<td>不支持</td>
-<td><code>true</code>为<code>1.0</code>，否则<code>0.0</code></td>
-<td>不支持</td>
+<td>Not supported</td>
+<td><code>true</code> is <code>1L</code>, else <code>0L</code></td>
+<td><code>true</code> is <code>1.0</code>, else <code>0.0</code></td>
+<td>Not supported</td>
+<td><code>Boolean.toString()</code></td>
 <td>-</td>
 </tr>
 </tbody>
 </table>
-<h2 id="_12">脏数据处理<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h2>
-<h3 id="_13">什么是脏数据<a class="headerlink" href="#_13" title="Permanent link">&para;</a></h3>
-<p>目前主要有三类脏数据：</p>
+<h2 id="dirty-data-handling">Dirty Data Handling<a class="headerlink" href="#dirty-data-handling" title="Permanent link">&para;</a></h2>
+<h3 id="what-is-dirty-data">What is Dirty Data<a class="headerlink" href="#what-is-dirty-data" title="Permanent link">&para;</a></h3>
+<p>Currently, there are three main types of dirty data:</p>
 <ol>
-<li>Reader 读到不支持的类型、不合法的值。</li>
-<li>不支持的类型转换，比如：<code>Bytes</code> 转换为 <code>Date</code>。</li>
-<li>写入目标端失败，比如：写 MySQL 整型长度超长。</li>
+<li>The Reader reads an unsupported type or an illegal value.</li>
+<li>Unsupported type conversion, for example, converting <code>Bytes</code> to <code>Date</code>.</li>
+<li>Writing to the target fails, for example, an integer value exceeds the length limit when writing to MySQL.</li>
 </ol>
-<h3 id="_14">如何处理脏数据<a class="headerlink" href="#_14" title="Permanent link">&para;</a></h3>
-<p>在 <code>Reader.Task</code> 和 <code>Writer.Task</code> 中，通过 <code>AbstractTaskPlugin.getPluginCollector()</code> 可以拿到一个 <code>TaskPluginCollector</code>，它提供了一系列 <code>collectDirtyRecord</code> 的方法。 当脏数据出现时，只需要调用合适的 <code>collectDirtyRecord</code>
-方法，把被认为是脏数据的 <code>Record</code> 传入即可。</p>
-<p>用户可以在任务的配置中指定脏数据限制条数或者百分比限制，当脏数据超出限制时，框架会结束同步任务，退出。插件需要保证脏数据都被收集到，其他工作交给框架就好。</p>
-<h2 id="_15">加载原理<a class="headerlink" href="#_15" title="Permanent link">&para;</a></h2>
+<h3 id="how-to-handle-dirty-data">How to Handle Dirty Data<a class="headerlink" href="#how-to-handle-dirty-data" title="Permanent link">&para;</a></h3>
+<p>In <code>Reader.Task</code> and <code>Writer.Task</code>, you can get a <code>TaskPluginCollector</code> through <code>AbstractTaskPlugin.getPluginCollector()</code>. It provides a series of <code>collectDirtyRecord</code> methods. When dirty data is encountered, you can call this method and pass in the <code>Record</code> that is considered dirty.</p>
+<p>Users can specify a limit on the number of dirty data records or a percentage limit in the task configuration. When the dirty data exceeds the limit, the framework will terminate the synchronization task. Plugins need to ensure that all dirty data is collected.</p>
+<h2 id="loading-principle">Loading Principle<a class="headerlink" href="#loading-principle" title="Permanent link">&para;</a></h2>
 <ol>
-<li>框架扫描 <code>plugin/reader</code> 和 <code>plugin/writer</code>目录，加载每个插件的 <code>plugin.json</code> 文件。</li>
-<li>以 <code>plugin.json</code> 文件中 <code>name</code> 为 key，索引所有的插件配置。如果发现重名的插件，框架会异常退出。</li>
-<li>用户在插件中在 <code>reader</code>/<code>writer</code> 配置的 <code>name</code> 字段指定插件名字。框架根据插件的类型（<code>reader</code>/<code>writer</code>）和插件名称去插件的路径下扫描所有的 jar，加入 <code>classpath</code>。</li>
-<li>根据插件配置中定义的入口类，框架通过反射实例化对应的 <code>Job</code> 和 <code>Task</code> 对象。</li>
+<li>The framework scans the <code>plugin/reader</code> and <code>plugin/writer</code> directories and loads each plugin's <code>plugin.json</code> file.</li>
+<li>It indexes all plugin configurations using the <code>name</code> from the <code>plugin.json</code> file as the key. If duplicate plugin names are found, the framework will exit with an error.</li>
+<li>The user specifies the plugin name in the <code>name</code> field of the <code>reader</code>/<code>writer</code> configuration. The framework then scans all jars in the plugin's path based on the plugin type (<code>reader</code>/<code>writer</code>) and name, and adds them to a custom <code>classloader</code>.</li>
+<li>Based on the entry class defined in the plugin configuration, the framework instantiates the corresponding <code>Job</code> and <code>Task</code> objects via reflection.</li>
 </ol>
 <div class="footnote">
 <hr />
 <ol>
 <li id="fn:1">
-<p>处理 <code>NaN</code>, <code>Infinity</code>, <code>-Infinity</code> 等数值&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+<p>Handles values like <code>NaN</code>, <code>Infinity</code>, <code>-Infinity</code>.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
 <li id="fn:2">
-<p>除非另有指定编码格式&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+<p>Unless another encoding format is specified.&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div>
@@ -3385,7 +3431,7 @@ Column &lt;|-- Bytescolumn</code></pre>
           <button type="button" class="md-top md-icon" data-md-component="top" hidden>
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
-  回到页面顶部
+  Back to top
 </button>
         
       </main>
@@ -3394,20 +3440,20 @@ Column &lt;|-- Bytescolumn</code></pre>
   
     
       
-      <nav class="md-footer__inner md-grid" aria-label="页脚" >
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../transformer/" class="md-footer__link md-footer__link--prev" aria-label="上一页: 数据转换">
+          <a href="../transformer/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Transformer">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
             </div>
             <div class="md-footer__title">
               <span class="md-footer__direction">
-                上一页
+                Previous
               </span>
               <div class="md-ellipsis">
-                数据转换
+                Transformer
               </div>
             </div>
           </a>
@@ -3468,7 +3514,7 @@ Column &lt;|-- Bytescolumn</code></pre>
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "..", "features": ["announce.dismiss", "content.action.edit", "content.action.view", "content.code.annotate", "content.code.copy", "content.tooltips", "navigation.footer", "navigation.indexes", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "toc.follow"], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": {"provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["announce.dismiss", "content.action.edit", "content.action.view", "content.code.annotate", "content.code.copy", "content.tooltips", "navigation.footer", "navigation.indexes", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "toc.follow"], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
       <script src="../assets/javascripts/bundle.081f42fc.min.js"></script>

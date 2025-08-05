@@ -1,6 +1,6 @@
 
 <!doctype html>
-<html lang="zh" class="no-js">
+<html lang="en" class="no-js">
   <head>
     
       <meta charset="utf-8">
@@ -26,7 +26,7 @@
     
     
       
-        <title>命令行工具 - Addax Documentation</title>
+        <title>Command Line - Addax Documentation</title>
       
     
     
@@ -88,8 +88,8 @@
     <div data-md-component="skip">
       
         
-        <a href="#_1" class="md-skip">
-          跳转至
+        <a href="#command-line-usage" class="md-skip">
+          Skip to content
         </a>
       
     </div>
@@ -107,7 +107,7 @@
   
 
 <header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
-  <nav class="md-header__inner md-grid" aria-label="页眉">
+  <nav class="md-header__inner md-grid" aria-label="Header">
     <a href=".." title="Addax Documentation" class="md-header__button md-logo" aria-label="Addax Documentation" data-md-component="logo">
       
   <img src="../images/logo.png" alt="logo">
@@ -127,7 +127,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              命令行工具
+              Command Line
             
           </span>
         </div>
@@ -164,6 +164,32 @@
       <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
     
     
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Select language">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04M18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12m-2.62 7 1.62-4.33L19.12 17h-3.24Z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="/en" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="/" hreflang="zh" class="md-select__link">
+              中文
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
     
       <label class="md-header__button md-icon" for="__search">
         
@@ -173,21 +199,21 @@
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
     <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
       <label class="md-search__icon md-icon" for="__search">
         
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
         
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
       </label>
-      <nav class="md-search__options" aria-label="查找">
+      <nav class="md-search__options" aria-label="Search">
         
-          <a href="javascript:void(0)" class="md-search__icon md-icon" title="分享" aria-label="分享" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
             
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08Z"/></svg>
           </a>
         
-        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
           
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
         </button>
@@ -200,7 +226,7 @@
       <div class="md-search__scrollwrap" data-md-scrollfix>
         <div class="md-search-result" data-md-component="search-result">
           <div class="md-search-result__meta">
-            正在初始化搜索引擎
+            Initializing search
           </div>
           <ol class="md-search-result__list" role="presentation"></ol>
         </div>
@@ -211,7 +237,7 @@
     
     
       <div class="md-header__source">
-        <a href="https://github.com/wgzhao/Addax" title="前往仓库" class="md-source" data-md-component="source">
+        <a href="https://github.com/wgzhao/Addax" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
@@ -226,7 +252,7 @@
   
     
       
-<nav class="md-tabs" aria-label="标签" data-md-component="tabs">
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
   <div class="md-grid">
     <ul class="md-tabs__list">
       
@@ -257,7 +283,7 @@
   
     
   
-  快速使用
+  Quick Start
 
       </a>
     </li>
@@ -274,7 +300,7 @@
   
     
   
-  任务配置
+  Job Configuration
 
       </a>
     </li>
@@ -293,7 +319,7 @@
   
     
   
-  命令行工具
+  Command Line
 
       </a>
     </li>
@@ -312,7 +338,7 @@
   
     
   
-  读取插件
+  Reader Plugins
 
         </a>
       </li>
@@ -332,7 +358,7 @@
   
     
   
-  写入插件
+  Writer Plugins
 
         </a>
       </li>
@@ -350,7 +376,7 @@
   
     
   
-  如何调试项目
+  Debug
 
       </a>
     </li>
@@ -367,7 +393,7 @@
   
     
   
-  加密配置文件的中密码
+  Password Encryption
 
       </a>
     </li>
@@ -384,7 +410,7 @@
   
     
   
-  任务结果上报
+  Statistics Report
 
       </a>
     </li>
@@ -401,7 +427,7 @@
   
     
   
-  数据转换
+  Transformer
 
       </a>
     </li>
@@ -418,7 +444,7 @@
   
     
   
-  插件开发
+  Plugin Development
 
       </a>
     </li>
@@ -451,7 +477,7 @@
   
 
 
-<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="导航栏" data-md-level="0">
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
     <a href=".." title="Addax Documentation" class="md-nav__button md-logo" aria-label="Addax Documentation" data-md-component="logo">
       
@@ -462,7 +488,7 @@
   </label>
   
     <div class="md-nav__source">
-      <a href="https://github.com/wgzhao/Addax" title="前往仓库" class="md-source" data-md-component="source">
+      <a href="https://github.com/wgzhao/Addax" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
@@ -506,7 +532,7 @@
         
   
   <span class="md-ellipsis">
-    快速使用
+    Quick Start
   </span>
   
 
@@ -526,7 +552,7 @@
         
   
   <span class="md-ellipsis">
-    任务配置
+    Job Configuration
   </span>
   
 
@@ -555,7 +581,7 @@
           
   
   <span class="md-ellipsis">
-    命令行工具
+    Command Line
   </span>
   
 
@@ -566,7 +592,7 @@
         
   
   <span class="md-ellipsis">
-    命令行工具
+    Command Line
   </span>
   
 
@@ -574,7 +600,7 @@
       
         
 
-<nav class="md-nav md-nav--secondary" aria-label="目录">
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
   
@@ -583,42 +609,348 @@
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
-      目录
+      Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
+  <a href="#basic-syntax" class="md-nav__link">
     <span class="md-ellipsis">
-      命令行工具
+      Basic Syntax
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
+  <a href="#command-line-options" class="md-nav__link">
     <span class="md-ellipsis">
-      使用方法
+      Command Line Options
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
-    <span class="md-ellipsis">
-      参数
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="参数">
+    <nav class="md-nav" aria-label="Command Line Options">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#params" class="md-nav__link">
+  <a href="#-h-help" class="md-nav__link">
     <span class="md-ellipsis">
-      params 参数说明
+      -h, --help
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-v-version" class="md-nav__link">
+    <span class="md-ellipsis">
+      -v, --version
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-m-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      -m, --mode
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-j-jvm" class="md-nav__link">
+    <span class="md-ellipsis">
+      -j, --jvm
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-p-params" class="md-nav__link">
+    <span class="md-ellipsis">
+      -p, --params
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-reader-plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      --reader-plugin
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-writer-plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      --writer-plugin
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Usage Examples
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Usage Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#basic-job-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      Basic Job Execution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#job-with-custom-jvm-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      Job with Custom JVM Settings
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#job-with-runtime-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Job with Runtime Parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#debug-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      Debug Mode
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance-monitoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      Performance Monitoring
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exit-codes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Exit Codes
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-override" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration Override
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration Override">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#override-speed-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      Override Speed Settings
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#override-error-limits" class="md-nav__link">
+    <span class="md-ellipsis">
+      Override Error Limits
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plugin-information" class="md-nav__link">
+    <span class="md-ellipsis">
+      Plugin Information
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Plugin Information">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#list-available-plugins" class="md-nav__link">
+    <span class="md-ellipsis">
+      List Available Plugins
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-plugin-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      Get Plugin Details
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#environment-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      Environment Variables
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Environment Variables">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#addax_home" class="md-nav__link">
+    <span class="md-ellipsis">
+      ADDAX_HOME
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#java_home" class="md-nav__link">
+    <span class="md-ellipsis">
+      JAVA_HOME
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#addax_opts" class="md-nav__link">
+    <span class="md-ellipsis">
+      ADDAX_OPTS
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#logging-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Logging Configuration
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Logging Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#setting-log-level" class="md-nav__link">
+    <span class="md-ellipsis">
+      Setting Log Level
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#custom-log-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      Custom Log File
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      Best Practices
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Best Practices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#resource-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      Resource Management
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      Error Handling
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#security" class="md-nav__link">
+    <span class="md-ellipsis">
+      Security
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      Performance
     </span>
   </a>
   
@@ -735,7 +1067,7 @@
             
   
   <span class="md-ellipsis">
-    读取插件
+    Reader Plugins
   </span>
   
 
@@ -745,7 +1077,7 @@
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
-            读取插件
+            Reader Plugins
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -761,6 +1093,153 @@
   
   <span class="md-ellipsis">
     Access Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reader/mysqlreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    MySQL Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reader/postgresqlreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    PostgreSQL Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reader/oraclereader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Oracle Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reader/rdbmsreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    RDBMS Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reader/txtfilereader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Text File Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reader/elasticsearchreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ElasticSearchReader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reader/mongodbreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    MongoDB Reader
   </span>
   
 
@@ -882,27 +1361,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../reader/elasticsearchreader/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    ElasticSearchReader
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../reader/excelreader/" class="md-nav__link">
         
   
@@ -928,7 +1386,7 @@
         
   
   <span class="md-ellipsis">
-    Ftp Reader
+    FTP Reader
   </span>
   
 
@@ -1218,111 +1676,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../reader/mongodbreader/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    MongoDB Reader
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../reader/mysqlreader/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    MySQL Reader
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../reader/oraclereader/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Oracle Reader
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../reader/postgresqlreader/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    PostgreSQL Reader
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../reader/rdbmsreader/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    RDBMS Reader
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../reader/redisreader/" class="md-nav__link">
         
   
@@ -1463,27 +1816,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../reader/txtfilereader/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    TxtFile Reader
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -1499,6 +1831,8 @@
   
     
     
+      
+        
       
         
       
@@ -1587,7 +1921,7 @@
             
   
   <span class="md-ellipsis">
-    写入插件
+    Writer Plugins
   </span>
   
 
@@ -1597,7 +1931,7 @@
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_6">
             <span class="md-nav__icon md-icon"></span>
-            写入插件
+            Writer Plugins
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -1613,6 +1947,153 @@
   
   <span class="md-ellipsis">
     Access Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../writer/mysqlwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    MySQL Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../writer/postgresqlwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Postgresql Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../writer/oraclewriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Oracle Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../writer/rdbmswriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    RDBMS Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../writer/txtfilewriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    TxtFile Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../writer/elasticsearchwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ElasticSearch Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../writer/mongodbwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    MongoDB Writer
   </span>
   
 
@@ -1671,6 +2152,27 @@
   
   
     <li class="md-nav__item">
+      <a href="../writer/databendwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    DatabendWriter
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../writer/dbfwriter/" class="md-nav__link">
         
   
@@ -1713,48 +2215,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../writer/databendwriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    DatabendWriter
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../writer/elasticsearchwriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    ElasticSearch Writer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../writer/excelwriter/" class="md-nav__link">
         
   
@@ -1780,7 +2240,7 @@
         
   
   <span class="md-ellipsis">
-    Ftp Writer
+    FTP Writer
   </span>
   
 
@@ -1801,7 +2261,7 @@
         
   
   <span class="md-ellipsis">
-    Greenplum Writer
+    GreenPlum Writer
   </span>
   
 
@@ -1864,7 +2324,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11X Writer
+    HBase11x Writer
   </span>
   
 
@@ -1907,6 +2367,27 @@
   
   <span class="md-ellipsis">
     HDFS Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../writer/icebergwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Iceberg Writer
   </span>
   
 
@@ -2007,116 +2488,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../writer/mongodbwriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    MongoDB Writer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../writer/mysqlwriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    MySQL Writer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../writer/oraclewriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Oracle Writer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../writer/paimonwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
     Paimon Writer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../writer/postgresqlwriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Postgresql Writer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../writer/rdbmswriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    RDBMS Writer
   </span>
   
 
@@ -2294,27 +2670,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../writer/txtfilewriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    TxtFile Writer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -2333,7 +2688,7 @@
         
   
   <span class="md-ellipsis">
-    如何调试项目
+    Debug
   </span>
   
 
@@ -2353,7 +2708,7 @@
         
   
   <span class="md-ellipsis">
-    加密配置文件的中密码
+    Password Encryption
   </span>
   
 
@@ -2373,7 +2728,7 @@
         
   
   <span class="md-ellipsis">
-    任务结果上报
+    Statistics Report
   </span>
   
 
@@ -2393,7 +2748,7 @@
         
   
   <span class="md-ellipsis">
-    数据转换
+    Transformer
   </span>
   
 
@@ -2413,7 +2768,7 @@
         
   
   <span class="md-ellipsis">
-    插件开发
+    Plugin Development
   </span>
   
 
@@ -2435,7 +2790,7 @@
                   <div class="md-sidebar__inner">
                     
 
-<nav class="md-nav md-nav--secondary" aria-label="目录">
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
   
@@ -2444,42 +2799,348 @@
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
-      目录
+      Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
+  <a href="#basic-syntax" class="md-nav__link">
     <span class="md-ellipsis">
-      命令行工具
+      Basic Syntax
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
+  <a href="#command-line-options" class="md-nav__link">
     <span class="md-ellipsis">
-      使用方法
+      Command Line Options
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
-    <span class="md-ellipsis">
-      参数
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="参数">
+    <nav class="md-nav" aria-label="Command Line Options">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#params" class="md-nav__link">
+  <a href="#-h-help" class="md-nav__link">
     <span class="md-ellipsis">
-      params 参数说明
+      -h, --help
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-v-version" class="md-nav__link">
+    <span class="md-ellipsis">
+      -v, --version
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-m-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      -m, --mode
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-j-jvm" class="md-nav__link">
+    <span class="md-ellipsis">
+      -j, --jvm
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-p-params" class="md-nav__link">
+    <span class="md-ellipsis">
+      -p, --params
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-reader-plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      --reader-plugin
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-writer-plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      --writer-plugin
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Usage Examples
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Usage Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#basic-job-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      Basic Job Execution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#job-with-custom-jvm-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      Job with Custom JVM Settings
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#job-with-runtime-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Job with Runtime Parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#debug-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      Debug Mode
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance-monitoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      Performance Monitoring
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exit-codes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Exit Codes
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-override" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration Override
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration Override">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#override-speed-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      Override Speed Settings
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#override-error-limits" class="md-nav__link">
+    <span class="md-ellipsis">
+      Override Error Limits
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plugin-information" class="md-nav__link">
+    <span class="md-ellipsis">
+      Plugin Information
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Plugin Information">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#list-available-plugins" class="md-nav__link">
+    <span class="md-ellipsis">
+      List Available Plugins
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-plugin-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      Get Plugin Details
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#environment-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      Environment Variables
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Environment Variables">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#addax_home" class="md-nav__link">
+    <span class="md-ellipsis">
+      ADDAX_HOME
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#java_home" class="md-nav__link">
+    <span class="md-ellipsis">
+      JAVA_HOME
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#addax_opts" class="md-nav__link">
+    <span class="md-ellipsis">
+      ADDAX_OPTS
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#logging-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Logging Configuration
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Logging Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#setting-log-level" class="md-nav__link">
+    <span class="md-ellipsis">
+      Setting Log Level
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#custom-log-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      Custom Log File
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      Best Practices
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Best Practices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#resource-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      Resource Management
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      Error Handling
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#security" class="md-nav__link">
+    <span class="md-ellipsis">
+      Security
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      Performance
     </span>
   </a>
   
@@ -2505,108 +3166,164 @@
                   
 
 
-<h1 id="_1">命令行工具<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
-<p>这里介绍 <a href="https://github.com/wgzhao/Addax/blob/master/bin/addax.sh">addax.sh</a> 命令行工具的使用方法。</p>
-<h2 id="_2">命令行工具<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
-<p>Addax 提供了一个命令行工具 <code>addax.sh</code>，用于执行 Addax 作业。该工具位于 Addax 安装目录的 <code>bin</code> 目录下。</p>
-<h2 id="_3">使用方法<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<p>执行 Addax 作业的基本命令格式如下：</p>
-<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>&lt;job_file&gt;
+<h1 id="command-line-usage">Command Line Usage<a class="headerlink" href="#command-line-usage" title="Permanent link">&para;</a></h1>
+<p>Addax provides a simple command-line interface for executing data synchronization jobs.</p>
+<h2 id="basic-syntax">Basic Syntax<a class="headerlink" href="#basic-syntax" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span><span class="o">[</span>options<span class="o">]</span><span class="w"> </span>job_config_file
 </code></pre></div>
-<p>其中 <code>&lt;job_file&gt;</code> 是一个 JSON 格式的作业配置文件，包含了数据源的读取和写入配置。</p>
-<h2 id="_4">参数<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
-<p><code>addax.sh</code> 命令行工具支持以下参数：</p>
+<h2 id="command-line-options">Command Line Options<a class="headerlink" href="#command-line-options" title="Permanent link">&para;</a></h2>
+<h3 id="-h-help"><code>-h, --help</code><a class="headerlink" href="#-h-help" title="Permanent link">&para;</a></h3>
+<p>Display help information and exit.</p>
+<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>-h
+</code></pre></div>
+<h3 id="-v-version"><code>-v, --version</code><a class="headerlink" href="#-v-version" title="Permanent link">&para;</a></h3>
+<p>Display version information and exit.</p>
+<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>-v
+</code></pre></div>
+<h3 id="-m-mode"><code>-m, --mode</code><a class="headerlink" href="#-m-mode" title="Permanent link">&para;</a></h3>
+<p>Set execution mode. Available options:</p>
 <ul>
-<li><code>-h</code>, <code>--help</code>: 显示帮助信息。</li>
-<li><code>-v</code>, <code>--version</code>: 显示 Addax 的版本信息。</li>
-<li><code>-l</code>, <code>--log</code>: 指定日志文件路径，默认是在 <code>$ADDAX_HOME/log</code> 目录下。</li>
-<li><code>-d</code>, <code>--debug</code>: 启用调试模式，详见 <a href="docs/debug.md">调试模式</a>。</li>
-<li><code>-L</code>, <code>--log-level</code>: 设置日志级别，支持 <code>DEBUG</code>, <code>INFO</code>, <code>WARN</code>, <code>ERROR</code> 等级别，默认是 <code>INFO</code>。</li>
-<li><code>-j</code>, <code>--jvm</code>: 指定 JVM 参数，可以传递给 Java 虚拟机的参数。</li>
-<li><code>-p</code>, <code>--params</code> : 传递额外的参数给作业配置文件，可以在作业配置中使用 <code>${param}</code> 的方式引用这些参数。</li>
+<li><code>standalone</code>: Standalone mode (default)</li>
+<li><code>local</code>: Local mode</li>
 </ul>
-<h3 id="params">params 参数说明<a class="headerlink" href="#params" title="Permanent link">&para;</a></h3>
-<p><code>-p</code>, <code>--params</code> 参数用来向设置某些配置任务的参数，使得作业配置文件可以更加灵活。可以在作业配置文件中使用 <code>${param}</code> 的方式引用这些参数。</p>
-<p>假定作业配置文件中有如下内容：</p>
+<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>-m<span class="w"> </span>standalone<span class="w"> </span>job.json
+</code></pre></div>
+<h3 id="-j-jvm"><code>-j, --jvm</code><a class="headerlink" href="#-j-jvm" title="Permanent link">&para;</a></h3>
+<p>Set JVM parameters.</p>
+<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>-j<span class="w"> </span><span class="s2">&quot;-Xms1g -Xmx4g&quot;</span><span class="w"> </span>job.json
+</code></pre></div>
+<h3 id="-p-params"><code>-p, --params</code><a class="headerlink" href="#-p-params" title="Permanent link">&para;</a></h3>
+<p>Pass runtime parameters for variable substitution in job configuration.</p>
+<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>-p<span class="w"> </span><span class="s2">&quot;-Dhost=localhost -Dport=3306&quot;</span><span class="w"> </span>job.json
+</code></pre></div>
+<h3 id="-reader-plugin"><code>--reader-plugin</code><a class="headerlink" href="#-reader-plugin" title="Permanent link">&para;</a></h3>
+<p>Display information about a specific reader plugin.</p>
+<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>--reader-plugin<span class="w"> </span>mysqlreader
+</code></pre></div>
+<h3 id="-writer-plugin"><code>--writer-plugin</code><a class="headerlink" href="#-writer-plugin" title="Permanent link">&para;</a></h3>
+<p>Display information about a specific writer plugin.</p>
+<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>--writer-plugin<span class="w"> </span>postgresqlwriter
+</code></pre></div>
+<h2 id="usage-examples">Usage Examples<a class="headerlink" href="#usage-examples" title="Permanent link">&para;</a></h2>
+<h3 id="basic-job-execution">Basic Job Execution<a class="headerlink" href="#basic-job-execution" title="Permanent link">&para;</a></h3>
+<p>Execute a simple synchronization job:</p>
+<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>job/mysql_to_postgres.json
+</code></pre></div>
+<h3 id="job-with-custom-jvm-settings">Job with Custom JVM Settings<a class="headerlink" href="#job-with-custom-jvm-settings" title="Permanent link">&para;</a></h3>
+<p>Execute job with custom memory settings:</p>
+<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>-j<span class="w"> </span><span class="s2">&quot;-Xms2g -Xmx8g -XX:+UseG1GC&quot;</span><span class="w"> </span>job/large_table_sync.json
+</code></pre></div>
+<h3 id="job-with-runtime-parameters">Job with Runtime Parameters<a class="headerlink" href="#job-with-runtime-parameters" title="Permanent link">&para;</a></h3>
+<p>Execute job with variable substitution:</p>
+<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>-p<span class="w"> </span><span class="s2">&quot;-Dsource.host=db1.example.com -Dtarget.host=db2.example.com&quot;</span><span class="w"> </span>job/template.json
+</code></pre></div>
+<p>Where <code>template.json</code> contains variables like:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;job&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;settings&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;param1&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${param1}&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;param2&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${param2}&quot;</span>
-<span class="w">    </span><span class="p">},</span>
-<span class="w">    </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;reader&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;mysqlreader&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;parameter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">          </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${username}&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;password&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${password}&quot;</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">      </span><span class="p">},</span>
-<span class="w">      </span><span class="nt">&quot;writer&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;mysqlwriter&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;parameter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">          </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${username}&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;password&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${password}&quot;</span>
+<span class="w">    </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;reader&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;parameter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;jdbcUrl&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;jdbc:mysql://${source.host}:3306/mydb&quot;</span>
+<span class="w">          </span><span class="p">}</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="nt">&quot;writer&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;parameter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;jdbcUrl&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;jdbc:postgresql://${target.host}:5432/mydb&quot;</span>
+<span class="w">          </span><span class="p">}</span>
 <span class="w">        </span><span class="p">}</span>
 <span class="w">      </span><span class="p">}</span>
-<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>执行命令时，可以使用 <code>-p</code> 参数传递参数：</p>
-<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>job/test.json<span class="w"> </span>-p<span class="w"> </span><span class="s2">&quot;-Dusername=root -Dpassword=123456 -Dparam1=value1 -Dparam2=value2&quot;</span>
+<h3 id="debug-mode">Debug Mode<a class="headerlink" href="#debug-mode" title="Permanent link">&para;</a></h3>
+<p>Run job with debug output:</p>
+<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>-j<span class="w"> </span><span class="s2">&quot;-Daddax.debug=true&quot;</span><span class="w"> </span>job.json
 </code></pre></div>
-<p>为了方便使用，程序内置了部分常见时间变量，可以直接。假定当前时间是 <code>2025-07-16 12:13:14</code>，下面列出可以直接使用的变量以及变量值：</p>
-<table>
-<thead>
-<tr>
-<th>变量名</th>
-<th>变量值</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>${curr_date_short}</code></td>
-<td><code>20250716</code></td>
-</tr>
-<tr>
-<td><code>${curr_date_dash}</code></td>
-<td><code>2025-07-16</code></td>
-</tr>
-<tr>
-<td><code>$curr_datetime_short}</code></td>
-<td><code>20250716121314</code></td>
-</tr>
-<tr>
-<td><code>${curr_datetime_dash}</code></td>
-<td><code>2025-07-16 12:13:14</code></td>
-</tr>
-<tr>
-<td><code>${biz_date_short}</code></td>
-<td><code>20250715</code></td>
-</tr>
-<tr>
-<td><code>${biz_date_dash}</code></td>
-<td><code>2025-07-15</code></td>
-</tr>
-<tr>
-<td><code>${biz_datetime_short}</code></td>
-<td><code>20250715121314</code></td>
-</tr>
-<tr>
-<td><code>${biz_datetime_dash}</code></td>
-<td><code>2025-07-15 12:13:14</code></td>
-</tr>
-<tr>
-<td><code>${biz_datetime_0_short}</code></td>
-<td><code>20250715000000</code></td>
-</tr>
-<tr>
-<td><code>${biz_datetime_0_dash}</code></td>
-<td><code>2025-07-15 00:00:00</code></td>
-</tr>
-</tbody>
-</table>
+<h3 id="performance-monitoring">Performance Monitoring<a class="headerlink" href="#performance-monitoring" title="Permanent link">&para;</a></h3>
+<p>Run job with performance monitoring enabled:</p>
+<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>-j<span class="w"> </span><span class="s2">&quot;-Daddax.monitor=true&quot;</span><span class="w"> </span>job.json
+</code></pre></div>
+<h2 id="exit-codes">Exit Codes<a class="headerlink" href="#exit-codes" title="Permanent link">&para;</a></h2>
+<p>Addax uses the following exit codes:</p>
+<ul>
+<li><code>0</code>: Job completed successfully</li>
+<li><code>1</code>: Job failed due to configuration error</li>
+<li><code>2</code>: Job failed due to runtime error</li>
+<li><code>3</code>: Job killed by user or system</li>
+</ul>
+<h2 id="configuration-override">Configuration Override<a class="headerlink" href="#configuration-override" title="Permanent link">&para;</a></h2>
+<p>You can override configuration settings via command line parameters:</p>
+<h3 id="override-speed-settings">Override Speed Settings<a class="headerlink" href="#override-speed-settings" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>-p<span class="w"> </span><span class="s2">&quot;-Djob.setting.speed.channel=5&quot;</span><span class="w"> </span>job.json
+</code></pre></div>
+<h3 id="override-error-limits">Override Error Limits<a class="headerlink" href="#override-error-limits" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>-p<span class="w"> </span><span class="s2">&quot;-Djob.setting.errorLimit.record=100&quot;</span><span class="w"> </span>job.json
+</code></pre></div>
+<h2 id="plugin-information">Plugin Information<a class="headerlink" href="#plugin-information" title="Permanent link">&para;</a></h2>
+<h3 id="list-available-plugins">List Available Plugins<a class="headerlink" href="#list-available-plugins" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># List all reader plugins</span>
+bin/addax.sh<span class="w"> </span>--reader-plugin
+
+<span class="c1"># List all writer plugins  </span>
+bin/addax.sh<span class="w"> </span>--writer-plugin
+</code></pre></div>
+<h3 id="get-plugin-details">Get Plugin Details<a class="headerlink" href="#get-plugin-details" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Get MySQL reader details</span>
+bin/addax.sh<span class="w"> </span>--reader-plugin<span class="w"> </span>mysqlreader
+
+<span class="c1"># Get PostgreSQL writer details</span>
+bin/addax.sh<span class="w"> </span>--writer-plugin<span class="w"> </span>postgresqlwriter
+</code></pre></div>
+<h2 id="environment-variables">Environment Variables<a class="headerlink" href="#environment-variables" title="Permanent link">&para;</a></h2>
+<p>You can set the following environment variables to customize Addax behavior:</p>
+<h3 id="addax_home"><code>ADDAX_HOME</code><a class="headerlink" href="#addax_home" title="Permanent link">&para;</a></h3>
+<p>Set the Addax installation directory:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">ADDAX_HOME</span><span class="o">=</span>/opt/addax
+</code></pre></div>
+<h3 id="java_home"><code>JAVA_HOME</code><a class="headerlink" href="#java_home" title="Permanent link">&para;</a></h3>
+<p>Set the Java installation directory:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">JAVA_HOME</span><span class="o">=</span>/usr/lib/jvm/java-8-openjdk
+</code></pre></div>
+<h3 id="addax_opts"><code>ADDAX_OPTS</code><a class="headerlink" href="#addax_opts" title="Permanent link">&para;</a></h3>
+<p>Set default JVM options:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">ADDAX_OPTS</span><span class="o">=</span><span class="s2">&quot;-Xms1g -Xmx4g&quot;</span>
+</code></pre></div>
+<h2 id="logging-configuration">Logging Configuration<a class="headerlink" href="#logging-configuration" title="Permanent link">&para;</a></h2>
+<p>Addax uses logback for logging. You can customize logging by:</p>
+<h3 id="setting-log-level">Setting Log Level<a class="headerlink" href="#setting-log-level" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>-j<span class="w"> </span><span class="s2">&quot;-Dlogback.configurationFile=conf/logback-debug.xml&quot;</span><span class="w"> </span>job.json
+</code></pre></div>
+<h3 id="custom-log-file">Custom Log File<a class="headerlink" href="#custom-log-file" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>-j<span class="w"> </span><span class="s2">&quot;-Daddax.log.file=/var/log/addax/job.log&quot;</span><span class="w"> </span>job.json
+</code></pre></div>
+<h2 id="best-practices">Best Practices<a class="headerlink" href="#best-practices" title="Permanent link">&para;</a></h2>
+<h3 id="resource-management">Resource Management<a class="headerlink" href="#resource-management" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Use appropriate JVM heap sizes based on your data volume</li>
+<li>Monitor memory usage during large data transfers</li>
+<li>Set reasonable channel numbers based on system capacity</li>
+</ul>
+<h3 id="error-handling">Error Handling<a class="headerlink" href="#error-handling" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Always check exit codes in scripts</li>
+<li>Set appropriate error limits for your use case</li>
+<li>Review logs for detailed error information</li>
+</ul>
+<h3 id="security">Security<a class="headerlink" href="#security" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Avoid passing passwords via command line (use configuration files)</li>
+<li>Use encrypted password files when possible</li>
+<li>Limit file permissions on configuration files</li>
+</ul>
+<h3 id="performance">Performance<a class="headerlink" href="#performance" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Test with different channel numbers to find optimal concurrency</li>
+<li>Use speed limits to prevent overwhelming source/target systems</li>
+<li>Monitor system resources during execution</li>
+</ul>
+<p>For more detailed information about specific plugins and configuration options, please refer to the <a href="../setupJob/">job configuration guide</a> and individual plugin documentation.</p>
 
 
 
@@ -2632,7 +3349,7 @@
           <button type="button" class="md-top md-icon" data-md-component="top" hidden>
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
-  回到页面顶部
+  Back to top
 </button>
         
       </main>
@@ -2641,30 +3358,30 @@
   
     
       
-      <nav class="md-footer__inner md-grid" aria-label="页脚" >
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../setupJob/" class="md-footer__link md-footer__link--prev" aria-label="上一页: 任务配置">
+          <a href="../setupJob/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Job Configuration">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
             </div>
             <div class="md-footer__title">
               <span class="md-footer__direction">
-                上一页
+                Previous
               </span>
               <div class="md-ellipsis">
-                任务配置
+                Job Configuration
               </div>
             </div>
           </a>
         
         
           
-          <a href="../reader/accessreader/" class="md-footer__link md-footer__link--next" aria-label="下一页: Access Reader">
+          <a href="../reader/accessreader/" class="md-footer__link md-footer__link--next" aria-label="Next: Access Reader">
             <div class="md-footer__title">
               <span class="md-footer__direction">
-                下一页
+                Next
               </span>
               <div class="md-ellipsis">
                 Access Reader
@@ -2731,7 +3448,7 @@
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "..", "features": ["announce.dismiss", "content.action.edit", "content.action.view", "content.code.annotate", "content.code.copy", "content.tooltips", "navigation.footer", "navigation.indexes", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "toc.follow"], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": {"provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["announce.dismiss", "content.action.edit", "content.action.view", "content.code.annotate", "content.code.copy", "content.tooltips", "navigation.footer", "navigation.indexes", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "toc.follow"], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
       <script src="../assets/javascripts/bundle.081f42fc.min.js"></script>

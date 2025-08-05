@@ -1,6 +1,6 @@
 
 <!doctype html>
-<html lang="zh" class="no-js">
+<html lang="en" class="no-js">
   <head>
     
       <meta charset="utf-8">
@@ -86,8 +86,8 @@
     <div data-md-component="skip">
       
         
-        <a href="#addax" class="md-skip">
-          跳转至
+        <a href="#addax-introduction" class="md-skip">
+          Skip to content
         </a>
       
     </div>
@@ -105,7 +105,7 @@
   
 
 <header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
-  <nav class="md-header__inner md-grid" aria-label="页眉">
+  <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="." title="Addax Documentation" class="md-header__button md-logo" aria-label="Addax Documentation" data-md-component="logo">
       
   <img src="images/logo.png" alt="logo">
@@ -162,6 +162,32 @@
       <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
     
     
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Select language">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04M18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12m-2.62 7 1.62-4.33L19.12 17h-3.24Z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="/en" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="/" hreflang="zh" class="md-select__link">
+              中文
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
     
       <label class="md-header__button md-icon" for="__search">
         
@@ -171,21 +197,21 @@
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
     <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
       <label class="md-search__icon md-icon" for="__search">
         
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
         
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
       </label>
-      <nav class="md-search__options" aria-label="查找">
+      <nav class="md-search__options" aria-label="Search">
         
-          <a href="javascript:void(0)" class="md-search__icon md-icon" title="分享" aria-label="分享" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
             
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08Z"/></svg>
           </a>
         
-        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
           
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
         </button>
@@ -198,7 +224,7 @@
       <div class="md-search__scrollwrap" data-md-scrollfix>
         <div class="md-search-result" data-md-component="search-result">
           <div class="md-search-result__meta">
-            正在初始化搜索引擎
+            Initializing search
           </div>
           <ol class="md-search-result__list" role="presentation"></ol>
         </div>
@@ -209,7 +235,7 @@
     
     
       <div class="md-header__source">
-        <a href="https://github.com/wgzhao/Addax" title="前往仓库" class="md-source" data-md-component="source">
+        <a href="https://github.com/wgzhao/Addax" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
@@ -224,7 +250,7 @@
   
     
       
-<nav class="md-tabs" aria-label="标签" data-md-component="tabs">
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
   <div class="md-grid">
     <ul class="md-tabs__list">
       
@@ -257,7 +283,7 @@
   
     
   
-  快速使用
+  Quick Start
 
       </a>
     </li>
@@ -274,7 +300,7 @@
   
     
   
-  任务配置
+  Job Configuration
 
       </a>
     </li>
@@ -291,7 +317,7 @@
   
     
   
-  命令行工具
+  Command Line
 
       </a>
     </li>
@@ -310,7 +336,7 @@
   
     
   
-  读取插件
+  Reader Plugins
 
         </a>
       </li>
@@ -330,7 +356,7 @@
   
     
   
-  写入插件
+  Writer Plugins
 
         </a>
       </li>
@@ -348,7 +374,7 @@
   
     
   
-  如何调试项目
+  Debug
 
       </a>
     </li>
@@ -365,7 +391,7 @@
   
     
   
-  加密配置文件的中密码
+  Password Encryption
 
       </a>
     </li>
@@ -382,7 +408,7 @@
   
     
   
-  任务结果上报
+  Statistics Report
 
       </a>
     </li>
@@ -399,7 +425,7 @@
   
     
   
-  数据转换
+  Transformer
 
       </a>
     </li>
@@ -416,7 +442,7 @@
   
     
   
-  插件开发
+  Plugin Development
 
       </a>
     </li>
@@ -449,7 +475,7 @@
   
 
 
-<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="导航栏" data-md-level="0">
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
     <a href="." title="Addax Documentation" class="md-nav__button md-logo" aria-label="Addax Documentation" data-md-component="logo">
       
@@ -460,7 +486,7 @@
   </label>
   
     <div class="md-nav__source">
-      <a href="https://github.com/wgzhao/Addax" title="前往仓库" class="md-source" data-md-component="source">
+      <a href="https://github.com/wgzhao/Addax" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
@@ -512,7 +538,7 @@
       
         
 
-<nav class="md-nav md-nav--secondary" aria-label="目录">
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
   
@@ -521,51 +547,51 @@
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
-      目录
+      Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#_1" class="md-nav__link">
+  <a href="#overview" class="md-nav__link">
     <span class="md-ellipsis">
-      概览
+      Overview
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
+  <a href="#framework-design" class="md-nav__link">
     <span class="md-ellipsis">
-      框架设计
+      Framework Design
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
+  <a href="#core-architecture" class="md-nav__link">
     <span class="md-ellipsis">
-      核心架构
+      Core Architecture
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="核心架构">
+    <nav class="md-nav" aria-label="Core Architecture">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
+  <a href="#core-module-introduction" class="md-nav__link">
     <span class="md-ellipsis">
-      核心模块介绍
+      Core Module Introduction
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
+  <a href="#scheduling-process" class="md-nav__link">
     <span class="md-ellipsis">
-      调度流程
+      Scheduling Process
     </span>
   </a>
   
@@ -577,55 +603,55 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_6" class="md-nav__link">
+  <a href="#core-advantages" class="md-nav__link">
     <span class="md-ellipsis">
-      核心优势
+      Core Advantages
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="核心优势">
+    <nav class="md-nav" aria-label="Core Advantages">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_7" class="md-nav__link">
+  <a href="#reliable-data-quality-monitoring" class="md-nav__link">
     <span class="md-ellipsis">
-      可靠的数据质量监控
+      Reliable Data Quality Monitoring
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#_8" class="md-nav__link">
+  <a href="#rich-data-transformation-functions" class="md-nav__link">
     <span class="md-ellipsis">
-      丰富的数据转换功能
+      Rich Data Transformation Functions
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#_9" class="md-nav__link">
+  <a href="#precise-speed-control" class="md-nav__link">
     <span class="md-ellipsis">
-      精准的速度控制
+      Precise Speed Control
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#_10" class="md-nav__link">
+  <a href="#strong-synchronization-performance" class="md-nav__link">
     <span class="md-ellipsis">
-      强劲地同步性能
+      Strong Synchronization Performance
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#_11" class="md-nav__link">
+  <a href="#robust-error-tolerance-mechanism" class="md-nav__link">
     <span class="md-ellipsis">
-      健壮的容错机制
+      Robust Error Tolerance Mechanism
     </span>
   </a>
   
@@ -655,7 +681,7 @@
         
   
   <span class="md-ellipsis">
-    快速使用
+    Quick Start
   </span>
   
 
@@ -675,7 +701,7 @@
         
   
   <span class="md-ellipsis">
-    任务配置
+    Job Configuration
   </span>
   
 
@@ -695,7 +721,7 @@
         
   
   <span class="md-ellipsis">
-    命令行工具
+    Command Line
   </span>
   
 
@@ -802,7 +828,7 @@
             
   
   <span class="md-ellipsis">
-    读取插件
+    Reader Plugins
   </span>
   
 
@@ -812,7 +838,7 @@
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
-            读取插件
+            Reader Plugins
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -828,6 +854,153 @@
   
   <span class="md-ellipsis">
     Access Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="reader/mysqlreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    MySQL Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="reader/postgresqlreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    PostgreSQL Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="reader/oraclereader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Oracle Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="reader/rdbmsreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    RDBMS Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="reader/txtfilereader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Text File Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="reader/elasticsearchreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ElasticSearchReader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="reader/mongodbreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    MongoDB Reader
   </span>
   
 
@@ -949,27 +1122,6 @@
   
   
     <li class="md-nav__item">
-      <a href="reader/elasticsearchreader/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    ElasticSearchReader
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="reader/excelreader/" class="md-nav__link">
         
   
@@ -995,7 +1147,7 @@
         
   
   <span class="md-ellipsis">
-    Ftp Reader
+    FTP Reader
   </span>
   
 
@@ -1285,111 +1437,6 @@
   
   
     <li class="md-nav__item">
-      <a href="reader/mongodbreader/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    MongoDB Reader
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="reader/mysqlreader/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    MySQL Reader
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="reader/oraclereader/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Oracle Reader
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="reader/postgresqlreader/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    PostgreSQL Reader
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="reader/rdbmsreader/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    RDBMS Reader
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="reader/redisreader/" class="md-nav__link">
         
   
@@ -1530,27 +1577,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="reader/txtfilereader/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    TxtFile Reader
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -1566,6 +1592,8 @@
   
     
     
+      
+        
       
         
       
@@ -1654,7 +1682,7 @@
             
   
   <span class="md-ellipsis">
-    写入插件
+    Writer Plugins
   </span>
   
 
@@ -1664,7 +1692,7 @@
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_6">
             <span class="md-nav__icon md-icon"></span>
-            写入插件
+            Writer Plugins
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -1680,6 +1708,153 @@
   
   <span class="md-ellipsis">
     Access Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="writer/mysqlwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    MySQL Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="writer/postgresqlwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Postgresql Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="writer/oraclewriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Oracle Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="writer/rdbmswriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    RDBMS Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="writer/txtfilewriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    TxtFile Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="writer/elasticsearchwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ElasticSearch Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="writer/mongodbwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    MongoDB Writer
   </span>
   
 
@@ -1738,6 +1913,27 @@
   
   
     <li class="md-nav__item">
+      <a href="writer/databendwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    DatabendWriter
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="writer/dbfwriter/" class="md-nav__link">
         
   
@@ -1780,48 +1976,6 @@
   
   
     <li class="md-nav__item">
-      <a href="writer/databendwriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    DatabendWriter
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="writer/elasticsearchwriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    ElasticSearch Writer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="writer/excelwriter/" class="md-nav__link">
         
   
@@ -1847,7 +2001,7 @@
         
   
   <span class="md-ellipsis">
-    Ftp Writer
+    FTP Writer
   </span>
   
 
@@ -1868,7 +2022,7 @@
         
   
   <span class="md-ellipsis">
-    Greenplum Writer
+    GreenPlum Writer
   </span>
   
 
@@ -1931,7 +2085,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11X Writer
+    HBase11x Writer
   </span>
   
 
@@ -1974,6 +2128,27 @@
   
   <span class="md-ellipsis">
     HDFS Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="writer/icebergwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Iceberg Writer
   </span>
   
 
@@ -2074,116 +2249,11 @@
   
   
     <li class="md-nav__item">
-      <a href="writer/mongodbwriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    MongoDB Writer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="writer/mysqlwriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    MySQL Writer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="writer/oraclewriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Oracle Writer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="writer/paimonwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
     Paimon Writer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="writer/postgresqlwriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Postgresql Writer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="writer/rdbmswriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    RDBMS Writer
   </span>
   
 
@@ -2361,27 +2431,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="writer/txtfilewriter/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    TxtFile Writer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -2400,7 +2449,7 @@
         
   
   <span class="md-ellipsis">
-    如何调试项目
+    Debug
   </span>
   
 
@@ -2420,7 +2469,7 @@
         
   
   <span class="md-ellipsis">
-    加密配置文件的中密码
+    Password Encryption
   </span>
   
 
@@ -2440,7 +2489,7 @@
         
   
   <span class="md-ellipsis">
-    任务结果上报
+    Statistics Report
   </span>
   
 
@@ -2460,7 +2509,7 @@
         
   
   <span class="md-ellipsis">
-    数据转换
+    Transformer
   </span>
   
 
@@ -2480,7 +2529,7 @@
         
   
   <span class="md-ellipsis">
-    插件开发
+    Plugin Development
   </span>
   
 
@@ -2502,7 +2551,7 @@
                   <div class="md-sidebar__inner">
                     
 
-<nav class="md-nav md-nav--secondary" aria-label="目录">
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
   
@@ -2511,51 +2560,51 @@
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
-      目录
+      Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#_1" class="md-nav__link">
+  <a href="#overview" class="md-nav__link">
     <span class="md-ellipsis">
-      概览
+      Overview
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
+  <a href="#framework-design" class="md-nav__link">
     <span class="md-ellipsis">
-      框架设计
+      Framework Design
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
+  <a href="#core-architecture" class="md-nav__link">
     <span class="md-ellipsis">
-      核心架构
+      Core Architecture
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="核心架构">
+    <nav class="md-nav" aria-label="Core Architecture">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
+  <a href="#core-module-introduction" class="md-nav__link">
     <span class="md-ellipsis">
-      核心模块介绍
+      Core Module Introduction
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
+  <a href="#scheduling-process" class="md-nav__link">
     <span class="md-ellipsis">
-      调度流程
+      Scheduling Process
     </span>
   </a>
   
@@ -2567,55 +2616,55 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_6" class="md-nav__link">
+  <a href="#core-advantages" class="md-nav__link">
     <span class="md-ellipsis">
-      核心优势
+      Core Advantages
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="核心优势">
+    <nav class="md-nav" aria-label="Core Advantages">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_7" class="md-nav__link">
+  <a href="#reliable-data-quality-monitoring" class="md-nav__link">
     <span class="md-ellipsis">
-      可靠的数据质量监控
+      Reliable Data Quality Monitoring
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#_8" class="md-nav__link">
+  <a href="#rich-data-transformation-functions" class="md-nav__link">
     <span class="md-ellipsis">
-      丰富的数据转换功能
+      Rich Data Transformation Functions
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#_9" class="md-nav__link">
+  <a href="#precise-speed-control" class="md-nav__link">
     <span class="md-ellipsis">
-      精准的速度控制
+      Precise Speed Control
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#_10" class="md-nav__link">
+  <a href="#strong-synchronization-performance" class="md-nav__link">
     <span class="md-ellipsis">
-      强劲地同步性能
+      Strong Synchronization Performance
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#_11" class="md-nav__link">
+  <a href="#robust-error-tolerance-mechanism" class="md-nav__link">
     <span class="md-ellipsis">
-      健壮的容错机制
+      Robust Error Tolerance Mechanism
     </span>
   </a>
   
@@ -2641,12 +2690,12 @@
                   
 
 
-<h1 id="addax">Addax 介绍<a class="headerlink" href="#addax" title="Permanent link">&para;</a></h1>
-<h2 id="_1">概览<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
-<p>Addax 是一个异构数据源离线同步工具，最初来源于阿里的 <a href="https://github.com/alibaba/datax">DataX</a> ，致力于实现包括关系型数据库(MySQL、Oracle 等)、HDFS、Hive、HBase、FTP 等各种异构数据源之间稳定高效的数据同步功能。</p>
-<p><img alt="addax why new" src="images/addax_why_new.png" /></p>
-<p>为了解决异构数据源同步问题，Addax 将复杂的网状的同步链路变成了星型数据链路，Addax 作为中间传输载体负责连接各种数据源。当需要接入一个新的数据源的时候，只需要将此数据源对接到 Addax，便能跟已有的数据源做到无缝数据同步。</p>
-<h2 id="_2">框架设计<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<h1 id="addax-introduction">Addax Introduction<a class="headerlink" href="#addax-introduction" title="Permanent link">&para;</a></h1>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p>Addax is a heterogeneous data source offline synchronization tool originally derived from Alibaba's <a href="https://github.com/alibaba/datax">DataX</a>, dedicated to implementing stable and efficient data synchronization between various heterogeneous data sources including relational databases (MySQL, Oracle, etc.), HDFS, Hive, HBase, FTP, and more.</p>
+<p><img alt="addax why new" src="../images/addax_why_new.png" /></p>
+<p>To solve the problem of heterogeneous data source synchronization, Addax transforms complex network synchronization links into star-shaped data links. Addax serves as the intermediate transmission carrier responsible for connecting various data sources. When a new data source needs to be integrated, you only need to connect this data source to Addax to achieve seamless data synchronization with existing data sources.</p>
+<h2 id="framework-design">Framework Design<a class="headerlink" href="#framework-design" title="Permanent link">&para;</a></h2>
 <pre class="mermaid"><code>graph LR
 MySQL
 subgraph Addax
@@ -2663,15 +2712,15 @@ end
 
 MySQL ==&gt; Addax ==&gt; HDFS
 </code></pre>
-<p>Addax 本身作为离线数据同步框架，采用 Framework + plugin 架构构建。将数据源读取和写入抽象成为 Reader/Writer 插件，纳入到整个同步框架中。</p>
+<p>Addax serves as an offline data synchronization framework, built with a Framework + plugin architecture. It abstracts data source reading and writing into Reader/Writer plugins, which are integrated into the entire synchronization framework.</p>
 <ul>
-<li>Reader：Reader 为数据采集模块，负责采集数据源的数据，将数据发送给 Framework。</li>
-<li>Writer： Writer 为数据写入模块，负责不断向 Framework 取数据，并将数据写入到目的端。</li>
-<li>Framework：Framework 用于连接 reader 和 writer，作为两者的数据传输通道，并处理缓冲，流控，并发，数据转换等核心技术问题。</li>
+<li>Reader: The Reader is the data collection module, responsible for collecting data from data sources and sending it to the Framework.</li>
+<li>Writer: The Writer is the data writing module, responsible for continuously fetching data from the Framework and writing it to the destination.</li>
+<li>Framework: The Framework connects Reader and Writer, serving as the data transmission channel between them, handling buffering, flow control, concurrency, data transformation, and other core technical issues.</li>
 </ul>
-<p>Addax Framework 提供了简单的接口与插件交互，提供简单的插件接入机制，只需要任意加上一种插件，就能无缝对接其他数据源。</p>
-<h2 id="_3">核心架构<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<p>本小节按一个 Addax 作业生命周期的时序图，从整体架构设计非常简要说明各个模块相互关系。</p>
+<p>Addax Framework provides simple interfaces for plugin interaction and a simple plugin integration mechanism. By simply adding a plugin, you can seamlessly connect to other data sources.</p>
+<h2 id="core-architecture">Core Architecture<a class="headerlink" href="#core-architecture" title="Permanent link">&para;</a></h2>
+<p>This section uses a sequence diagram of an Addax job lifecycle to briefly explain the relationships between various modules from an overall architectural design perspective.</p>
 <pre class="mermaid"><code>graph TB
 subgraph Job
 end
@@ -2721,39 +2770,39 @@ end
 
 Job == split ==&gt; task
 task == Schedule ==&gt; taskgroup</code></pre>
-<h3 id="_4">核心模块介绍<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
+<h3 id="core-module-introduction">Core Module Introduction<a class="headerlink" href="#core-module-introduction" title="Permanent link">&para;</a></h3>
 <ol>
-<li>Addax 完成单个数据同步的作业，我们称之为 Job，Addax 接收到一个 Job 之后，将启动一个进程来完成整个作业同步过程。Addax Job 模块是单个作业的中枢管理节点，承担了数据清理、子任务切分(将单一作业计算转化为多个子 Task)、TaskGroup 管理等功能。</li>
-<li>Addax Job 启动后，会根据不同的源端切分策略，将 Job 切分成多个小的 Task (子任务)，以便于并发执行。Task 便是 Addax 作业的最小单元，每一个 Task 都会负责一部分数据的同步工作。</li>
-<li>切分多个 Task 之后，Addax Job 会调用 Scheduler 模块，根据配置的并发数据量，将拆分成的 Task 重新组合，组装成 TaskGroup(任务组)。每一个 TaskGroup 负责以一定的并发运行完毕分配好的所有 Task，默认单个任务组的并发数量为 5。</li>
-<li>每一个 Task 都由 TaskGroup 负责启动，Task 启动后，会固定启动 <code>Reader—&gt;Channel—&gt;Writer</code> 的线程来完成任务同步工作。</li>
-<li>Addax 作业运行起来之后， Job 监控并等待多个 TaskGroup 模块任务完成，等待所有 TaskGroup 任务完成后 Job 成功退出。否则，异常退出，进程退出值非 0</li>
+<li>Addax completes a single data synchronization job, which we call a Job. After Addax receives a Job, it will start a process to complete the entire job synchronization process. The Addax Job module is the central management node for a single job, responsible for data cleaning, sub-task splitting (converting a single job calculation into multiple sub-Tasks), TaskGroup management, and other functions.</li>
+<li>After the Addax Job starts, it will split the Job into multiple small Tasks (sub-tasks) according to different source-side splitting strategies for concurrent execution. Task is the smallest unit of Addax jobs, and each Task is responsible for a portion of the data synchronization work.</li>
+<li>After splitting multiple Tasks, the Addax Job will call the Scheduler module, which reorganizes the split Tasks into TaskGroups according to the configured concurrency. Each TaskGroup is responsible for running all assigned Tasks with a certain degree of concurrency. The default concurrency of a single task group is 5.</li>
+<li>Each Task is started by the TaskGroup. After the Task starts, it will start the <code>Reader—&gt;Channel—&gt;Writer</code> thread to complete the task synchronization work.</li>
+<li>After the Addax job runs, the Job monitors and waits for multiple TaskGroup modules to complete tasks. After all TaskGroup tasks are completed, the Job exits successfully. Otherwise, it exits abnormally with a non-zero exit code.</li>
 </ol>
-<h3 id="_5">调度流程<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
-<p>举例来说，用户提交了一个作业，并且配置了 20 个并发，目的是将一个 100 张分表的 MySQL 数据同步到 Oracle 里面。 调度决策思路是：</p>
+<h3 id="scheduling-process">Scheduling Process<a class="headerlink" href="#scheduling-process" title="Permanent link">&para;</a></h3>
+<p>For example, a user submitted a job configured with 20 concurrent threads, aiming to synchronize data from 100 MySQL sub-tables to Oracle. The scheduling decision logic is:</p>
 <ol>
-<li>Addax Job 根据分库分表切分成了 100 个 Task。</li>
-<li>根据 20 个并发，计算共需要分配 <code>20/5 = 4</code> 个 TaskGroup。</li>
-<li>4 个 TaskGroup 平分切分好的 100 个 Task，每一个 TaskGroup 负责以 5 个并发共计运行 25 个 Task。</li>
+<li>Addax Job splits into 100 Tasks based on database and table partitioning.</li>
+<li>Based on 20 concurrent threads, it calculates that <code>20/5 = 4</code> TaskGroups need to be allocated.</li>
+<li>The 4 TaskGroups evenly distribute the 100 split Tasks, with each TaskGroup responsible for running 25 Tasks with 5 concurrent threads.</li>
 </ol>
-<h2 id="_6">核心优势<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
-<h3 id="_7">可靠的数据质量监控<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
+<h2 id="core-advantages">Core Advantages<a class="headerlink" href="#core-advantages" title="Permanent link">&para;</a></h2>
+<h3 id="reliable-data-quality-monitoring">Reliable Data Quality Monitoring<a class="headerlink" href="#reliable-data-quality-monitoring" title="Permanent link">&para;</a></h3>
 <ul>
-<li>完美解决数据传输个别类型失真问题</li>
+<li>Perfect solution for data transmission type distortion issues</li>
 </ul>
-<p>支持所有的强数据类型，每一种插件都有自己的数据类型转换策略，让数据可以完整无损的传输到目的端。</p>
+<p>Supports all strong data types, each plugin has its own data type conversion strategy, allowing data to be transmitted to the destination completely and without loss.</p>
 <ul>
-<li>提供作业全链路的流量、数据量运行时监控</li>
+<li>Provides full-link traffic and data volume runtime monitoring for jobs</li>
 </ul>
-<p>运行过程中可以将作业本身状态、数据流量、数据速度、执行进度等信息进行全面的展示，让用户可以实时了解作业状态。并可在作业执行过程中智能判断源端和目的端的速度对比情况，给予用户更多性能排查信息。</p>
+<p>During operation, comprehensive displays of job status, data traffic, data speed, execution progress, and other information can be provided, allowing users to understand job status in real-time. It can also intelligently compare the speed between source and destination during job execution, providing users with more performance troubleshooting information.</p>
 <ul>
-<li>提供脏数据探测</li>
+<li>Provides dirty data detection</li>
 </ul>
-<p>在大量数据的传输过程中，必定会由于各种原因导致很多数据传输报错(比如类型转换错误)，这种数据 Addax 认为就是脏数据。Addax 目前可以实现脏数据精确过滤、识别、采集、展示，为用户提供多种的脏数据处理模式，让用户准确把控数据质量关！</p>
-<h3 id="_8">丰富的数据转换功能<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h3>
-<p>作为一个服务于大数据的 ETL 工具，除了提供数据快照搬迁功能之外，还提供了丰富数据转换的功能，让数据在传输过程中可以轻松完成数据脱敏，补全，过滤等数据转换功能，另外还提供了自动 <code>groovy</code> 函数，让用户自定义转换函数。详情请看 <a href="transformer">transformer</a> 详细介绍。</p>
-<h3 id="_9">精准的速度控制<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h3>
-<p>提供了包括通道(并发)、记录流、字节流三种流控模式，可以随意控制你的作业速度，让你的作业在库可以承受的范围内达到最佳的同步速度。</p>
+<p>In the process of large-scale data transmission, many data transmission errors (such as type conversion errors) will inevitably occur due to various reasons. Addax considers such data as dirty data. Addax can currently achieve precise filtering, identification, collection, and display of dirty data, providing users with multiple dirty data processing modes to accurately control data quality!</p>
+<h3 id="rich-data-transformation-functions">Rich Data Transformation Functions<a class="headerlink" href="#rich-data-transformation-functions" title="Permanent link">&para;</a></h3>
+<p>As an ETL tool serving big data, in addition to providing data snapshot migration functions, it also provides rich data transformation functions, allowing data to easily complete data desensitization, completion, filtering, and other data transformation functions during transmission. It also provides automatic <code>groovy</code> functions, allowing users to customize transformation functions. For details, please see the <a href="transformer/">transformer</a> detailed introduction.</p>
+<h3 id="precise-speed-control">Precise Speed Control<a class="headerlink" href="#precise-speed-control" title="Permanent link">&para;</a></h3>
+<p>Provides three flow control modes including channel (concurrency), record flow, and byte flow, allowing you to control your job speed at will, letting your job achieve optimal synchronization speed within the range that the database can bear.</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;speed&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;channel&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span>
@@ -2762,12 +2811,12 @@ task == Schedule ==&gt; taskgroup</code></pre>
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<h3 id="_10">强劲地同步性能<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h3>
-<p>每一种读插件都有一种或多种切分策略，都能将作业合理切分成多个 Task 并行执行，单机多线程执行模型可以让速度随并发成线性增长。
-在源端和目的端性能都足够的情况下，单个作业一定可以打满网卡。</p>
-<h3 id="_11">健壮的容错机制<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h3>
-<p>作业是极易受外部因素的干扰，网络闪断、数据源不稳定等因素很容易让同步到一半的作业报错停止。因此稳定性是 Addax 的基本要求，在 Addax 的设计中，重点完善了框架和插件的稳定性。
-目前 Addax 可以做到线程级别、作业级别多层次局部/全局的重试，保证用户的作业稳定运行。</p>
+<h3 id="strong-synchronization-performance">Strong Synchronization Performance<a class="headerlink" href="#strong-synchronization-performance" title="Permanent link">&para;</a></h3>
+<p>Each reader plugin has one or more splitting strategies, all of which can reasonably split jobs into multiple Tasks for parallel execution. The single-machine multi-threaded execution model can make speed increase linearly with concurrency.
+When both source and destination performance are sufficient, a single job can definitely saturate the network card.</p>
+<h3 id="robust-error-tolerance-mechanism">Robust Error Tolerance Mechanism<a class="headerlink" href="#robust-error-tolerance-mechanism" title="Permanent link">&para;</a></h3>
+<p>Jobs are extremely susceptible to interference from external factors, and factors such as network interruptions and unstable data sources can easily cause synchronization jobs to report errors and stop halfway. Therefore, stability is a basic requirement for Addax. In the design of Addax, the stability of both framework and plugins has been improved.
+Currently, Addax can achieve multi-level local/global retries at the thread level and job level, ensuring stable operation of user jobs.</p>
 
 
 
@@ -2796,7 +2845,7 @@ task == Schedule ==&gt; taskgroup</code></pre>
           <button type="button" class="md-top md-icon" data-md-component="top" hidden>
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
-  回到页面顶部
+  Back to top
 </button>
         
       </main>
@@ -2805,17 +2854,17 @@ task == Schedule ==&gt; taskgroup</code></pre>
   
     
       
-      <nav class="md-footer__inner md-grid" aria-label="页脚" >
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
         
           
-          <a href="quickstart/" class="md-footer__link md-footer__link--next" aria-label="下一页: 快速使用">
+          <a href="quickstart/" class="md-footer__link md-footer__link--next" aria-label="Next: Quick Start">
             <div class="md-footer__title">
               <span class="md-footer__direction">
-                下一页
+                Next
               </span>
               <div class="md-ellipsis">
-                快速使用
+                Quick Start
               </div>
             </div>
             <div class="md-footer__button md-icon">
@@ -2879,7 +2928,7 @@ task == Schedule ==&gt; taskgroup</code></pre>
     </div>
     
     
-    <script id="__config" type="application/json">{"base": ".", "features": ["announce.dismiss", "content.action.edit", "content.action.view", "content.code.annotate", "content.code.copy", "content.tooltips", "navigation.footer", "navigation.indexes", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "toc.follow"], "search": "assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": {"provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": ".", "features": ["announce.dismiss", "content.action.edit", "content.action.view", "content.code.annotate", "content.code.copy", "content.tooltips", "navigation.footer", "navigation.indexes", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "toc.follow"], "search": "assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
   <!-- Add scripts that need to run before here -->
