@@ -292,7 +292,7 @@ public class SingleTableSplitUtil
                             ) t order by %1$s""",
                     splitPK, table, whereSql, adviceNum - 1);
 
-            case PostgreSQL, SQLite -> String.format("""
+            case PostgreSQL, SQLite, GaussDB -> String.format("""
                             select %1$s from (
                                 select %1$s from %2$s %3$s order by random() limit %4$d
                             ) t order by %1$s""",

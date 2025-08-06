@@ -11,6 +11,7 @@
 | ElasticSearch       | :white_check_mark:    | :white_check_mark:     | elasticsearchreader/elasticsearchwriter | originally from [@Kestrong][1]  |
 | Excel               | :white_check_mark:    | :white_check_mark:     | excelreader/excelwriter                 |                                 |
 | FTP                 | :white_check_mark:    | :white_check_mark:     | ftpreader/ftpwriter                     |                                 |
+| GaussDB             | :white_check_mark:    | :white_check_mark:     | gaussdbreader/gaussdbwriter             |                                 |
 | HBase 1.x(API)      | :white_check_mark:    | :white_check_mark:     | hbase11xreader/hbase11xwriter           | use HBASE API                   |
 | HBase 1.x(SQL)      | :white_check_mark:    | :white_check_mark:     | hbase11xsqlreader/hbase11xsqlwriter     | use Phoenix[Phoenix][2]         |
 | HBase 2.x(API)      | :white_check_mark:    | :x:     | hbase20xreader                          | use HBase API                   |

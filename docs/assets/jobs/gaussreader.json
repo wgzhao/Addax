@@ -1,0 +1,34 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "byte": -1,
+        "channel": 1
+      }
+    },
+    "content": {
+      "reader": {
+        "name": "gaussdbreader",
+        "parameter": {
+          "username": "gstest",
+          "password": "gstest",
+          "column": [
+            "*"
+          ],
+          "connection": {
+            "table": [
+              "addax_tbl"
+            ],
+            "jdbcUrl": "jdbc:gaussdb://127.0.0.1:8000/gstest"
+          }
+        }
+      },
+      "writer": {
+        "name": "streamwriter",
+        "parameter": {
+          "print": true
+        }
+      }
+    }
+  }
+}
