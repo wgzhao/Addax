@@ -39,17 +39,18 @@ body:
       description: |
         - 选择您运行 Addax 的版本（非常重要）。  
           *Select the Addax version you are using (this is crucial for debugging).*  
-        - 如果您的版本不在列表中，请选择 "4.1.4 or older" 并在问题描述中补充准确的版本号。  
-          *If your version is not listed, select "4.1.4 or older" and specify the exact version in the description.*
+        - 如果您的版本不在列表中，请选择 "4.3.0 or older" 并在问题描述中补充准确的版本号。  
+          *If your version is not listed, select "4.3.0 or older" and specify the exact version in the description.*
       options:
-        - 5.1.0 (Default)
+        - 6.0.3 (Default)
+        - 6.0.2
+        - 6.0.1
+        - 6.0.0
+        - 5.1.2
+        - 5.1.1
+        - 5.1.0
         - 5.0.0
-        - 4.3.0
-        - 4.2.4
-        - 4.2.3
-        - 4.2.2
-        - 4.2.1
-        - 4.2.0 or older
+        - 4.3.0 or older
     validations:
       required: true
 
@@ -87,13 +88,13 @@ body:
     attributes:
       label: 5️⃣ 相关日志/输出结果 | Relevant Log Output
       description: |
-        - **请完整地粘贴 Addax 的任务输出日志，不要使用截图！**  
+        - **请完整地粘贴 Addax 的任务输出日志，不要使用截图,不要使用截图,不要使用截图**  
           *Please paste the full Addax task log output (do not use screenshots).*  
         - 日志是定位问题的关键，请确保提供完整内容。  
           *Logs are crucial for diagnosis. Please ensure they are complete.*  
         - 如果日志中包含敏感信息，请进行脱敏处理后再提交。  
           *Anonymize sensitive information in logs before submission, if necessary.*
       placeholder: |
-        粘贴日志或错误信息... ⚠️ 不要使用截图  
+        粘贴日志或错误信息... ⚠️ 不要使用截图 ,不要使用截图 ,不要使用截图  
         Paste logs or error messages... ⚠️ No screenshots, please
       render: shell-script

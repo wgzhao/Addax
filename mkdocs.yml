@@ -63,7 +63,7 @@ theme:
     - toc.follow
     # - toc.integrate
 
-docs_dir: docs/en
+docs_dir: docs
 site_dir: site
 
 plugins:

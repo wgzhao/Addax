@@ -6,6 +6,30 @@
       }
     },
     "content": {
+      "reader": {
+        "name": "streamreader",
+        "parameter": {
+          "column": [
+            {
+              "random": "1,500",
+              "type": "long"
+            },
+            {
+              "random": "1,127",
+              "type": "long"
+            },
+            {
+              "value": "this is a text",
+              "type": "string"
+            },
+            {
+              "random": "5,200",
+              "type": "long"
+            }
+          ],
+          "sliceRecordCount": 100
+        }
+      },
       "writer": {
         "name": "doriswriter",
         "parameter": {
@@ -30,30 +54,6 @@
             "format": "json",
             "strip_outer_array": true
           }
-        }
-      },
-      "reader": {
-        "name": "streamreader",
-        "parameter": {
-          "column": [
-            {
-              "random": "1,500",
-              "type": "long"
-            },
-            {
-              "random": "1,127",
-              "type": "long"
-            },
-            {
-              "value": "this is a text",
-              "type": "string"
-            },
-            {
-              "random": "5,200",
-              "type": "long"
-            }
-          ],
-          "sliceRecordCount": 100
         }
       }
     }

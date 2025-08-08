@@ -74,14 +74,6 @@
       "writer": {
         "name": "mongodbwriter",
         "parameter": {
-          "connection": {
-            "address": [
-              "127.0.0.1:27017"
-            ],
-            "database": "my_database",
-            "collection": "addax_writer",
-            "authDb": "my_database"
-          },
           "username": "my_user",
           "password": "password123",
           "column": [
@@ -145,7 +137,15 @@
               "type": "int"
             }
           ],
-          "writeMode": "insert"
+          "writeMode": "insert",
+          "connection": {
+            "address": [
+              "127.0.0.1:27017"
+            ],
+            "database": "my_database",
+            "collection": "addax_writer",
+            "authDb": "my_database"
+          }
         }
       }
     }

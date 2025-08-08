@@ -29,16 +29,14 @@
             ],
             "username": "oracle",
             "password": "password",
-            "connection": [
-              {
-                "table": [
-                  "${sdb}.${stable}"
-                ],
-                "jdbcUrl": [
-                  "jdbc:oracle:thin:@127.0.0.1/stage"
-                ]
-              }
-            ]
+            "connection": {
+              "table": [
+                "${sdb}.${stable}"
+              ],
+              "jdbcUrl": [
+                "jdbc:oracle:thin:@127.0.0.1/stage"
+              ]
+            }
           }
         }
       }

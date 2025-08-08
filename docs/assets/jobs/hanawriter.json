@@ -38,19 +38,17 @@
       "writer": {
         "name": "hanawriter",
         "parameter": {
-          "connection": [
-            {
-              "jdbcUrl": "jdbc:sap://wgzhao-pc:39017/system",
-              "table": [
-                "addax_tbl"
-              ]
-            }
-          ],
           "username": "system",
           "password": "HXEHana1",
           "column": [
             "*"
-          ]
+          ],
+          "connection": {
+            "jdbcUrl": "jdbc:sap://wgzhao-pc:39017/system",
+            "table": [
+              "addax_tbl"
+            ]
+          }
         }
       }
     }

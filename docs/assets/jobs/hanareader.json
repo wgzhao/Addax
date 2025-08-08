@@ -1,5 +1,11 @@
 {
   "job": {
+    "setting": {
+      "speed": {
+        "bytes": -1,
+        "channel": 1
+      }
+    },
     "content": [
       {
         "reader": {
@@ -25,12 +31,6 @@
           }
         }
       }
-    ],
-    "setting": {
-      "speed": {
-        "bytes": -1,
-        "channel": 1
-      }
-    }
+    ]
   }
 }

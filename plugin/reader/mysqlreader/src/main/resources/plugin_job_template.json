@@ -13,7 +13,6 @@
       "table": [
         "addax_reader"
       ],
-      "driver": "com.mysql.jdbc.Driver",
       "fetchSize": 2048
     },
     "where": ""

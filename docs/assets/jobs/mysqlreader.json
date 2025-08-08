@@ -19,8 +19,7 @@
             "table": [
               "addax_reader"
             ],
-            "jdbcUrl": "jdbc:mysql://127.0.0.1:3306/test",
-            "driver": "com.mysql.jdbc.Driver"
+            "jdbcUrl": "jdbc:mysql://127.0.0.1:3306/test"
           }
         }
       },

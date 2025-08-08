@@ -26,6 +26,9 @@
       "writer": {
         "name": "postgresqlwriter",
         "parameter": {
+          "username": "pgtest",
+          "password": "pgtest",
+          "writeMode": "insert",
           "column": [
             "*"
           ],
@@ -37,10 +40,7 @@
             "table": [
               "addax_tbl1"
             ]
-          },
-          "username": "pgtest",
-          "password": "pgtest",
-          "writeMode": "insert"
+          }
         }
       }
     }

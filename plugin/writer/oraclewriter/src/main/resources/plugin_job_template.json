@@ -1,8 +1,8 @@
 {
   "name": "oraclewriter",
   "parameter": {
-    "username": "root",
-    "password": "root",
+    "username": "oracle",
+    "password": "password",
     "column": [
       "id",
       "name"
@@ -10,13 +10,11 @@
     "preSql": [
       "delete from @table"
     ],
-    "connection": [
-      {
-        "jdbcUrl": "jdbc:oracle:thin:@[HOST_NAME]:PORT:[DATABASE_NAME]",
-        "table": [
-          "test"
-        ]
-      }
-    ]
+    "connection": {
+      "jdbcUrl": "jdbc:oracle:thin:@[HOST_NAME]:PORT:[DATABASE_NAME]",
+      "table": [
+        "test"
+      ]
+    }
   }
 }

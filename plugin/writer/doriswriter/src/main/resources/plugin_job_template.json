@@ -11,15 +11,13 @@
     "loadUrl": [
       "fe:fe_port"
     ],
-    "connection": [
-      {
-        "jdbcUrl": "jdbc:mysql://fe:fe_port",
-        "database": "example_db",
-        "table": [
-          "table1"
-        ]
-      }
-    ],
+    "connection": {
+      "jdbcUrl": "jdbc:mysql://fe:fe_port",
+      "database": "example_db",
+      "table": [
+        "table1"
+      ]
+    },
     "loadProps": {
       "workers": "2"
     }

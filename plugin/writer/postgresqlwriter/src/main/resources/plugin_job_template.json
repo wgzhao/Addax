@@ -11,14 +11,12 @@
       "truncate table @table"
     ],
     "postSql": [],
-    "connection": [
-      {
-        "jdbcUrl": "jdbc:postgresql://127.0.0.1:5432/test",
-        "table": [
-          "addax_tbl1"
-        ]
-      }
-    ],
+    "connection": {
+      "jdbcUrl": "jdbc:postgresql://127.0.0.1:5432/test",
+      "table": [
+        "addax_tbl1"
+      ]
+    },
     "batchSize": 1024
   }
 }

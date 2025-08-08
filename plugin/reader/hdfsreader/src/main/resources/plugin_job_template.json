@@ -25,9 +25,10 @@
     "encoding": "UTF-8",
     "fieldDelimiter": ","
   },
-  "haveKerberos": "true",
+  "haveKerberos": "false",
   "kerberosPrincipal": "hive@COMPANY.COM",
   "kerberosKeytabFilePath": "/etc/security/keytabs/hive.headless.keytab",
+  "hdfsSitePath": "/etc/hadoop/conf/hdfs-site.xml",
   "hadoopConfig": {
     "dfs.nameservices": "cluster",
     "dfs.ha.namenodes.cluster": "nn1,nn2",

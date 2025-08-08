@@ -1,5 +1,10 @@
 {
   "job": {
+    "setting": {
+      "speed": {
+        "channel": 1
+      }
+    },
     "content": {
       "reader": {
         "name": "redisreader",
@@ -29,11 +34,6 @@
           },
           "timeout": 60000
         }
-      }
-    },
-    "setting": {
-      "speed": {
-        "channel": 1
       }
     }
   }

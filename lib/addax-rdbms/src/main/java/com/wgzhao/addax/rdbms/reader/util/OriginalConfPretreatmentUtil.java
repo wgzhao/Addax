@@ -34,6 +34,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -285,6 +287,26 @@ public final class OriginalConfPretreatmentUtil
 
         var isTableMode = StringUtils.isNotBlank(table);
         var isQuerySqlMode = StringUtils.isNotBlank(querySql);
+        if (isQuerySqlMode) {
+            //if the query sql come from external sql file , read it , then set back the querySql item
+            List<String> result = new ArrayList<>();
+            for (String sql: connConf.getList(Key.QUERY_SQL, String.class)) {
+                if (sql.startsWith("@")) {
+                    Path sqlFilePath = Path.of(sql.substring(1));
+                    try {
+                        String sqlContent = Files.readString(sqlFilePath).strip();
+                        result.add(sqlContent);
+
+                    } catch (Exception e) {
+                        throw AddaxException.asAddaxException(EXECUTE_FAIL,
+                                "Failed to read querySql from file: " + sqlFilePath, e);
+                    }
+                } else {
+                    result.add(sql);
+                }
+            }
+            originalConfig.set(Key.CONNECTION + "." + Key.QUERY_SQL, result);
+        }
 
         Predicate<Boolean> neitherConfigured = mode -> !mode;
         Predicate<Boolean> bothConfigured = mode -> mode;

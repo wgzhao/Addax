@@ -1,35 +1,33 @@
 {
   "job": {
-    "content": [
-      {
-        "reader": {
-          "name": "sybasereader",
-          "parameter": {
-            "column": [
-              "*"
-            ],
-            "connection": {
-              "jdbcUrl": "jdbc:sybase:Tds:127.0.0.1:5000/master",
-              "table": [
-                "dbo.ijdbc_function_escapes"
-              ]
-            },
-            "username": "sa",
-            "password": "password"
-          }
-        },
-        "writer": {
-          "name": "streamwriter",
-          "parameter": {
-            "print": "true"
-          }
-        }
-      }
-    ],
     "setting": {
       "speed": {
         "bytes": -1,
         "channel": 1
+      }
+    },
+    "content": {
+      "reader": {
+        "name": "sybasereader",
+        "parameter": {
+          "username": "sa",
+          "password": "password",
+          "column": [
+            "*"
+          ],
+          "connection": {
+            "jdbcUrl": "jdbc:sybase:Tds:127.0.0.1:5000/master",
+            "table": [
+              "dbo.ijdbc_function_escapes"
+            ]
+          }
+        }
+      },
+      "writer": {
+        "name": "streamwriter",
+        "parameter": {
+          "print": "true"
+        }
       }
     }
   }

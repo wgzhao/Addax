@@ -6,14 +6,12 @@
     "column": [
       "*"
     ],
-    "connection": [
-      {
-        "jdbcUrl": "jdbc:clickhouse://<host>:<port>[/<database>]",
-        "table": [
-          "table1"
-        ]
-      }
-    ],
+    "connection": {
+      "jdbcUrl": "jdbc:clickhouse://<host>:<port>[/<database>]",
+      "table": [
+        "table1"
+      ]
+    },
     "preSql": [],
     "postSql": [],
     "batchSize": 65536,

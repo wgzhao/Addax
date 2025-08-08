@@ -1,5 +1,11 @@
 {
   "job": {
+    "setting": {
+      "speed": {
+        "byte": -1,
+        "channel": 1
+      }
+    },
     "content": {
       "reader": {
         "name": "streamreader",

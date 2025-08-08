@@ -2,26 +2,6 @@
   "job": {
     "content": [
       {
-        "writer": {
-          "name": "postgresqlwriter",
-          "parameter": {
-            "column": [
-              "id","subid","msg"
-            ],
-            "connection": [
-              {
-                "jdbcUrl": "jdbc:postgresql://127.0.0.1:5432/pgtest"
-                ,
-                "table": [
-                  "addax_tbl"
-                ]
-              }
-            ],
-            "username": "pgtest",
-            "password": "pgtest",
-            "writeMode": "update(id, subid)"
-          }
-        },
         "reader": {
           "name": "streamreader",
           "parameter": {
@@ -40,6 +20,25 @@
               }
             ],
             "sliceRecordCount": 1
+          }
+        },
+        "writer": {
+          "name": "postgresqlwriter",
+          "parameter": {
+            "username": "pgtest",
+            "password": "pgtest",
+            "writeMode": "update(id, subid)",
+            "column": [
+              "id",
+              "subid",
+              "msg"
+            ],
+            "connection": {
+              "jdbcUrl": "jdbc:postgresql://127.0.0.1:5432/pgtest",
+              "table": [
+                "addax_tbl"
+              ]
+            }
           }
         }
       }

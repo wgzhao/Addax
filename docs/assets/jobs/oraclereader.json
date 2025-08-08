@@ -10,8 +10,8 @@
       "reader": {
         "name": "oraclereader",
         "parameter": {
-          "username": "root",
-          "password": "root",
+          "username": "oracle",
+          "password": "password",
           "column": [
             "id",
             "name"
@@ -21,7 +21,7 @@
             "table": [
               "table"
             ],
-            "jdbcUrl": "jdbc:oracle:thin:@<HOST_NAME>:PORT:<DATABASE_NAME>"
+            "jdbcUrl": "jdbc:oracle:thin:@127.0.0.1:5432/orcl"
           }
         }
       },

@@ -6,26 +6,6 @@
       }
     },
     "content": {
-      "writer": {
-        "name": "databendwriter",
-        "parameter": {
-          "preSql": [
-            "truncate table @table"
-          ],
-          "postSql": [
-          ],
-          "username": "u1",
-          "password": "123",
-          "database": "example_db",
-          "table": "table1",
-          "jdbcUrl": "jdbc:mysql://127.0.0.1:3307/example_db",
-          "loadUrl": ["127.0.0.1:8000","127.0.0.1:8000"],
-          "fieldDelimiter": "\\x01",
-          "lineDelimiter": "\\x02",
-          "column": ["*"],
-          "format": "csv"
-        }
-      },
       "reader": {
         "name": "streamreader",
         "parameter": {
@@ -48,6 +28,31 @@
             }
           ],
           "sliceRecordCount": 100
+        }
+      },
+      "writer": {
+        "name": "databendwriter",
+        "parameter": {
+          "preSql": [
+            "truncate table @table"
+          ],
+          "postSql": [
+          ],
+          "username": "u1",
+          "password": "123",
+          "database": "example_db",
+          "table": "table1",
+          "jdbcUrl": "jdbc:mysql://127.0.0.1:3307/example_db",
+          "loadUrl": [
+            "127.0.0.1:8000",
+            "127.0.0.1:8000"
+          ],
+          "fieldDelimiter": "\\x01",
+          "lineDelimiter": "\\x02",
+          "column": [
+            "*"
+          ],
+          "format": "csv"
         }
       }
     }

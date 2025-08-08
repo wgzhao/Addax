@@ -13,7 +13,7 @@
       ]
     },
     "where": "logdate='20211013'",
-    "haveKerberos": true,
+    "haveKerberos": false,
     "kerberosKeytabFilePath": "/etc/security/keytabs/hive.headless.keytab",
     "kerberosPrincipal": "hive@COMPANY.COM"
   }
