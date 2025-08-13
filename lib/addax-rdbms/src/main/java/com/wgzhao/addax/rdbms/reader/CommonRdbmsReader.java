@@ -280,12 +280,7 @@ public class CommonRdbmsReader
                     return new DateColumn(rs.getDate(i));
 
                 case Types.TIMESTAMP:
-                    if(!"org.apache.hive.jdbc.HiveDriver".equals(this.dataBaseType.getDriverClassName())){
-                        return new TimestampColumn(rs.getTimestamp(i, Calendar.getInstance()));
-                    }else{
-                        //hive not support method(Timestamp getTimestamp(int columnIndex, Calendar cal))
-                        return new TimestampColumn(rs.getTimestamp(i));
-                    }
+                    return new TimestampColumn(rs.getTimestamp(i, Calendar.getInstance()));
 
                 case Types.BINARY:
                 case Types.VARBINARY:
