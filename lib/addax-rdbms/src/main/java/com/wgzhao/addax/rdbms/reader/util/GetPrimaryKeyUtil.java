@@ -32,8 +32,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import static com.wgzhao.addax.core.base.Key.CONNECTION;
 import static com.wgzhao.addax.core.base.Key.JDBC_URL;
@@ -108,7 +108,7 @@ public class GetPrimaryKeyUtil
 
         LOG.warn("The table {} contains a multiply candidate keys. try to choose numeric type key if present", table);
         JDBCType jdbcType;
-        List<JDBCType> numericTypes = Arrays.asList(JDBCType.NUMERIC, JDBCType.INTEGER, JDBCType.BIGINT, JDBCType.DECIMAL, JDBCType.FLOAT);
+        Set<JDBCType> numericTypes = Set.of(JDBCType.SMALLINT, JDBCType.INTEGER, JDBCType.BIGINT, JDBCType.FLOAT, JDBCType.REAL, JDBCType.DOUBLE, JDBCType.DECIMAL, JDBCType.NUMERIC);
         for (String[] column : columns) {
             // JDBCType not support INT type, it exists in MySQL
             if ("INT".equals(column[1])) {
