@@ -1,0 +1,48 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "byte": -1,
+        "channel": 1
+      }
+    },
+    "content": {
+      "reader": {
+        "name": "gaussdbreader",
+        "parameter": {
+          "username": "gstest",
+          "password": "gstest",
+          "column": [
+            "*"
+          ],
+          "connection": {
+            "table": [
+              "addax_tbl"
+            ],
+            "jdbcUrl": "jdbc:gaussdb://localhost:8000/gstest"
+          }
+        }
+      },
+      "writer": {
+        "name": "gaussdbwriter",
+        "parameter": {
+          "column": [
+            "*"
+          ],
+          "preSql": [
+            "truncate table @table"
+          ],
+          "connection": {
+            "jdbcUrl": "jdbc:gaussdb://127.0.0.1:8000/gstest",
+            "table": [
+              "addax_tbl1"
+            ]
+          },
+          "username": "gstest",
+          "password": "gstest",
+          "writeMode": "insert"
+        }
+      }
+    }
+  }
+}
