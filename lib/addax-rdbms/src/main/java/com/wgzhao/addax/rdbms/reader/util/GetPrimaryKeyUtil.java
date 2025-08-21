@@ -226,41 +226,37 @@ public class GetPrimaryKeyUtil
                         ORDER BY ac.constraint_type ASC, cc.data_type ASC
                         """.formatted(normalizedSchema, normalizedTableName);
             }
-            case SQLite -> {
-                yield """
-                        SELECT name AS column_name,  `type` AS column_type, 'PRI' AS KEY_TYPE
-                        FROM  pragma_table_info('%1$s')
-                        WHERE  pk > 0
-                        UNION ALL
-                        SELECT t.name,  t.`type`, 'UNI'
-                        FROM pragma_index_list('%1$s') AS il
-                        JOIN pragma_index_info(il.name) AS ii
-                        JOIN pragma_table_info('%1$s') AS t
-                         ON t.name = ii.name
-                        WHERE  il.`unique` = 1  AND il.origin != 'pk'
-                        GROUP BY seq HAVING  count(seq) = 1
-                        """.formatted(tableName);
-            }
-            case Sybase -> {
-                yield """
-                        SELECT  c.name AS COLUMN_NAME, UPPER(t.name) AS COLUMN_TYPE,  CASE WHEN i.status & 2048 = 2048 THEN 'PRI' ELSE 'UNI' END AS KEY_TYPE
-                        FROM sysindexes i JOIN syscolumns c ON i.id = c.id AND
-                        c.colid = (
-                                SELECT MIN(cx.colid) FROM sysindexkeys k
-                                JOIN syscolumns cx ON k.id = cx.id AND k.colid = cx.colid
-                                WHERE k.id = i.id AND k.indid = i.indid
-                                )
-                            JOIN sysobjects o ON i.id = o.id
-                            JOIN systypes t ON c.usertype = t.usertype
-                        WHERE
-                            o.name = '%s'
-                            AND (i.status & 2 = 2 OR i.status & 2048 = 2048) ")
-                            AND (SELECT COUNT(*) FROM sysindexkeys k WHERE k.id = i.id AND k.indid = i.indid) = 1 ")
-                            AND o.uid = USER_ID('%s')
-                        ORDER BY
-                            CASE WHEN i.status & 2048 = 2048 THEN 0 ELSE 1 END,  t.name
-                        """.formatted(tableName, username != null ? username : schema);
-            }
+            case SQLite -> """
+                    SELECT name AS column_name,  `type` AS column_type, 'PRI' AS KEY_TYPE
+                    FROM  pragma_table_info('%1$s')
+                    WHERE  pk > 0
+                    UNION ALL
+                    SELECT t.name,  t.`type`, 'UNI'
+                    FROM pragma_index_list('%1$s') AS il
+                    JOIN pragma_index_info(il.name) AS ii
+                    JOIN pragma_table_info('%1$s') AS t
+                     ON t.name = ii.name
+                    WHERE  il.`unique` = 1  AND il.origin != 'pk'
+                    GROUP BY seq HAVING  count(seq) = 1
+                    """.formatted(tableName);
+            case Sybase -> """
+                    SELECT  c.name AS COLUMN_NAME, UPPER(t.name) AS COLUMN_TYPE,  CASE WHEN i.status & 2048 = 2048 THEN 'PRI' ELSE 'UNI' END AS KEY_TYPE
+                    FROM sysindexes i JOIN syscolumns c ON i.id = c.id AND
+                    c.colid = (
+                            SELECT MIN(cx.colid) FROM sysindexkeys k
+                            JOIN syscolumns cx ON k.id = cx.id AND k.colid = cx.colid
+                            WHERE k.id = i.id AND k.indid = i.indid
+                            )
+                        JOIN sysobjects o ON i.id = o.id
+                        JOIN systypes t ON c.usertype = t.usertype
+                    WHERE
+                        o.name = '%s'
+                        AND (i.status & 2 = 2 OR i.status & 2048 = 2048) ")
+                        AND (SELECT COUNT(*) FROM sysindexkeys k WHERE k.id = i.id AND k.indid = i.indid) = 1 ")
+                        AND o.uid = USER_ID('%s')
+                    ORDER BY
+                        CASE WHEN i.status & 2048 = 2048 THEN 0 ELSE 1 END,  t.name
+                    """.formatted(tableName, username != null ? username : schema);
             default -> {
                 LOG.warn("Unsupported database type: {}", dataBaseType);
                 yield null;
