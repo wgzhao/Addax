@@ -42,37 +42,48 @@ public class Communication
     private Throwable throwable;
     private long timestamp;
 
+    /**
+     * Create a new Communication with default values.
+     */
     public Communication()
     {
         this.init();
     }
 
-    public Communication(Communication communication)
+    /**
+     * Deep-copy constructor. Clone all counters, state, throwable and messages
+     * from the given source communication into this instance.
+     *
+     * @param source the source communication to copy from
+     */
+    public Communication(Communication source)
     {
         this.init();
-        for (Map.Entry<String, Number> entry : this.counter.entrySet()) {
+        if (source == null) {
+            return;
+        }
+        // copy counters
+        for (Map.Entry<String, Number> entry : source.getCounter().entrySet()) {
             String key = entry.getKey();
             Number value = entry.getValue();
             if (value instanceof Long) {
-                communication.setLongCounter(key, (Long) value);
+                this.setLongCounter(key, value.longValue());
             }
             else if (value instanceof Double) {
-                communication.setDoubleCounter(key, (Double) value);
+                this.setDoubleCounter(key, value.doubleValue());
             }
         }
+        // copy state/throwable/timestamp
+        this.setState(source.getState(), true);
+        this.setThrowable(source.getThrowable(), true);
+        this.setTimestamp(source.getTimestamp());
 
-        communication.setState(this.state, true);
-        communication.setThrowable(this.throwable, true);
-        communication.setTimestamp(this.timestamp);
-
-        /*
-         * clone message
-         */
-        if (this.message != null) {
-            for (Map.Entry<String, List<String>> entry : this.message.entrySet()) {
+        // clone messages
+        if (source.message != null) {
+            for (Map.Entry<String, List<String>> entry : source.message.entrySet()) {
                 String key = entry.getKey();
                 List<String> value = new ArrayList<>(entry.getValue());
-                communication.getMessage().put(key, value);
+                this.getMessage().put(key, value);
             }
         }
     }
@@ -225,7 +236,7 @@ public class Communication
                     value = value.longValue() + otherValue.longValue();
                 }
                 else {
-                    value = value.doubleValue() + value.doubleValue();
+                    value = value.doubleValue() + otherValue.doubleValue();
                 }
             }
 
@@ -246,7 +257,7 @@ public class Communication
     }
 
     /**
-     * Merge state, priority: ( Failed | Killed )  &gt; Running &gt; Success
+     * Merge state, priority: (Failed | Killed)  &gt; Running &gt; Success
      * Killing state only exists in Job's own state.
      *
      * @param otherComm communication
