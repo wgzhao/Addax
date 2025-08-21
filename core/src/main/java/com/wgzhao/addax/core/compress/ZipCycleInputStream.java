@@ -38,29 +38,29 @@ public class ZipCycleInputStream
     public int read()
             throws IOException
     {
-        // 定位一个Entry数据流的开头
-        if (null == this.currentZipEntry) {
-            this.currentZipEntry = this.zipInputStream.getNextEntry();
-            if (null == this.currentZipEntry) {
-                return -1;
+        // Locate the beginning of an entry stream
+        while (true) {
+            if (this.currentZipEntry == null) {
+                this.currentZipEntry = this.zipInputStream.getNextEntry();
+                if (this.currentZipEntry == null) {
+                    return -1;
+                }
             }
-        }
 
-        // 不支持zip下的嵌套, 对于目录跳过
-        if (this.currentZipEntry.isDirectory()) {
-            this.currentZipEntry = null;
-            return this.read();
-        }
+            // Skip directories; nested zips are not supported
+            if (this.currentZipEntry.isDirectory()) {
+                this.currentZipEntry = null;
+                continue;
+            }
 
-        // 读取一个Entry数据流
-        int result = this.zipInputStream.read();
+            // Read one entry stream
+            int result = this.zipInputStream.read();
 
-        // 当前Entry数据流结束了, 需要尝试下一个Entry
-        if (-1 == result) {
-            this.currentZipEntry = null;
-            return this.read();
-        }
-        else {
+            // If current entry stream ends, try next entry
+            if (result == -1) {
+                this.currentZipEntry = null;
+                continue;
+            }
             return result;
         }
     }

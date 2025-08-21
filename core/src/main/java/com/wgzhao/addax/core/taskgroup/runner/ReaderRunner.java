@@ -28,9 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Created by jingxing on 14-9-1.
- * <p>
- * 单个slice的reader执行调用
+ * ReaderRunner is responsible for executing a single Reader.Task slice.
  */
 public class ReaderRunner
         extends AbstractRunner
@@ -41,11 +39,21 @@ public class ReaderRunner
 
     private RecordSender recordSender;
 
+    /**
+     * Construct a ReaderRunner with a specific task plugin.
+     *
+     * @param abstractTaskPlugin the Reader.Task plugin instance
+     */
     public ReaderRunner(AbstractTaskPlugin abstractTaskPlugin)
     {
         super(abstractTaskPlugin);
     }
 
+    /**
+     * Set the RecordSender used to send records downstream.
+     *
+     * @param recordSender the sender implementation
+     */
     public void setRecordSender(RecordSender recordSender)
     {
         this.recordSender = recordSender;
@@ -112,8 +120,13 @@ public class ReaderRunner
         }
     }
 
+    /**
+     * Shutdown the RecordSender if present to release resources.
+     */
     public void shutdown()
     {
-        recordSender.shutdown();
+        if (recordSender != null) {
+            recordSender.shutdown();
+        }
     }
 }

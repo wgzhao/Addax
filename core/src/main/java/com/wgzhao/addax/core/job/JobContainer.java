@@ -98,9 +98,9 @@ public class JobContainer
         errorLimit = new ErrorRecordChecker(configuration);
     }
 
-    /*
-     * The main work of the jobContainer is all done in the start() method，
-     * including init, prepare, split, scheduler, post, destroy and statistics
+    /**
+     * Start the JobContainer. It manages the whole lifecycle: pre-handle, init, prepare,
+     * split, schedule, post, and statistics logging. Supports dry-run pre-check.
      */
     @Override
     public void start()
@@ -222,7 +222,8 @@ public class JobContainer
 
         // configure the jobConfig of reader
         jobReader.setPluginJobConf(this.configuration.getConfiguration(CoreConstant.JOB_CONTENT_READER_PARAMETER));
-        jobReader.setPeerPluginJobConf(this.configuration.getConfiguration(CoreConstant.JOB_CONTENT_READER_PARAMETER));
+        // use writer parameters as peer for reader during pre-check
+        jobReader.setPeerPluginJobConf(this.configuration.getConfiguration(CoreConstant.JOB_CONTENT_WRITER_PARAMETER));
         jobReader.setJobPluginCollector(jobPluginCollector);
 
         classLoaderSwapper.restoreCurrentThreadClassLoader();
@@ -238,9 +239,9 @@ public class JobContainer
 
         this.configuration.set(CoreConstant.JOB_CONTENT_WRITER_PARAMETER + ".dryRun", true);
 
-        // 设置writer的jobConfig
+        // set job config for writer
         jobWriter.setPluginJobConf(this.configuration.getConfiguration(CoreConstant.JOB_CONTENT_WRITER_PARAMETER));
-        // 设置reader的readerConfig
+        // set peer config (reader) for writer
         jobWriter.setPeerPluginJobConf(this.configuration.getConfiguration(CoreConstant.JOB_CONTENT_READER_PARAMETER));
 
         jobWriter.setPeerPluginName(this.readerPluginName);
@@ -268,14 +269,14 @@ public class JobContainer
     }
 
     /*
-     * reader和writer的初始化
+     * Initialize reader and writer plugins
      */
     private void init()
     {
         Thread.currentThread().setName("job-0");
 
         JobPluginCollector jobPluginCollector = new DefaultJobPluginCollector(this.getContainerCommunicator());
-        //必须先Reader ，后Writer
+        // reader must be initialized before writer
         this.jobReader = this.initJobReader(jobPluginCollector);
         this.jobWriter = this.initJobWriter(jobPluginCollector);
     }
@@ -350,9 +351,9 @@ public class JobContainer
     }
 
     /*
-     * 执行reader和writer最细粒度的切分，需要注意的是，writer的切分结果要参照reader的切分结果，
-     * 达到切分后数目相等，才能满足1：1的通道模型，所以这里可以将reader和writer的配置整合到一起，
-     * 然后，为避免顺序给读写端带来长尾影响，将整合的结果shuffler掉
+     * Perform the finest-grained split for reader and writer. Writer's split should match
+     * reader's split count to satisfy the 1:1 channel model. Then merge the parameters into
+     * content and optionally shuffle to avoid long-tail effects.
      */
     private int split()
     {
@@ -370,7 +371,7 @@ public class JobContainer
 
         LOG.debug("The transformer configuration:{} ", JSON.toJSONString(transformerList));
         /*
-         * 输入是reader和writer的parameter list，输出是content下面元素的list
+         * input is reader and writer parameter list, output is content list
          */
         List<Configuration> contentConfig = mergeReaderAndWriterTaskConfigs(readerTaskConfigs, writerTaskConfigs, transformerList);
 
@@ -390,7 +391,7 @@ public class JobContainer
         if (isByteLimit) {
             long globalLimitedByteSpeed = this.configuration.getInt(CoreConstant.JOB_SETTING_SPEED_BYTE, 10 * 1024 * 1024);
 
-            // 在byte流控情况下，单个Channel流量最大值必须设置，否则报错！
+            // Under byte-rate limit, the per-channel byte limit must be set, otherwise fail
             Long channelLimitedByteSpeed = this.configuration.getLong(CoreConstant.CORE_TRANSPORT_CHANNEL_SPEED_BYTE, -1);
             if (channelLimitedByteSpeed == null || channelLimitedByteSpeed <= 0) {
                 throw AddaxException.asAddaxException(
@@ -432,13 +433,13 @@ public class JobContainer
     }
 
     /*
-     * schedule首先完成的工作是把上一步reader和writer split的结果整合到具体taskGroupContainer中,
-     * 同时不同的执行模式调用不同的调度策略，将所有任务调度起来
+     * schedule merges the split results into TaskGroupContainer and dispatches them
+     * according to the execution mode.
      */
     private void schedule()
     {
         /*
-         * 这里的全局speed和每个channel的速度设置为B/s
+         * The global and per-channel speed are in B/s
          */
         int channelsPerTaskGroup = this.configuration.getInt(CoreConstant.CORE_CONTAINER_TASK_GROUP_CHANNEL, 5);
         int taskNumber = this.configuration.getList(CoreConstant.JOB_CONTENT).size();
@@ -447,7 +448,7 @@ public class JobContainer
         PerfTrace.getInstance().setChannelNumber(needChannelNumber);
 
         /*
-         * 通过获取配置信息得到每个taskGroup需要运行哪些tasks任务
+         * Get which tasks each taskGroup should run from configuration
          */
 
         List<Configuration> taskGroupConfigs = JobAssignUtil.assignFairly(this.configuration, this.needChannelNumber, channelsPerTaskGroup);
@@ -469,7 +470,7 @@ public class JobContainer
         }
 
         /*
-         * 检查任务执行情况
+         * Check job limits
          */
         this.checkLimit();
     }
@@ -520,7 +521,7 @@ public class JobContainer
 
         Communication reportCommunication = CommunicationTool.getReportCommunication(communication, tempComm, this.totalStage);
 
-        // 字节速率
+        // byte speed
         long byteSpeedPerSecond = communication.getLongCounter(CommunicationTool.READ_SUCCEED_BYTES) / transferCosts;
         long recordSpeedPerSecond = communication.getLongCounter(CommunicationTool.READ_SUCCEED_RECORDS) / transferCosts;
 
@@ -600,7 +601,7 @@ public class JobContainer
     }
 
     /*
-     * reader job的初始化，返回Reader.Job
+     * Initialize reader job and return Reader.Job
      */
     private Reader.Job initJobReader(
             JobPluginCollector jobPluginCollector)
@@ -609,10 +610,10 @@ public class JobContainer
         classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(PluginType.READER, this.readerPluginName));
 
         Reader.Job jobReader = (Reader.Job) LoadUtil.loadJobPlugin(PluginType.READER, this.readerPluginName);
-        // 设置reader的jobConfig
+        // set job config for reader
         jobReader.setPluginJobConf(this.configuration.getConfiguration(CoreConstant.JOB_CONTENT_READER_PARAMETER));
 
-        // 设置reader的readerConfig
+        // set peer config (writer) for reader
         jobReader.setPeerPluginJobConf(this.configuration.getConfiguration(CoreConstant.JOB_CONTENT_WRITER_PARAMETER));
 
         jobReader.setJobPluginCollector(jobPluginCollector);
@@ -623,7 +624,7 @@ public class JobContainer
     }
 
     /*
-     * writer job的初始化，返回Writer.Job
+     * Initialize writer job and return Writer.Job
      */
     private Writer.Job initJobWriter(JobPluginCollector jobPluginCollector)
     {
@@ -631,10 +632,10 @@ public class JobContainer
         classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(PluginType.WRITER, this.writerPluginName));
 
         Writer.Job jobWriter = (Writer.Job) LoadUtil.loadJobPlugin(PluginType.WRITER, this.writerPluginName);
-        // 设置writer的jobConfig
+        // set job config for writer
         jobWriter.setPluginJobConf(this.configuration.getConfiguration(CoreConstant.JOB_CONTENT_WRITER_PARAMETER));
 
-        // 设置reader的readerConfig
+        // set peer config (reader) for writer
         jobWriter.setPeerPluginJobConf(this.configuration.getConfiguration(CoreConstant.JOB_CONTENT_READER_PARAMETER));
 
         jobWriter.setPeerPluginName(this.readerPluginName);
@@ -690,7 +691,7 @@ public class JobContainer
     }
 
     /*
-     * 按顺序整合reader和writer的配置，这里的顺序不能乱！ 输入是reader、writer级别的配置，输出是一个完整task的配置
+     * Merge reader and writer task configs into full task content by index order.
      */
     private List<Configuration> mergeReaderAndWriterTaskConfigs(
             List<Configuration> readerTasksConfigs,
@@ -713,7 +714,8 @@ public class JobContainer
             taskConfig.set(CoreConstant.JOB_WRITER_NAME, this.writerPluginName);
             taskConfig.set(CoreConstant.JOB_WRITER_PARAMETER, writerTasksConfigs.get(i));
 
-            if (!transformerConfigs.isEmpty()) {
+            // Avoid NPE if transformer list is null
+            if (transformerConfigs != null && !transformerConfigs.isEmpty()) {
                 taskConfig.set(CoreConstant.JOB_TRANSFORMER, transformerConfigs);
             }
 
@@ -741,7 +743,7 @@ public class JobContainer
     }
 
     /**
-     * 检查最终结果是否超出阈值，如果阈值设定小于1，则表示百分数阈值，大于1表示条数阈值。
+     * Check whether the final results exceed thresholds. If threshold < 1, it's a percentage; otherwise it's a record count.
      */
     private void checkLimit()
     {
@@ -776,15 +778,19 @@ public class JobContainer
             }
         }
         catch (IOException | InterruptedException e) {
+            // Preserve interrupt status when interrupted during HTTP reporting
+            if (e instanceof InterruptedException) {
+                Thread.currentThread().interrupt();
+            }
             LOG.warn("Exception occurred while uploading the job results: {}", e.getMessage());
         }
     }
 
     /**
-     * 调用外部hook
+     * Invoke external hooks if any (currently noop).
      */
     private void invokeHooks()
     {
-        //
+        // no-op
     }
 }

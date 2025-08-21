@@ -133,23 +133,23 @@ public final class JobAssignUtil
 
         for (Configuration aTaskConfig : contentConfig) {
             int taskId = aTaskConfig.getInt(CoreConstant.TASK_ID);
-            // 把 readerResourceMark 加到 readerResourceMarkAndTaskIdMap 中
+            // Add readerResourceMark to readerResourceMarkAndTaskIdMap
             String readerResourceMark = aTaskConfig.getString(JOB_READER_PARAMETER + "." + LOAD_BALANCE_RESOURCE_MARK);
             readerResourceMarkAndTaskIdMap.computeIfAbsent(readerResourceMark, k -> new ArrayList<>());
             readerResourceMarkAndTaskIdMap.get(readerResourceMark).add(taskId);
 
-            // 把 writerResourceMark 加到 writerResourceMarkAndTaskIdMap 中
+            // Add writerResourceMark to writerResourceMarkAndTaskIdMap
             String writerResourceMark = aTaskConfig.getString(JOB_WRITER_PARAMETER + "." + LOAD_BALANCE_RESOURCE_MARK);
             writerResourceMarkAndTaskIdMap.computeIfAbsent(writerResourceMark, k -> new ArrayList<>());
             writerResourceMarkAndTaskIdMap.get(writerResourceMark).add(taskId);
         }
 
         if (readerResourceMarkAndTaskIdMap.size() >= writerResourceMarkAndTaskIdMap.size()) {
-            // 采用 reader 对资源做的标记进行 shuffle
+            // Use reader's resource mark for shuffling
             return readerResourceMarkAndTaskIdMap;
         }
         else {
-            // 采用 writer 对资源做的标记进行 shuffle
+            // Use writer's resource mark for shuffling
             return writerResourceMarkAndTaskIdMap;
         }
     }

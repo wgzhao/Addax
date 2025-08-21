@@ -162,7 +162,7 @@ public class PerfRecord
     public enum PHASE
     {
         /**
-         * task total运行的时间，前10为框架统计，后面为部分插件的个性统计
+         * Total time of a task phase. The first 10 are framework phases, followed by plugin-specific ones.
          */
         TASK_TOTAL(0),
 
@@ -179,11 +179,11 @@ public class PerfRecord
         WRITE_TASK_DESTROY(10),
 
         /**
-         * SQL_QUERY: sql query阶段, 部分reader的个性统计
+         * SQL_QUERY: SQL query phase, used by some readers as custom metrics.
          */
         SQL_QUERY(100),
         /**
-         * 数据从sql全部读出来
+         * All rows fetched from SQL result set.
          */
         RESULT_NEXT_ALL(101),
 

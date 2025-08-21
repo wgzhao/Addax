@@ -58,7 +58,7 @@ public abstract class AbstractScheduler
         ErrorRecordChecker errorLimit = new ErrorRecordChecker(configurations.get(0));
 
         /*
-         * 给 taskGroupContainer 的 Communication 注册
+         * Register communication channels for TaskGroupContainers
          */
         this.containerCommunicator.registerCommunication(configurations);
 
@@ -85,7 +85,6 @@ public abstract class AbstractScheduler
             nowJobContainerCommunication.setTimestamp(System.currentTimeMillis());
             LOG.debug(nowJobContainerCommunication.toString());
 
-            //汇报周期
             long now = System.currentTimeMillis();
             if (now - lastReportTimeStamp > jobReportIntervalInMillSec) {
                 Communication reportCommunication = CommunicationTool
@@ -93,25 +92,36 @@ public abstract class AbstractScheduler
 
                 this.containerCommunicator.report(reportCommunication);
                 lastReportTimeStamp = now;
+                // Update the last snapshot reference for next delta calculation
                 lastJobContainerCommunication = nowJobContainerCommunication;
             }
 
+            // Enforce error limits ASAP to fail-fast
             errorLimit.checkRecordLimit(nowJobContainerCommunication);
+            errorLimit.checkPercentageLimit(nowJobContainerCommunication);
 
-            if (nowJobContainerCommunication.getState() == State.SUCCEEDED) {
+            State state = nowJobContainerCommunication.getState();
+            if (state == State.SUCCEEDED) {
                 LOG.info("The scheduler has completed all tasks.");
                 break;
             }
 
-            if (nowJobContainerCommunication.getState() == State.FAILED) {
+            if (state == State.FAILED) {
                 dealFailedStat(this.containerCommunicator, nowJobContainerCommunication.getThrowable());
             }
+
+            if (state == State.KILLING || state == State.KILLED) {
+                // Best-effort graceful shutdown when being killed
+                dealKillingStat(this.containerCommunicator, totalTasks);
+            }
+
             try {
                 TimeUnit.MILLISECONDS.sleep(jobSleepIntervalInMillSec);
             }
             catch (InterruptedException e) {
-                // 以 failed 状态退出
-                LOG.error("An InterruptedException was caught!", e);
+                // Restore interrupt status and exit as failed
+                Thread.currentThread().interrupt();
+                LOG.error("The scheduler thread was interrupted.", e);
                 throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
             }
         }

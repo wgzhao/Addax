@@ -67,7 +67,7 @@ public class TaskGroupContainer
     // The current taskGroupId
     private final int taskGroupId;
 
-    // The channel class used 使用的channel类
+    // The channel class used
     private final String channelClazz;
 
     /**
@@ -77,6 +77,11 @@ public class TaskGroupContainer
 
     private final TaskMonitor taskMonitor = TaskMonitor.getInstance();
 
+    /**
+     * Construct a TaskGroupContainer with the given configuration.
+     *
+     * @param configuration task group configuration
+     */
     public TaskGroupContainer(Configuration configuration)
     {
         super(configuration);
@@ -98,6 +103,9 @@ public class TaskGroupContainer
         return taskGroupId;
     }
 
+    /**
+     * Start scheduling tasks within this task group, handling failover and reporting periodically.
+     */
     @Override
     public void start()
     {
@@ -119,13 +127,13 @@ public class TaskGroupContainer
 
         List<Configuration> taskConfigs = this.configuration.getListConfiguration(CoreConstant.JOB_CONTENT);
 
-        LOG.debug("The task configuration [{} for taskGroup[{}]", this.taskGroupId, JSON.toJSONString(taskConfigs));
+        LOG.debug("The task configuration [{}] for taskGroup[{}]", JSON.toJSONString(taskConfigs), this.taskGroupId);
 
         int taskCountInThisTaskGroup = taskConfigs.size();
         LOG.info("The taskGroupId=[{}] started [{}] channels for [{}] tasks.", this.taskGroupId, channelNumber, taskCountInThisTaskGroup);
 
         this.containerCommunicator.registerCommunication(taskConfigs);
-        // setup the taskId and task configuration map
+        // set up the taskId and task configuration map
         Map<Integer, Configuration> taskConfigMap = buildTaskConfigMap(taskConfigs);
         // the task queue for the task that has not been executed
         List<Configuration> taskQueue = buildRemainTasks(taskConfigs);
@@ -275,6 +283,9 @@ public class TaskGroupContainer
         reportTaskGroupCommunication(lastTaskGroupContainerCommunication, taskCountInThisTaskGroup);
     }
 
+    /**
+     * Build a map from taskId to task configuration.
+     */
     private Map<Integer, Configuration> buildTaskConfigMap(List<Configuration> configurations)
     {
         Map<Integer, Configuration> map = new HashMap<>();
@@ -285,11 +296,17 @@ public class TaskGroupContainer
         return map;
     }
 
+    /**
+     * Build a list of pending tasks (a shallow copy of input list).
+     */
     private List<Configuration> buildRemainTasks(List<Configuration> configurations)
     {
         return new ArrayList<>(configurations);
     }
 
+    /**
+     * Remove and return a TaskExecutor with given taskId from the running list.
+     */
     private TaskExecutor removeTask(List<TaskExecutor> taskList, int taskId)
     {
         Iterator<TaskExecutor> iterator = taskList.iterator();
@@ -303,6 +320,9 @@ public class TaskGroupContainer
         return null;
     }
 
+    /**
+     * Check whether all tasks in the list have finished.
+     */
     private boolean isAllTaskDone(List<TaskExecutor> taskList)
     {
         for (TaskExecutor taskExecutor : taskList) {
@@ -313,6 +333,9 @@ public class TaskGroupContainer
         return true;
     }
 
+    /**
+     * Report task group communication metrics and return the reported snapshot.
+     */
     private Communication reportTaskGroupCommunication(Communication lastTaskGroupContainerCommunication, int taskCount)
     {
         Communication nowTaskGroupContainerCommunication = this.containerCommunicator.collect();
@@ -329,6 +352,9 @@ public class TaskGroupContainer
         communication.setState(State.FAILED);
     }
 
+    /**
+     * Execute a task with paired reader/writer threads and a shared channel.
+     */
     class TaskExecutor
     {
         private final Configuration taskConfig;

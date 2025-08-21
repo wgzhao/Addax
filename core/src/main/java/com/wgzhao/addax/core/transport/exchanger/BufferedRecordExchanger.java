@@ -70,7 +70,7 @@ public class BufferedRecordExchanger
         this.bufferSize = configuration.getInt(CORE_TRANSPORT_EXCHANGER_BUFFER_SIZE, 32);
         this.buffer = new ArrayList<>(bufferSize);
 
-        //channel的queue默认大小为8M，原来为64M
+        // The default channel queue capacity is 8MB (was 64MB)
         this.byteCapacity = configuration.getInt(
                 CORE_TRANSPORT_CHANNEL_CAPACITY_BYTE, 8 * 1024 * 1024);
 

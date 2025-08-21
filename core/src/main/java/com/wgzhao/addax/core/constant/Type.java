@@ -18,7 +18,7 @@
 package com.wgzhao.addax.core.constant;
 
 /**
- * Addax 内部类型
+ * Internal data types used by Addax.
  */
 public enum Type
 {

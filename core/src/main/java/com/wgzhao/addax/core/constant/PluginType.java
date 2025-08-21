@@ -22,7 +22,8 @@ package com.wgzhao.addax.core.constant;
  */
 public enum PluginType
 {
-    //pluginType还代表了资源目录，很难扩展,或者说需要足够必要才扩展。先mark Handler（其实和transformer一样），再讨论
+    // pluginType also represents the resource directory layout. Avoid adding new types unless necessary.
+    // Marking Handler here for future discussion (similar to transformer).
     READER("reader"), TRANSFORMER("transformer"), WRITER("writer"), HANDLER("handler");
 
     private final String pluginType;

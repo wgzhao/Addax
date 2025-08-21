@@ -69,7 +69,7 @@ public class BufferedRecordTransformerExchanger
         this.bufferSize = configuration.getInt(CoreConstant.CORE_TRANSPORT_EXCHANGER_BUFFER_SIZE, 32);
         this.buffer = new ArrayList<>(bufferSize);
 
-        //channel的queue默认大小为8M，原来为64M
+        // The default channel queue capacity is 8MB (was 64MB)
         this.byteCapacity = configuration.getInt(
                 CoreConstant.CORE_TRANSPORT_CHANNEL_CAPACITY_BYTE, 8 * 1024 * 1024);
 
@@ -134,7 +134,7 @@ public class BufferedRecordTransformerExchanger
             throw AddaxException.asAddaxException(ErrorCode.SHUT_DOWN_TASK, "");
         }
         this.channel.pushAll(this.buffer);
-        //和channel的统计保持同步
+        // Keep transformer stats in sync with channel pushes
         doStat();
         this.buffer.clear();
         this.bufferIndex = 0;

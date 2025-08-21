@@ -29,7 +29,7 @@ import com.wgzhao.addax.core.util.container.LoadUtil;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,13 +47,18 @@ public class Engine
 {
     private static final Logger LOG = LoggerFactory.getLogger(Engine.class);
 
+    /**
+     * Start the Engine with the given configuration.
+     *
+     * @param allConf the job configuration
+     */
     public void start(Configuration allConf)
     {
 
-        // bind and casting column type
+        // Bind and cast column type
         ColumnCast.bind(allConf);
 
-        // initialize the PluginLoader
+        // Initialize the PluginLoader
         LoadUtil.bind(allConf);
 
         AbstractContainer container;
@@ -62,7 +67,12 @@ public class Engine
         container.start();
     }
 
-
+    /**
+     * Filter job configuration to mask sensitive keys and return a beautified JSON string.
+     *
+     * @param configuration original configuration
+     * @return masked configuration in pretty JSON format
+     */
     public static String filterJobConfiguration(final Configuration configuration)
     {
         Configuration jobConfWithSetting = configuration.getConfiguration("job").clone();
@@ -76,19 +86,30 @@ public class Engine
         return jobConfWithSetting.beautify();
     }
 
+    /**
+     * Mask sensitive fields in the configuration such as password/accessKey/token.
+     *
+     * @param configuration configuration to be masked in place
+     */
     public static void filterSensitiveConfiguration(Configuration configuration)
     {
         Set<String> keys = configuration.getKeys();
         for (String key : keys) {
-            boolean isSensitive = StringUtils.endsWithIgnoreCase(key, "password")
-                    || StringUtils.endsWithIgnoreCase(key, "accessKey")
-                    || StringUtils.endsWithIgnoreCase(key, "token");
+            boolean isSensitive = Strings.CI.endsWith(key, "password")
+                    || Strings.CI.endsWith(key, "accessKey")
+                    || Strings.CI.endsWith(key, "token");
             if (isSensitive && configuration.get(key) instanceof String) {
                 configuration.set(key, "*****");
             }
         }
     }
 
+    /**
+     * CLI entry to parse arguments, validate the configuration, and run the Engine.
+     *
+     * @param args command line args
+     * @throws Throwable any error raised while starting the engine
+     */
     public static void entry(String[] args)
             throws Throwable
     {
@@ -101,7 +122,7 @@ public class Engine
         String jobPath = cl.getOptionValue("job");
         Configuration configuration = ConfigParser.parse(jobPath);
 
-        //打印vmInfo
+        // Print VM info
         VMInfo vmInfo = VMInfo.getVmInfo();
         if (vmInfo != null) {
             LOG.debug(vmInfo.toString());
@@ -116,6 +137,11 @@ public class Engine
         engine.start(configuration);
     }
 
+    /**
+     * Get current Addax version from project.properties on classpath.
+     *
+     * @return version string, or null if not found
+     */
     public static String getVersion()
     {
         try {
@@ -128,6 +154,11 @@ public class Engine
         }
     }
 
+    /**
+     * Java main entry. It expects at least one argument specifying the job file path.
+     *
+     * @param args command line args
+     */
     public static void main(String[] args)
     {
         LOG.info("\n  ___      _     _            \n" +

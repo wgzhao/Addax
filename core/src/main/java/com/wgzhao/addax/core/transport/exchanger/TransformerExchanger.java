@@ -81,8 +81,8 @@ public abstract class TransformerExchanger
             }
 
             /*
-             * 延迟检查transformer参数的有效性，直接抛出异常，不作为脏数据
-             * 不需要在插件中检查参数的有效性。但参数的个数等和插件相关的参数，在插件内部检查
+             * Deferred validation of transformer parameters; throw directly if invalid rather than marking dirty.
+             * No need to validate parameters inside plugins except for plugin-specific ones like parameter count.
              */
             if (!transformerInfoExec.isChecked()) {
 

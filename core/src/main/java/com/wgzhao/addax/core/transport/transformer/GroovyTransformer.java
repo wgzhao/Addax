@@ -50,7 +50,7 @@ public class GroovyTransformer
     {
 
         if (groovyTransformer == null) {
-            //全局唯一
+            // global unique initialization
             if (paras.length < 1 || paras.length > 2) {
                 throw AddaxException.asAddaxException(
                         ILLEGAL_VALUE,

@@ -16,17 +16,18 @@
  */
 
 /*
- * description:
+ * Description:
  *
- * 使用了shevek在github上开源的lzo解压缩代码(https://github.com/shevek/lzo-java)
+ * This class leverages the open-source LZO decompression code by shevek on GitHub
+ * (https://github.com/shevek/lzo-java).
  *
- * 继承LzopInputStream的原因是因为开源版本代码中LZO_LIBRARY_VERSION是这样定义的:
- * public static final short LZO_LIBRARY_VERSION = 0x2050;
- * 而很多lzo文件LZO_LIBRARY_VERSION是0x2060,要解压这种version的lzo文件,必须要更改
- * LZO_LIBRARY_VERSION的值,才不会抛异常,而LZO_LIBRARY_VERSION是final类型的,无法更改
- * 其值,于是继承了LzopInputStream的类,重新定义了LZO_LIBRARY_VERSION的值。
- *
+ * The reason for extending LzopInputStream is that the open-source implementation defines
+ * LZO_LIBRARY_VERSION as 0x2050, while many LZO files use 0x2060. To decompress those files
+ * without throwing an exception, we must accept a higher library version. Since
+ * LZO_LIBRARY_VERSION is declared final in the original code and cannot be changed, we
+ * extend LzopInputStream and override the header checks to allow 0x2060.
  */
+
 package com.wgzhao.addax.core.compress;
 
 import org.anarres.lzo.LzoVersion;

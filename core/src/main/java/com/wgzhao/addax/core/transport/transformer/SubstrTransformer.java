@@ -30,8 +30,7 @@ import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
 /**
- * no comments.
- * Created by liqiang on 16/3/4.
+ * SubstrTransformer extracts a substring from a designated column value.
  */
 public class SubstrTransformer
         extends Transformer
@@ -41,6 +40,13 @@ public class SubstrTransformer
         setTransformerName("dx_substr");
     }
 
+    /**
+     * Evaluate and replace the specified column with a substring.
+     *
+     * @param record input record
+     * @param paras parameters: [columnIndex:int, startIndex:String, length:String]
+     * @return record with updated column, or original when input is null
+     */
     @Override
     public Record evaluate(Record record, Object... paras)
     {
@@ -67,7 +73,7 @@ public class SubstrTransformer
 
         try {
             String oriValue = column.asString();
-            //如果字段为空，跳过subStr处理
+            // If the field is null, skip substring processing
             if (oriValue == null) {
                 return record;
             }

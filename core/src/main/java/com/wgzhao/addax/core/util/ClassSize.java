@@ -20,7 +20,7 @@
 package com.wgzhao.addax.core.util;
 
 /**
- * Created by liqiang on 15/12/12.
+ * Utility constants for estimating object sizes in memory.
  */
 public class ClassSize
 {
@@ -48,7 +48,7 @@ public class ClassSize
     }
 
     static {
-        //only 64位
+        // 64-bit only
         REFERENCE = 8;
 
         OBJECT = 2 * REFERENCE;

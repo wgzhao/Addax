@@ -37,25 +37,15 @@ public final class RetryUtil
     private RetryUtil() {}
 
     /**
-     * 重试次数工具方法.
+     * Execute the callable with retry.
      *
-     * @param callable 实际逻辑
-     * @param retryTimes 最大重试次数
-     * @param sleepTimeInMilliSecond 运行失败后休眠对应时间再重试
-     * @param exponential 休眠时间是否指数递增
-     * @param <T> 返回值类型
-     * @return 经过重试的callable的执行结果
-     * @throws Exception 运行异常
-     */
-
-    /**
-     *  This method is used to execute the callable with retry.
      * @param callable the actual logic
-     * @param retryTimes the maximum number of retries
-     * @param sleepTimeInMilliSecond the time to sleep after the operation fails before retrying
-     * @param exponential whether the sleep time is exponentially increased
-     * @param <T> the return type
-     * @throws Exception if the operation fails
+     * @param retryTimes the maximum retry attempts (&ge 1)
+     * @param sleepTimeInMilliSecond sleep duration between retries in milliseconds
+     * @param exponential whether to increase the sleep time exponentially
+     * @param <T> return type
+     * @return the callable result after retries
+     * @throws Exception if all retries fail or a non-retriable error occurs
      */
     public static <T> T executeWithRetry(Callable<T> callable,
             int retryTimes,
@@ -68,14 +58,16 @@ public final class RetryUtil
     }
 
     /**
-     *  This method is used to execute the callable with retry.
+     * Execute the callable with retry.
+     *
      * @param callable the actual logic
-     * @param retryTimes the maximum number of retries
-     * @param sleepTimeInMilliSecond the time to sleep after the operation fails before retrying
-     * @param exponential whether the sleep time is exponentially increased
-     * @param retryExceptionClass the exception types that trigger a retry
-     * @param <T> the return type
-     * @throws Exception if the operation fails
+     * @param retryTimes the maximum retry attempts ( &ge 1)
+     * @param sleepTimeInMilliSecond sleep duration between retries in milliseconds
+     * @param exponential whether to increase the sleep time exponentially
+     * @param retryExceptionClass exception types that should trigger a retry; if null/empty, all exceptions are retried
+     * @param <T> return type
+     * @return the callable result after retries
+     * @throws Exception if all retries fail or a non-retriable error occurs
      */
     public static <T> T executeWithRetry(Callable<T> callable,
             int retryTimes,
@@ -89,17 +81,20 @@ public final class RetryUtil
     }
 
     /**
-     *  It is used to execute and retry in an external thread. Each execution must be completed within timeoutMs, otherwise it is considered a failure.
-     *  limit conditions: can only interrupt threads when blocking
+     * Execute the callable with retry asynchronously. Each attempt must complete within timeoutMs.
+     * If an attempt exceeds the timeout, it's treated as a failure and retried.
+     *
+     * Limitations: only blocking operations can be interrupted reliably.
+     *
      * @param callable the actual logic
-     * @param retryTimes the maximum number of retries
-     * @param sleepTimeInMilliSecond the time to sleep after the operation fails before retrying
-     * @param exponential whether the sleep time is exponentially increased
-     * @param timeoutMs the timeout for the callable to execute, in milliseconds
+     * @param retryTimes the maximum retry attempts ( &ge 1)
+     * @param sleepTimeInMilliSecond sleep duration between retries in milliseconds
+     * @param exponential whether to increase the sleep time exponentially
+     * @param timeoutMs the timeout for a single attempt in milliseconds
      * @param executor the thread pool for executing asynchronous operations
-     * @return the result of the callable after retry
-     * @param <T> the return type
-     * @throws Exception if the operation fails
+     * @param <T> return type
+     * @return the callable result after retries
+     * @throws Exception if all retries fail or a non-retriable error occurs
      */
     public static <T> T asyncExecuteWithRetry(Callable<T> callable,
             int retryTimes,
