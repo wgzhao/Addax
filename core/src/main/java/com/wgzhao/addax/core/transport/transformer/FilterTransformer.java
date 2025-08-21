@@ -107,7 +107,7 @@ public class FilterTransformer
     private Record doGreat(Record record, String value, Column column, boolean hasEqual)
     {
 
-        //如果字段为空，直接不参与比较。即空也属于无穷小
+        // If the field is null, skip comparison. Null is treated as negative infinity
         if (column.getRawData() == null) {
             return record;
         }
@@ -175,15 +175,14 @@ public class FilterTransformer
             }
         }
         else {
-            throw new RuntimeException(">=,> can't support this columnType:"
-                    + column.getClass().getSimpleName());
+            throw new RuntimeException(">=,> can't support this columnType:" + column.getClass().getSimpleName());
         }
     }
 
     private Record doLess(Record record, String value, Column column, boolean hasEqual)
     {
 
-        //如果字段为空，直接不参与比较。即空也属于无穷大
+        // If the field is null, skip comparison. Null is treated as positive infinity
         if (column.getRawData() == null) {
             return record;
         }
@@ -252,23 +251,22 @@ public class FilterTransformer
             }
         }
         else {
-            throw new RuntimeException("<=,< can't support this columnType:"
-                    + column.getClass().getSimpleName());
+            throw new RuntimeException("<=,< can't support this columnType:" + column.getClass().getSimpleName());
         }
     }
 
     /**
-     * DateColumn将比较long值，StringColumn，ByteColumn以及BooleanColumn比较其String值
+     * For DateColumn, compares the long value; for StringColumn, ByteColumn and BooleanColumn, compares their String values.
      *
      * @param record message record
      * @param value value to compared
      * @param column the column of record
-     * @return Record
+     * @return Record (null to filter out the record, or non-null to keep)
      */
     private Record doEqual(Record record, String value, Column column)
     {
 
-        //如果字段为空，只比较目标字段为"null"，否则null字段均不过滤
+        // If the field is null, only keep when the target value is "null"; otherwise do not filter nulls
         if (column.getRawData() == null) {
             if ("null".equalsIgnoreCase(value)) {
                 return null;
@@ -279,10 +277,10 @@ public class FilterTransformer
         }
 
         if (column instanceof DoubleColumn) {
-            Double ori = column.asDouble();
+            double ori = column.asDouble();
             double val = Double.parseDouble(value);
 
-            if (ori == val) {
+            if (Double.compare(ori, val) == 0) {
                 return null;
             }
             else {
@@ -290,7 +288,7 @@ public class FilterTransformer
             }
         }
         else if (column instanceof LongColumn || column instanceof DateColumn) {
-            Long ori = column.asLong();
+            long ori = column.asLong();
             long val = Long.parseLong(value);
 
             if (ori == val) {
@@ -312,22 +310,21 @@ public class FilterTransformer
             }
         }
         else {
-            throw new RuntimeException("== can't support this columnType:"
-                    + column.getClass().getSimpleName());
+            throw new RuntimeException("== can't support this columnType:" + column.getClass().getSimpleName());
         }
     }
 
     /**
-     * For DateColumn, it will compare long value, for StringColumn, ByteColumn and BooleanColumn, it will compare their String value.
+     * For DateColumn, it will compare long value; for StringColumn, ByteColumn and BooleanColumn, it will compare their String value.
      * @param record message record
      * @param value value to compare
      * @param column the column of record
-     * @return Record
+     * @return Record (null to filter out the record, or non-null to keep)
      */
     private Record doNotEqual(Record record, String value, Column column)
     {
 
-        //如果字段为空，只比较目标字段为"null", 否则null字段均过滤。
+        // If the field is null, only keep when the target value is "null", otherwise filter nulls
         if (column.getRawData() == null) {
             if ("null".equalsIgnoreCase(value)) {
                 return record;
@@ -338,10 +335,10 @@ public class FilterTransformer
         }
 
         if (column instanceof DoubleColumn) {
-            Double ori = column.asDouble();
+            double ori = column.asDouble();
             double val = Double.parseDouble(value);
 
-            if (ori != val) {
+            if (Double.compare(ori, val) != 0) {
                 return null;
             }
             else {
@@ -349,7 +346,7 @@ public class FilterTransformer
             }
         }
         else if (column instanceof LongColumn || column instanceof DateColumn) {
-            Long ori = column.asLong();
+            long ori = column.asLong();
             long val = Long.parseLong(value);
 
             if (ori != val) {
@@ -371,8 +368,7 @@ public class FilterTransformer
             }
         }
         else {
-            throw new RuntimeException("== can't support this columnType:"
-                    + column.getClass().getSimpleName());
+            throw new RuntimeException("== can't support this columnType:" + column.getClass().getSimpleName());
         }
     }
 

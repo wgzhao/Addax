@@ -40,7 +40,7 @@ public final class RetryUtil
      * Execute the callable with retry.
      *
      * @param callable the actual logic
-     * @param retryTimes the maximum retry attempts (&ge 1)
+     * @param retryTimes the maximum retry attempts (&ge; 1)
      * @param sleepTimeInMilliSecond sleep duration between retries in milliseconds
      * @param exponential whether to increase the sleep time exponentially
      * @param <T> return type
@@ -61,7 +61,7 @@ public final class RetryUtil
      * Execute the callable with retry.
      *
      * @param callable the actual logic
-     * @param retryTimes the maximum retry attempts ( &ge 1)
+     * @param retryTimes the maximum retry attempts ( &ge; 1)
      * @param sleepTimeInMilliSecond sleep duration between retries in milliseconds
      * @param exponential whether to increase the sleep time exponentially
      * @param retryExceptionClass exception types that should trigger a retry; if null/empty, all exceptions are retried
@@ -87,7 +87,7 @@ public final class RetryUtil
      * Limitations: only blocking operations can be interrupted reliably.
      *
      * @param callable the actual logic
-     * @param retryTimes the maximum retry attempts ( &ge 1)
+     * @param retryTimes the maximum retry attempts ( &ge; 1)
      * @param sleepTimeInMilliSecond sleep duration between retries in milliseconds
      * @param exponential whether to increase the sleep time exponentially
      * @param timeoutMs the timeout for a single attempt in milliseconds
