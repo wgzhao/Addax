@@ -23,12 +23,31 @@ package com.wgzhao.addax.rdbms.util;
 
 import java.sql.Connection;
 
+/**
+ * Factory interface for creating database connections.
+ * Provides methods to obtain connections with different retry behaviors.
+ */
 public interface ConnectionFactory
 {
-
+    /**
+     * Gets a database connection with retry mechanism enabled.
+     *
+     * @return A database connection
+     */
     Connection getConnection();
 
+    /**
+     * Gets a database connection without retry mechanism.
+     * Fails immediately if connection cannot be established.
+     *
+     * @return A database connection
+     */
     Connection getConnectionWithoutRetry();
 
+    /**
+     * Gets connection information string for logging and debugging purposes.
+     *
+     * @return Connection information as a string
+     */
     String getConnectionInfo();
 }

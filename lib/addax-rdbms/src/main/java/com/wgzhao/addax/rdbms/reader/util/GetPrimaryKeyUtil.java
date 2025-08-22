@@ -41,23 +41,26 @@ import static com.wgzhao.addax.core.base.Key.PASSWORD;
 import static com.wgzhao.addax.core.base.Key.TABLE;
 import static com.wgzhao.addax.core.base.Key.USERNAME;
 
+/**
+ * Utility class for automatically detecting primary keys or unique keys suitable for table splitting.
+ * Provides database-specific queries to find optimal split keys for parallel data reading.
+ */
 public class GetPrimaryKeyUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger(GetPrimaryKeyUtil.class);
 
     private GetPrimaryKeyUtil()
     {
+        // Private constructor to prevent instantiation
     }
 
     /**
-     * Try to get a primary key or unique key on single column to split the data
-     * if no primary key or unique key, return null
-     * Give priority to selecting the primary key, followed by a unique index of numeric type,
-     * and lastly, other divisible unique indexes.
+     * Attempts to automatically detect a primary key or unique key suitable for table splitting.
+     * Prioritizes primary keys, followed by numeric unique indexes, then other unique indexes.
      *
-     * @param dataBaseType {@link DataBaseType}
-     * @param readConf {@link Configuration}
-     * @return column name if it has primary key or unique key, else null
+     * @param dataBaseType The database type for generating appropriate queries
+     * @param readConf Reader configuration containing connection details
+     * @return Column name of the best split key candidate, or null if none found
      */
     public static String getPrimaryKey(DataBaseType dataBaseType, Configuration readConf)
     {
@@ -132,12 +135,14 @@ public class GetPrimaryKeyUtil
     }
 
     /**
-     * Generate SQL to get primary key or unique single-column key
+     * Generates database-specific SQL query to retrieve primary key or unique single-column key information.
+     * Supports multiple database types with optimized queries for each platform.
      *
-     * @param schema schema name, can be null
-     * @param tableName the table name
-     * @param username username (used for Oracle when schema is null)
-     * @return the sql string to get primary key
+     * @param dataBaseType The database type for query generation
+     * @param schema Schema name (can be null, will use default schema)
+     * @param tableName The table name to query
+     * @param username Username (used for Oracle when schema is null)
+     * @return SQL query string to retrieve primary key information, or null if database type not supported
      */
     public static String getPrimaryKeyQuery(DataBaseType dataBaseType, String schema, String tableName, String username)
     {

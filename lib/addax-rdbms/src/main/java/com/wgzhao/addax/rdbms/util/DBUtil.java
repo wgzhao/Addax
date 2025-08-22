@@ -55,12 +55,16 @@ import static com.wgzhao.addax.core.spi.ErrorCode.CONNECT_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
 import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
+/**
+ * Utility class for database operations, including connection management, SQL validation,
+ * privilege checks, and result set handling.
+ */
 public final class DBUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger(DBUtil.class);
     private static final int DEFAULT_SOCKET_TIMEOUT_SEC = 20_000;
 
-    // Use ThreadLocal.withInitial() (JDK 8+) for cleaner initialization
+    // Use ThreadLocal.withInitial() for cleaner initialization
     private static final ThreadLocal<ExecutorService> RS_EXECUTORS = ThreadLocal.withInitial(() -> Executors.newFixedThreadPool(1, new ThreadFactoryBuilder()
             .setNameFormat("rsExecutors-%d")
             .setDaemon(true)
@@ -68,8 +72,19 @@ public final class DBUtil
 
     private DBUtil()
     {
+        // Private constructor to prevent instantiation
     }
 
+    /**
+     * Validates JDBC URL connectivity with retry mechanism.
+     *
+     * @param dataBaseType The database type
+     * @param jdbcUrl The JDBC URL to validate
+     * @param username Database username
+     * @param password Database password 
+     * @param preSql List of pre-SQL statements to execute during validation
+     * @throws AddaxException if connection validation fails after retries
+     */
     public static void validJdbcUrl(DataBaseType dataBaseType, String jdbcUrl, String username, String password, List<String> preSql)
     {
         try {
@@ -84,6 +99,16 @@ public final class DBUtil
         }
     }
 
+    /**
+     * Validates JDBC URL connectivity without retry mechanism.
+     *
+     * @param dataBaseType The database type
+     * @param jdbcUrl The JDBC URL to validate
+     * @param username Database username
+     * @param password Database password
+     * @param preSql List of pre-SQL statements to execute during validation
+     * @throws AddaxException if connection validation fails
+     */
     public static void validJdbcUrlWithoutRetry(DataBaseType dataBaseType, String jdbcUrl, String username, String password, List<String> preSql)
     {
         try {
@@ -95,6 +120,16 @@ public final class DBUtil
         }
     }
 
+    /**
+     * Checks if the specified user has INSERT privileges on the given tables.
+     *
+     * @param dataBaseType The database type
+     * @param jdbcURL The JDBC URL for connection
+     * @param userName Database username
+     * @param password Database password
+     * @param tableList List of table names to check privileges for
+     * @return true if user has INSERT privilege on all tables, false otherwise
+     */
     public static boolean checkInsertPrivilege(DataBaseType dataBaseType, String jdbcURL, String userName, String password, List<String> tableList)
     {
         try (Connection connection = getConnection(dataBaseType, jdbcURL, userName, password)) {
@@ -121,6 +156,16 @@ public final class DBUtil
         }
     }
 
+    /**
+     * Checks if the specified user has DELETE privileges on the given tables.
+     *
+     * @param dataBaseType The database type
+     * @param jdbcURL The JDBC URL for connection
+     * @param userName Database username
+     * @param password Database password
+     * @param tableList List of table names to check privileges for
+     * @return true if user has DELETE privilege on all tables, false otherwise
+     */
     public static boolean checkDeletePrivilege(DataBaseType dataBaseType, String jdbcURL, String userName, String password, List<String> tableList)
     {
         try (Connection connection = getConnection(dataBaseType, jdbcURL, userName, password)) {
@@ -147,6 +192,12 @@ public final class DBUtil
         }
     }
 
+    /**
+     * Determines if DELETE privilege check is needed by examining pre/post SQL statements.
+     *
+     * @param originalConfig The configuration containing pre/post SQL statements
+     * @return true if any SQL statement contains DELETE operations, false otherwise
+     */
     public static boolean needCheckDeletePrivilege(Configuration originalConfig)
     {
         var allSqls = new ArrayList<String>();
@@ -169,22 +220,34 @@ public final class DBUtil
     }
 
     /**
-     * Get direct JDBC connection
+     * Get direct JDBC connection with default socket timeout.
      * <p>
-     * if connecting failed, try to connect for MAX_TRY_TIMES times
-     * <p>
+     * If connecting failed, try to connect for MAX_TRY_TIMES times
+     * </p>
      *
-     * @param dataBaseType database type.
-     * @param jdbcUrl java jdbc url.
-     * @param username User for login.
-     * @param password Password to use when connecting to server.
-     * @return Connection class {@link Connection}
+     * @param dataBaseType Database type
+     * @param jdbcUrl JDBC URL for connection
+     * @param username Username for login
+     * @param password Password to use when connecting to server
+     * @return Connection instance
+     * @throws RdbmsException if connection fails
      */
     public static synchronized Connection getConnection(DataBaseType dataBaseType, String jdbcUrl, String username, String password)
     {
         return getConnection(dataBaseType, jdbcUrl, username, password, DEFAULT_SOCKET_TIMEOUT_SEC);
     }
 
+    /**
+     * Get direct JDBC connection with specified socket timeout.
+     *
+     * @param dataBaseType Database type
+     * @param jdbcUrl JDBC URL for connection
+     * @param username Username for login
+     * @param password Password to use when connecting to server
+     * @param socketTimeout Socket timeout in seconds
+     * @return Connection instance
+     * @throws RdbmsException if connection fails
+     */
     public static synchronized Connection getConnection(DataBaseType dataBaseType, String jdbcUrl, String username, String password, int socketTimeout)
     {
 
@@ -194,15 +257,16 @@ public final class DBUtil
             bds.setPassword(password);
 
             if (dataBaseType == DataBaseType.Oracle) {
-                //oracle.net.READ_TIMEOUT for jdbc versions < 10.1.0.5 oracle.jdbc.ReadTimeout for jdbc versions >=10.1.0.5
-                // unit ms
-                bds.addConnectionProperty("oracle.jdbc.ReadTimeout", String.valueOf(socketTimeout * 1000));
+                // oracle.net.READ_TIMEOUT for jdbc versions < 10.1.0.5 
+                // oracle.jdbc.ReadTimeout for jdbc versions >= 10.1.0.5
+                // unit: ms
+                bds.addConnectionProperty("oracle.jdbc.ReadTimeout", String.valueOf(socketTimeout * 1000L));
             }
             if ("org.apache.hive.jdbc.HiveDriver".equals(bds.getDriverClassName())) {
                 DriverManager.setLoginTimeout(DEFAULT_SOCKET_TIMEOUT_SEC);
             }
             if (jdbcUrl.contains("inceptor2")) {
-                LOG.warn("inceptor2 must be process specially");
+                LOG.warn("inceptor2 must be processed specially");
                 jdbcUrl = jdbcUrl.replace("inceptor2", "hive2");
                 bds.setUrl(jdbcUrl);
                 bds.setDriverClassName("org.apache.hive.jdbc.HiveDriver");
@@ -213,7 +277,7 @@ public final class DBUtil
                 bds.setDriverClassName(dataBaseType.getDriverClassName());
             }
             bds.setMinIdle(2);
-//            bds.setMaxActive(5);
+            // bds.setMaxActive(5); // Deprecated method, use setMaxTotal instead
             bds.setMaxOpenPreparedStatements(200);
             return bds.getConnection();
         }
@@ -223,35 +287,47 @@ public final class DBUtil
     }
 
     /**
-     * Get direct JDBC connection
+     * Get direct JDBC connection without retry mechanism.
      * <p>
-     * if connecting failed, try to connect for MAX_TRY_TIMES times
-     * <p>
+     * If connecting failed, fail immediately without retries
+     * </p>
      *
-     * @param dataBaseType The database's type
-     * @param jdbcUrl jdbc url
-     * @param username User for login
+     * @param dataBaseType The database type
+     * @param jdbcUrl JDBC URL for connection
+     * @param username Username for login
      * @param password Password to use when connecting to server
-     * @return Connection class {@link Connection}
+     * @return Connection instance
+     * @throws RdbmsException if connection fails
      */
     public static Connection getConnectionWithoutRetry(DataBaseType dataBaseType, String jdbcUrl, String username, String password)
     {
         return getConnectionWithoutRetry(dataBaseType, jdbcUrl, username, password, DEFAULT_SOCKET_TIMEOUT_SEC);
     }
 
+    /**
+     * Get connection without retry mechanism with specified socket timeout.
+     *
+     * @param dataBaseType The database type
+     * @param jdbcUrl JDBC URL for connection
+     * @param username Username for login
+     * @param password Password to use when connecting to server
+     * @param socketTimeout Socket timeout in seconds
+     * @return Connection instance
+     * @throws RdbmsException if connection fails
+     */
     public static Connection getConnectionWithoutRetry(DataBaseType dataBaseType, String jdbcUrl, String username, String password, int socketTimeout)
     {
         return DBUtil.getConnection(dataBaseType, jdbcUrl, username, password, socketTimeout);
     }
 
     /**
-     * a wrapped method to execute select-like sql statement.
+     * A wrapper method to execute SELECT-like SQL statements with default query timeout.
      *
-     * @param conn Database connection.
-     * @param sql sql statement to be executed
-     * @param fetchSize fetch size
-     * @return a {@link ResultSet}
-     * @throws SQLException if occurs SQLException.
+     * @param conn Database connection
+     * @param sql SQL statement to be executed
+     * @param fetchSize Fetch size for each batch
+     * @return A {@link ResultSet} containing query results
+     * @throws SQLException if SQL execution fails
      */
     public static ResultSet query(Connection conn, String sql, int fetchSize)
             throws SQLException
@@ -261,19 +337,19 @@ public final class DBUtil
     }
 
     /**
-     * a wrapped method to execute select-like sql statement.
+     * A wrapper method to execute SELECT-like SQL statements with configurable query timeout.
      *
-     * @param conn Database connection.
-     * @param sql sql statement to be executed
-     * @param fetchSize fetch size each batch
-     * @param queryTimeout unit:second
-     * @return A {@link ResultSet}
-     * @throws SQLException if failed to execute sql statement
+     * @param conn Database connection
+     * @param sql SQL statement to be executed
+     * @param fetchSize Fetch size for each batch
+     * @param queryTimeout Query timeout in seconds
+     * @return A {@link ResultSet} containing query results
+     * @throws SQLException if SQL execution fails
      */
     public static ResultSet query(Connection conn, String sql, int fetchSize, int queryTimeout)
             throws SQLException
     {
-        // make sure autocommit is off
+        // Make sure autocommit is off
         try {
             conn.setAutoCommit(false);
         }
@@ -287,7 +363,7 @@ public final class DBUtil
             stmt = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY); //NOSONAR
         }
         catch (SQLException ignore) {
-            // some database does not support TYPE_FORWARD_ONLY/CONCUR_READ_ONLY
+            // Some databases do not support TYPE_FORWARD_ONLY/CONCUR_READ_ONLY
             LOG.warn("The current database does not support TYPE_FORWARD_ONLY/CONCUR_READ_ONLY");
             stmt = conn.createStatement(); //NOSONAR
         }
@@ -296,6 +372,14 @@ public final class DBUtil
         return stmt.executeQuery(sql);
     }
 
+    /**
+     * Safely close database resources (ResultSet, Statement, Connection).
+     * Handles null values and suppresses SQLExceptions during cleanup.
+     *
+     * @param rs ResultSet to close (can be null)
+     * @param stmt Statement to close (can be null)
+     * @param conn Connection to close (can be null)
+     */
     public static void closeDBResources(ResultSet rs, Statement stmt, Connection conn)
     {
         if (rs != null) {
@@ -303,7 +387,7 @@ public final class DBUtil
                 rs.close();
             }
             catch (SQLException ignored) {
-                // Ignored
+                // Exception ignored during cleanup
             }
         }
 
@@ -312,7 +396,7 @@ public final class DBUtil
                 stmt.close();
             }
             catch (SQLException ignored) {
-                // Ignored
+                // Exception ignored during cleanup
             }
         }
 
@@ -321,16 +405,33 @@ public final class DBUtil
                 conn.close();
             }
             catch (SQLException ignored) {
-                // Ignored
+                // Exception ignored during cleanup
             }
         }
     }
 
+    /**
+     * Convenience method to close Statement and Connection resources.
+     *
+     * @param stmt Statement to close (can be null)
+     * @param conn Connection to close (can be null)
+     */
     public static void closeDBResources(Statement stmt, Connection conn)
     {
         closeDBResources(null, stmt, conn);
     }
 
+    /**
+     * Retrieves all column names for a specified table.
+     *
+     * @param dataBaseType Database type
+     * @param jdbcUrl JDBC URL for connection
+     * @param user Database username
+     * @param pass Database password
+     * @param tableName Name of the table to query
+     * @return List of column names in the table
+     * @throws AddaxException if connection or query fails
+     */
     public static List<String> getTableColumns(DataBaseType dataBaseType, String jdbcUrl, String user, String pass, String tableName)
     {
         try (Connection conn = getConnection(dataBaseType, jdbcUrl, user, pass)) {
@@ -341,10 +442,15 @@ public final class DBUtil
         }
     }
 
+    /**
+     * Retrieves column names for a table using an existing connection.
+     *
+     * @param conn Database connection
+     * @param tableName Name of the table to query
+     * @return List of column names in the table
+     */
     public static List<String> getTableColumnsByConn(Connection conn, String tableName)
     {
-        List<String> columns = new ArrayList<>();
-
         List<Map<String, Object>> rsMetaData = getColumnMetaData(conn, tableName, "*");
 
         // Using Stream API to transform metadata to column names
@@ -355,24 +461,25 @@ public final class DBUtil
     }
 
     /**
-     * get column description
+     * Retrieves detailed column metadata for a table.
      *
-     * @param conn database connection
+     * @param conn Database connection
      * @param tableName The table name
-     * @param column table column
-     * @return {@link List}
+     * @param column The column specification (use "*" for all columns)
+     * @return List of maps containing column metadata (name, type, label, typeName, precision, scale)
+     * @throws AddaxException if metadata retrieval fails
      */
     public static List<Map<String, Object>> getColumnMetaData(Connection conn, String tableName, String column)
     {
         List<Map<String, Object>> result = new ArrayList<>();
-        // skip index 0, compliant with jdbc resultSet and resultMetaData
+        // Skip index 0, compliant with JDBC ResultSet and ResultSetMetaData
         result.add(null);
 
         try (var statement = conn.createStatement()) {
-            // Using text blocks for multiline SQL (JDK 15+)
+            // Build query SQL based on database type
             String queryColumnSql;
             if (DataBaseType.TDengine.getDriverClassName().equals(conn.getMetaData().getDriverName())) {
-                // TDengine does not support 1=2 clause
+                // TDengine does not support "1=2" clause
                 queryColumnSql = "SELECT " + column + " FROM " + tableName + " LIMIT 0";
             }
             else {
@@ -398,6 +505,16 @@ public final class DBUtil
         }
     }
 
+    /**
+     * Tests database connection and executes pre-SQL statements without retry mechanism.
+     *
+     * @param dataBaseType Database type
+     * @param url JDBC URL
+     * @param user Database username
+     * @param pass Database password
+     * @param preSql List of pre-SQL statements to execute
+     * @throws AddaxException if connection test fails
+     */
     public static void testConnWithoutRetry(DataBaseType dataBaseType, String url, String user, String pass, List<String> preSql)
     {
         try (Connection connection = getConnection(dataBaseType, url, user, pass)) {
@@ -414,6 +531,14 @@ public final class DBUtil
         }
     }
 
+    /**
+     * Executes a SQL query and returns the ResultSet.
+     *
+     * @param conn Database connection
+     * @param sql SQL statement to execute
+     * @return ResultSet if query returns results, null otherwise
+     * @throws SQLException if SQL execution fails
+     */
     public static ResultSet query(Connection conn, String sql)
             throws SQLException
     {
@@ -429,6 +554,13 @@ public final class DBUtil
         }
     }
 
+    /**
+     * Executes a pre-check SQL statement and validates the result.
+     *
+     * @param conn Database connection
+     * @param pre Pre-check SQL statement
+     * @return true if pre-check passes (result is 0), false otherwise
+     */
     private static boolean doPreCheck(Connection conn, String pre)
     {
         try (ResultSet rs = query(conn, pre)) {
@@ -448,7 +580,15 @@ public final class DBUtil
         }
     }
 
-    // warn:until now, only oracle need to handle session config.
+    /**
+     * Handles session configuration for different database types.
+     * Currently, supports Oracle, MySQL, and SQLServer session configurations.
+     *
+     * @param conn Database connection
+     * @param config Configuration containing session settings
+     * @param databaseType Database type
+     * @param message Context message for logging
+     */
     public static void dealWithSessionConfig(Connection conn, Configuration config, DataBaseType databaseType, String message)
     {
         switch (databaseType) {
@@ -460,6 +600,13 @@ public final class DBUtil
         }
     }
 
+    /**
+     * Executes a list of session configuration SQL statements.
+     *
+     * @param conn Database connection
+     * @param sessions List of session configuration SQL statements
+     * @param message Context message for logging
+     */
     private static void doDealWithSessionConfig(Connection conn, List<String> sessions, String message)
     {
         if (null == sessions || sessions.isEmpty()) {
@@ -482,6 +629,12 @@ public final class DBUtil
         }
     }
 
+    /**
+     * Validates SQL syntax using Druid SQL parser.
+     *
+     * @param sql SQL statement to validate
+     * @param dataBaseType Database type for parser selection
+     */
     public static void sqlValid(String sql, DataBaseType dataBaseType)
     {
         SQLStatementParser statementParser = SQLParserUtils.createSQLStatementParser(sql, dataBaseType.getTypeName());
@@ -489,16 +642,24 @@ public final class DBUtil
     }
 
     /**
-     * async next() only apply to meta query, not for data reading
+     * Asynchronously advances ResultSet to next row with default timeout.
+     * This method is designed for metadata queries, not for data reading.
      *
-     * @param resultSet result set
-     * @return boolean
+     * @param resultSet ResultSet to advance
+     * @return true if there is a next row, false otherwise
      */
     public static boolean asyncResultSetNext(ResultSet resultSet)
     {
         return asyncResultSetNext(resultSet, 3600);
     }
 
+    /**
+     * Asynchronously advances ResultSet to next row with specified timeout.
+     *
+     * @param resultSet ResultSet to advance
+     * @param timeout Timeout in seconds
+     * @return true if there is a next row, false otherwise
+     */
     public static boolean asyncResultSetNext(ResultSet resultSet, int timeout)
     {
         // Use a method reference for cleaner code
@@ -511,6 +672,12 @@ public final class DBUtil
         }
     }
 
+    /**
+     * Loads database driver classes from plugin configuration.
+     *
+     * @param pluginType Type of plugin ("reader" or "writer")
+     * @param pluginName Name of the plugin
+     */
     public static void loadDriverClass(String pluginType, String pluginName)
     {
         try {
@@ -524,7 +691,7 @@ public final class DBUtil
             Configuration configuration = Configuration.from(new File(pluginJsonPath));
             List<String> drivers = configuration.getList("drivers", String.class);
 
-            // Using parallel streams for potentially faster loading
+            // Load drivers sequentially to avoid potential class loading conflicts
             drivers.forEach(driver -> {
                 try {
                     Class.forName(driver);

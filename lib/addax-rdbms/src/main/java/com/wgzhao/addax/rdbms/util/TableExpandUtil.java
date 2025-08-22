@@ -26,24 +26,28 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Utility class for expanding table name patterns into concrete table names.
+ * Supports pattern-based table name expansion with range syntax like table[0-32].
+ */
 public final class TableExpandUtil
 {
-
-    // schema.table[0-2]more
-    // 1 2 3 4 5
-    public static Pattern pattern = Pattern.compile("(\\w+\\.)?(\\w+)\\[(\\d+)-(\\d+)\\](.*)");
+    // Groups: 1=schema, 2=table, 3=start, 4=end, 5=suffix
+    public static final Pattern PATTERN = Pattern.compile("(\\w+\\.)?(\\w+)\\[(\\d+)-(\\d+)\\](.*)");
 
     private TableExpandUtil()
     {
+        // Private constructor to prevent instantiation
     }
 
     /**
-     * Split the table string(Usually contains names of some tables) to a List
-     * that is format. example: table[0-32] will be split into `table0`,
-     * `table1`, `table2`, ... ,`table32` in {@link List}
+     * Splits table string containing table names with range patterns into a list of concrete table names.
+     * <p>
+     * Example: "table[0-32]" will be split into "table0", "table1", "table2", ..., "table32"
+     * </p>
      *
-     * @param tables a string contains table name(one or many).
-     * @return a split result of table name.
+     * @param tables A string containing table names (one or many, comma-separated)
+     * @return A list of expanded table names
      */
     public static List<String> splitTables(String tables)
     {
@@ -53,7 +57,7 @@ public final class TableExpandUtil
 
         String tableName;
         for (String tableArray : tableArrays) {
-            Matcher matcher = pattern.matcher(tableArray.trim());
+            Matcher matcher = PATTERN.matcher(tableArray.trim());
             if (!matcher.matches()) {
                 tableName = tableArray.trim();
                 splitTables.add(tableName);
@@ -61,25 +65,27 @@ public final class TableExpandUtil
             else {
                 String start = matcher.group(3).trim();
                 String end = matcher.group(4).trim();
-                String tmp;
+                
+                // Ensure start <= end
                 if (Integer.parseInt(start) > Integer.parseInt(end)) {
-                    tmp = start;
+                    String temp = start;
                     start = end;
-                    end = tmp;
+                    end = temp;
                 }
-                int len = start.length();
-                String schema;
+                
+                int paddingLength = start.length();
+                String schema = (matcher.group(1) == null) ? "" : matcher.group(1).trim();
+                
                 for (int k = Integer.parseInt(start); k <= Integer.parseInt(end); k++) {
-                    schema = (null == matcher.group(1)) ? "" : matcher.group(1)
-                            .trim();
                     if (start.startsWith("0")) {
+                        // Preserve zero-padding format
                         tableName = schema + matcher.group(2).trim()
-                                + String.format("%0" + len + "d", k)
+                                + String.format("%0" + paddingLength + "d", k)
                                 + matcher.group(5).trim();
                     }
                     else {
                         tableName = schema + matcher.group(2).trim()
-                                + String.format("%d", k)
+                                + k
                                 + matcher.group(5).trim();
                     }
                     splitTables.add(tableName);
@@ -89,16 +95,25 @@ public final class TableExpandUtil
         return splitTables;
     }
 
+    /**
+     * Expands table configurations based on database type and table patterns.
+     * Handles special cases like SQL Server's bracket notation for table names containing commas.
+     *
+     * @param dataBaseType The database type
+     * @param tables List of table configurations to expand
+     * @return List of expanded table names
+     */
     public static List<String> expandTableConf(DataBaseType dataBaseType, List<String> tables)
     {
         List<String> parsedTables = new ArrayList<>();
         for (String table : tables) {
             if (table.startsWith("[") && dataBaseType == DataBaseType.SQLServer) {
-                //SQLServer allow the table or column name include comma(,), then quote with [
+                // SQL Server allows table or column names to include commas, quoted with brackets
                 parsedTables.add(table);
-            } else {
-                List<String> splitTables = splitTables(table);
-                parsedTables.addAll(splitTables);
+            } 
+            else {
+                List<String> expandedTables = splitTables(table);
+                parsedTables.addAll(expandedTables);
             }
         }
 

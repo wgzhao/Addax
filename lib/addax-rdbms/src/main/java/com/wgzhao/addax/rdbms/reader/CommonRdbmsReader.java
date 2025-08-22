@@ -57,20 +57,38 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Common RDBMS Reader implementation providing database reading capabilities.
+ * Supports both table mode and query SQL mode for flexible data extraction.
+ */
 public class CommonRdbmsReader
 {
-
+    /**
+     * Job-level operations for RDBMS reader including initialization, validation, and task splitting.
+     */
     public static class Job
     {
         private static final Logger LOG = LoggerFactory.getLogger(Job.class);
 
         private final DataBaseType dataBaseType;
 
+        /**
+         * Constructs a new Job instance for the specified database type.
+         *
+         * @param dataBaseType The database type this job will operate on
+         */
         public Job(DataBaseType dataBaseType)
         {
             this.dataBaseType = dataBaseType;
         }
 
+        /**
+         * Initializes the job configuration and performs preprocessing.
+         * Attempts to auto-detect primary key for splitting if configured.
+         *
+         * @param originalConfig The original job configuration
+         * @return The processed configuration
+         */
         public Configuration init(Configuration originalConfig)
         {
             OriginalConfPretreatmentUtil.doPretreatment(dataBaseType, originalConfig);
@@ -90,9 +108,16 @@ public class CommonRdbmsReader
             return originalConfig;
         }
 
+        /**
+         * Performs pre-checks on the configuration to validate table accessibility and split key validity.
+         *
+         * @param originalConfig The configuration to validate
+         * @param dataBaseType The database type
+         * @throws AddaxException if pre-check validation fails
+         */
         public void preCheck(Configuration originalConfig, DataBaseType dataBaseType)
         {
-            // check each table can read and split key is valid
+            // Check each table can be read and split key is valid
             Configuration queryConf = ReaderSplitUtil.doPreCheckSplit(originalConfig);
             String splitPK = queryConf.getString(Key.SPLIT_PK);
             Configuration connConf = queryConf.getConfiguration(Key.CONNECTION);
@@ -101,26 +126,49 @@ public class CommonRdbmsReader
             new PreCheckTask(username, password, connConf, dataBaseType, splitPK).call();
         }
 
+        /**
+         * Splits the job configuration into multiple task configurations.
+         *
+         * @param originalConfig The original job configuration
+         * @param adviceNumber The suggested number of splits
+         * @return List of task configurations
+         */
         public List<Configuration> split(Configuration originalConfig, int adviceNumber)
         {
             return ReaderSplitUtil.doSplit(dataBaseType, originalConfig, adviceNumber);
         }
 
+        /**
+         * Performs post-processing operations after all tasks are completed.
+         *
+         * @param originalConfig The original job configuration
+         */
         public void post(Configuration originalConfig)
         {
-            // do nothing
+            // No post-processing required
         }
 
+        /**
+         * Cleans up resources after job completion.
+         *
+         * @param originalConfig The original job configuration
+         */
         public void destroy(Configuration originalConfig)
         {
-            // do nothing
+            // No cleanup required
         }
     }
 
+    /**
+     * Task-level operations for reading data from RDBMS sources.
+     * Handles the actual data reading and record transformation.
+     */
     public static class Task
     {
         private static final Logger LOG = LoggerFactory.getLogger(Task.class);
         private static final boolean IS_DEBUG = LOG.isDebugEnabled();
+
+        /** Empty byte array constant used for string encoding operations when source bytes are null */
         protected final byte[] EMPTY_CHAR_ARRAY = new byte[0];
 
         private final DataBaseType dataBaseType;
@@ -134,11 +182,23 @@ public class CommonRdbmsReader
 
         private String basicMsg;
 
+        /**
+         * Creates a new Task instance for the specified database type.
+         *
+         * @param dataBaseType The database type this task will operate on
+         */
         public Task(DataBaseType dataBaseType)
         {
             this(dataBaseType, -1, -1);
         }
 
+        /**
+         * Creates a new Task instance with group and task identifiers.
+         *
+         * @param dataBaseType The database type this task will operate on
+         * @param taskGroupId The task group identifier
+         * @param taskId The task identifier
+         */
         public Task(DataBaseType dataBaseType, int taskGroupId, int taskId)
         {
             this.dataBaseType = dataBaseType;
@@ -146,6 +206,11 @@ public class CommonRdbmsReader
             this.taskId = taskId;
         }
 
+        /**
+         * Initializes the task with configuration parameters.
+         *
+         * @param readerSliceConfig The slice configuration for this task
+         */
         public void init(Configuration readerSliceConfig)
         {
             this.username = readerSliceConfig.getString(Key.USERNAME);
@@ -210,16 +275,38 @@ public class CommonRdbmsReader
             }
         }
 
+        /**
+         * Performs task cleanup operations.
+         * This method is called after data reading is complete.
+         *
+         * @param originalConfig The reader configuration
+         */
         public void post(Configuration originalConfig)
         {
             // do nothing
         }
 
+        /**
+         * Performs task cleanup and resource deallocation.
+         * This method is called when the task is being shut down.
+         *
+         * @param originalConfig The reader configuration
+         */
         public void destroy(Configuration originalConfig)
         {
             // do nothing
         }
 
+        /**
+         * Transports one record from ResultSet to RecordSender.
+         * This method builds a record from the current row in the ResultSet and sends it downstream.
+         *
+         * @param recordSender Interface to send records downstream
+         * @param rs The ResultSet positioned at the current row
+         * @param metaData Metadata about the ResultSet columns
+         * @param columnNumber Number of columns in the ResultSet
+         * @param taskPluginCollector Collector for handling dirty records
+         */
         protected void transportOneRecord(RecordSender recordSender, ResultSet rs, ResultSetMetaData metaData,
                 int columnNumber, TaskPluginCollector taskPluginCollector)
         {

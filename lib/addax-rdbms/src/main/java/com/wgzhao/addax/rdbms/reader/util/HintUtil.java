@@ -33,7 +33,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created by liuyi on 15/9/18.
+ * Utility class for handling database hints, particularly Oracle hints.
+ * Provides functionality to apply table-specific hints to SQL queries based on configured patterns.
  */
 public class HintUtil
 {
@@ -43,8 +44,18 @@ public class HintUtil
     private static Pattern tablePattern;
     private static String hintExpression;
 
-    private HintUtil() {}
+    private HintUtil()
+    {
+        // Private constructor to prevent instantiation
+    }
 
+    /**
+     * Initializes hint configuration from the provided configuration.
+     * Parses hint expression and table pattern for later use in query building.
+     *
+     * @param type The database type
+     * @param configuration Configuration containing hint settings
+     */
     public static void initHintConf(DataBaseType type, Configuration configuration)
     {
         dataBaseType = type;
@@ -63,6 +74,14 @@ public class HintUtil
         }
     }
 
+    /**
+     * Builds a query column specification with optional database hints.
+     * Currently, supports Oracle hints applied to tables matching the configured pattern.
+     *
+     * @param table The table name to check against hint patterns
+     * @param column The column specification to potentially enhance with hints
+     * @return The column specification, possibly enhanced with database hints
+     */
     public static String buildQueryColumn(String table, String column)
     {
         try {

@@ -41,21 +41,35 @@ import java.util.List;
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
+/**
+ * Utility class for preprocessing writer configuration before execution.
+ * Handles password decryption, column validation, write mode processing, and configuration optimization.
+ */
 public final class OriginalConfPretreatmentUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger(OriginalConfPretreatmentUtil.class);
-
+    // The database type used for processing configurations
     public static DataBaseType dataBaseType;
     private static final String jdbcUrlPath = Key.CONNECTION + "." + Key.JDBC_URL;
 
-    private OriginalConfPretreatmentUtil() {}
+    private OriginalConfPretreatmentUtil()
+    {
+        // Private constructor to prevent instantiation
+    }
 
+    /**
+     * Performs comprehensive preprocessing of writer configuration.
+     * Validates credentials, handles encryption, and prepares configuration for execution.
+     *
+     * @param originalConfig The configuration to preprocess (modified in-place)
+     * @param dataBaseType The database type for type-specific processing
+     */
     public static void doPretreatment(Configuration originalConfig, DataBaseType dataBaseType)
     {
         originalConfig.getNecessaryValue(Key.USERNAME, REQUIRED_VALUE);
         String pass = originalConfig.getString(Key.PASSWORD, null);
         if (pass != null && pass.startsWith(Constant.ENC_PASSWORD_PREFIX)) {
-            // encrypted password, need to decrypt
+            // Encrypted password, need to decrypt
             String decryptPassword = EncryptUtil.decrypt(
                     pass.substring(Constant.ENC_PASSWORD_PREFIX.length(), pass.length() - 1)
             );
@@ -68,6 +82,12 @@ public final class OriginalConfPretreatmentUtil
         dealWriteMode(originalConfig, dataBaseType);
     }
 
+    /**
+     * Validates and normalizes the batch size configuration.
+     * Ensures batch size is within acceptable range for optimal performance.
+     *
+     * @param originalConfig The configuration to validate
+     */
     public static void doCheckBatchSize(Configuration originalConfig)
     {
         int batchSize = originalConfig.getInt(Key.BATCH_SIZE, Constant.DEFAULT_BATCH_SIZE);
@@ -78,6 +98,12 @@ public final class OriginalConfPretreatmentUtil
         originalConfig.set(Key.BATCH_SIZE, batchSize);
     }
 
+    /**
+     * Simplifies and validates connection configuration.
+     * Processes JDBC URL, driver settings, and table expansion.
+     *
+     * @param originalConfig The configuration to simplify
+     */
     public static void simplifyConf(Configuration originalConfig)
     {
         Configuration connConf = originalConfig.getConfiguration(Key.CONNECTION);
@@ -112,6 +138,12 @@ public final class OriginalConfPretreatmentUtil
         originalConfig.set(Key.TABLE_NUMBER, expandedTables.size());
     }
 
+    /**
+     * Validates and processes column configuration.
+     * Handles column expansion, validation against table schema, and duplicate checking.
+     *
+     * @param originalConfig The configuration containing column settings
+     */
     public static void dealColumnConf(Configuration originalConfig)
     {
         String jdbcUrl = originalConfig.getString(jdbcUrlPath);
@@ -129,7 +161,6 @@ public final class OriginalConfPretreatmentUtil
 
             allColumns = DBUtil.getTableColumnsByConn(connection, oneTable);
 
-
             LOG.info("The table [{}] has columns [{}].", oneTable, StringUtils.join(allColumns, ","));
 
             if (1 == userConfiguredColumns.size() && "*".equals(userConfiguredColumns.get(0))) {
@@ -145,10 +176,10 @@ public final class OriginalConfPretreatmentUtil
                                 + "are greater than the number of table columns " + allColumns.size());
             }
             else {
-                // ensure the column is not duplicated
+                // Ensure the column is not duplicated
                 ListUtil.makeSureNoValueDuplicate(userConfiguredColumns, false);
                 try {
-                    // check whether the user's configuration column exists in the table
+                    // Check whether the user's configured columns exist in the table
                     DBUtil.getColumnMetaData(connection, oneTable, StringUtils.join(userConfiguredColumns, ","));
                 }
                 finally {
@@ -158,6 +189,13 @@ public final class OriginalConfPretreatmentUtil
         }
     }
 
+    /**
+     * Processes write mode configuration and generates appropriate SQL templates.
+     * Supports insert, update, and upsert modes based on database capabilities.
+     *
+     * @param originalConfig The configuration containing write mode settings
+     * @param dataBaseType The database type for generating appropriate SQL templates
+     */
     public static void dealWriteMode(Configuration originalConfig, DataBaseType dataBaseType)
     {
         List<String> columns = originalConfig.getList(Key.COLUMN, String.class);

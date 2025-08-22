@@ -46,26 +46,47 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
 import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
 
+/**
+ * Common RDBMS Writer implementation providing database writing capabilities.
+ * Supports various write modes including INSERT, REPLACE, and UPDATE operations.
+ */
 public class CommonRdbmsWriter
 {
+    /**
+     * Job-level operations for RDBMS writer including configuration validation,
+     * table preparation, and task coordination.
+     */
     public static class Job
     {
         private static final Logger LOG = LoggerFactory.getLogger(Job.class);
         private final DataBaseType dataBaseType;
 
+        /**
+         * Constructs a new Job instance for the specified database type.
+         *
+         * @param dataBaseType The database type this job will operate on
+         */
         public Job(DataBaseType dataBaseType)
         {
             this.dataBaseType = dataBaseType;
             OriginalConfPretreatmentUtil.dataBaseType = this.dataBaseType;
         }
 
+        /**
+         * Initialize job level configuration. Will validate DDL if provided and
+         * then perform pretreatment (column expansion, write mode template, etc.).
+         *
+         * @param originalConfig original job configuration (modified in‑place)
+         */
         public void init(Configuration originalConfig)
         {
             ddlValid(originalConfig, dataBaseType);
@@ -73,25 +94,42 @@ public class CommonRdbmsWriter
             LOG.debug("After job init(), originalConfig now is:[\n{}\n]", originalConfig.toJSON());
         }
 
-        /*目前只支持MySQL Writer跟Oracle Writer;检查PreSQL跟PostSQL语法以及insert，delete权限*/
+        /**
+         * Pre-check writer configuration: validate pre- / post-SQL syntax and privileges.
+         * Currently only MySQL / Oracle / etc. are supported for privilege check.
+         *
+         * @param originalConfig the original configuration to validate
+         * @param dataBaseType the database type for privilege checking
+         */
         public void writerPreCheck(Configuration originalConfig, DataBaseType dataBaseType)
         {
-            /*检查PreSql跟PostSql语句*/
+            // validate PreSQL & PostSQL syntax
             prePostSqlValid(originalConfig, dataBaseType);
-            /*检查insert 跟delete权限*/
+            // validate insert & delete privilege if necessary
             privilegeValid(originalConfig, dataBaseType);
         }
 
+        /**
+         * Validate pre and post SQL syntax.
+         *
+         * @param originalConfig the configuration containing pre/post SQL statements
+         * @param dataBaseType the database type for SQL validation
+         */
         public void prePostSqlValid(Configuration originalConfig, DataBaseType dataBaseType)
         {
-            /*检查PreSql跟PostSql语句*/
             WriterUtil.preCheckPrePareSQL(originalConfig, dataBaseType);
             WriterUtil.preCheckPostSQL(originalConfig, dataBaseType);
         }
 
+        /**
+         * Validate insert / delete privilege.
+         *
+         * @param originalConfig the configuration containing database connection info
+         * @param dataBaseType the database type for privilege checking
+         * @throws RdbmsException if user lacks required INSERT or DELETE privileges
+         */
         public void privilegeValid(Configuration originalConfig, DataBaseType dataBaseType)
         {
-            /*检查insert 跟delete权限*/
             String username = originalConfig.getString(Key.USERNAME);
             String password = originalConfig.getString(Key.PASSWORD);
             Configuration connConf = originalConfig.getConfiguration(Key.CONNECTION);
@@ -111,6 +149,12 @@ public class CommonRdbmsWriter
             }
         }
 
+        /**
+         * Execute user provided DDL before job splitting if configured.
+         *
+         * @param originalConfig the configuration that may contain DDL statements
+         * @param dataBaseType the database type for DDL execution
+         */
         public void ddlValid(Configuration originalConfig, DataBaseType dataBaseType)
         {
             if (originalConfig.getString("ddl", null) != null) {
@@ -126,7 +170,12 @@ public class CommonRdbmsWriter
             }
         }
 
-        // 一般来说，是需要推迟到 task 中进行pre 的执行（单表情况例外）
+        /**
+         * Prepare job level resources. Normally pre SQL should be delayed to task
+         * phase unless there is only one table (single table case executes here).
+         *
+         * @param originalConfig the original job configuration to prepare
+         */
         public void prepare(Configuration originalConfig)
         {
             int tableNumber = originalConfig.getInt(Key.TABLE_NUMBER);
@@ -136,7 +185,7 @@ public class CommonRdbmsWriter
 
                 Configuration connConf = originalConfig.getConfiguration(Key.CONNECTION);
 
-                // 这里的 jdbcUrl 已经 append 了合适后缀参数
+                // jdbcUrl here has already appended suitable suffix parameters
                 String jdbcUrl = connConf.getString(Key.JDBC_URL);
                 originalConfig.set(Key.JDBC_URL, jdbcUrl);
 
@@ -160,11 +209,23 @@ public class CommonRdbmsWriter
             LOG.debug("After job prepare(), originalConfig now is:[\n{}\n]", originalConfig.toJSON());
         }
 
+        /**
+         * Split configuration into task slices.
+         *
+         * @param originalConfig original job configuration to split
+         * @param mandatoryNumber the number of parallel channels/tasks to create
+         * @return list of task configurations, one per channel
+         */
         public List<Configuration> split(Configuration originalConfig, int mandatoryNumber)
         {
             return WriterUtil.doSplit(originalConfig, mandatoryNumber);
         }
 
+        /**
+         * Execute post SQL for single table scenario (multi-table handled in task post()).
+         *
+         * @param originalConfig the original job configuration containing post SQL statements
+         */
         public void post(Configuration originalConfig)
         {
             int tableNumber = originalConfig.getInt(Key.TABLE_NUMBER);
@@ -172,7 +233,7 @@ public class CommonRdbmsWriter
                 String username = originalConfig.getString(Key.USERNAME);
                 String password = originalConfig.getString(Key.PASSWORD);
 
-                // 已经由 prepare 进行了appendJDBCSuffix处理
+                // jdbcUrl already has appendJDBCSuffix applied by prepare
                 String jdbcUrl = originalConfig.getString(Key.JDBC_URL);
 
                 String table = originalConfig.getString(Key.TABLE);
@@ -190,40 +251,98 @@ public class CommonRdbmsWriter
             }
         }
 
+        /**
+         * Cleanup job level resources.
+         *
+         * @param originalConfig the original job configuration (unused in current implementation)
+         */
         public void destroy(Configuration originalConfig)
         {
-            //
+            // no-op
         }
     }
 
+    /**
+     * Task-level operations for writing data to RDBMS destinations.
+     * Handles record buffering, batch insertion, and transaction management.
+     */
     public static class Task
     {
+        /** Logger instance for this task class */
         protected static final Logger LOG = LoggerFactory.getLogger(Task.class);
+
+        /** Constant for SQL parameter placeholder */
         private static final String VALUE_HOLDER = "?";
+
+        /** Basic message template for logging context information */
         protected static String basicMessage;
+
+        /** Template for INSERT/REPLACE SQL statements */
         protected static String insertOrReplaceTemplate;
+
+        /** Database type for this task */
         protected DataBaseType dataBaseType;
+
+        /** Database username for authentication */
         protected String username;
+
+        /** Database password for authentication */
         protected String password;
+
+        /** JDBC URL for database connection */
         protected String jdbcUrl;
+
+        /** Target table name for data insertion */
         protected String table;
+
+        /** List of column names to insert data into */
         protected List<String> columns;
+
+        /** Pre-SQL statements to execute before data insertion */
         protected List<String> preSqls;
+
+        /** Post-SQL statements to execute after data insertion */
         protected List<String> postSqls;
+
+        /** Number of records to batch before committing */
         protected int batchSize;
+
+        /** Maximum bytes to buffer before committing batch */
         protected int batchByteSize;
+
+        /** Number of columns in the target table */
         protected int columnNumber = 0;
+
+        /** Collector for handling dirty records and statistics */
         protected TaskPluginCollector taskPluginCollector;
+
+        /** Generated SQL statement for record insertion */
         protected String writeRecordSql;
+
+        /** Write mode (INSERT, REPLACE, UPDATE, etc.) */
         protected String writeMode;
+
+        /** Whether to treat empty strings as NULL values */
         protected boolean emptyAsNull;
+
+        /** Metadata information about target table columns */
         protected List<Map<String, Object>> resultSetMetaData;
 
+        /**
+         * Constructs a new Task instance for the specified database type.
+         *
+         * @param dataBaseType The database type this task will operate on
+         */
         public Task(DataBaseType dataBaseType)
         {
             this.dataBaseType = dataBaseType;
         }
 
+        /**
+         * Initialize task configuration from slice config.
+         *
+         * @param writerSliceConfig the writer slice configuration containing connection and table info
+         */
         public void init(Configuration writerSliceConfig)
         {
             this.username = writerSliceConfig.getString(Key.USERNAME);
@@ -248,6 +367,11 @@ public class CommonRdbmsWriter
             basicMessage = "jdbcUrl:" + jdbcUrl + ",table:" + table;
         }
 
+        /**
+         * Prepare task (execute pre SQL when multiple tables scenario).
+         *
+         * @param writerSliceConfig the writer slice configuration containing pre SQL statements
+         */
         public void prepare(Configuration writerSliceConfig)
         {
             Connection connection = DBUtil.getConnection(this.dataBaseType, this.jdbcUrl, username, password);
@@ -264,6 +388,13 @@ public class CommonRdbmsWriter
             DBUtil.closeDBResources(null, connection);
         }
 
+        /**
+         * Start writing records with provided connection.
+         * @param recordReceiver record data source
+         * @param taskPluginCollector dirty record collector
+         * @param connection JDBC connection
+         * @param supportCommit whether commit/rollback is supported
+         */
         public void startWriteWithConnection(RecordReceiver recordReceiver, TaskPluginCollector taskPluginCollector, Connection connection, boolean supportCommit)
         {
             this.taskPluginCollector = taskPluginCollector;
@@ -337,6 +468,13 @@ public class CommonRdbmsWriter
             }
         }
 
+        /**
+         * Start writing (auto create and manage its own connection, auto commit on success).
+         *
+         * @param recordReceiver the record receiver to get data from
+         * @param writerSliceConfig the writer configuration for this task
+         * @param taskPluginCollector the collector for handling dirty records and statistics
+         */
         public void startWrite(RecordReceiver recordReceiver, Configuration writerSliceConfig, TaskPluginCollector taskPluginCollector)
         {
             Connection connection = DBUtil.getConnection(dataBaseType, jdbcUrl, username, password);
@@ -344,6 +482,14 @@ public class CommonRdbmsWriter
             startWriteWithConnection(recordReceiver, taskPluginCollector, connection, true);
         }
 
+        /**
+         * Start writing with manual commit control toggle.
+         *
+         * @param recordReceiver the record receiver to get data from
+         * @param writerSliceConfig the writer configuration for this task
+         * @param taskPluginCollector the collector for handling dirty records and statistics
+         * @param supportCommit whether to support transaction commit/rollback operations
+         */
         public void startWrite(RecordReceiver recordReceiver, Configuration writerSliceConfig, TaskPluginCollector taskPluginCollector, boolean supportCommit)
         {
             Connection connection = DBUtil.getConnection(dataBaseType, jdbcUrl, username, password);
@@ -351,6 +497,11 @@ public class CommonRdbmsWriter
             startWriteWithConnection(recordReceiver, taskPluginCollector, connection, supportCommit);
         }
 
+        /**
+         * Execute post SQL (multi-table scenario only).
+         *
+         * @param writerSliceConfig the writer slice configuration containing post SQL statements
+         */
         public void post(Configuration writerSliceConfig)
         {
             int tableNumber = writerSliceConfig.getInt(Key.TABLE_NUMBER);
@@ -367,11 +518,24 @@ public class CommonRdbmsWriter
             DBUtil.closeDBResources(null, null, connection);
         }
 
+        /**
+         * Clean up task resources.
+         *
+         * @param writerSliceConfig the writer slice configuration (unused in current implementation)
+         */
         public void destroy(Configuration writerSliceConfig)
         {
-            //
+            // no-op
         }
 
+        /**
+         * Batch insert buffered records.
+         *
+         * @param connection the database connection to use for insertion
+         * @param buffer the list of records to insert in batch
+         * @param supportCommit whether to support transaction commit/rollback
+         * @throws SQLException if database operation fails
+         */
         protected void doBatchInsert(Connection connection, List<Record> buffer, boolean supportCommit)
                 throws SQLException
         {
@@ -383,20 +547,25 @@ public class CommonRdbmsWriter
                 preparedStatement = connection.prepareStatement(writeRecordSql);
                 if ((this.dataBaseType == DataBaseType.Oracle || this.dataBaseType == DataBaseType.SQLServer)
                         && !"insert".equalsIgnoreCase(writeMode)) {
-                    String merge = this.writeMode;
-                    String[] sArray = WriterUtil.getStrings(merge);
+                    String[] sArray = WriterUtil.getStrings(this.writeMode);
+                    Set<String> mergeKeySet = new HashSet<>(java.util.Arrays.asList(sArray));
                     for (Record record : buffer) {
-                        List<Column> recordOne = new ArrayList<>();
+                        List<Column> recordOne = new ArrayList<>(this.columns.size() * 2);
+                        // key columns first
                         for (int j = 0; j < this.columns.size(); j++) {
-                            if (Arrays.asList(sArray).contains(columns.get(j))) {
+                            String col = columns.get(j);
+                            if (mergeKeySet.contains(col)) {
                                 recordOne.add(record.getColumn(j));
                             }
                         }
+                        // non-key columns next
                         for (int j = 0; j < this.columns.size(); j++) {
-                            if (!Arrays.asList(sArray).contains(columns.get(j))) {
+                            String col = columns.get(j);
+                            if (!mergeKeySet.contains(col)) {
                                 recordOne.add(record.getColumn(j));
                             }
                         }
+                        // all columns again for update placeholders
                         for (int j = 0; j < this.columns.size(); j++) {
                             recordOne.add(record.getColumn(j));
                         }
@@ -434,6 +603,12 @@ public class CommonRdbmsWriter
             }
         }
 
+        /**
+         * Fallback strategy: insert one by one when batch fails.
+         *
+         * @param connection the database connection to use for insertion
+         * @param buffer the list of records to insert individually
+         */
         protected void doOneInsert(Connection connection, List<Record> buffer)
         {
             PreparedStatement preparedStatement = null;
@@ -451,7 +626,7 @@ public class CommonRdbmsWriter
                         this.taskPluginCollector.collectDirtyRecord(record, e);
                     }
                     finally {
-                        // 最后不要忘了关闭 preparedStatement
+                        // clear parameters before reuse
                         preparedStatement.clearParameters();
                     }
                 }
@@ -464,6 +639,14 @@ public class CommonRdbmsWriter
             }
         }
 
+        /**
+         * Fill PreparedStatement with record values.
+         *
+         * @param preparedStatement the PreparedStatement to populate
+         * @param record the record containing the data to insert
+         * @return the populated PreparedStatement
+         * @throws SQLException if setting parameter values fails
+         */
         protected PreparedStatement fillPreparedStatement(PreparedStatement preparedStatement, Record record)
                 throws SQLException
         {
@@ -569,9 +752,10 @@ public class CommonRdbmsWriter
                     preparedStatement.setBytes(columnIndex, column.asBytes());
                     break;
 
-                // warn: bit(1) -> Types.BIT 可使用setBoolean
-                // warn: bit(>1) -> Types.VARBINARY 可使用setBytes
+                // warn: bit(1) -> Types.BIT using setBoolean
+                // warn: bit(>1) -> Types.VARBINARY using setBytes
                 case Types.BIT:
+                    // bit(1) -> setBoolean; bit(>1) -> treat as VARBINARY and use setBytes
                     if ((int) this.resultSetMetaData.get(columnIndex).get("precision") == 1) {
                         preparedStatement.setBoolean(columnIndex, column.asBoolean());
                     }
@@ -595,6 +779,9 @@ public class CommonRdbmsWriter
             return preparedStatement;
         }
 
+        /**
+         * Calculate write record SQL template.
+         */
         private void calcWriteRecordSql()
         {
             List<String> valueHolders = new ArrayList<>(columnNumber);
@@ -607,6 +794,12 @@ public class CommonRdbmsWriter
             writeRecordSql = String.format(insertOrReplaceTemplate, table);
         }
 
+        /**
+         * Calculate value holder placeholder for a specific column type.
+         *
+         * @param columnType the column type name
+         * @return the value holder placeholder (typically "?")
+         */
         protected String calcValueHolder(String columnType)
         {
             return VALUE_HOLDER;

@@ -45,6 +45,9 @@ import java.util.StringJoiner;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 
+/**
+ * Utility class for splitting a single table configuration into multiple task configurations.
+ */
 public class SingleTableSplitUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger(SingleTableSplitUtil.class);
@@ -62,6 +65,15 @@ public class SingleTableSplitUtil
     {
     }
 
+    /**
+     * Splits a single table configuration into multiple task configurations for parallel reading.
+     * Uses primary key ranges to divide the table data across multiple reading tasks.
+     *
+     * @param dataBaseType The database type for generating appropriate SQL queries
+     * @param configuration The configuration for the single table to split
+     * @param adviceNum The number of parallel tasks to create
+     * @return List of task configurations, each with specific query ranges
+     */
     public static List<Configuration> splitSingleTable(DataBaseType dataBaseType, Configuration configuration, int adviceNum)
     {
         List<Configuration> pluginParams = new ArrayList<>();
@@ -116,6 +128,14 @@ public class SingleTableSplitUtil
         return pluginParams;
     }
 
+    /**
+     * Builds a complete SQL query string with optional WHERE clause.
+     *
+     * @param column The column specification (e.g., "*" or "col1,col2")
+     * @param table The table name to query
+     * @param where The WHERE clause condition (can be null or empty)
+     * @return Complete SQL query string
+     */
     public static String buildQuerySql(String column, String table, String where)
     {
         return StringUtils.isBlank(where)
@@ -191,15 +211,16 @@ public class SingleTableSplitUtil
     }
 
     /**
-     * support Number and String split
+     * Generates primary key range SQL queries for splitting table data across multiple tasks.
+     * Supports numeric and string primary key types with appropriate splitting strategies.
      *
-     * @param splitPK the primary key will be split
-     * @param table table name
-     * @param where where clause
-     * @param configuration configuration
-     * @param adviceNum the number of splits
-     * @return 1. empty list of the min value is equal to max value, or the split key has only null value;
-     * 2. {@link List} of where clause
+     * @param dataBaseType The database type for generating appropriate queries
+     * @param splitPK The primary key column name to use for splitting
+     * @param table The table name to split
+     * @param where Optional WHERE clause to filter data
+     * @param configuration Configuration containing connection details
+     * @param adviceNum The number of splits to create
+     * @return List of WHERE clause conditions for each split, or empty list if splitting not possible
      */
     public static List<String> genPkRangeSQLForGeneric(DataBaseType dataBaseType, String splitPK, String table, String where, Configuration configuration, int adviceNum)
     {
@@ -359,6 +380,14 @@ public class SingleTableSplitUtil
         return FLOAT_TYPES.contains(JDBCType.valueOf(type));
     }
 
+    /**
+     * Generates SQL query to get the minimum and maximum values of the primary key column.
+     *
+     * @param splitPK The primary key column name (should be properly quoted)
+     * @param table The table name to query
+     * @param where Optional WHERE clause to filter the range calculation
+     * @return SQL query string to retrieve MIN and MAX values of the primary key
+     */
     public static String genPKSql(String splitPK, String table, String where)
     {
         String pkRangeSQL = String.format("SELECT MIN(%s), MAX(%s) FROM %s", splitPK, splitPK, table);
@@ -380,7 +409,7 @@ public class SingleTableSplitUtil
      */
     private static List<Object> calculateStringSplitPoints(String min, String max, int numSplits)
     {
-        // 使用Stream API生成分割点
+        // Generate split points using Stream API
         if (numSplits <= 0 || min.compareTo(max) >= 0) {
             return new ArrayList<>();
         }
@@ -440,7 +469,7 @@ public class SingleTableSplitUtil
     // Clamp the character to the nearest valid character from ALLOWED_CHARS
     private static char clampToAllowedChar(char c)
     {
-        // 使用文本块定义字符集
+        // Define character set using predefined string
         final String ALLOWED_CHARS_STR = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_";
         final char[] ALLOWED_CHARS = ALLOWED_CHARS_STR.toCharArray();
 
@@ -451,7 +480,7 @@ public class SingleTableSplitUtil
             return ALLOWED_CHARS[ALLOWED_CHARS.length - 1];
         }
 
-        // 使用Stream API查找最接近的字符
+        // Find the nearest character using linear search
         for (int i = 0; i < ALLOWED_CHARS.length - 1; i++) {
             if (c >= ALLOWED_CHARS[i] && c <= ALLOWED_CHARS[i + 1]) {
                 // Choose the closer one

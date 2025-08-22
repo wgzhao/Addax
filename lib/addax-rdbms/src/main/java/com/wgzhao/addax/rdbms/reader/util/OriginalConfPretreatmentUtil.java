@@ -45,17 +45,27 @@ import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
+/**
+ * Utility class for preprocessing reader configuration before execution.
+ * Handles password decryption, table expansion, column validation, and mode detection.
+ */
 public final class OriginalConfPretreatmentUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger(OriginalConfPretreatmentUtil.class);
 
     private static final String EXCLUDE_COLUMN = "excludeColumn";
 
+    private OriginalConfPretreatmentUtil()
+    {
+        // Private constructor to prevent instantiation
+    }
+
     /**
-     * Handle the configuration before execution
+     * Performs comprehensive preprocessing of the reader configuration.
+     * Validates credentials, handles password decryption, and prepares configuration for execution.
      *
-     * @param dataBaseType database type
-     * @param originalConfig configuration
+     * @param dataBaseType The database type for type-specific processing
+     * @param originalConfig The configuration to preprocess (modified in-place)
      */
     public static void doPretreatment(DataBaseType dataBaseType, Configuration originalConfig)
     {
@@ -81,9 +91,10 @@ public final class OriginalConfPretreatmentUtil
     }
 
     /**
-     * Handle the where clause
+     * Sanitizes and normalizes the WHERE clause configuration.
+     * Removes trailing semicolons and trims whitespace for proper SQL formation.
      *
-     * @param originalConfig configuration
+     * @param originalConfig The configuration containing the WHERE clause
      */
     public static void dealWhere(Configuration originalConfig)
     {
@@ -95,12 +106,11 @@ public final class OriginalConfPretreatmentUtil
     }
 
     /**
-     * Handle configuration preliminary:
-     * 1. Handle the situation where multiple jdbcUrls are configured for the same database
-     * 2. Identify and mark whether to use querySql mode or table mode
-     * 3. For table mode, determine the number of sub-tables and process the column to * matters
+     * Performs comprehensive configuration simplification and validation.
+     * Determines operation mode, validates connections, and prepares table/column configurations.
      *
-     * @param originalConfig configuration
+     * @param dataBaseType The database type for type-specific processing
+     * @param originalConfig The configuration to simplify and validate
      */
     private static void simplifyConf(DataBaseType dataBaseType, Configuration originalConfig)
     {
@@ -112,10 +122,11 @@ public final class OriginalConfPretreatmentUtil
     }
 
     /**
-     * Handle the jdbcUrl and table configuration
+     * Processes JDBC URL and table configurations with validation and expansion.
+     * Handles table pattern expansion and JDBC URL suffix adjustment for the specific database type.
      *
-     * @param dataBaseType database type
-     * @param originalConfig configuration
+     * @param dataBaseType The database type for URL suffix processing
+     * @param originalConfig The configuration to process
      */
     private static void dealJdbcAndTable(DataBaseType dataBaseType, Configuration originalConfig)
     {
@@ -174,9 +185,11 @@ public final class OriginalConfPretreatmentUtil
     }
 
     /**
-     * Handle the column configuration
+     * Processes and validates column configuration based on operation mode.
+     * Handles column expansion, exclusion, quoting, and split key validation.
      *
-     * @param originalConfig configuration
+     * @param dataBaseType The database type for column quoting
+     * @param originalConfig The configuration to process
      */
     private static void dealColumnConf(DataBaseType dataBaseType, Configuration originalConfig)
     {
@@ -204,13 +217,13 @@ public final class OriginalConfPretreatmentUtil
                 var excludeColumns = originalConfig.getList(EXCLUDE_COLUMN, String.class);
 
                 if (!excludeColumns.isEmpty()) {
-                    // Get the all columns of table and exclude the excludeColumns
+                    // Get all columns of table and exclude the excludeColumns
                     List<String> allColumns = DBUtil.getTableColumns(dataBaseType, jdbcUrl, username, password, tableName);
-                    // warn: does it need to judge the table column is case-insensitive?
+                    // Note: Consider if table column comparison should be case-insensitive
                     allColumns.removeAll(excludeColumns);
                     originalConfig.set(Key.COLUMN_LIST, allColumns);
 
-                    // Each column in allColumns should be quoted with ``
+                    // Each column in allColumns should be quoted appropriately
                     var quotedColumns = allColumns.stream()
                             .map(dataBaseType::quoteColumnName)
                             .toList();
@@ -274,10 +287,11 @@ public final class OriginalConfPretreatmentUtil
     }
 
     /**
-     * Identify and mark whether to use querySql mode or table mode
+     * Determines the operation mode by analyzing table and querySql configurations.
+     * Validates that exactly one mode is configured and handles external SQL file loading.
      *
-     * @param originalConfig configuration
-     * @return true if table mode, false if querySql mode
+     * @param originalConfig The configuration to analyze
+     * @return true for table mode, false for querySql mode
      */
     private static boolean recognizeTableOrQuerySqlMode(Configuration originalConfig)
     {
@@ -288,7 +302,7 @@ public final class OriginalConfPretreatmentUtil
         var isTableMode = StringUtils.isNotBlank(table);
         var isQuerySqlMode = StringUtils.isNotBlank(querySql);
         if (isQuerySqlMode) {
-            //if the query sql come from external sql file , read it , then set back the querySql item
+            // If the query SQL comes from external SQL file, read it and set back the querySql item
             List<String> result = new ArrayList<>();
             for (String sql: connConf.getList(Key.QUERY_SQL, String.class)) {
                 if (sql.startsWith("@")) {

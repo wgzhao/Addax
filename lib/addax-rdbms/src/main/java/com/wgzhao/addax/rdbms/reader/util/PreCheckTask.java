@@ -34,6 +34,10 @@ import java.sql.ResultSet;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+/**
+ * Pre-check task for validating database connection, query syntax, and split key configuration.
+ * Performs validation before the actual data reading process begins.
+ */
 public class PreCheckTask
         implements Callable<Boolean>
 {
@@ -43,6 +47,15 @@ public class PreCheckTask
     private final Configuration connection;
     private final DataBaseType dataBaseType;
 
+    /**
+     * Constructs a new PreCheckTask with the specified parameters.
+     *
+     * @param userName Database username
+     * @param password Database password
+     * @param connection Configuration containing connection details
+     * @param dataBaseType The database type
+     * @param splitPkId The primary key column name for table splitting
+     */
     public PreCheckTask(String userName, String password, Configuration connection, DataBaseType dataBaseType, String splitPkId)
     {
         this.connection = connection;
@@ -52,6 +65,13 @@ public class PreCheckTask
         this.splitPkId = splitPkId;
     }
 
+    /**
+     * Executes the pre-check validation process.
+     * Validates SQL syntax for both query and split key SQLs, and tests connectivity.
+     *
+     * @return true if all validations pass
+     * @throws AddaxException if any validation fails
+     */
     @Override
     public Boolean call()
             throws AddaxException

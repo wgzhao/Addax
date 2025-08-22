@@ -42,12 +42,25 @@ import java.util.stream.Collectors;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 
+/**
+ * Utility class for RDBMS writer operations.
+ * Provides methods for splitting configurations, rendering SQL templates,
+ * executing SQL statements, and generating write templates based on database type and write mode.
+ */
 public final class WriterUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger(WriterUtil.class);
 
     private WriterUtil() {}
 
+    /**
+     * Split writer configuration into slice configs according to table list and channel number.
+     * If only one table, replicate config for each channel; if multi-table, require 1:1 with channels.
+     *
+     * @param simplifiedConf The simplified configuration containing table and connection information
+     * @param adviceNumber The number of channels (advised number of parallel tasks)
+     * @return List of configuration slices, one for each channel
+     */
     public static List<Configuration> doSplit(Configuration simplifiedConf, int adviceNumber)
     {
 
@@ -56,7 +69,7 @@ public final class WriterUtil
         int tableNumber = simplifiedConf.getInt(Key.TABLE_NUMBER);
 
         if (tableNumber == 1) {
-            //由于在之前的  master prepare 中已经把 table,jdbcUrl 提取出来，所以这里处理十分简单
+            // Since table and jdbcUrl have been extracted in the previous master prepare phase, processing here is simple
             for (int j = 0; j < adviceNumber; j++) {
                 splitResultConfigs.add(simplifiedConf.clone());
             }
@@ -97,6 +110,13 @@ public final class WriterUtil
         return splitResultConfigs;
     }
 
+    /**
+     * Render pre- / post-SQL templates by replacing table placeholder with real table name.
+     *
+     * @param preOrPostSqls List of SQL templates that may contain table placeholders
+     * @param tableName The actual table name to replace placeholders with
+     * @return List of rendered SQL statements with placeholders replaced
+     */
     public static List<String> renderPreOrPostSqls(List<String> preOrPostSqls, String tableName)
     {
         if (null == preOrPostSqls) {
@@ -113,6 +133,12 @@ public final class WriterUtil
         return renderedSqls;
     }
 
+    /**
+     * Execute a list of SQL statements in order, fail fast on first error.
+     *
+     * @param conn Database connection to execute statements on
+     * @param sqls List of SQL statements to execute in sequence
+     */
     public static void executeSqls(Connection conn, List<String> sqls)
     {
         String currentSql = null;
@@ -127,6 +153,16 @@ public final class WriterUtil
         }
     }
 
+    /**
+     * Build upsert/insert template based on writeMode and database dialect.
+     *
+     * @param columnHolders List of column names for the INSERT/UPDATE statement
+     * @param valueHolders List of value placeholders (typically "?") for parameters
+     * @param writeMode The write mode (insert, replace, update, etc.)
+     * @param dataBaseType The database type for generating appropriate SQL syntax
+     * @param forceUseUpdate Whether to force using UPDATE syntax regardless of writeMode
+     * @return SQL template string with placeholders for table name and values
+     */
     public static String getWriteTemplate(List<String> columnHolders, List<String> valueHolders,
             String writeMode, DataBaseType dataBaseType, boolean forceUseUpdate)
     {
@@ -195,6 +231,12 @@ public final class WriterUtil
         return sb.toString();
     }
 
+    /**
+     * Generates MySQL-specific ON DUPLICATE KEY UPDATE clause for upsert operations.
+     *
+     * @param columnHolders List of column names to include in the UPDATE clause
+     * @return MySQL ON DUPLICATE KEY UPDATE clause string
+     */
     public static String doMysqlUpdate(List<String> columnHolders)
     {
         if (columnHolders == null || columnHolders.isEmpty()) {
@@ -208,6 +250,15 @@ public final class WriterUtil
         return " ON DUPLICATE KEY UPDATE " + updates;
     }
 
+    /**
+     * Generates Oracle or SQL Server MERGE statement for upsert operations.
+     *
+     * @param merge The merge configuration containing key columns for matching
+     * @param columnHolders List of all column names in the target table
+     * @param valueHolders List of value placeholders for the MERGE statement
+     * @param dataBaseType The database type (Oracle or SQL Server)
+     * @return MERGE statement template with placeholders
+     */
     public static String doOracleOrSqlServerUpdate(String merge, List<String> columnHolders, List<String> valueHolders, DataBaseType dataBaseType)
     {
         // Extract key columns from the merge clause for the join condition
@@ -271,6 +322,12 @@ public final class WriterUtil
         return mergeSql.toString();
     }
 
+    /**
+     * Parses merge configuration string to extract key column names.
+     *
+     * @param merge The merge configuration string containing column names
+     * @return Array of key column names extracted from the merge string
+     */
     public static String[] getStrings(String merge)
     {
         merge = merge.replace("update", "");
@@ -280,6 +337,12 @@ public final class WriterUtil
         return merge.split(",");
     }
 
+    /**
+     * Validates the syntax of pre-SQL statements before execution.
+     *
+     * @param originalConfig The configuration containing pre-SQL statements
+     * @param type The database type for SQL validation
+     */
     public static void preCheckPrePareSQL(Configuration originalConfig, DataBaseType type)
     {
         Configuration connConf = originalConfig.getConfiguration(Key.CONNECTION);
@@ -301,6 +364,12 @@ public final class WriterUtil
         }
     }
 
+    /**
+     * Validates the syntax of post-SQL statements before execution.
+     *
+     * @param originalConfig The configuration containing post-SQL statements
+     * @param type The database type for SQL validation
+     */
     public static void preCheckPostSQL(Configuration originalConfig, DataBaseType type)
     {
         Configuration connConf = originalConfig.getConfiguration(Key.CONNECTION);

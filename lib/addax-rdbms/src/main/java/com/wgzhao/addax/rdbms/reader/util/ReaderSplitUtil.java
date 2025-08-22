@@ -32,22 +32,36 @@ import java.util.List;
 
 import static com.wgzhao.addax.core.base.Constant.LOAD_BALANCE_RESOURCE_MARK;
 
+/**
+ * Utility class for splitting database reader tasks across multiple parallel threads.
+ * Handles both table-mode and query-mode splitting strategies with optional primary key splitting.
+ */
 public final class ReaderSplitUtil
 {
+    private ReaderSplitUtil()
+    {
+        // Private constructor to prevent instantiation
+    }
 
-    private ReaderSplitUtil() {}
-
+    /**
+     * Splits the original reader configuration into multiple slice configurations for parallel execution.
+     * Supports two modes: table-mode (splits tables) and query-mode (uses pre-defined queries).
+     *
+     * @param dataBaseType The database type being read from
+     * @param originalSliceConfig The original configuration to split
+     * @param adviceNumber The recommended number of parallel tasks (channels)
+     * @return List of split configurations, one for each parallel task
+     */
     public static List<Configuration> doSplit(DataBaseType dataBaseType, Configuration originalSliceConfig, int adviceNumber)
     {
         boolean isTableMode = originalSliceConfig.getBool(Key.IS_TABLE_MODE);
         boolean isUserSpecifyEachTableSplitSize = originalSliceConfig.getInt(Key.EACH_TABLE_SPLIT_SIZE, -1) != -1;
         int eachTableShouldSplitNumber = -1;
         if (isTableMode) {
-            // the adviceNumber is the number of channel, i.e., the number of concurrent tasks in addax
+            // The adviceNumber is the number of channels, i.e., the number of concurrent tasks in Addax
             // eachTableShouldSplitNumber is the number of splits that a single table should be split into,
             // and the rounding up may not have a proportional relationship with adviceNumber
             if (!isUserSpecifyEachTableSplitSize) {
-                // eachTableShouldSplitNumber = eachTableShouldSplitNumber * 2 + 1;
                 eachTableShouldSplitNumber = calculateEachTableShouldSplitNumber(
                         adviceNumber, originalSliceConfig.getInt(Key.TABLE_NUMBER));
             }
@@ -68,7 +82,7 @@ public final class ReaderSplitUtil
         String jdbcUrl = connConf.getString(Key.JDBC_URL);
         sliceConfig.set(Key.JDBC_URL, jdbcUrl);
 
-        // mark resource
+        // mark resource for load balancing
         sliceConfig.set(LOAD_BALANCE_RESOURCE_MARK, DataBaseType.parseIpFromJdbcUrl(jdbcUrl));
 
         sliceConfig.remove(Key.CONNECTION);
@@ -78,11 +92,12 @@ public final class ReaderSplitUtil
         if (isTableMode) {
             List<String> tables = connConf.getList(Key.TABLE, String.class);
 
-            Validate.isTrue(null != tables && !tables.isEmpty(), "");
+            Validate.isTrue(null != tables && !tables.isEmpty(), "Tables list cannot be null or empty");
 
             String splitPk = originalSliceConfig.getString(Key.SPLIT_PK, null);
             boolean needSplitTable = tableSplitNumber > 0 && StringUtils.isNotBlank(splitPk);
             if (needSplitTable) {
+                // For single table scenarios, increase split multiplier for better parallelism
                 if (tables.size() == 1 && !isUserSpecifyEachTableSplitSize) {
                     tableSplitNumber = tableSplitNumber * 5;
                 }
@@ -97,6 +112,7 @@ public final class ReaderSplitUtil
                 }
             }
             else {
+                // No primary key splitting, create one slice per table
                 for (String table : tables) {
                     tempSlice = sliceConfig.clone();
                     tempSlice.set(Key.TABLE, table);
@@ -107,7 +123,7 @@ public final class ReaderSplitUtil
             }
         }
         else {
-            // querySql mode
+            // querySql mode - use pre-defined SQL queries
             List<String> sqls = connConf.getList(Key.QUERY_SQL, String.class);
 
             for (String querySql : sqls) {
@@ -120,6 +136,13 @@ public final class ReaderSplitUtil
         return splitConfigs;
     }
 
+    /**
+     * Performs pre-check configuration splitting for validation purposes.
+     * Generates the necessary SQL queries for table validation and split key analysis.
+     *
+     * @param originalSliceConfig The original configuration to prepare for pre-check
+     * @return Configuration with generated SQL queries for validation
+     */
     public static Configuration doPreCheckSplit(Configuration originalSliceConfig)
     {
         Configuration queryConfig = originalSliceConfig.clone();
@@ -133,6 +156,7 @@ public final class ReaderSplitUtil
 
         List<String> queries = new ArrayList<>();
         List<String> splitPkQueries = new ArrayList<>();
+        
         // table mode
         if (isTableMode) {
             List<String> tables = connConf.getList(Key.TABLE, String.class);
@@ -150,6 +174,7 @@ public final class ReaderSplitUtil
             queryConfig.set(Key.CONNECTION, connConf);
         }
         else {
+            // Query SQL mode - use provided queries as-is
             List<String> sqls = connConf.getList(Key.QUERY_SQL, String.class);
             queries.addAll(sqls);
             connConf.set(Key.QUERY_SQL, queries);
@@ -159,10 +184,17 @@ public final class ReaderSplitUtil
         return queryConfig;
     }
 
+    /**
+     * Calculates the optimal number of splits per table based on total channel count and table count.
+     * Uses ceiling division to ensure all channels are utilized effectively.
+     *
+     * @param adviceNumber The total number of recommended parallel channels
+     * @param tableNumber The number of tables to be processed
+     * @return The number of splits each table should be divided into
+     */
     private static int calculateEachTableShouldSplitNumber(int adviceNumber, int tableNumber)
     {
         double tempNum = 1.0 * adviceNumber / tableNumber;
-
         return (int) Math.ceil(tempNum);
     }
 }
