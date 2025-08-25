@@ -71,10 +71,10 @@ plugins:
 
 nav:
   - Home: index.md
-  - Quick Start: quickstart.md
-  - Job Configuration: setupJob.md
-  - Command Line: commandline.md
-  - Reader Plugins:
+  - quickstart.md
+  - setupJob.md
+  - commandline.md
+  - 读取插件:
       - reader/accessreader.md
       - reader/mysqlreader.md
       - reader/postgresqlreader.md
@@ -110,8 +110,7 @@ nav:
       - reader/streamreader.md
       - reader/sybasereader.md
       - reader/tdenginereader.md
-
-  - Writer Plugins:
+  - 写入插件:
       - writer/accesswriter.md
       - writer/mysqlwriter.md
       - writer/postgresqlwriter.md
@@ -147,11 +146,11 @@ nav:
       - writer/streamwriter.md
       - writer/sybasewriter.md
       - writer/tdenginewriter.md
-  - Debug: debug.md
-  - Password Encryption: encrypt_password.md
-  - Statistics Report: statsreport.md
-  - Transformer: transformer.md
-  - Plugin Development: plugin_development.md
+  - debug.md
+  - encrypt_password.md
+  - statsreport.md
+  - transformer.md
+  - plugin_development.md
 
 extra:
   version:
