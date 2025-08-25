@@ -64,33 +64,75 @@ import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
-public class StorageWriterUtil
+/**
+ * Utility class for writing storage files with various compression formats.
+ * Provides methods for writing compressed streams, validating configurations,
+ * and converting data records to different output formats.
+ *
+ * @author wgzhao
+ * @since 1.0.0
+ */
+public final class StorageWriterUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger(StorageWriterUtil.class);
-    private static final Set<String> supportedWriteModes = Set.of("truncate", "append", "nonConflict", "overwrite");
 
+    /**
+     * Supported write modes for file output
+     */
+    private static final Set<String> SUPPORTED_WRITE_MODES = Set.of("truncate", "append", "nonConflict", "overwrite");
+
+    /**
+     * Private constructor to prevent instantiation
+     */
     private StorageWriterUtil()
     {
-
+        // Utility class
     }
 
-    /*
-     * check parameter: writeMode, encoding, compress, filedDelimiter
+    /**
+     * Validate writer configuration parameters including write mode, encoding,
+     * compression, and field delimiter.
+     *
+     * @param writerConfiguration the configuration to validate
+     * @throws AddaxException if validation fails
      */
     public static void validateParameter(Configuration writerConfiguration)
     {
-        // writeMode check
+        validateWriteMode(writerConfiguration);
+        validateEncoding(writerConfiguration);
+        validateCompression(writerConfiguration);
+        validateFieldDelimiter(writerConfiguration);
+        validateFileFormat(writerConfiguration);
+    }
+
+    /**
+     * Validate the write mode parameter.
+     *
+     * @param writerConfiguration configuration to validate
+     * @throws AddaxException if write mode is invalid
+     */
+    private static void validateWriteMode(Configuration writerConfiguration)
+    {
         String writeMode = writerConfiguration.getNecessaryValue(Key.WRITE_MODE, REQUIRED_VALUE);
         writeMode = writeMode.trim();
-        if (!supportedWriteModes.contains(writeMode)) {
-            throw AddaxException.illegalConfigValue(Key.WRITE_MODE, writeMode, "valid write modes " + StringUtils.join(supportedWriteModes, ","));
+        if (!SUPPORTED_WRITE_MODES.contains(writeMode)) {
+            throw AddaxException.illegalConfigValue(Key.WRITE_MODE, writeMode,
+                    "valid write modes " + String.join(",", SUPPORTED_WRITE_MODES));
         }
         writerConfiguration.set(Key.WRITE_MODE, writeMode);
+        LOG.debug("Validated write mode: {}", writeMode);
+    }
 
-        // encoding check
+    /**
+     * Validate the encoding parameter.
+     *
+     * @param writerConfiguration configuration to validate
+     * @throws AddaxException if encoding is not supported
+     */
+    private static void validateEncoding(Configuration writerConfiguration)
+    {
         String encoding = writerConfiguration.getString(Key.ENCODING);
         if (StringUtils.isBlank(encoding)) {
-            // like "  ", null
             LOG.warn("The item encoding is empty, uses [{}] as default.", Constant.DEFAULT_ENCODING);
             writerConfiguration.set(Key.ENCODING, Constant.DEFAULT_ENCODING);
         }
@@ -99,6 +141,7 @@ public class StorageWriterUtil
                 encoding = encoding.trim();
                 writerConfiguration.set(Key.ENCODING, encoding);
                 Charsets.toCharset(encoding);
+                LOG.debug("Validated encoding: {}", encoding);
             }
             catch (Exception e) {
                 throw AddaxException.asAddaxException(
@@ -106,68 +149,146 @@ public class StorageWriterUtil
                         String.format("The encoding [%s] is unsupported.", encoding), e);
             }
         }
+    }
 
-        // only support compress types
+    /**
+     * Validate the compression parameter.
+     *
+     * @param writerConfiguration configuration to validate
+     */
+    private static void validateCompression(Configuration writerConfiguration)
+    {
         String compress = writerConfiguration.getString(Key.COMPRESS);
         if (StringUtils.isBlank(compress)) {
             writerConfiguration.set(Key.COMPRESS, null);
+            LOG.debug("No compression specified");
         }
-
-        // fieldDelimiter check
-        String delimiterInStr = writerConfiguration.getString(Key.FIELD_DELIMITER);
-        // warn: if it has, length must be one
-        if (null != delimiterInStr && 1 != delimiterInStr.length()) {
-            throw AddaxException.illegalConfigValue(Key.FIELD_DELIMITER, delimiterInStr);
-        }
-        if (null == delimiterInStr) {
-            LOG.warn("The item delimiter is empty, uses {} as default.", Constant.DEFAULT_FIELD_DELIMITER);
-            writerConfiguration.set(Key.FIELD_DELIMITER, Constant.DEFAULT_FIELD_DELIMITER);
-        }
-
-        // fileFormat check
-        String fileFormat = writerConfiguration.getString(Key.FILE_FORMAT, Constant.DEFAULT_FILE_FORMAT);
-        if (!Constant.SUPPORTED_FILE_FORMAT.contains(fileFormat)) {
-            throw AddaxException.illegalConfigValue(Key.FILE_NAME, fileFormat, "valid file format are " + Constant.SUPPORTED_FILE_FORMAT.toString());
+        else {
+            LOG.debug("Compression specified: {}", compress);
         }
     }
 
+    /**
+     * Validate the field delimiter parameter.
+     *
+     * @param writerConfiguration configuration to validate
+     * @throws AddaxException if delimiter is invalid
+     */
+    private static void validateFieldDelimiter(Configuration writerConfiguration)
+    {
+        String delimiterInStr = writerConfiguration.getString(Key.FIELD_DELIMITER);
+        if (delimiterInStr != null && delimiterInStr.length() != 1) {
+            throw AddaxException.illegalConfigValue(Key.FIELD_DELIMITER, delimiterInStr);
+        }
+        if (delimiterInStr == null) {
+            LOG.warn("The item delimiter is empty, uses {} as default.", Constant.DEFAULT_FIELD_DELIMITER);
+            writerConfiguration.set(Key.FIELD_DELIMITER, Constant.DEFAULT_FIELD_DELIMITER);
+        }
+        else {
+            LOG.debug("Validated field delimiter: {}", delimiterInStr);
+        }
+    }
+
+    /**
+     * Validate the file format parameter.
+     *
+     * @param writerConfiguration configuration to validate
+     * @throws AddaxException if file format is invalid
+     */
+    private static void validateFileFormat(Configuration writerConfiguration)
+    {
+        String fileFormat = writerConfiguration.getString(Key.FILE_FORMAT, Constant.DEFAULT_FILE_FORMAT);
+        if (!Constant.SUPPORTED_FILE_FORMAT.contains(fileFormat)) {
+            throw AddaxException.illegalConfigValue(Key.FILE_FORMAT, fileFormat,
+                    "valid file formats are " + Constant.SUPPORTED_FILE_FORMAT);
+        }
+        LOG.debug("Validated file format: {}", fileFormat);
+    }
+
+    /**
+     * Split writer configuration into multiple configurations for parallel processing.
+     *
+     * @param writerSliceConfig the base configuration to split
+     * @param originAllFileExists set of existing file names to avoid conflicts
+     * @param mandatoryNumber number of configurations to create
+     * @return list of split configurations
+     */
     public static List<Configuration> split(Configuration writerSliceConfig, Set<String> originAllFileExists, int mandatoryNumber)
     {
         List<Configuration> writerSplitConfigs = new ArrayList<>();
-        LOG.info("Begin to split...");
+        LOG.info("Begin to split writer configuration for {} instances", mandatoryNumber);
+
         if (mandatoryNumber == 1) {
             writerSplitConfigs.add(writerSliceConfig);
             return writerSplitConfigs;
         }
 
         Set<String> allFileExists = new HashSet<>(originAllFileExists);
-
         String filePrefix = writerSliceConfig.getString(Key.FILE_NAME);
-        String suffix = "";
+        String suffix = extractFileSuffix(filePrefix);
+
         if (filePrefix.contains(".")) {
-            String[] split = filePrefix.split("\\.");
-            filePrefix = split[0];
-            suffix = "." + split[1];
+            filePrefix = filePrefix.substring(0, filePrefix.lastIndexOf('.'));
         }
+
         for (int i = 0; i < mandatoryNumber; i++) {
-            // handle same file name
             Configuration splitTaskConfig = writerSliceConfig.clone();
-            String fullFileName;
-            do {
-                fullFileName = String.format("%s_%s%s", filePrefix, FileHelper.generateFileMiddleName(), suffix);
-            }
-            while (allFileExists.contains(fullFileName));
+            String fullFileName = generateUniqueFileName(filePrefix, suffix, allFileExists);
             allFileExists.add(fullFileName);
             splitTaskConfig.set(Key.FILE_NAME, fullFileName);
             LOG.info("split write file name:[{}]", fullFileName);
             writerSplitConfigs.add(splitTaskConfig);
         }
-        LOG.info("Finished split.");
+
+        LOG.info("Finished split into {} configurations", writerSplitConfigs.size());
         return writerSplitConfigs;
     }
 
+    /**
+     * Extract file suffix from a filename.
+     *
+     * @param fileName the filename to extract suffix from
+     * @return the file suffix including the dot, or empty string if no suffix
+     */
+    private static String extractFileSuffix(String fileName)
+    {
+        if (fileName == null || !fileName.contains(".")) {
+            return "";
+        }
+        return fileName.substring(fileName.lastIndexOf('.'));
+    }
+
+    /**
+     * Generate a unique filename by appending a unique identifier.
+     *
+     * @param filePrefix the base filename without extension
+     * @param suffix the file extension
+     * @param existingFiles set of existing filenames to avoid conflicts
+     * @return a unique filename
+     */
+    private static String generateUniqueFileName(String filePrefix, String suffix, Set<String> existingFiles)
+    {
+        String fullFileName;
+        do {
+            fullFileName = String.format("%s_%s%s", filePrefix, FileHelper.generateFileMiddleName(), suffix);
+        } while (existingFiles.contains(fullFileName));
+        return fullFileName;
+    }
+
+    /**
+     * Build a complete file path from components.
+     *
+     * @param path the directory path
+     * @param fileName the file name
+     * @param suffix the file suffix (can be null)
+     * @return the complete file path
+     */
     public static String buildFilePath(String path, String fileName, String suffix)
     {
+        if (StringUtils.isBlank(path) || StringUtils.isBlank(fileName)) {
+            throw new IllegalArgumentException("Path and fileName cannot be blank");
+        }
+
         boolean isEndWithSeparator = switch (IOUtils.DIR_SEPARATOR) {
             case IOUtils.DIR_SEPARATOR_UNIX -> path.endsWith(String.valueOf(IOUtils.DIR_SEPARATOR));
             case IOUtils.DIR_SEPARATOR_WINDOWS -> path.endsWith(String.valueOf(IOUtils.DIR_SEPARATOR_WINDOWS));
@@ -179,19 +300,30 @@ public class StorageWriterUtil
         }
 
         suffix = (suffix == null) ? "" : suffix.trim();
-        return "%s%s%s".formatted(path, fileName, suffix);
+        return path + fileName + suffix;
     }
 
+    /**
+     * Write records to an output stream with optional compression.
+     *
+     * @param lineReceiver receiver for reading records
+     * @param outputStream the output stream to write to
+     * @param config configuration for writing
+     * @param fileName file name for logging and compression
+     * @param taskPluginCollector collector for error handling
+     * @throws AddaxException if writing fails
+     */
     public static void writeToStream(RecordReceiver lineReceiver,
             OutputStream outputStream, Configuration config, String fileName,
             TaskPluginCollector taskPluginCollector)
     {
         String encoding = config.getString(Key.ENCODING, Constant.DEFAULT_ENCODING);
-
         String compress = config.getString(Key.COMPRESS);
 
-        try (var writer = createWriter(outputStream, encoding, compress, fileName)) {
-            StorageWriterUtil.doWriteToStream(lineReceiver, writer, fileName, config, taskPluginCollector);
+        LOG.debug("Writing to stream with encoding: {}, compression: {}", encoding, compress);
+
+        try (BufferedWriter writer = createWriter(outputStream, encoding, compress, fileName)) {
+            doWriteToStream(lineReceiver, writer, config, taskPluginCollector);
         }
         catch (UnsupportedEncodingException uee) {
             throw AddaxException.asAddaxException(ENCODING_ERROR,
@@ -200,7 +332,7 @@ public class StorageWriterUtil
         catch (CompressorException e) {
             throw AddaxException.asAddaxException(
                     NOT_SUPPORT_TYPE,
-                    "Unsupported compression algorithm: " + compress
+                    "Unsupported compression algorithm: " + compress, e
             );
         }
         catch (IOException e) {
@@ -210,160 +342,202 @@ public class StorageWriterUtil
         }
     }
 
+    /**
+     * Create a BufferedWriter with optional compression.
+     *
+     * @param outputStream the output stream
+     * @param encoding character encoding
+     * @param compress compression type (can be null)
+     * @param fileName file name for ZIP compression
+     * @return BufferedWriter with compression if specified
+     * @throws IOException if writer creation fails
+     * @throws CompressorException if compression is not supported
+     */
     private static BufferedWriter createWriter(OutputStream outputStream, String encoding,
             String compress, String fileName)
             throws IOException, CompressorException
     {
-        if (compress == null) {
+        if (compress == null || "none".equalsIgnoreCase(compress)) {
             return new BufferedWriter(new OutputStreamWriter(outputStream, encoding));
         }
 
-        // Normalize compress name
-        compress = switch (compress.toLowerCase()) {
+        // Normalize compress name for compatibility
+        String normalizedCompress = switch (compress.toLowerCase()) {
             case "gzip" -> "gz";
             case "bz2" -> "bzip2";
-            default -> compress;
+            default -> compress.toLowerCase();
         };
 
-        if ("zip".equals(compress)) {
-            var zis = new ZipCycleOutputStream(outputStream, fileName);
-            return new BufferedWriter(new OutputStreamWriter(zis, encoding));
+        if ("zip".equals(normalizedCompress)) {
+            ZipCycleOutputStream zos = new ZipCycleOutputStream(outputStream, fileName);
+            return new BufferedWriter(new OutputStreamWriter(zos, encoding));
         }
 
         var compressorOutputStream = new CompressorStreamFactory()
-                .createCompressorOutputStream(compress, outputStream);
+                .createCompressorOutputStream(normalizedCompress, outputStream);
         return new BufferedWriter(new OutputStreamWriter(compressorOutputStream, encoding));
     }
 
+    /**
+     * Write records to a BufferedWriter using the specified format.
+     *
+     * @param lineReceiver receiver for reading records
+     * @param writer the writer to write to
+     * @param config configuration for writing
+     * @param taskPluginCollector collector for error handling
+     * @throws IOException if writing fails
+     */
     private static void doWriteToStream(RecordReceiver lineReceiver,
-            BufferedWriter writer, String context, Configuration config,
+            BufferedWriter writer, Configuration config,
             TaskPluginCollector taskPluginCollector)
             throws IOException
     {
-        CSVFormat.Builder csvBuilder = CSVFormat.DEFAULT.builder();
-        csvBuilder.setRecordSeparator(IOUtils.LINE_SEPARATOR_UNIX);
-        String nullFormat = config.getString(Key.NULL_FORMAT);
-        csvBuilder.setNullString(nullFormat);
-        String dateFormat = config.getString(Key.DATE_FORMAT);
-        DateFormat dateParse = null; //
-        if (StringUtils.isNotBlank(dateFormat)) {
-            dateParse = new SimpleDateFormat(dateFormat);
-        }
-
-        // warn: default false
         String fileFormat = config.getString(Key.FILE_FORMAT, Constant.DEFAULT_FILE_FORMAT);
-        if (Objects.equals(fileFormat, Constant.SQL_FORMAT)) {
+
+        if (Constant.SQL_FORMAT.equals(fileFormat)) {
             writeToSql(lineReceiver, writer, config);
             return;
         }
 
+        writeToCSV(lineReceiver, writer, config, taskPluginCollector);
+    }
+
+    /**
+     * Write records in CSV format.
+     *
+     * @param lineReceiver receiver for reading records
+     * @param writer the writer to write to
+     * @param config configuration for writing
+     * @param taskPluginCollector collector for error handling
+     * @throws IOException if writing fails
+     */
+    private static void writeToCSV(RecordReceiver lineReceiver, BufferedWriter writer,
+            Configuration config, TaskPluginCollector taskPluginCollector)
+            throws IOException
+    {
+        CSVFormat.Builder csvBuilder = CSVFormat.DEFAULT.builder();
+        csvBuilder.setRecordSeparator(IOUtils.LINE_SEPARATOR_UNIX);
+
+        String nullFormat = config.getString(Key.NULL_FORMAT);
+        csvBuilder.setNullString(nullFormat);
+
+        String dateFormat = config.getString(Key.DATE_FORMAT);
+        DateFormat dateParse = StringUtils.isNotBlank(dateFormat) ? new SimpleDateFormat(dateFormat) : null;
+
+        // Validate and set field delimiter
         String delimiterInStr = config.getString(Key.FIELD_DELIMITER);
-        if (null != delimiterInStr && 1 != delimiterInStr.length()) {
+        if (delimiterInStr != null && delimiterInStr.length() != 1) {
             throw AddaxException.illegalConfigValue(Key.FIELD_DELIMITER, delimiterInStr);
         }
-        if (null == delimiterInStr) {
-            LOG.warn("Take the  {}  as the value of {}", Constant.DEFAULT_FIELD_DELIMITER, Key.FIELD_DELIMITER);
-        }
-
-        // warn: fieldDelimiter could not be '' for no fieldDelimiter
         char fieldDelimiter = config.getChar(Key.FIELD_DELIMITER, Constant.DEFAULT_FIELD_DELIMITER);
         csvBuilder.setDelimiter(fieldDelimiter);
 
+        // Handle headers
         List<String> headers = config.getList(Key.HEADER, String.class);
-        if (null != headers && !headers.isEmpty()) {
+        if (headers != null && !headers.isEmpty()) {
             csvBuilder.setHeader(headers.toArray(new String[0]));
         }
 
         Record record;
-        CSVPrinter csvPrinter = new CSVPrinter(writer, csvBuilder.build());
-        while ((record = lineReceiver.getFromReader()) != null) {
-            final List<String> result = recordToList(record, nullFormat, dateParse, taskPluginCollector);
-            if (result != null) {
-                csvPrinter.printRecord(result);
+        try (CSVPrinter csvPrinter = new CSVPrinter(writer, csvBuilder.build())) {
+            while ((record = lineReceiver.getFromReader()) != null) {
+                List<String> result = recordToList(record, nullFormat, dateParse, taskPluginCollector);
+                if (result != null) {
+                    csvPrinter.printRecord(result);
+                }
             }
         }
-        csvPrinter.close();
     }
 
+    /**
+     * Convert a record to a list of string values.
+     *
+     * @param record the record to convert
+     * @param nullFormat format for null values
+     * @param dateParse date formatter (can be null)
+     * @param taskPluginCollector collector for error handling
+     * @return list of string values, or null if conversion fails
+     */
     public static List<String> recordToList(Record record, String nullFormat, DateFormat dateParse, TaskPluginCollector taskPluginCollector)
     {
         try {
             List<String> splitRows = new ArrayList<>();
             int recordLength = record.getColumnNumber();
-            if (0 != recordLength) {
-                Column column;
-                for (int i = 0; i < recordLength; i++) {
-                    column = record.getColumn(i);
-                    if (null == column || null == column.getRawData() || column.asString().equals(nullFormat)) {
-                        // warn: it's all ok if nullFormat is null
-                        splitRows.add(nullFormat);
-                    }
-                    else {
-                        // warn: it's all ok if nullFormat is null
-                        boolean isDateColumn = column instanceof DateColumn || column instanceof TimestampColumn;
-                        if (!isDateColumn) {
-                            splitRows.add(column.asString());
-                        }
-                        else {
-                            if (null != dateParse) {
-                                splitRows.add(dateParse.format(column.asDate()));
-                            }
-                            else {
-                                splitRows.add(column.asString());
-                            }
-                        }
-                    }
-                }
+
+            for (int i = 0; i < recordLength; i++) {
+                Column column = record.getColumn(i);
+                String value = convertColumnToString(column, nullFormat, dateParse);
+                splitRows.add(value);
             }
+
             return splitRows;
         }
         catch (Exception e) {
-            // warn: dirty data
-            taskPluginCollector.collectDirtyRecord(record, e);
+            LOG.warn("Failed to convert record to list", e);
+            taskPluginCollector.collectDirtyRecord(record, e.getMessage());
             return null;
         }
     }
 
+    /**
+     * Convert a column to its string representation.
+     *
+     * @param column the column to convert
+     * @param nullFormat format for null values
+     * @param dateParse date formatter (can be null)
+     * @return string representation of the column
+     */
+    private static String convertColumnToString(Column column, String nullFormat, DateFormat dateParse)
+    {
+        if (column == null || column.getRawData() == null || column.asString().equals(nullFormat)) {
+            return nullFormat;
+        }
+
+        boolean isDateColumn = column instanceof DateColumn || column instanceof TimestampColumn;
+        if (!isDateColumn) {
+            return column.asString();
+        }
+
+        if (dateParse != null) {
+            return dateParse.format(column.asDate());
+        }
+
+        return column.asString();
+    }
+
+    /**
+     * Write records in SQL INSERT format.
+     *
+     * @param lineReceiver receiver for reading records
+     * @param writer the writer to write to
+     * @param config configuration for writing
+     * @throws IOException if writing fails
+     * @throws AddaxException if configuration is invalid
+     */
     public static void writeToSql(RecordReceiver lineReceiver, BufferedWriter writer, Configuration config)
             throws IOException
     {
-        // sql format required table and column name and optional extendedInsert and optional batchSize
         String tableName = config.getNecessaryValue(Key.TABLE, REQUIRED_VALUE);
-        String existColumns = config.getString(Key.COLUMN, null);
-        List<String> columns = null;
-        if (existColumns != null) {
-            columns = config.getList(Key.COLUMN, String.class);
-        }
+        List<String> columns = config.getList(Key.COLUMN, String.class);
         boolean extendedInsert = config.getBool(Key.EXTENDED_INSERT, true);
         int batchSize = config.getInt(Key.BATCH_SIZE, Constant.DEFAULT_BATCH_SIZE);
 
-        String sqlHeader = existColumns != null
-                ? "INSERT INTO %s(%s)".formatted(tableName, String.join(",", columns))
-                : "INSERT INTO %s".formatted(tableName);
-
-        var sb = new StringBuilder(sqlHeader).append(" VALUES (");
-        int curNum = 0;
+        String sqlHeader = buildSqlHeader(tableName, columns);
+        StringBuilder sb = new StringBuilder(sqlHeader).append(" VALUES (");
+        int currentBatchSize = 0;
 
         Record record;
         while ((record = lineReceiver.getFromReader()) != null) {
-            if (columns != null && record.getColumnNumber() != columns.size()) {
-                throw AddaxException.asAddaxException(
-                        CONFIG_ERROR,
-                        "Column count mismatch: record has %d columns but table has %d columns"
-                                .formatted(record.getColumnNumber(), columns.size())
-                );
-            }
-
             appendRecordValues(record, sb);
 
             if (extendedInsert) {
-                if (curNum >= batchSize) {
+                currentBatchSize++;
+                if (currentBatchSize >= batchSize) {
                     writeAndResetBuffer(writer, sb, sqlHeader);
-                    curNum = 0;
+                    currentBatchSize = 0;
                 }
                 else {
                     sb.append("), (");
-                    curNum++;
                 }
             }
             else {
@@ -375,32 +549,87 @@ public class StorageWriterUtil
         }
 
         // Write remaining records
-        if (curNum > 0) {
-            sb.delete(sb.length() - 3, sb.length()).append(";");
+        if (currentBatchSize > 0) {
+            sb.delete(sb.length() - 3, sb.length()).append(";\n");
             writer.write(sb.toString());
         }
     }
 
+    /**
+     * Build the SQL header for INSERT statements.
+     *
+     * @param tableName the table name
+     * @param columns list of column names (can be null)
+     * @return SQL header string
+     */
+    private static String buildSqlHeader(String tableName, List<String> columns)
+    {
+        if (columns != null && !columns.isEmpty()) {
+            return String.format("INSERT INTO %s(%s)", tableName, String.join(",", columns));
+        }
+        return String.format("INSERT INTO %s", tableName);
+    }
+
+    /**
+     * Validate that record column count matches expected columns.
+     *
+     * @param record the record to validate
+     * @param columns expected columns (can be null)
+     * @throws AddaxException if column count mismatch
+     */
+    private static void validateRecordColumns(Record record, List<String> columns)
+    {
+        if (columns != null && record.getColumnNumber() != columns.size()) {
+            throw AddaxException.asAddaxException(
+                    CONFIG_ERROR,
+                    String.format("Column count mismatch: record has %d columns but table has %d columns",
+                            record.getColumnNumber(), columns.size())
+            );
+        }
+    }
+
+    /**
+     * Append record values to SQL statement.
+     *
+     * @param record the record to append
+     * @param sb the StringBuilder to append to
+     */
     private static void appendRecordValues(Record record, StringBuilder sb)
     {
         for (int i = 0; i < record.getColumnNumber(); i++) {
-            var column = record.getColumn(i);
+            Column column = record.getColumn(i);
+
+            // Numeric and boolean columns don't need quotes
             if (column instanceof LongColumn || column instanceof BoolColumn) {
                 sb.append(column.asString());
             }
             else {
-                sb.append("'").append(column.asString()).append("'");
+                // Escape single quotes in string values
+                String value = column.asString();
+                if (value != null) {
+                    value = value.replace("'", "''");
+                }
+                sb.append("'").append(value).append("'");
             }
+
             if (i < record.getColumnNumber() - 1) {
                 sb.append(",");
             }
         }
     }
 
+    /**
+     * Write buffer content and reset for next batch.
+     *
+     * @param writer the writer to write to
+     * @param sb the StringBuilder to write and reset
+     * @param sqlHeader SQL header for next batch
+     * @throws IOException if writing fails
+     */
     private static void writeAndResetBuffer(BufferedWriter writer, StringBuilder sb, String sqlHeader)
             throws IOException
     {
-        sb.append(";\n");
+        sb.delete(sb.length() - 3, sb.length()).append(";\n");
         writer.write(sb.toString());
         sb.setLength(0);
         sb.append(sqlHeader).append(" VALUES (");

@@ -30,13 +30,12 @@ import org.slf4j.LoggerFactory;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -49,10 +48,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class FileHelper
+/**
+ * Utility class for file operations including compression detection,
+ * file reading, and path manipulation.
+ *
+ * @author wgzhao
+ * @since 1.0.0
+ */
+public final class FileHelper
 {
     private static final Logger LOG = LoggerFactory.getLogger(FileHelper.class);
 
+    /**
+     * Mapping of compression type names to their corresponding file suffixes
+     */
     private static final Map<String, String> COMPRESS_TYPE_SUFFIX_MAP = Map.ofEntries(
             Map.entry("BZIP", ".bz2"),
             Map.entry("BZIP2", ".bz2"),
@@ -74,65 +83,77 @@ public class FileHelper
             Map.entry("ZSTD", ".zstd")
     );
 
-    public static final Map<String, String> FILE_MAGIC_TYPES = Map.ofEntries(
-            Map.entry("504B", "zip"),
-            Map.entry("5261", "rar"),
-            Map.entry("1F8B", "gz"),
-            Map.entry("1F9D", "z"),
-            Map.entry("1FA0", "z"),
-            Map.entry("425A", "bz2"),
-            Map.entry("377A", "7z"),
-            Map.entry("FD37", "xz"),
-            Map.entry("0422", "lz4"),
-            Map.entry("7573", "tar")
-    );
+    /**
+     * Default buffer size for reading operations
+     */
+    private static final int DEFAULT_BUFFER_SIZE = 8192;
 
+    /**
+     * Private constructor to prevent instantiation
+     */
     private FileHelper()
     {
-        // Prevent instantiation
+        // Utility class
     }
 
     /**
-     * Detect the specified file compression type
+     * Detect the compression type of the specified file.
      *
-     * @param fileName the file name
+     * @param fileName the file name to analyze
      * @return the compression type if present, otherwise "none"
      * @throws IOException if there's an error reading the file
      */
     public static String getFileCompressType(String fileName)
             throws IOException
     {
-        if (fileName == null || fileName.isEmpty()) {
-            LOG.warn("Empty file name provided for compression detection");
+        if (StringUtils.isBlank(fileName)) {
+            LOG.warn("Empty or null file name provided for compression detection");
             return "none";
         }
 
         LOG.debug("Detecting compression type for file: {}", fileName);
-        try (InputStream inputStream = new FileInputStream(fileName)) {
-            return getFileCompressType(inputStream);
+
+        Path filePath = Paths.get(fileName);
+        if (!Files.exists(filePath)) {
+            throw new FileNotFoundException("File not found: " + fileName);
         }
-        catch (FileNotFoundException e) {
-            LOG.error("Failed to find file for compression detection: {}", fileName);
-            throw new IOException("File not found: " + fileName, e);
+
+        if (!Files.isReadable(filePath)) {
+            throw new IOException("File is not readable: " + fileName);
+        }
+
+        try (InputStream inputStream = Files.newInputStream(filePath);
+             BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream)) {
+            return getFileCompressType(bufferedInputStream);
+        }
+        catch (IOException e) {
+            LOG.error("Failed to detect compression type for file: {}", fileName, e);
+            throw e;
         }
     }
 
     /**
-     * Detect compression type from an input stream
+     * Detect compression type from an input stream.
+     * The input stream must support mark/reset operations.
      *
-     * @param inputStream the input stream to detect
+     * @param inputStream the input stream to detect (must support mark)
      * @return the compression type if present, otherwise "none"
+     * @throws IllegalArgumentException if the input stream doesn't support mark
      */
     public static String getFileCompressType(InputStream inputStream)
     {
+        if (inputStream == null) {
+            throw new IllegalArgumentException("Input stream cannot be null");
+        }
+
+        if (!inputStream.markSupported()) {
+            throw new IllegalArgumentException("Input stream must support mark operation");
+        }
+
         try {
             String type = CompressorStreamFactory.detect(inputStream);
             LOG.debug("Detected compression type: {}", type);
             return type;
-        }
-        catch (IllegalArgumentException e) {
-            LOG.warn("Cannot detect compression type: stream does not support mark", e);
-            throw new IllegalArgumentException("Input stream does not support mark operation", e);
         }
         catch (CompressorException e) {
             LOG.debug("No compression detected, assuming uncompressed file");
@@ -141,7 +162,7 @@ public class FileHelper
     }
 
     /**
-     * Return the corresponding file name suffix according to compression algorithm
+     * Return the corresponding file name suffix according to compression algorithm.
      *
      * @param compress the compression type name
      * @return the suffix if present, otherwise empty string
@@ -157,12 +178,13 @@ public class FileHelper
     }
 
     /**
-     * Read a compressed file and return a buffered reader
+     * Read a compressed file and return a buffered reader.
      *
      * @param fileName the file to read
-     * @param encoding character encoding to use
-     * @param bufferSize buffer size for reading
+     * @param encoding character encoding to use (if null, uses UTF-8)
+     * @param bufferSize buffer size for reading (if &le; 0, uses default)
      * @return BufferedReader for reading the file content
+     * @throws AddaxException if reading fails
      */
     public static BufferedReader readCompressFile(String fileName, String encoding, int bufferSize)
     {
@@ -170,27 +192,31 @@ public class FileHelper
             throw new IllegalArgumentException("File name cannot be blank");
         }
 
-        LOG.debug("Reading compressed file: {} with encoding: {}", fileName, encoding);
+        // Validate and set defaults
+        String actualEncoding = StringUtils.isBlank(encoding) ? StandardCharsets.UTF_8.name() : encoding;
+        int actualBufferSize = bufferSize <= 0 ? DEFAULT_BUFFER_SIZE : bufferSize;
+
+        LOG.debug("Reading compressed file: {} with encoding: {}, buffer size: {}",
+                fileName, actualEncoding, actualBufferSize);
 
         try {
-
-            var compressType = getFileCompressType(fileName);
+            String compressType = getFileCompressType(fileName);
             LOG.debug("Detected compression type: {} for file: {}", compressType, fileName);
-            var path = Path.of(fileName);
+            Path path = Paths.get(fileName);
 
             return switch (compressType) {
-                case "none" -> Files.newBufferedReader(path, Charset.forName(encoding));
+                case "none" -> Files.newBufferedReader(path, Charset.forName(actualEncoding));
                 case "zip" -> {
-                    var inputStream = new FileInputStream(fileName);
-                    var zis = new ZipCycleInputStream(inputStream);
-                    yield new BufferedReader(new InputStreamReader(zis, encoding), bufferSize);
+                    InputStream inputStream = Files.newInputStream(path);
+                    ZipCycleInputStream zis = new ZipCycleInputStream(inputStream);
+                    yield new BufferedReader(new InputStreamReader(zis, actualEncoding), actualBufferSize);
                 }
                 default -> {
-                    var inputStream = new FileInputStream(fileName);
-                    var bis = new BufferedInputStream(inputStream);
-                    var input = new CompressorStreamFactory()
+                    InputStream inputStream = Files.newInputStream(path);
+                    BufferedInputStream bis = new BufferedInputStream(inputStream);
+                    InputStream compressedInput = new CompressorStreamFactory()
                             .createCompressorInputStream(compressType, bis, true);
-                    yield new BufferedReader(new InputStreamReader(input, encoding), bufferSize);
+                    yield new BufferedReader(new InputStreamReader(compressedInput, actualEncoding), actualBufferSize);
                 }
             };
         }
@@ -204,10 +230,10 @@ public class FileHelper
     }
 
     /**
-     * Build a list of source files from directories, handling wildcards
+     * Build a list of source files from directories, handling wildcards.
      *
      * @param directories list of directory paths, possibly with wildcards
-     * @return list of resolved file paths
+     * @return list of resolved file paths (never null)
      */
     public static List<String> buildSourceTargets(List<String> directories)
     {
@@ -225,36 +251,47 @@ public class FileHelper
                 continue;
             }
 
-            if (eachPath.contains("*") || eachPath.contains("?")) {
-                LOG.debug("Processing wildcard path: {}", eachPath);
-                List<String> matched = listFilesWithWildcard(eachPath);
-                LOG.debug("Found {} files matching wildcard path: {}", matched.size(), eachPath);
-                toBeReadFiles.addAll(matched);
-            }
-            else {
-                File file = new File(eachPath);
-                if (file.isDirectory()) {
-                    LOG.debug("Processing directory: {}", eachPath);
-                    List<String> dirFiles = listFilesWithWildcard(eachPath + "/*.*");
-                    LOG.debug("Found {} files in directory: {}", dirFiles.size(), eachPath);
-                    toBeReadFiles.addAll(dirFiles);
+            try {
+                if (eachPath.contains("*") || eachPath.contains("?")) {
+                    LOG.debug("Processing wildcard path: {}", eachPath);
+                    List<String> matched = listFilesWithWildcard(eachPath);
+                    LOG.debug("Found {} files matching wildcard path: {}", matched.size(), eachPath);
+                    toBeReadFiles.addAll(matched);
                 }
                 else {
-                    LOG.debug("Adding single file: {}", eachPath);
-                    toBeReadFiles.add(eachPath);
+                    Path pathObj = Paths.get(eachPath);
+                    if (Files.isDirectory(pathObj)) {
+                        LOG.debug("Processing directory: {}", eachPath);
+                        // Use proper path joining instead of string concatenation
+                        String wildcardPath = pathObj.resolve("*.*").toString();
+                        List<String> dirFiles = listFilesWithWildcard(wildcardPath);
+                        LOG.debug("Found {} files in directory: {}", dirFiles.size(), eachPath);
+                        toBeReadFiles.addAll(dirFiles);
+                    }
+                    else if (Files.exists(pathObj)) {
+                        LOG.debug("Adding single file: {}", eachPath);
+                        toBeReadFiles.add(pathObj.toAbsolutePath().toString());
+                    }
+                    else {
+                        LOG.warn("Path does not exist: {}", eachPath);
+                    }
                 }
+            }
+            catch (Exception e) {
+                LOG.error("Error processing path: {}", eachPath, e);
             }
         }
 
-        LOG.info("Total source files to process: {}", toBeReadFiles.size());
-        return new ArrayList<>(toBeReadFiles);
+        List<String> result = new ArrayList<>(toBeReadFiles);
+        LOG.info("Total source files to process: {}", result.size());
+        return result;
     }
 
     /**
-     * List files that match a wildcard pattern
+     * List files that match a wildcard pattern.
      *
      * @param wildcardPath path with wildcard patterns
-     * @return list of matching files
+     * @return list of matching files (never null)
      */
     private static List<String> listFilesWithWildcard(String wildcardPath)
     {
@@ -265,32 +302,37 @@ public class FileHelper
         }
 
         LOG.debug("Listing files with wildcard: {}", wildcardPath);
-        Path path = Paths.get(wildcardPath);
-        Path dir = path.getParent();
-        String globPattern = path.getFileName().toString();
 
-        if (dir == null) {
-            LOG.error("Invalid wildcard path (no parent directory): {}", wildcardPath);
-            return result;
-        }
+        try {
+            Path path = Paths.get(wildcardPath);
+            Path dir = path.getParent();
+            String globPattern = path.getFileName().toString();
 
-        if (!Files.exists(dir)) {
-            LOG.warn("Directory does not exist: {}", dir);
-            return result;
-        }
-
-        if (!Files.isReadable(dir)) {
-            LOG.error("No read permission for directory: {}", dir);
-            return result;
-        }
-
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir, globPattern)) {
-            for (Path entry : stream) {
-                result.add(entry.toFile().getAbsolutePath());
+            if (dir == null) {
+                LOG.error("Invalid wildcard path (no parent directory): {}", wildcardPath);
+                return result;
             }
-            LOG.debug("Found {} files matching pattern: {}", result.size(), globPattern);
+
+            if (!Files.exists(dir)) {
+                LOG.warn("Directory does not exist: {}", dir);
+                return result;
+            }
+
+            if (!Files.isReadable(dir)) {
+                LOG.error("No read permission for directory: {}", dir);
+                return result;
+            }
+
+            try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir, globPattern)) {
+                for (Path entry : stream) {
+                    if (Files.isRegularFile(entry)) {
+                        result.add(entry.toAbsolutePath().toString());
+                    }
+                }
+                LOG.debug("Found {} files matching pattern: {}", result.size(), globPattern);
+            }
         }
-        catch (IOException e) {
+        catch (Exception e) {
             LOG.error("Failed to list files with wildcard path: {}", wildcardPath, e);
         }
 
@@ -298,11 +340,12 @@ public class FileHelper
     }
 
     /**
-     * Split a list into approximately equal-sized sublists
+     * Split a list into approximately equal-sized sublists.
      *
-     * @param sourceList the list to split
-     * @param adviceNumber suggested number of sublists
-     * @return list of sublists
+     * @param <T> the type of elements in the list
+     * @param sourceList the list to split (can be null or empty)
+     * @param adviceNumber suggested number of sublists (must be positive)
+     * @return list of sublists (never null)
      */
     public static <T> List<List<T>> splitSourceFiles(final List<T> sourceList, int adviceNumber)
     {
@@ -319,26 +362,35 @@ public class FileHelper
         }
 
         LOG.debug("Splitting {} items into approximately {} parts", sourceList.size(), adviceNumber);
-        int averageLength = Math.max(1, sourceList.size() / adviceNumber);
 
-        for (int begin = 0, end; begin < sourceList.size(); begin = end) {
-            end = Math.min(begin + averageLength, sourceList.size());
-            splitedList.add(sourceList.subList(begin, end));
+        // Optimize: calculate the actual number of splits needed
+        int actualSplits = Math.min(adviceNumber, sourceList.size());
+        int averageLength = sourceList.size() / actualSplits;
+        int remainder = sourceList.size() % actualSplits;
+
+        int startIndex = 0;
+        for (int i = 0; i < actualSplits; i++) {
+            int endIndex = startIndex + averageLength + (i < remainder ? 1 : 0);
+            splitedList.add(new ArrayList<>(sourceList.subList(startIndex, endIndex)));
+            startIndex = endIndex;
         }
 
+        LOG.debug("Split into {} actual parts", splitedList.size());
         return splitedList;
     }
 
     /**
-     * Generate a unique file name middle part based on timestamp and random chars
+     * Generate a unique file name middle part based on timestamp and random characters.
+     * Format: yyyyMMdd_HHmmss_SSS_randomChars
      *
-     * @return generated string for file naming
+     * @return generated string for file naming (never null)
      */
     public static String generateFileMiddleName()
     {
         String randomChars = "0123456789abcdefghmnpqrstuvwxyz";
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS");
-        // like 20211203_143329_237_6587fddb
-        return dateFormat.format(new Date()) + "_" + RandomStringUtils.insecure().next(8, randomChars);
+        // Generate format like: 20211203_143329_237_6587fddb
+        return dateFormat.format(new Date()) + "_" +
+               RandomStringUtils.insecure().next(8, randomChars);
     }
 }
