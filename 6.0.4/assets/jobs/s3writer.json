@@ -1,0 +1,54 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "byte": -1,
+        "channel": 1
+      }
+    },
+    "content": {
+      "reader": {
+        "name": "streamreader",
+        "parameter": {
+          "column": [
+            {
+              "value": "Addax",
+              "type": "string"
+            },
+            {
+              "value": 19890604,
+              "type": "long"
+            },
+            {
+              "value": "1989-06-04 11:22:33",
+              "type": "date"
+            },
+            {
+              "value": true,
+              "type": "bool"
+            },
+            {
+              "value": "test",
+              "type": "bytes"
+            }
+          ],
+          "sliceRecordCount": 10
+        }
+      },
+      "writer": {
+        "name": "s3writer",
+        "parameter": {
+          "endpoint": "https://s3.amazonaws.com",
+          "accessId": "xxxxxxxxxxxx",
+          "accessKey": "xxxxxxxxxxxxxxxxxxxxxxx",
+          "bucket": "test",
+          "object": "upload.csv",
+          "region": "ap-northeast-1",
+          "encoding": "",
+          "fieldDelimiter": ",",
+          "writeMode": "truncate"
+        }
+      }
+    }
+  }
+}
