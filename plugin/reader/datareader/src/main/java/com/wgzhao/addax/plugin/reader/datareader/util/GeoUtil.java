@@ -997,7 +997,7 @@ public class GeoUtil
     private static BigDecimal coordinate()
     {
         return BigDecimal.valueOf((
-            RandomSource.XO_RO_SHI_RO_128_PP.create().nextDouble(0, 360000000) - 180000000) / 1000000.0)
+                        RandomSource.XO_RO_SHI_RO_128_PP.create().nextDouble(0, 360000000) - 180000000) / 1000000.0)
                 .setScale(7, RoundingMode.HALF_UP);
     }
 

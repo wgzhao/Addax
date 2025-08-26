@@ -462,7 +462,7 @@ public class DataReader
             int scale = eachColumnConfig.getInt(DataKey.MIX_FUNCTION_SCALE, -1);
             UniformRandomProvider rng = RandomSource.XO_RO_SHI_RO_128_PP.create();
             return switch (columnType) {
-                case STRING -> new StringColumn(RandomStringUtils.randomAlphanumeric(
+                case STRING -> new StringColumn(RandomStringUtils.insecure().nextAlphanumeric(
                         (int) rng.nextLong(param1Int, param2Int + 1)));
                 case LONG -> new LongColumn(rng.nextLong(param1Int, param2Int + 1));
                 case DOUBLE -> {
@@ -492,8 +492,8 @@ public class DataReader
                         yield new BoolColumn(randomInt > param1Int);
                     }
                 }
-                case BYTES -> new BytesColumn(RandomStringUtils.randomAlphanumeric((int)
-                        rng.nextLong(param1Int, param2Int + 1)).getBytes());
+                case BYTES -> new BytesColumn(RandomStringUtils.insecure().nextAlphanumeric(
+                        (int) rng.nextLong(param1Int, param2Int + 1)).getBytes());
             };
         }
 
