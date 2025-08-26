@@ -25,21 +25,29 @@ import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.plugin.RecordReceiver;
 import com.wgzhao.addax.core.spi.Writer;
 import com.wgzhao.addax.core.util.Configuration;
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
+import org.apache.commons.compress.archivers.zip.ZipFile;
+import org.apache.poi.openxml4j.opc.internal.ZipHelper;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.util.TempFile;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
 
-import static com.wgzhao.addax.core.base.Constant.DEFAULT_DATE_FORMAT;
 import static com.wgzhao.addax.core.base.Key.FILE_NAME;
 import static com.wgzhao.addax.core.base.Key.HEADER;
 import static com.wgzhao.addax.core.base.Key.PATH;
@@ -138,53 +146,38 @@ public class ExcelWriter
             Record record;
             XSSFWorkbook workbook = new XSSFWorkbook();
             XSSFSheet sheet = workbook.createSheet();
-            Row row;
-            Cell cell;
-            int rowNum = 0;
-            // set header ?
-            if (!header.isEmpty()) {
-                row = sheet.createRow(rowNum++);
-                for(int i =0 ;i< header.size();i++) {
-                    cell = row.createCell(i);
-                    cell.setCellValue(header.get(i));
-                }
-            }
-            // set date format
-            CellStyle dateStyle = workbook.createCellStyle();
-            CreationHelper createHelper = workbook.getCreationHelper();
-            dateStyle.setDataFormat(createHelper.createDataFormat().getFormat(DEFAULT_DATE_FORMAT));
+            //name of the zip entry holding sheet data, e.g. /xl/worksheets/sheet1.xml
+            String sheetRef = sheet.getPackagePart().getPartName().getName();
 
-            while ( (record = lineReceiver.getFromReader()) != null)
-            {
-                int recordLength = record.getColumnNumber();
-                row = sheet.createRow(rowNum++);
-                Column column;
-                for(int i=0; i< recordLength; i++) {
-                    cell = row.createCell(i);
-                    column = record.getColumn(i);
-                    if (column == null || column.getRawData() == null) {
-                        cell.setBlank();
-                        continue;
-                    }
-                    switch (column.getType()) {
-                        case INT:
-                        case LONG:
-                            cell.setCellValue(column.asLong());
-                            break;
-                        case BOOL:
-                            cell.setCellValue(column.asBoolean());
-                            break;
-                        case DATE:
-                            cell.setCellValue(column.asDate());
-                            cell.setCellStyle(dateStyle);
-                            break;
-                        case NULL:
-                            cell.setBlank();
-                            break;
-                        default:
-                            cell.setCellValue(column.asString());
-                    }
-                }
+            // save the template
+            try(FileOutputStream fileOutputStream = new FileOutputStream("template.xlsx")) {
+                workbook.write(fileOutputStream);
+            }
+            catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            //Step 2. Generate XML file.
+            File tmp = null;
+            try {
+                tmp = TempFile.createTempFile("sheet", ".xml");
+            }
+            catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            try (
+            FileOutputStream stream = new FileOutputStream(tmp);
+            java.io.Writer fw = new OutputStreamWriter(stream, StandardCharsets.UTF_8)
+            ){
+                fillData(fw, lineReceiver);
+            }
+            catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            //Step 3. Substitute the template entry with the generated data
+            try (FileOutputStream out = new FileOutputStream("big-grid.xlsx")) {
+                substitute(new File("template.xlsx"), tmp, sheetRef.substring(1), out);
             }
             // write to file
             try(FileOutputStream out = new FileOutputStream(filePath)) {
@@ -198,5 +191,98 @@ public class ExcelWriter
                 throw AddaxException.asAddaxException(IO_ERROR, "IOException occurred while writing to " + filePath);
             }
         }
+
+        private void fillData(java.io.Writer writer, RecordReceiver lineReceiver) throws IOException
+        {
+            Row row;
+            Cell cell;
+            int rowNum = 0;
+            SpreadsheetWriter sw = new SpreadsheetWriter(writer);
+            sw.beginSheet();
+            // set header ?
+            if (!header.isEmpty()) {
+                sw.insertRow(0);
+                for (int i = 0; i < header.size(); i++) {
+                    sw.createCell(i, header.get(i));
+                }
+                sw.endRow();
+            }
+            // set date format
+//            CellStyle dateStyle = workbook.createCellStyle();
+//            CreationHelper createHelper = workbook.getCreationHelper();
+//            dateStyle.setDataFormat(createHelper.createDataFormat().getFormat(DEFAULT_DATE_FORMAT));
+            Record record;
+            while ((record = lineReceiver.getFromReader()) != null) {
+                int recordLength = record.getColumnNumber();
+                sw.insertRow(rowNum++);
+                Column column;
+                for (int i = 0; i < recordLength; i++) {
+                    column = record.getColumn(i);
+                    if (column == null || column.getRawData() == null) {
+                        sw.createCell(i, null);
+                        continue;
+                    }
+                    switch (column.getType()) {
+                        case INT:
+                        case LONG:
+                            sw.createCell(i, column.asLong());
+                            break;
+                        case BOOL:
+                            sw.createCell(i, column.asBoolean().toString());
+                            break;
+                        case DATE:
+//                            cell.setCellValue(column.asDate());
+                            sw.createCell(i, column.asDate().toString());
+//                            cell.setCellStyle(dateStyle);
+                            break;
+                        case NULL:
+                            sw.createCell(i, null);
+                            break;
+                        default:
+                            sw.createCell(i, column.asString());
+                    }
+                }
+                sw.endSheet();
+            }
+        }
+
+        /**
+         *
+         * @param zipfile the template file
+         * @param tmpfile the XML file with the sheet data
+         * @param entry the name of the sheet entry to substitute, e.g. xl/worksheets/sheet1.xml
+         * @param out the stream to write the result to
+         */
+        private void substitute(File zipfile, File tmpfile, String entry, OutputStream out) throws IOException {
+            try (ZipFile zip = ZipHelper.openZipFile(zipfile)) {
+                try (ZipArchiveOutputStream zos = new ZipArchiveOutputStream(out)) {
+                    Enumeration<? extends ZipArchiveEntry> en = zip.getEntries();
+                    while (en.hasMoreElements()) {
+                        ZipArchiveEntry ze = en.nextElement();
+                        if (!ze.getName().equals(entry)) {
+                            zos.putArchiveEntry(new ZipArchiveEntry(ze.getName()));
+                            try (InputStream is = zip.getInputStream(ze)) {
+                                copyStream(is, zos);
+                            }
+                            zos.closeArchiveEntry();
+                        }
+                    }
+                    zos.putArchiveEntry(new ZipArchiveEntry(entry));
+                    try (InputStream is = new FileInputStream(tmpfile)) {
+                        copyStream(is, zos);
+                    }
+                    zos.closeArchiveEntry();
+                }
+            }
+        }
+
+        private void copyStream(InputStream in, OutputStream out) throws IOException {
+            byte[] chunk = new byte[1024];
+            int count;
+            while ((count = in.read(chunk)) >=0 ) {
+                out.write(chunk,0,count);
+            }
+        }
+
     }
 }
