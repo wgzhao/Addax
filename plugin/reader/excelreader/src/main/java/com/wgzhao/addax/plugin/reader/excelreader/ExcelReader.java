@@ -106,21 +106,26 @@ public class ExcelReader
         private static final Logger LOG = LoggerFactory.getLogger(Task.class);
 
         private List<String> sourceFiles;
-        private boolean header = false;
+        private boolean hasHeader = false;
         private int skipRows = 0;
+        private int maxMemoryMB = 500; // Default 500MB
 
         @Override
         public void init()
         {
             Configuration readerSliceConfig = this.getPluginJobConf();
             this.sourceFiles = readerSliceConfig.getList(Key.SOURCE_FILES, String.class);
-            this.header = readerSliceConfig.getBool("header", false);
-            if (this.header) {
+            this.hasHeader = readerSliceConfig.getBool("header", false);
+            if (this.hasHeader) {
                 LOG.info("The first row is skipped as a table header");
             }
             this.skipRows = readerSliceConfig.getInt("skipRows", 0);
             if (this.skipRows > 0) {
                 LOG.info("The first {} rows is skipped", this.skipRows);
+            }
+            this.maxMemoryMB = readerSliceConfig.getInt("maxMemoryMB", 500);
+            if (this.maxMemoryMB > 500) {
+                LOG.info("Using increased memory limit: {} MB for large Excel files", this.maxMemoryMB);
             }
         }
 
@@ -135,12 +140,13 @@ public class ExcelReader
         {
             for (String file : sourceFiles) {
                 LOG.info("begin read file {}", file);
-                ExcelHelper excelHelper = new ExcelHelper(header, skipRows);
+                int maxMemoryBytes = this.maxMemoryMB * 1024 * 1024; // Convert to bytes
+                ExcelHelper excelHelper = new ExcelHelper(hasHeader, skipRows, maxMemoryBytes);
                 excelHelper.open(file);
-                Record record = excelHelper.readLine(recordSender.createRecord());
-                while (record != null) {
+
+                Record record;
+                while ((record = excelHelper.readLine(recordSender.createRecord())) != null) {
                     recordSender.sendToWriter(record);
-                    record = excelHelper.readLine(recordSender.createRecord());
                 }
                 excelHelper.close();
             }
