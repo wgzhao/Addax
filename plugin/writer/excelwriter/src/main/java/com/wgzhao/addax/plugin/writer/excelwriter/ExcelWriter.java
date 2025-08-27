@@ -29,29 +29,32 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.poi.openxml4j.opc.internal.ZipHelper;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.util.LocaleUtil;
 import org.apache.poi.util.TempFile;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 
+import static com.wgzhao.addax.core.base.Constant.DEFAULT_DATE_FORMAT;
 import static com.wgzhao.addax.core.base.Key.FILE_NAME;
 import static com.wgzhao.addax.core.base.Key.HEADER;
 import static com.wgzhao.addax.core.base.Key.PATH;
-import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
 import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
@@ -60,10 +63,12 @@ import static com.wgzhao.addax.core.spi.ErrorCode.PERMISSION_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
 public class ExcelWriter
-    extends Writer
+        extends Writer
 {
+    private static final Logger log = LoggerFactory.getLogger(ExcelWriter.class);
+
     public static class Job
-        extends Writer.Job
+            extends Writer.Job
     {
         private Configuration conf;
 
@@ -79,7 +84,7 @@ public class ExcelWriter
             this.conf.getNecessaryValue(PATH, REQUIRED_VALUE);
             String path = this.conf.getNecessaryValue(PATH, REQUIRED_VALUE);
             String fileName = this.conf.getNecessaryValue(FILE_NAME, REQUIRED_VALUE);
-            if (fileName.endsWith(".xls")){
+            if (fileName.endsWith(".xls")) {
                 throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE, "Only support new excel format file(.xlsx)");
             }
             if (fileName.split("\\.").length == 1) {
@@ -95,7 +100,7 @@ public class ExcelWriter
                     boolean createdOk = dir.mkdirs();
                     if (!createdOk) {
                         throw AddaxException.asAddaxException(EXECUTE_FAIL,
-                               "can not create directory '" + dir + "' failure");
+                                "can not create directory '" + dir + "' failure");
                     }
                 }
             }
@@ -120,11 +125,12 @@ public class ExcelWriter
     }
 
     public static class Task
-        extends Writer.Task
+            extends Writer.Task
     {
 
         private String filePath;
         private List<String> header;
+        private XSSFWorkbook workbook;
 
         @Override
         public void init()
@@ -143,59 +149,62 @@ public class ExcelWriter
         @Override
         public void startWrite(RecordReceiver lineReceiver)
         {
-            Record record;
-            XSSFWorkbook workbook = new XSSFWorkbook();
+            this.workbook = new XSSFWorkbook();
             XSSFSheet sheet = workbook.createSheet();
             //name of the zip entry holding sheet data, e.g. /xl/worksheets/sheet1.xml
             String sheetRef = sheet.getPackagePart().getPartName().getName();
 
             // save the template
-            try(FileOutputStream fileOutputStream = new FileOutputStream("template.xlsx")) {
+            File fTemplate;
+            try {
+                fTemplate = TempFile.createTempFile("template", ".xlsx");
+                FileOutputStream fileOutputStream = new FileOutputStream(fTemplate);
                 workbook.write(fileOutputStream);
+                fileOutputStream.close();
             }
             catch (IOException e) {
                 throw new RuntimeException(e);
             }
 
-            //Step 2. Generate XML file.
             File tmp = null;
             try {
+                //Step 2. Generate XML file.
                 tmp = TempFile.createTempFile("sheet", ".xml");
-            }
-            catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            try (
-            FileOutputStream stream = new FileOutputStream(tmp);
-            java.io.Writer fw = new OutputStreamWriter(stream, StandardCharsets.UTF_8)
-            ){
+                log.info("temp file for sheet data: {}", tmp.getAbsolutePath());
+                FileOutputStream stream = new FileOutputStream(tmp);
+                java.io.Writer fw = new OutputStreamWriter(stream, StandardCharsets.UTF_8);
                 fillData(fw, lineReceiver);
-            }
-            catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+                fw.close();
+                stream.close();
 
-            //Step 3. Substitute the template entry with the generated data
-            try (FileOutputStream out = new FileOutputStream("big-grid.xlsx")) {
-                substitute(new File("template.xlsx"), tmp, sheetRef.substring(1), out);
-            }
-            // write to file
-            try(FileOutputStream out = new FileOutputStream(filePath)) {
-                workbook.write(out);
+                //Step 3. Substitute the template entry with the generated data
+                FileOutputStream out = new FileOutputStream(this.filePath);
+                substitute(fTemplate, tmp, sheetRef.substring(1), out);
+                out.close();
+
                 workbook.close();
-            }
-            catch (FileNotFoundException e) {
-                throw AddaxException.asAddaxException(CONFIG_ERROR, "No such file: " + filePath);
             }
             catch (IOException e) {
                 throw AddaxException.asAddaxException(IO_ERROR, "IOException occurred while writing to " + filePath);
             }
+            finally {
+                // delete the temp file
+                if (tmp != null && tmp.exists()) {
+                    if (!tmp.delete()) {
+                        log.warn("temp file {} delete failed.", tmp.getAbsolutePath());
+                    }
+                }
+                if (fTemplate.exists()) {
+                    if (!fTemplate.delete()) {
+                        log.warn("temp file {} delete failed.", fTemplate.getAbsolutePath());
+                    }
+                }
+            }
         }
 
-        private void fillData(java.io.Writer writer, RecordReceiver lineReceiver) throws IOException
+        private void fillData(java.io.Writer writer, RecordReceiver lineReceiver)
+                throws IOException
         {
-            Row row;
-            Cell cell;
             int rowNum = 0;
             SpreadsheetWriter sw = new SpreadsheetWriter(writer);
             sw.beginSheet();
@@ -208,9 +217,9 @@ public class ExcelWriter
                 sw.endRow();
             }
             // set date format
-//            CellStyle dateStyle = workbook.createCellStyle();
-//            CreationHelper createHelper = workbook.getCreationHelper();
-//            dateStyle.setDataFormat(createHelper.createDataFormat().getFormat(DEFAULT_DATE_FORMAT));
+            CellStyle dateStyle = workbook.createCellStyle();
+            CreationHelper createHelper = workbook.getCreationHelper();
+            dateStyle.setDataFormat(createHelper.createDataFormat().getFormat(DEFAULT_DATE_FORMAT));
             Record record;
             while ((record = lineReceiver.getFromReader()) != null) {
                 int recordLength = record.getColumnNumber();
@@ -219,7 +228,7 @@ public class ExcelWriter
                 for (int i = 0; i < recordLength; i++) {
                     column = record.getColumn(i);
                     if (column == null || column.getRawData() == null) {
-                        sw.createCell(i, null);
+                        sw.createCell(i, "");
                         continue;
                     }
                     switch (column.getType()) {
@@ -231,19 +240,20 @@ public class ExcelWriter
                             sw.createCell(i, column.asBoolean().toString());
                             break;
                         case DATE:
-//                            cell.setCellValue(column.asDate());
-                            sw.createCell(i, column.asDate().toString());
-//                            cell.setCellStyle(dateStyle);
+                            Calendar calendar = LocaleUtil.getLocaleCalendar();
+                            calendar.setTime(column.asDate());
+                            sw.createCell(i, calendar, dateStyle.getIndex());
                             break;
                         case NULL:
-                            sw.createCell(i, null);
+                            sw.createCell(i, "");
                             break;
                         default:
                             sw.createCell(i, column.asString());
                     }
                 }
-                sw.endSheet();
+                sw.endRow();
             }
+            sw.endSheet();
         }
 
         /**
@@ -253,7 +263,9 @@ public class ExcelWriter
          * @param entry the name of the sheet entry to substitute, e.g. xl/worksheets/sheet1.xml
          * @param out the stream to write the result to
          */
-        private void substitute(File zipfile, File tmpfile, String entry, OutputStream out) throws IOException {
+        private void substitute(File zipfile, File tmpfile, String entry, OutputStream out)
+                throws IOException
+        {
             try (ZipFile zip = ZipHelper.openZipFile(zipfile)) {
                 try (ZipArchiveOutputStream zos = new ZipArchiveOutputStream(out)) {
                     Enumeration<? extends ZipArchiveEntry> en = zip.getEntries();
@@ -276,13 +288,14 @@ public class ExcelWriter
             }
         }
 
-        private void copyStream(InputStream in, OutputStream out) throws IOException {
+        private void copyStream(InputStream in, OutputStream out)
+                throws IOException
+        {
             byte[] chunk = new byte[1024];
             int count;
-            while ((count = in.read(chunk)) >=0 ) {
-                out.write(chunk,0,count);
+            while ((count = in.read(chunk)) >= 0) {
+                out.write(chunk, 0, count);
             }
         }
-
     }
 }
