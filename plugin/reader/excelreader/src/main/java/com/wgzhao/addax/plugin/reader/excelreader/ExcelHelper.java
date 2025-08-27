@@ -247,7 +247,7 @@ public class ExcelHelper
                 } catch (Exception e) {
                     try {
                         // Try older POI version constructor (styles, null, sst, handler, dataOnly)
-                        contentHandler = new XSSFSheetXMLHandler(styles, null, sst, handler, false);
+                        contentHandler = new XSSFSheetXMLHandler(styles, sst, handler, false);
                         LOG.info("Using XSSFSheetXMLHandler constructor: (styles, null, sst, handler, dataOnly)");
                     } catch (Exception e2) {
                         try {
