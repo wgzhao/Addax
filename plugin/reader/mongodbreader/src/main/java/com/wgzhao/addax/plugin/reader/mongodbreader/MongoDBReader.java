@@ -38,6 +38,7 @@ import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.core.util.EncryptUtil;
 import com.wgzhao.addax.plugin.reader.mongodbreader.util.CollectionSplitUtil;
 import com.wgzhao.addax.plugin.reader.mongodbreader.util.MongoUtil;
+import org.bson.BsonDocument;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
@@ -130,119 +131,9 @@ public class MongoDBReader
         private boolean isObjectId = true;
         private int fetchSize;
 
+        private final MongoRowConverter rowConverter = new MongoRowConverter();
+
         private record MongoQueryFilter(Document filter, boolean isObjectId) {}
-
-        private boolean notNullAndEmpty(String obj)
-        {
-            return obj != null && !obj.isEmpty();
-        }
-
-        private MongoQueryFilter buildQueryFilter()
-        {
-            Document filter = new Document();
-            if (lowerBound.equals("min")) {
-                if (!upperBound.equals("max")) {
-                    filter.append(KeyConstant.MONGO_PRIMARY_ID,
-                            new Document("$lt", isObjectId ? new ObjectId(upperBound.toString()) : upperBound));
-                }
-            }
-            else if (upperBound.equals("max")) {
-                filter.append(KeyConstant.MONGO_PRIMARY_ID,
-                        new Document("$gte", isObjectId ? new ObjectId(lowerBound.toString()) : lowerBound));
-            }
-            else {
-                filter.append(KeyConstant.MONGO_PRIMARY_ID,
-                        new Document("$gte", isObjectId ? new ObjectId(lowerBound.toString()) : lowerBound)
-                                .append("$lt", isObjectId ? new ObjectId(upperBound.toString()) : upperBound));
-            }
-
-            if (query != null && !query.isEmpty()) {
-                Document queryFilter = Document.parse(query);
-                filter = new Document("$and", List.of(filter, queryFilter));
-            }
-
-            return new MongoQueryFilter(filter, isObjectId);
-        }
-
-        private void addColumnToRecord(Record record, Document item, String column)
-        {
-            if (column.startsWith("'")) {
-                record.addColumn(new StringColumn(column.replace("'", "")));
-                return;
-            }
-
-            try {
-                Double numValue = Double.parseDouble(column);
-                record.addColumn(column.contains(".") ?
-                        new DoubleColumn(numValue) :
-                        new LongColumn(Long.parseLong(column)));
-                return;
-            }
-            catch (NumberFormatException ignored) {
-                // Not a number, continue with normal processing
-            }
-
-            if (!item.containsKey(column)) {
-                record.addColumn(new StringColumn());
-                return;
-            }
-
-            Object tempCol = item.get(column);
-            if (tempCol == null) {
-                record.addColumn(new StringColumn());
-                return;
-            }
-
-            if (tempCol instanceof Double d) {
-                record.addColumn(new DoubleColumn(d));
-            }
-            else if (tempCol instanceof Boolean b) {
-                record.addColumn(new BoolColumn(b));
-            }
-            else if (tempCol instanceof Date d) {
-                record.addColumn(new DateColumn(d));
-            }
-            else if (tempCol instanceof Integer i) {
-                record.addColumn(new LongColumn(i));
-            }
-            else if (tempCol instanceof Long l) {
-                record.addColumn(new LongColumn(l));
-            }
-            else if (tempCol instanceof Document doc) {
-                record.addColumn(new StringColumn(doc.toJson()));
-            }
-            else {
-                record.addColumn(new StringColumn(tempCol.toString()));
-            }
-        }
-
-        @Override
-        public void startRead(RecordSender recordSender)
-        {
-
-            if (lowerBound == null || upperBound == null ||
-                    mongoClient == null || database == null ||
-                    collection == null || mongodbColumnMeta == null) {
-                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                        ILLEGAL_VALUE.getDescription());
-            }
-
-            MongoDatabase db = mongoClient.getDatabase(database);
-            MongoCollection<Document> col = db.getCollection(this.collection);
-
-            MongoQueryFilter queryFilter = buildQueryFilter();
-            try (MongoCursor<Document> dbCursor = col.find(queryFilter.filter())
-                    .batchSize(fetchSize)
-                    .iterator()) {
-
-                while (dbCursor.hasNext()) {
-                    Document item = dbCursor.next();
-                    Record record = recordSender.createRecord();
-                    mongodbColumnMeta.forEach(column -> addColumnToRecord(record, item, column));
-                    recordSender.sendToWriter(record);
-                }
-            }
-        }
 
         @Override
         public void init()
@@ -275,9 +166,69 @@ public class MongoDBReader
         }
 
         @Override
+        public void startRead(RecordSender recordSender)
+        {
+
+            if (lowerBound == null || upperBound == null ||
+                    mongoClient == null || database == null ||
+                    collection == null || mongodbColumnMeta == null) {
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                        ILLEGAL_VALUE.getDescription());
+            }
+
+            MongoDatabase db = mongoClient.getDatabase(database);
+            MongoCollection<BsonDocument> bsonCollection = rowConverter.getBsonCollection(db, collection);
+
+            MongoQueryFilter queryFilter = buildQueryFilter();
+            try (MongoCursor<BsonDocument> dbCursor = bsonCollection.find(queryFilter.filter())
+                    .batchSize(fetchSize)
+                    .iterator()) {
+
+                while (dbCursor.hasNext()) {
+                    BsonDocument doc = dbCursor.next();
+                    Record record = recordSender.createRecord();
+                    rowConverter.processOne(doc, record, mongodbColumnMeta);
+                    recordSender.sendToWriter(record);
+                }
+            }
+        }
+
+        @Override
         public void destroy()
         {
             //
+        }
+
+        private boolean notNullAndEmpty(String obj)
+        {
+            return obj != null && !obj.isEmpty();
+        }
+
+        private MongoQueryFilter buildQueryFilter()
+        {
+            Document filter = new Document();
+            if (lowerBound.equals("min")) {
+                if (!upperBound.equals("max")) {
+                    filter.append(KeyConstant.MONGO_PRIMARY_ID,
+                            new Document("$lt", isObjectId ? new ObjectId(upperBound.toString()) : upperBound));
+                }
+            }
+            else if (upperBound.equals("max")) {
+                filter.append(KeyConstant.MONGO_PRIMARY_ID,
+                        new Document("$gte", isObjectId ? new ObjectId(lowerBound.toString()) : lowerBound));
+            }
+            else {
+                filter.append(KeyConstant.MONGO_PRIMARY_ID,
+                        new Document("$gte", isObjectId ? new ObjectId(lowerBound.toString()) : lowerBound)
+                                .append("$lt", isObjectId ? new ObjectId(upperBound.toString()) : upperBound));
+            }
+
+            if (query != null && !query.isEmpty()) {
+                Document queryFilter = Document.parse(query);
+                filter = new Document("$and", List.of(filter, queryFilter));
+            }
+
+            return new MongoQueryFilter(filter, isObjectId);
         }
     }
 }
