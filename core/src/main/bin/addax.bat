@@ -13,7 +13,7 @@ if "%ADDAX_HOME%"=="" exit /b 2
 set CLASS_PATH=.;%ADDAX_HOME%\lib\*
 set LOGBACK_FILE=%ADDAX_HOME%\conf\logback.xml
 set DEFAULT_JVM=-Xms64m -Xmx2g -XX:+HeapDumpOnOutOfMemoryError -XX:+ExitOnOutOfMemoryError -XX:HeapDumpPath=%ADDAX_HOME%
-set DEFAULT_PROPERTY_CONF=-Dfile.encoding=UTF-8 -Djava.security.egd=file:///dev/urandom -Daddax.home=%ADDAX_HOME% -Dlogback.configurationFile=%LOGBACK_FILE%
+set DEFAULT_PROPERTY_CONF=-Djava.security.manager=allow -Dfile.encoding=UTF-8 -Djava.security.egd=file:///dev/urandom -Daddax.home=%ADDAX_HOME% -Dlogback.configurationFile=%LOGBACK_FILE%
 set ENGINE_COMMAND=java -server %DEFAULT_JVM% %DEFAULT_PROPERTY_CONF% -classpath %CLASS_PATH%
 set REMOTE_DEBUG_CONFIG=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,address=0.0.0.0:9999
 
