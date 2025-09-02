@@ -1518,5 +1518,45 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>java24-dependencies</id>
+            <activation>
+                <jdk>24</jdk>
+            </activation>
+            <properties>
+                <java.version>24</java.version>
+                <jdk.version>24</jdk.version>
+                <maven.compiler.source>24</maven.compiler.source>
+                <maven.compiler.target>24</maven.compiler.target>
+                <maven.compiler.release>24</maven.compiler.release>
+            </properties>
+            <modules>
+                <!-- patch -->
+                <module>patch/addax-kerberos-jdk24-patch</module>
+            </modules>
+            <dependencyManagement>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.wgzhao.addax</groupId>
+                        <artifactId>addax-kerberos-jdk24-patch</artifactId>
+                        <version>${project.version}</version>
+                        <scope>provided</scope>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
+            <dependencies>
+            <dependency>
+                <groupId>com.fasterxml.woodstox</groupId>
+                <artifactId>woodstox-core</artifactId>
+                <version>${woodstox.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.protobuf</groupId>
+                <artifactId>protobuf-java</artifactId>
+                <version>${protobuf.version}</version>
+            </dependency>
+            </dependencies>
+        </profile>
+
     </profiles>
 </project>
