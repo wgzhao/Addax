@@ -268,8 +268,8 @@ public class TextWriter
             Column column = record.getColumn(i);
             if (column == null || column.asString() == null) {
                 sj.add(this.nullFormat);
+                continue;
             }
-            assert column != null;
             Column.Type type = column.getType();
             if (type == Column.Type.DATE) {
                 SimpleDateFormat sdf = new SimpleDateFormat(this.dateFormat);
