@@ -12,6 +12,7 @@
   "startTimeStamp": 1587971621,
   "endTimeStamp": 1587971621,
   "totalCosts": 10,
+  "totalBytes": 330,
   "byteSpeedPerSecond": 33,
   "recordSpeedPerSecond": 1,
   "totalReadRecords": 6,
@@ -70,17 +71,18 @@ Java 代码示例可以参考 [AddaxReportController.java](https://github.com/wg
 
 上述参数说明如下：
 
-| 参数                   | 描述          | 必选 | 默认值     |
-|----------------------|-------------|----|---------|
-| jobName              | 任务名         | 是  | jobName |
-| startTimeStamp       | 任务执行的开始时间   | 是  | 无       |
-| endTimeStamp         | 任务执行的结束时间   | 是  | 无       |
-| totalCosts           | 任务总计耗时(s)   | 是  | 无       |
-| byteSpeedPerSecond   | 任务平均流量      | 是  | 无       |
-| recordSpeedPerSecond | 记录写入速度      | 是  | 无       |
-| totalReadRecords     | 读出记录总数      | 是  | 0       |
-| totalErrorRecords    | 读写失败总数      | 是  | 0       |
-| jobContent           | 本次任务的json文件 | 是  | 无       |
+| 参数                    | 描述          | 必选 | 默认值      |
+|-----------------------|-------------|----|----------|
+| jobName               | 任务名         | 是  | jobName  |
+| startTimeStamp        | 任务执行的开始时间   | 是  | 无        |
+| endTimeStamp          | 任务执行的结束时间   | 是  | 无        |
+| totalCosts            | 任务总计耗时(s)   | 是  | 无        |
+| totalBytes            | 任务读写总字节数    | 是  | 无        |
+| byteSpeedPerSecond    | 任务平均流量      | 是  | 无        |
+| recordSpeedPerSecond  | 记录写入速度      | 是  | 无        |
+| totalReadRecords      | 读出记录总数      | 是  | 0        |
+| totalErrorRecords     | 读写失败总数      | 是  | 0        |
+| jobContent            | 本次任务的json文件 | 是  | 无        |
 
 上述参数只有 `jobName` 可以通过自行传递参数的时候设定，当你以
 

@@ -520,9 +520,9 @@ public class JobContainer
         tempComm.setTimestamp(this.startTransferTimeStamp);
 
         Communication reportCommunication = CommunicationTool.getReportCommunication(communication, tempComm, this.totalStage);
-
+        long totalReadBytes = communication.getLongCounter(CommunicationTool.READ_SUCCEED_BYTES);
         // byte speed
-        long byteSpeedPerSecond = communication.getLongCounter(CommunicationTool.READ_SUCCEED_BYTES) / transferCosts;
+        long byteSpeedPerSecond = totalReadBytes / transferCosts;
         long recordSpeedPerSecond = communication.getLongCounter(CommunicationTool.READ_SUCCEED_RECORDS) / transferCosts;
 
         long totalReadRecords = CommunicationTool.getTotalReadRecords(communication);
@@ -563,6 +563,7 @@ public class JobContainer
             resultLog.put("startTimeStamp", startTimeStamp / 1000);
             resultLog.put("endTimeStamp", endTimeStamp / 1000);
             resultLog.put("totalCosts", totalCosts);
+            resultLog.put("totalBytes", totalReadBytes);
             resultLog.put("byteSpeedPerSecond", byteSpeedPerSecond);
             resultLog.put("recordSpeedPerSecond", recordSpeedPerSecond);
             resultLog.put("totalReadRecords", totalReadRecords);
@@ -577,10 +578,11 @@ public class JobContainer
             postJobRunStatistic(jobResultReportUrl, timeoutMills, jsonStr);
         }
         String statMsg = String.format("%n" + "%-26s: %-18s%n" + "%-26s: %-18s%n" + "%-26s: %19s%n"
-                        + "%-26s: %19s%n" + "%-26s: %19s%n" + "%-26s: %19s%n" + "%-26s: %19s%n",
+                        + "%-26s: %19s%n" + "%-26s: %19s%n" + "%-26s: %19s%n" + "%-26s: %19s%n" + "%-26s: %19s%n",
                 "Job start  at", dateFormat.format(startTimeStamp),
                 "Job end    at", dateFormat.format(endTimeStamp),
                 "Job took secs", totalCosts + "s",
+                "Total   bytes", totalReadBytes,
                 "Average   bps", StrUtil.stringify(byteSpeedPerSecond) + "/s",
                 "Average   rps", recordSpeedPerSecond + "rec/s",
                 "Number of rec", totalReadRecords,
