@@ -34,7 +34,7 @@
     <packaging>jar</packaging>
 
     <properties>
-        <hive.version>2.1.1</hive.version>
+        <hive.version>4.1.0</hive.version>
     </properties>
 
     <dependencies>
