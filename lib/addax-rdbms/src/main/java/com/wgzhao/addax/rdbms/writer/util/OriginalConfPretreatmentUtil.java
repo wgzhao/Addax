@@ -159,7 +159,7 @@ public final class OriginalConfPretreatmentUtil
             List<String> allColumns;
             Connection connection = DBUtil.getConnectionWithoutRetry(dataBaseType, jdbcUrl, username, password);
 
-            allColumns = DBUtil.getTableColumnsByConn(connection, oneTable);
+            allColumns = DBUtil.getTableColumnsByConn(connection, oneTable, dataBaseType);
 
             LOG.info("The table [{}] has columns [{}].", oneTable, StringUtils.join(allColumns, ","));
 

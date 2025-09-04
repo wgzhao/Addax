@@ -435,7 +435,7 @@ public final class DBUtil
     public static List<String> getTableColumns(DataBaseType dataBaseType, String jdbcUrl, String user, String pass, String tableName)
     {
         try (Connection conn = getConnection(dataBaseType, jdbcUrl, user, pass)) {
-            return getTableColumnsByConn(conn, tableName);
+            return getTableColumnsByConn(conn, tableName, dataBaseType);
         }
         catch (SQLException e) {
             throw AddaxException.asAddaxException(CONNECT_ERROR, "Failed to get table columns", e);
@@ -449,14 +449,14 @@ public final class DBUtil
      * @param tableName Name of the table to query
      * @return List of column names in the table
      */
-    public static List<String> getTableColumnsByConn(Connection conn, String tableName)
+    public static List<String> getTableColumnsByConn(Connection conn, String tableName, DataBaseType dataBaseType)
     {
         List<Map<String, Object>> rsMetaData = getColumnMetaData(conn, tableName, "*");
 
         // Using Stream API to transform metadata to column names
         return rsMetaData.stream()
                 .skip(1) // Skip the first null element
-                .map(map -> map.get("name").toString())
+                .map(map ->  dataBaseType.quoteColumnName(map.get("name").toString()))
                 .toList();
     }
 
