@@ -40,9 +40,6 @@
             <useProjectArtifact>false</useProjectArtifact>
             <outputDirectory>lib</outputDirectory>
             <scope>runtime</scope>
-            <excludes>
-                <exclude>com.wgzhao.addax:addax-core</exclude>
-            </excludes>
         </dependencySet>
     </dependencySets>
 </assembly>

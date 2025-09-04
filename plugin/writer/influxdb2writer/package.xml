@@ -48,9 +48,6 @@
             <useProjectArtifact>false</useProjectArtifact>
             <outputDirectory>plugin/writer/${project.artifactId}/libs</outputDirectory>
             <scope>runtime</scope>
-            <excludes>
-                <exclude>com.wgzhao.addax:*</exclude>
-            </excludes>
         </dependencySet>
     </dependencySets>
 </assembly>
