@@ -21,6 +21,7 @@ package com.wgzhao.addax.plugin.reader.hbase20xreader;
 
 import com.wgzhao.addax.core.exception.AddaxException;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
@@ -50,7 +51,7 @@ public enum ColumnType
             throw AddaxException.asAddaxException(REQUIRED_VALUE, "The configuration item type is required ");
         }
         for (ColumnType columnType : values()) {
-            if (StringUtils.equalsIgnoreCase(columnType.typeName, typeName.trim())) {
+            if (Strings.CI.equals(columnType.typeName, typeName.trim())) {
                 return columnType;
             }
         }

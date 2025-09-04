@@ -29,6 +29,7 @@ import com.wgzhao.addax.plugin.writer.s3writer.writer.ParquetWriter;
 import com.wgzhao.addax.plugin.writer.s3writer.writer.TextWriter;
 import com.wgzhao.addax.storage.writer.StorageWriterUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -124,7 +125,7 @@ public class S3Writer
                 Configuration splitTaskConfig = this.writerSliceConfig.clone();
                 do {
                     fullObjectName = String.format("%s_%s%s", objectName,
-                            StringUtils.replace(UUID.randomUUID().toString(), "-", ""),
+                            Strings.CI.replace(UUID.randomUUID().toString(), "-", ""),
                             objectSuffix
                     );
                 }

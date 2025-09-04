@@ -439,7 +439,7 @@ public final class StorageWriterUtil
         }
 
         Record record;
-        try (CSVPrinter csvPrinter = new CSVPrinter(writer, csvBuilder.build())) {
+        try (CSVPrinter csvPrinter = new CSVPrinter(writer, csvBuilder.get())) {
             while ((record = lineReceiver.getFromReader()) != null) {
                 List<String> result = recordToList(record, nullFormat, dateParse, taskPluginCollector);
                 if (result != null) {

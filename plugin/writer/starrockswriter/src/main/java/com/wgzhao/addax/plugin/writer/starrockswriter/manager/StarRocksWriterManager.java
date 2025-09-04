@@ -65,7 +65,8 @@ public class StarRocksWriterManager
     public void startScheduler()
     {
         stopScheduler();
-        this.scheduler = Executors.newScheduledThreadPool(1, new BasicThreadFactory.Builder().namingPattern("starrocks-interval-flush").daemon(true).build());
+        BasicThreadFactory basicThreadFactory = BasicThreadFactory.builder().namingPattern("starrocks-interval-flush").daemon(true).build();
+        this.scheduler = Executors.newScheduledThreadPool(1, basicThreadFactory);
         this.scheduledFuture = this.scheduler.schedule(() -> {
             synchronized (StarRocksWriterManager.this) {
                 if (!closed) {

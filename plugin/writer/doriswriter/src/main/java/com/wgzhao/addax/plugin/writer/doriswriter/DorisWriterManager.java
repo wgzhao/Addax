@@ -63,7 +63,8 @@ public class DorisWriterManager {
 
     public void startScheduler() {
         stopScheduler();
-        this.scheduler = Executors.newScheduledThreadPool(1, new BasicThreadFactory.Builder().namingPattern("Doris-interval-flush").daemon(true).build());
+        BasicThreadFactory basicThreadFactory = BasicThreadFactory.builder().namingPattern("Doris-interval-flush").daemon(true).build();
+        this.scheduler = Executors.newScheduledThreadPool(1, basicThreadFactory);
         this.scheduledFuture = this.scheduler.schedule(() -> {
             synchronized (DorisWriterManager.this) {
                 if (!closed) {

@@ -1384,7 +1384,7 @@
                         <configuration>
                             <rules>
                                 <requireJavaVersion>
-                                    <version>[8,)</version>
+                                    <version>[17,)</version>
                                 </requireJavaVersion>
                                 <requireMavenVersion>
                                     <version>[3.8,)</version>
@@ -1421,7 +1421,7 @@
                             <version>(3.5.4,)</version>
                         </requireMavenVersion>
                         <requireJavaVersion>
-                            <version>1.8</version>
+                            <version>17</version>
                         </requireJavaVersion>
                     </rules>
                 </configuration>
@@ -1429,7 +1429,7 @@
                     <dependency>
                         <groupId>com.github.ferstl</groupId>
                         <artifactId>pedantic-pom-enforcers</artifactId>
-                        <version>2.2.0</version>
+                        <version>2.3.0</version>
                     </dependency>
                 </dependencies>
             </plugin>

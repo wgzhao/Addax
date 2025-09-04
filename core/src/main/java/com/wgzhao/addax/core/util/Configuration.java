@@ -24,6 +24,7 @@ import com.wgzhao.addax.core.spi.ErrorCode;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.io.File;
@@ -967,7 +968,7 @@ public class Configuration
 
     private String split(String path)
     {
-        return StringUtils.replace(path, "[", ".[");
+        return Strings.CS.replace(path, "[", ".[");
     }
 
     private List<String> split2List(String path)

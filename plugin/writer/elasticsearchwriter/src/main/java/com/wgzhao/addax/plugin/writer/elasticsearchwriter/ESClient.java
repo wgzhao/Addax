@@ -217,7 +217,7 @@ public class ESClient
         return jsonObject.has("items");
     }
 
-    public boolean alias(String indexName, String aliasName, boolean needClean)
+    public void alias(String indexName, String aliasName, boolean needClean)
             throws IOException
     {
         GetAliases getAliases = new GetAliases.Builder().addIndex(aliasName).build();
@@ -226,8 +226,7 @@ public class ESClient
         log.info(rst.getJsonString());
         List<AliasMapping> list = new ArrayList<>();
         if (rst.isSucceeded()) {
-            JsonParser jp = new JsonParser();
-            JsonObject jo = (JsonObject) jp.parse(rst.getJsonString());
+            JsonObject jo = (JsonObject) JsonParser.parseString(rst.getJsonString());
             for (Map.Entry<String, JsonElement> entry : jo.entrySet()) {
                 String index = entry.getKey();
                 if (indexName.equals(index)) {
@@ -246,9 +245,7 @@ public class ESClient
         rst = jestClient.execute(modifyAliases);
         if (!rst.isSucceeded()) {
             log.error(rst.getErrorMessage());
-            return false;
         }
-        return true;
     }
 
     public JestResult bulkInsert(Bulk.Builder bulk, int trySize)
