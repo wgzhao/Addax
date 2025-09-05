@@ -32,7 +32,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -173,16 +172,15 @@ public class StreamWriter
 
         private void writeToConsole(RecordReceiver recordReceiver)
         {
-            BufferedWriter writer = new BufferedWriter(
-                    new OutputStreamWriter(System.out, StandardCharsets.UTF_8));
             try {
                 Record record;
                 while ((record = recordReceiver.getFromReader()) != null) {
-                    writer.write(recordToString(record));
+                    String output = recordToString(record);
+                    System.out.print(output);
                 }
-                writer.flush();
+                System.out.flush();
             }
-            catch (IOException e) {
+            catch (Exception e) {
                 throw AddaxException.asAddaxException(IO_ERROR, e);
             }
         }

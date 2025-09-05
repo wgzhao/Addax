@@ -22,11 +22,16 @@
     <property name="log.dir" value="${addax.log}/" />
     <!-- Suppress all internal status messages -->
     <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+
+    <!-- Console appender configuration -->
     <if condition='!isDefined("console.enabled") || "${console.enabled}" == "true"' >
         <then>
-            <!-- console output -->
             <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
                 <withJansi>true</withJansi>
+                <!-- force use System.out to cooperate with other outputs -->
+                <target>System.out</target>
+                <!-- add sync to avoid jumbled output in multi-thread environment -->
+                <immediateFlush>true</immediateFlush>
                 <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
                     <pattern>
                         %cyan(%d{yyyy-MM-dd HH:mm:ss.SSS}) %green([%12thread]) %highlight(%-5level) %magenta(%-20logger{0}) - %msg%n
@@ -39,9 +44,12 @@
         </then>
     </if>
 
+    <!-- File appender configuration -->
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
         <file>${log.dir}/${log.file.name}</file>
         <append>false</append>
+        <!-- 确保文件输出独立于控制台输出 -->
+        <immediateFlush>true</immediateFlush>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%12thread] %-5level %-20logger{0} - %msg%n
             </pattern>
