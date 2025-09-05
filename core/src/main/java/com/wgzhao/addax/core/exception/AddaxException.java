@@ -19,8 +19,6 @@ package com.wgzhao.addax.core.exception;
 
 import com.wgzhao.addax.core.spi.ErrorCode;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -29,7 +27,6 @@ import java.util.Objects;
 public class AddaxException
         extends RuntimeException
 {
-    private static final Logger logger = LoggerFactory.getLogger(AddaxException.class);
     private static final long serialVersionUID = 1L;
 
     private final transient ErrorCode errorCode;
@@ -38,14 +35,12 @@ public class AddaxException
     {
         super(errorMessage);
         this.errorCode = Objects.requireNonNull(errorCode, "ErrorCode cannot be null");
-//        logger.error("Error Code: {}: {}", errorCode.getCode(), errorMessage);
     }
 
     private AddaxException(ErrorCode errorCode, String errorMessage, Throwable cause)
     {
         super(errorMessage, cause);
         this.errorCode = Objects.requireNonNull(errorCode, "ErrorCode cannot be null");
-//        logger.error("Error Code: {}: {}", errorCode.getCode(), errorMessage, cause);
     }
 
     public static AddaxException asAddaxException(ErrorCode errorCode, String message)

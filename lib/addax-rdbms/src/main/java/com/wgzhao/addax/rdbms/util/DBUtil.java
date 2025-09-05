@@ -282,7 +282,7 @@ public final class DBUtil
             return bds.getConnection();
         }
         catch (Exception e) {
-            throw RdbmsException.asConnException(e);
+            throw RdbmsException.asConnException(e, jdbcUrl);
         }
     }
 

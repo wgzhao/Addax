@@ -53,9 +53,9 @@ public class RdbmsException
      * @param e The underlying exception that caused the connection failure
      * @return AddaxException with CONNECTION_ERROR code
      */
-    public static AddaxException asConnException(Exception e)
+    public static AddaxException asConnException(Exception e, String jdbcUrl)
     {
-        return asAddaxException(CONNECT_ERROR, e.getMessage());
+        return asAddaxException(CONNECT_ERROR, "Failed to connect the database with " + jdbcUrl, e);
     }
 
     /**
@@ -67,7 +67,7 @@ public class RdbmsException
      */
     public static AddaxException asQueryException(Exception e, String querySql)
     {
-        return asAddaxException(EXECUTE_FAIL, e.getMessage());
+        return asAddaxException(EXECUTE_FAIL, querySql, e);
     }
 
     /**
@@ -80,7 +80,7 @@ public class RdbmsException
      */
     public static AddaxException asSqlParserException(Exception e, String querySql)
     {
-        throw asAddaxException(EXECUTE_FAIL, e.getMessage());
+        throw asAddaxException(EXECUTE_FAIL, querySql, e);
     }
 
     /**
@@ -93,7 +93,7 @@ public class RdbmsException
      */
     public static AddaxException asPreSQLParserException(Exception e, String querySql)
     {
-        throw asAddaxException(EXECUTE_FAIL, e.getMessage());
+        throw asAddaxException(EXECUTE_FAIL, querySql, e);
     }
 
     /**
@@ -106,7 +106,7 @@ public class RdbmsException
      */
     public static AddaxException asPostSQLParserException(Exception e, String querySql)
     {
-        throw asAddaxException(EXECUTE_FAIL, e.getMessage());
+        throw asAddaxException(EXECUTE_FAIL, querySql, e);
     }
 
     /**
@@ -145,6 +145,7 @@ public class RdbmsException
      */
     public static AddaxException asSplitPKException(Exception e, String splitSql, String splitPkID)
     {
-        return asAddaxException(EXECUTE_FAIL, e.getMessage());
+        return asAddaxException(EXECUTE_FAIL, "Failed to split the table with " + splitSql + "  and " + splitPkID, e);
     }
 }
+
