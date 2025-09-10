@@ -61,6 +61,7 @@ public class HdfsWriter
         private static final Logger LOG = LoggerFactory.getLogger(Job.class);
 
         private static final String SKIP_TRASH = "skipTrash";
+        private static final String CREATE_PATH = "createPath";
 
         // The temporary directory where the file(s) are written will be deleted after the write operation is complete.
         private String tmpStorePath;
@@ -188,8 +189,18 @@ public class HdfsWriter
                 }
             }
             else {
-                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                        String.format("The directory [%s]  does not exists. please create it first. ", path));
+                if (this.writerSliceConfig.getBool(CREATE_PATH, false)) {
+                    // create path
+                    if (!hdfsHelper.createPath(path)) {
+                        throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                                String.format("The path [%s] is not exists and create it failed, please check your configuration or permission.", path));
+                    }
+                    LOG.info("The path [{}] is not exists, we create it automatically for you.", path);
+                }
+                else {
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                            String.format("The directory [%s]  does not exists. please create it first. ", path));
+                }
             }
 
             // validate the write permission

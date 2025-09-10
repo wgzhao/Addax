@@ -31,6 +31,7 @@ HDFS Writer 提供向 HDFS 文件系统指定路径中写入 `TextFile` ， `ORC
 | postShell              |  否   | `list`      | 无       | 写入数据后执行的shell命令，比如 `hive -e "select count(1) from test.hello"` |
 | ignoreError            |  否   | boolean     | false   | 是否忽略`preShell`, `postShell` 命令的错误                              |
 | hdfsSitePath           |  否   | string      | 无       | `hdfs-site.xml` 的路径，详细解释见下                                     |
+| createPath             |  否   | boolean     | 否       | 默认不存在时，是否创建，默认不创建而给出报错提示                                       |
 
 ### path
 

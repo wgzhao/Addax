@@ -223,6 +223,18 @@ public class HdfsHelper
         LOG.info("Finish deleting temporary dir [{}] .", path);
     }
 
+    public boolean createPath(String path)
+    {
+        try {
+            return fileSystem.mkdirs(new Path(path));
+        }
+        catch (IOException e) {
+            String message = String.format("Network IO exception occurred while mkdir [%s]", path);
+            LOG.error(message);
+            throw AddaxException.asAddaxException(IO_ERROR, e);
+        }
+    }
+
     /**
      * move all files in sourceDir to targetDir
      *
