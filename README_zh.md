@@ -226,6 +226,11 @@ Failed record             :                   0
 - [在线文档](https://wgzhao.github.io/Addax/)
 - [项目内文档](docs/index.md)
 
+## 相关项目
+
+- [addax-admin](https://github.com/wgzhao/addax-admin) - 基于web的管理工具，用于管理基于Addax的数据采集任务
+- [addax-ui](https://github.com/wgzhao/addax-ui) - addax-admin的前端实现
+
 ## 代码风格
 
 建议使用 IntelliJ 作为开发 IDE。项目的代码风格模板可以在[codestyle](https://github.com/airlift/codestyle)资源库中找到，还有我们的一般编程和Java指南。除了这些之外，你还应该遵守以下几点。

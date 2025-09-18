@@ -162,6 +162,13 @@ Explore more [example jobs](docs/assets/jobs)
 
 ---
 
+## 🔗 Related Projects
+
+- [addax-admin](https://github.com/wgzhao/addax-admin) - A web-based management tool for administering Addax data collection tasks
+- [addax-ui](https://github.com/wgzhao/addax-ui) - Frontend implementation for addax-admin
+
+---
+
 ## 🧩 Developing Addax
 
 ### Building Documentation
@@ -239,4 +246,3 @@ This software is free to use under the [Apache License 2.0](/LICENSE).
 ## 💌 Special Thanks
 
 Special thanks to [JetBrains](https://jb.gg/OpenSource) for providing open-source support to this project.
-
