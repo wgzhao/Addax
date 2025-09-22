@@ -3,6 +3,7 @@
 Server模块用于通过HTTP接口提交和管理数据采集任务。用户可通过POST方式提交JSON任务配置，服务端异步执行采集任务并返回唯一任务ID，随后可通过任务ID查询任务进度和结果。
 
 ## 功能简介
+
 - 提供RESTful接口，支持任务提交与状态查询
 - 支持最大并发任务数限制（默认30，可配置）
 - 集成Addax核心Engine，直接执行采集任务
@@ -12,15 +13,13 @@ Server模块用于通过HTTP接口提交和管理数据采集任务。用户可�
 ## HTTP接口说明
 
 ### 1. 提交任务
-- URL: `/api/submit`
+- URL: `/api/submit?k1=v1&k2=v2`
 - 方法: POST
 - 请求体示例：
-```json
-{
-    "name": "example-job",
-    "job": "{...job json...}",
-    "jvm": {"Xmx": "2G"}
-}
+```shell
+curl 'http://localhost:10601/api/submit?jobName=example-job' \
+-H 'Content-Type: application/json' \
+-d @job/job.json
 ```
 - 返回示例：
 ```json
@@ -36,7 +35,7 @@ Server模块用于通过HTTP接口提交和管理数据采集任务。用户可�
 ```
 
 ### 2. 查询任务状态
-- URL: `/api/status/{taskId}`
+- URL: `/api/status?taskId={taskId}`
 - 方法: GET
 - 返回示例：
 ```json

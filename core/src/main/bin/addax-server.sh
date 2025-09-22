@@ -25,20 +25,19 @@
 
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$SCRIPT_DIR/../../.."
-PID_FILE="$SCRIPT_DIR/addax-server.pid"
-OUT_FILE="$SCRIPT_DIR/addax-server.out"
+SCRIPT_PATH="$(
+    cd -- "$(dirname "$0")" >/dev/null 2>&1
+    pwd -P
+)"
+ADDAX_HOME=$(dirname "$SCRIPT_PATH")
 
-find_jar() {
-  # pattern is a glob relative to project root, use find to locate it
-  pattern="$1"
-  find "$PROJECT_ROOT" -name "$pattern" -type f -print | head -n 1
-}
+PID_FILE="$ADDAX_HOME/addax-server.pid"
+OUT_FILE="$ADDAX_HOME/addax-server.out"
+
 
 start_server() {
   PARALLEL=30
-  PORT=8080
+  PORT=10601
   DAEMON=0
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -53,28 +52,8 @@ start_server() {
     esac
   done
 
-  # Try expected build output locations first
-  SERVER_JAR="$PROJECT_ROOT/server/target/server-*.jar"
-  CORE_JAR="$PROJECT_ROOT/core/target/addax-core-*.jar"
 
-  # Resolve actual files (globs)
-  SERVER_JAR_RESOLVED=$(ls $SERVER_JAR 2>/dev/null || true)
-  CORE_JAR_RESOLVED=$(ls $CORE_JAR 2>/dev/null || true)
-
-  # Fallback to find if not found
-  if [[ -z "$SERVER_JAR_RESOLVED" ]]; then
-    SERVER_JAR_RESOLVED=$(find_jar "server-*.jar")
-  fi
-  if [[ -z "$CORE_JAR_RESOLVED" ]]; then
-    CORE_JAR_RESOLVED=$(find_jar "addax-core-*.jar")
-  fi
-
-  if [[ -z "$SERVER_JAR_RESOLVED" || -z "$CORE_JAR_RESOLVED" ]]; then
-    echo "Error: cannot find server or core jars. Build the project first: mvn -DskipTests clean package -pl :server,:core -am"
-    exit 1
-  fi
-
-  CMD=(java -cp "$SERVER_JAR_RESOLVED:$CORE_JAR_RESOLVED" com.wgzhao.addax.server.ServerApplication --port "$PORT" -p "$PARALLEL")
+  CMD=(java -server -Daddax.home=${ADDAX_HOME} -cp "lib/*" com.wgzhao.addax.server.AddaxServer --port "$PORT" -p "$PARALLEL")
 
   if [[ $DAEMON -eq 1 ]]; then
     nohup "${CMD[@]}" > "$OUT_FILE" 2>&1 &
@@ -99,6 +78,8 @@ stop_server() {
     echo "PID file not found: $PID_FILE. Server may not be running."
   fi
 }
+
+cd $ADDAX_HOME || exit 1
 
 case "${1:-}" in
   start)

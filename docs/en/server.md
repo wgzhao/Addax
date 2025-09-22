@@ -12,15 +12,13 @@ The Server module provides HTTP interfaces for submitting and managing data coll
 ## HTTP API
 
 ### 1. Submit Task
-- URL: `/api/submit`
+- URL: `/api/submit?k1=v1&k2=v2`
 - Method: POST
 - Request Example:
-```json
-{
-    "name": "example-job",
-    "job": "{...job json...}",
-    "jvm": {"Xmx": "2G"}
-}
+```shell
+curl 'http://localhost:10601/api/submit?jobName=example-job' \
+-H 'Content-Type: application/json' \
+-d @job/job.json
 ```
 - Response Example:
 ```json
@@ -36,7 +34,7 @@ The Server module provides HTTP interfaces for submitting and managing data coll
 ```
 
 ### 2. Query Task Status
-- URL: `/api/status/{taskId}`
+- URL: `/api/status?taskId={taskId}`
 - Method: GET
 - Response Example:
 ```json
@@ -68,7 +66,7 @@ Use the script `core/src/main/bin/addax-server.sh` to start and stop the service
 ```
 
 ## Concurrency Configuration
-- Command-line `-p` or `--parallel` has highest priority
+- Command-line `-p` or `--parallel` has the highest priority
 - Environment variable `ADDAX_SERVER_PARALLEL` is next
 - Default concurrency is 30
 

@@ -39,7 +39,8 @@ import java.net.URLDecoder;
 /**
  * Minimal HTTP server using JDK HttpServer. Provides /api/submit and /api/status endpoints.
  */
-public class ServerApplication {
+public class AddaxServer
+{
     private static final int DEFAULT_PORT = 10601;
     private static final int DEFAULT_PARALLEL = 30;
 
