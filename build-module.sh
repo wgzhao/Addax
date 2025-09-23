@@ -113,6 +113,13 @@ build_module() {
         return 0
     fi
 
+    if [ "$MODULE_NAME" == "server" ]; then
+        echo "Deploying server module..."
+        rsync -av server/target/${MODULE_NAME}-${version}.jar ${ADDAX_HOME}/lib/
+        echo "Server module deployed successfully"
+        return 0
+    fi
+
     if [ "$MODULE_NAME" == "addax-rdbms" ] || [ "$MODULE_NAME" == "addax-storage" ]; then
         echo "Deploying $MODULE_NAME module..."
         rsync -av lib/${MODULE_NAME}/target/${MODULE_NAME}-${version}.jar ${ADDAX_HOME}/lib/

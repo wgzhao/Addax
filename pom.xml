@@ -223,6 +223,7 @@
         <module>plugin/writer/sybasewriter</module>
         <module>plugin/writer/tdenginewriter</module>
         <module>plugin/writer/txtfilewriter</module>
+        <module>server</module>
     </modules>
 
     <developers>

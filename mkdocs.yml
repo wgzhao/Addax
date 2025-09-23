@@ -151,6 +151,7 @@ nav:
   - statsreport.md
   - transformer.md
   - plugin_development.md
+  - server.md
 
 extra:
   version:
