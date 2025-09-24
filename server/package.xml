@@ -33,6 +33,6 @@
                 <include>${project.artifactId}-${project.version}.jar</include>
             </includes>
             <outputDirectory>lib</outputDirectory>
-        </fileSet>s
+        </fileSet>
     </fileSets>
 </assembly>
