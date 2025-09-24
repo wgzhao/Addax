@@ -1,0 +1,46 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 1,
+        "bytes": -1
+      }
+    },
+    "content": {
+      "reader": {},
+      "writer": {
+        "name": "sqlserverwriter",
+        "parameter": {
+          "username": "root",
+          "password": "root",
+          "column": [
+            "db_id",
+            "db_type",
+            "db_ip",
+            "db_port",
+            "db_role",
+            "db_name",
+            "db_username",
+            "db_password",
+            "db_modify_time",
+            "db_modify_user",
+            "db_description",
+            "db_tddl_info"
+          ],
+          "preSql": [
+            "delete from @table where db_id = -1;"
+          ],
+          "postSql": [
+            "update @table set db_modify_time = now() where db_id = 1;"
+          ],
+          "connection": {
+            "table": [
+              "db_info_for_writer"
+            ],
+            "jdbcUrl": "jdbc:sqlserver://[HOST_NAME]:PORT;DatabaseName=[DATABASE_NAME]"
+          }
+        }
+      }
+    }
+  }
+}

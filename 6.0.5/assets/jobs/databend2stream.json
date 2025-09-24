@@ -1,0 +1,34 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "bytes": -1,
+        "channel": 1
+      }
+    },
+    "content": {
+      "reader": {
+        "name": "databendreader",
+        "parameter": {
+          "column": [
+            "*"
+          ],
+          "connection": {
+            "jdbcUrl": "jdbc:databend://127.0.0.1:8000/default",
+            "table": [
+              "addax_reader"
+            ]
+          },
+          "username": "databend",
+          "password": "databend"
+        }
+      },
+      "writer": {
+        "name": "streamwriter",
+        "parameter": {
+          "print": "true"
+        }
+      }
+    }
+  }
+}
