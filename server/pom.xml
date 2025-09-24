@@ -27,17 +27,10 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>server</artifactId>
+    <artifactId>addax-server</artifactId>
     <name>addax-server</name>
     <description>Minimal HTTP Server for Addax using JDK HttpServer</description>
     <packaging>jar</packaging>
-
-    <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <!-- Skip javadoc generation for this lightweight module to simplify builds -->
-        <maven.javadoc.skip>true</maven.javadoc.skip>
-    </properties>
 
     <dependencies>
         <!-- Depend on addax-core; core brings required runtime dependencies for job execution -->
@@ -45,6 +38,7 @@
             <groupId>com.wgzhao.addax</groupId>
             <artifactId>addax-core</artifactId>
             <version>${project.version}</version>
+            <scope>runtime</scope>
         </dependency>
     </dependencies>
 
@@ -52,22 +46,8 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
-                <configuration>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
-                </configuration>
+                <artifactId>maven-assembly-plugin</artifactId>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.4.0</version>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-            <!-- Keep default packaging; assembly is handled at top-level if needed -->
         </plugins>
     </build>
 </project>

@@ -35,6 +35,13 @@
             <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
+		<directory>server/target/</directory>
+            <includes>
+		    <include>addax-server-${project.version}.jar</include>
+            </includes>
+            <outputDirectory>lib</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>lib/addax-rdbms/target/addax-rdbms-${project.version}/lib/</directory>
             <includes>
                 <include>*.*</include>

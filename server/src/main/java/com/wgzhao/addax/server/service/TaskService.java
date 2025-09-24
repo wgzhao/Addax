@@ -30,14 +30,17 @@ import java.util.concurrent.ExecutorService;
  * This implementation uses only JDK classes (no external web framework) and
  * invokes Addax Engine via reflection.
  */
-public class TaskService {
+public class TaskService
+{
     private final ExecutorService executor;
 
     /**
      * Construct TaskService with an ExecutorService used to run tasks asynchronously.
+     *
      * @param executor ExecutorService instance
      */
-    public TaskService(ExecutorService executor) {
+    public TaskService(ExecutorService executor)
+    {
         this.executor = executor;
     }
 
@@ -45,13 +48,13 @@ public class TaskService {
      * Submit a task with explicit parameters. The job JSON must be provided in the body
      * of the POST request. Other parameters (e.g. name, jvm) are provided as query params.
      * This method accepts a raw jvmParam string (can be JSON object) and will try to parse it.
-     * @param name job name, may be null
+     *
      * @param jobJson job JSON content from request body
-     * @param jvmParam optional jvm parameter string (JSON object or empty)
+     * @param params optional jvm parameter string (JSON object or empty)
      * @return taskId if accepted, or an error string starting with "ERROR:"
      */
-    public String submitTask(String jobJson, Map<String, String> params) {
-
+    public String submitTask(String jobJson, Map<String, String> params)
+    {
         // currently name and jvmMap are passed to task execution; jvmMap is not used to spawn JVMs
         if (!TaskManager.tryAcquireSlot()) {
             return "ERROR: Maximum number of concurrent tasks reached.";
@@ -60,35 +63,25 @@ public class TaskService {
         TaskInfo info = new TaskInfo(taskId);
         TaskManager.addTask(info);
 
-        executor.submit(() -> runTask(taskId, "addax", jobJson));
+        executor.submit(() -> runTask(taskId, params, jobJson));
         return taskId;
     }
 
     /**
-     * Backwards compatible method that expects the old wrapper JSON. Maintained for internal use only.
-     * @param body old wrapper body
-     * @return taskId or error
-     */
-//    public String submitTaskFromJson(String body) {
-//        // try to extract top-level job and name if client used old format
-//        Map<String, String> top = parseTopLevelJson(body);
-//        String name = top.get("name");
-//        String job = top.get("job");
-//        String jvm = top.get("jvm");
-//        return submitTask(name, job, jvm);
-//    }
-
-    /**
      * Get task information.
+     *
      * @param taskId task id
      * @return TaskInfo or null
      */
-    public TaskInfo getTaskInfo(String taskId) {
+    public TaskInfo getTaskInfo(String taskId)
+    {
         return TaskManager.getTask(taskId);
     }
 
-    private void runTask(String taskId, String name, String jobJson) {
+    private void runTask(String taskId, Map<String, String> params, String jobJson)
+    {
         java.nio.file.Path tmp = null;
+        params.forEach(System::setProperty);
         try {
             // write job JSON to a temporary file
             tmp = java.nio.file.Files.createTempFile("addax-job-", ".json");
@@ -98,21 +91,28 @@ public class TaskService {
             Class<?> engineClass = Class.forName("com.wgzhao.addax.core.Engine");
             try {
                 Method entryMethod = engineClass.getMethod("entry", String[].class);
-                String[] args = new String[]{"-job", tmp.toString()};
+                String[] args = new String[] {"-job", tmp.toString()};
                 // invoke static method; cast to Object to avoid varargs expansion
                 entryMethod.invoke(null, (Object) args);
-            } catch (NoSuchMethodException nsme) {
+            }
+            catch (NoSuchMethodException nsme) {
                 // Fallback: try calling main(String[]), but main calls System.exit so avoid it.
                 throw new RuntimeException("Engine.entry(String[]) not found; cannot safely invoke Engine.main from server process.", nsme);
             }
 
-            TaskManager.updateTask(taskId, TaskInfo.Status.SUCCESS, "Job " + name + " executed.", null);
-        } catch (Throwable e) {
+            TaskManager.updateTask(taskId, TaskInfo.Status.SUCCESS, "Job executed.", null);
+        }
+        catch (Throwable e) {
             TaskManager.updateTask(taskId, TaskInfo.Status.FAILED, null, e.toString());
-        } finally {
+        }
+        finally {
             // cleanup temp file
             if (tmp != null) {
-                try { java.nio.file.Files.deleteIfExists(tmp); } catch (Exception ignored) {}
+                try {
+                    java.nio.file.Files.deleteIfExists(tmp);
+                }
+                catch (Exception ignored) {
+                }
             }
             TaskManager.releaseSlot();
         }

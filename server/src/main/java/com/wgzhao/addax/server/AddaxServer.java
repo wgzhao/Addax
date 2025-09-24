@@ -46,10 +46,13 @@ public class AddaxServer
 
     /**
      * Main entry. Accepts optional args: {@code -p|--parallel &lt;n&gt;} and {@code --port &lt;port&gt;}.
+     *
      * @param args command line arguments
      * @throws Exception on startup error
      */
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args)
+            throws Exception
+    {
         int port = DEFAULT_PORT;
         int parallel = DEFAULT_PARALLEL;
 
@@ -58,12 +61,20 @@ public class AddaxServer
                 case "-p":
                 case "--parallel":
                     if (i + 1 < args.length) {
-                        try { parallel = Integer.parseInt(args[++i]); } catch (NumberFormatException ignored) {}
+                        try {
+                            parallel = Integer.parseInt(args[++i]);
+                        }
+                        catch (NumberFormatException ignored) {
+                        }
                     }
                     break;
                 case "--port":
                     if (i + 1 < args.length) {
-                        try { port = Integer.parseInt(args[++i]); } catch (NumberFormatException ignored) {}
+                        try {
+                            port = Integer.parseInt(args[++i]);
+                        }
+                        catch (NumberFormatException ignored) {
+                        }
                     }
                     break;
                 default:
@@ -84,13 +95,17 @@ public class AddaxServer
         server.start();
     }
 
-    static String readRequestBody(HttpExchange exchange) throws IOException {
+    static String readRequestBody(HttpExchange exchange)
+            throws IOException
+    {
         InputStream in = exchange.getRequestBody();
         byte[] data = in.readAllBytes();
         return new String(data, StandardCharsets.UTF_8);
     }
 
-    static void writeJsonResponse(HttpExchange exchange, int statusCode, String json) throws IOException {
+    static void writeJsonResponse(HttpExchange exchange, int statusCode, String json)
+            throws IOException
+    {
         byte[] bytes = json.getBytes(StandardCharsets.UTF_8);
         exchange.getResponseHeaders().add("Content-Type", "application/json; charset=utf-8");
         exchange.sendResponseHeaders(statusCode, bytes.length);
@@ -99,53 +114,67 @@ public class AddaxServer
         }
     }
 
-    static Map<String, String> parseQueryParams(String query) throws IOException {
+    static Map<String, String> parseQueryParams(String query)
+    {
         Map<String, String> params = new HashMap<>();
-        if (query == null || query.isEmpty()) return params;
+        if (query == null || query.isEmpty()) {
+            return params;
+        }
         String[] pairs = query.split("&");
         for (String p : pairs) {
             int idx = p.indexOf('=');
             if (idx > 0) {
-                String k = URLDecoder.decode(p.substring(0, idx), StandardCharsets.UTF_8.name());
-                String v = URLDecoder.decode(p.substring(idx + 1), StandardCharsets.UTF_8.name());
+                String k = URLDecoder.decode(p.substring(0, idx), StandardCharsets.UTF_8);
+                String v = URLDecoder.decode(p.substring(idx + 1), StandardCharsets.UTF_8);
                 params.put(k, v);
-            } else if (!p.isEmpty()) {
-                String k = URLDecoder.decode(p, StandardCharsets.UTF_8.name());
+            }
+            else if (!p.isEmpty()) {
+                String k = URLDecoder.decode(p, StandardCharsets.UTF_8);
                 params.put(k, "");
             }
         }
         return params;
     }
 
-    static class SubmitHandler implements HttpHandler {
-        private final TaskService taskService;
-        SubmitHandler(TaskService taskService) { this.taskService = taskService; }
+    record SubmitHandler(TaskService taskService)
+            implements HttpHandler
+    {
         @Override
-        public void handle(HttpExchange exchange) throws IOException {
+        public void handle(HttpExchange exchange)
+                throws IOException
+        {
             if (!"POST".equalsIgnoreCase(exchange.getRequestMethod())) {
                 exchange.sendResponseHeaders(405, -1);
                 return;
             }
             String body = readRequestBody(exchange); // job JSON
+            if (body.isEmpty()) {
+                writeJsonResponse(exchange, 400, "{\"error\":\"missing job JSON in request body\"}");
+                return;
+            }
             Map<String, String> params = parseQueryParams(exchange.getRequestURI().getQuery());
             try {
                 String result = taskService.submitTask(body, params);
                 if (result.startsWith("ERROR:")) {
                     writeJsonResponse(exchange, 429, "{\"error\":\"" + escapeJson(result) + "\"}");
-                } else {
+                }
+                else {
                     writeJsonResponse(exchange, 200, "{\"taskId\":\"" + escapeJson(result) + "\"}");
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 writeJsonResponse(exchange, 500, "{\"error\":\"" + escapeJson(e.getMessage()) + "\"}");
             }
         }
     }
 
-    static class StatusHandler implements HttpHandler {
-        private final TaskService taskService;
-        StatusHandler(TaskService taskService) { this.taskService = taskService; }
+    record StatusHandler(TaskService taskService)
+            implements HttpHandler
+    {
         @Override
-        public void handle(HttpExchange exchange) throws IOException {
+        public void handle(HttpExchange exchange)
+                throws IOException
+        {
             if (!"GET".equalsIgnoreCase(exchange.getRequestMethod())) {
                 exchange.sendResponseHeaders(405, -1);
                 return;
@@ -178,8 +207,11 @@ public class AddaxServer
         }
     }
 
-    static String escapeJson(String s) {
-        if (s == null) return "";
+    static String escapeJson(String s)
+    {
+        if (s == null) {
+            return "";
+        }
         return s.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "\\r");
     }
 }

@@ -33,13 +33,6 @@
                 <include>${project.artifactId}-${project.version}.jar</include>
             </includes>
             <outputDirectory>lib</outputDirectory>
-        </fileSet>
+        </fileSet>s
     </fileSets>
-    <dependencySets>
-        <dependencySet>
-            <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>lib</outputDirectory>
-            <scope>runtime</scope>
-        </dependencySet>
-    </dependencySets>
 </assembly>

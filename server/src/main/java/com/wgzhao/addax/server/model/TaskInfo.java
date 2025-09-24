@@ -22,7 +22,7 @@ public class TaskInfo {
         RUNNING, SUCCESS, FAILED
     }
 
-    private String taskId;
+    private final String taskId;
     private Status status;
     private String result;
     private String error;
