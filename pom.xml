@@ -22,7 +22,7 @@
 
     <groupId>com.wgzhao.addax</groupId>
     <artifactId>addax-all</artifactId>
-    <version>6.0.6-SNAPSHOT</version>
+    <version>6.0.5-SNAPSHOT</version>
     <name>addax-all</name>
     <description>Addax: a versatile open-source ETL tool</description>
     <packaging>pom</packaging>
