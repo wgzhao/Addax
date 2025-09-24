@@ -12,24 +12,26 @@
         <meta name="author" content="Steven Zhao">
       
       
-        <link rel="canonical" href="https://wgzhao.github.io/Addax/develop/en/writer/paimonwriter/">
+        <link rel="canonical" href="https://wgzhao.github.io/Addax/develop/server/">
+      
+      
+        <link rel="prev" href="../plugin_development/">
       
       
       
-      
-      <link rel="icon" href="../../../images/favicon.ico">
+      <link rel="icon" href="../images/favicon.ico">
       <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.25">
     
     
       
-        <title>Paimon Writer - Addax Documentation</title>
+        <title>Server模块 - Addax Documentation</title>
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.6543a935.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.6543a935.min.css">
       
         
-        <link rel="stylesheet" href="../../../assets/stylesheets/palette.06af60db.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
       
       
 
@@ -48,7 +50,7 @@
       
     
     
-    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
   
@@ -84,7 +86,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#paimon-writer" class="md-skip">
+        <a href="#server" class="md-skip">
           Skip to content
         </a>
       
@@ -104,9 +106,9 @@
 
 <header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../.." title="Addax Documentation" class="md-header__button md-logo" aria-label="Addax Documentation" data-md-component="logo">
+    <a href=".." title="Addax Documentation" class="md-header__button md-logo" aria-label="Addax Documentation" data-md-component="logo">
       
-  <img src="../../../images/logo.png" alt="logo">
+  <img src="../images/logo.png" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -123,7 +125,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Paimon Writer
+              Server模块
             
           </span>
         </div>
@@ -257,7 +259,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../.." class="md-tabs__link">
+      <a href=".." class="md-tabs__link">
         
   
     
@@ -274,7 +276,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../../quickstart/" class="md-tabs__link">
+      <a href="../quickstart/" class="md-tabs__link">
         
   
     
@@ -291,7 +293,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../../setupJob/" class="md-tabs__link">
+      <a href="../setupJob/" class="md-tabs__link">
         
   
     
@@ -308,7 +310,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../../commandline/" class="md-tabs__link">
+      <a href="../commandline/" class="md-tabs__link">
         
   
     
@@ -327,7 +329,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../reader/accessreader/" class="md-tabs__link">
+        <a href="../reader/accessreader/" class="md-tabs__link">
           
   
     
@@ -347,7 +349,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../writer/accesswriter/" class="md-tabs__link">
+        <a href="../writer/accesswriter/" class="md-tabs__link">
           
   
     
@@ -365,7 +367,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../../debug/" class="md-tabs__link">
+      <a href="../debug/" class="md-tabs__link">
         
   
     
@@ -382,7 +384,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../../encrypt_password/" class="md-tabs__link">
+      <a href="../encrypt_password/" class="md-tabs__link">
         
   
     
@@ -399,7 +401,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../../statsreport/" class="md-tabs__link">
+      <a href="../statsreport/" class="md-tabs__link">
         
   
     
@@ -416,7 +418,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../../transformer/" class="md-tabs__link">
+      <a href="../transformer/" class="md-tabs__link">
         
   
     
@@ -433,7 +435,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../../plugin_development/" class="md-tabs__link">
+      <a href="../plugin_development/" class="md-tabs__link">
         
   
     
@@ -448,9 +450,11 @@
         
   
   
+    
   
-    <li class="md-tabs__item">
-      <a href="../../../server/" class="md-tabs__link">
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
         
   
     
@@ -490,9 +494,9 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../.." title="Addax Documentation" class="md-nav__button md-logo" aria-label="Addax Documentation" data-md-component="logo">
+    <a href=".." title="Addax Documentation" class="md-nav__button md-logo" aria-label="Addax Documentation" data-md-component="logo">
       
-  <img src="../../../images/logo.png" alt="logo">
+  <img src="../images/logo.png" alt="logo">
 
     </a>
     Addax Documentation
@@ -519,7 +523,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../.." class="md-nav__link">
+      <a href=".." class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -539,7 +543,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../quickstart/" class="md-nav__link">
+      <a href="../quickstart/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -559,7 +563,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../setupJob/" class="md-nav__link">
+      <a href="../setupJob/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -579,7 +583,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../commandline/" class="md-nav__link">
+      <a href="../commandline/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -711,7 +715,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reader/accessreader/" class="md-nav__link">
+      <a href="../reader/accessreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -732,7 +736,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reader/mysqlreader/" class="md-nav__link">
+      <a href="../reader/mysqlreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -753,7 +757,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reader/postgresqlreader/" class="md-nav__link">
+      <a href="../reader/postgresqlreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -774,7 +778,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reader/oraclereader/" class="md-nav__link">
+      <a href="../reader/oraclereader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -795,7 +799,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reader/rdbmsreader/" class="md-nav__link">
+      <a href="../reader/rdbmsreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -816,7 +820,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reader/txtfilereader/" class="md-nav__link">
+      <a href="../reader/txtfilereader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -837,7 +841,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reader/elasticsearchreader/" class="md-nav__link">
+      <a href="../reader/elasticsearchreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -858,7 +862,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reader/mongodbreader/" class="md-nav__link">
+      <a href="../reader/mongodbreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -879,7 +883,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reader/cassandrareader/" class="md-nav__link">
+      <a href="../reader/cassandrareader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -900,7 +904,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reader/clickhousereader/" class="md-nav__link">
+      <a href="../reader/clickhousereader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -921,7 +925,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reader/databendreader/" class="md-nav__link">
+      <a href="../reader/databendreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -942,7 +946,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reader/datareader/" class="md-nav__link">
+      <a href="../reader/datareader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -963,7 +967,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reader/dbfreader/" class="md-nav__link">
+      <a href="../reader/dbfreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -984,7 +988,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reader/excelreader/" class="md-nav__link">
+      <a href="../reader/excelreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1005,7 +1009,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reader/ftpreader/" class="md-nav__link">
+      <a href="../reader/ftpreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1026,7 +1030,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reader/hanareader/" class="md-nav__link">
+      <a href="../reader/hanareader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1047,7 +1051,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reader/hbase11xreader/" class="md-nav__link">
+      <a href="../reader/hbase11xreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1068,7 +1072,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reader/hbase11xsqlreader/" class="md-nav__link">
+      <a href="../reader/hbase11xsqlreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1089,7 +1093,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reader/hbase20xreader/" class="md-nav__link">
+      <a href="../reader/hbase20xreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1110,7 +1114,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reader/hbase20xsqlreader/" class="md-nav__link">
+      <a href="../reader/hbase20xsqlreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1131,7 +1135,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reader/hdfsreader/" class="md-nav__link">
+      <a href="../reader/hdfsreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1152,7 +1156,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reader/hivereader/" class="md-nav__link">
+      <a href="../reader/hivereader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1173,7 +1177,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reader/httpreader/" class="md-nav__link">
+      <a href="../reader/httpreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1194,7 +1198,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reader/influxdbreader/" class="md-nav__link">
+      <a href="../reader/influxdbreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1215,7 +1219,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reader/influxdb2reader/" class="md-nav__link">
+      <a href="../reader/influxdb2reader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1236,7 +1240,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reader/jsonfilereader/" class="md-nav__link">
+      <a href="../reader/jsonfilereader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1257,7 +1261,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reader/kafkareader/" class="md-nav__link">
+      <a href="../reader/kafkareader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1278,7 +1282,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reader/kudureader/" class="md-nav__link">
+      <a href="../reader/kudureader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1299,7 +1303,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reader/redisreader/" class="md-nav__link">
+      <a href="../reader/redisreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1320,7 +1324,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reader/s3reader/" class="md-nav__link">
+      <a href="../reader/s3reader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1341,7 +1345,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reader/sqlitereader/" class="md-nav__link">
+      <a href="../reader/sqlitereader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1362,7 +1366,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reader/sqlserverreader/" class="md-nav__link">
+      <a href="../reader/sqlserverreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1383,7 +1387,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reader/streamreader/" class="md-nav__link">
+      <a href="../reader/streamreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1404,7 +1408,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reader/sybasereader/" class="md-nav__link">
+      <a href="../reader/sybasereader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1425,7 +1429,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reader/tdenginereader/" class="md-nav__link">
+      <a href="../reader/tdenginereader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1565,7 +1569,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../writer/accesswriter/" class="md-nav__link">
+      <a href="../writer/accesswriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1586,7 +1590,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../writer/mysqlwriter/" class="md-nav__link">
+      <a href="../writer/mysqlwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1607,7 +1611,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../writer/postgresqlwriter/" class="md-nav__link">
+      <a href="../writer/postgresqlwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1628,7 +1632,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../writer/oraclewriter/" class="md-nav__link">
+      <a href="../writer/oraclewriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1649,7 +1653,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../writer/rdbmswriter/" class="md-nav__link">
+      <a href="../writer/rdbmswriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1670,7 +1674,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../writer/txtfilewriter/" class="md-nav__link">
+      <a href="../writer/txtfilewriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1691,7 +1695,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../writer/elasticsearchwriter/" class="md-nav__link">
+      <a href="../writer/elasticsearchwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1712,7 +1716,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../writer/mongodbwriter/" class="md-nav__link">
+      <a href="../writer/mongodbwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1733,7 +1737,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../writer/cassandrawriter/" class="md-nav__link">
+      <a href="../writer/cassandrawriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1754,7 +1758,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../writer/clickhousewriter/" class="md-nav__link">
+      <a href="../writer/clickhousewriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1775,7 +1779,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../writer/databendwriter/" class="md-nav__link">
+      <a href="../writer/databendwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1796,7 +1800,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../writer/dbfwriter/" class="md-nav__link">
+      <a href="../writer/dbfwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1817,7 +1821,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../writer/doriswriter/" class="md-nav__link">
+      <a href="../writer/doriswriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1838,7 +1842,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../writer/excelwriter/" class="md-nav__link">
+      <a href="../writer/excelwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1859,7 +1863,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../writer/ftpwriter/" class="md-nav__link">
+      <a href="../writer/ftpwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1880,7 +1884,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../writer/greenplumwriter/" class="md-nav__link">
+      <a href="../writer/greenplumwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1901,7 +1905,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../writer/hanawriter/" class="md-nav__link">
+      <a href="../writer/hanawriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1922,7 +1926,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../writer/hbase11xsqlwriter/" class="md-nav__link">
+      <a href="../writer/hbase11xsqlwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1943,7 +1947,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../writer/hbase11xwriter/" class="md-nav__link">
+      <a href="../writer/hbase11xwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1964,7 +1968,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../writer/hbase20xsqlwriter/" class="md-nav__link">
+      <a href="../writer/hbase20xsqlwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1985,7 +1989,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../writer/hdfswriter/" class="md-nav__link">
+      <a href="../writer/hdfswriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2006,7 +2010,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../writer/icebergwriter/" class="md-nav__link">
+      <a href="../writer/icebergwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2027,7 +2031,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../writer/influxdbwriter/" class="md-nav__link">
+      <a href="../writer/influxdbwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2048,7 +2052,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../writer/influxdb2writer/" class="md-nav__link">
+      <a href="../writer/influxdb2writer/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2069,7 +2073,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../writer/kafkawriter/" class="md-nav__link">
+      <a href="../writer/kafkawriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2090,7 +2094,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../writer/kuduwriter/" class="md-nav__link">
+      <a href="../writer/kuduwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2111,7 +2115,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../writer/paimonwriter/" class="md-nav__link">
+      <a href="../writer/paimonwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2132,7 +2136,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../writer/rediswriter/" class="md-nav__link">
+      <a href="../writer/rediswriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2153,7 +2157,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../writer/s3writer/" class="md-nav__link">
+      <a href="../writer/s3writer/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2174,7 +2178,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../writer/sqlitewriter/" class="md-nav__link">
+      <a href="../writer/sqlitewriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2195,7 +2199,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../writer/sqlserverwriter/" class="md-nav__link">
+      <a href="../writer/sqlserverwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2216,7 +2220,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../writer/starrockswriter/" class="md-nav__link">
+      <a href="../writer/starrockswriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2237,7 +2241,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../writer/streamwriter/" class="md-nav__link">
+      <a href="../writer/streamwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2258,7 +2262,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../writer/sybasewriter/" class="md-nav__link">
+      <a href="../writer/sybasewriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2279,7 +2283,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../writer/tdenginewriter/" class="md-nav__link">
+      <a href="../writer/tdenginewriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2307,7 +2311,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../debug/" class="md-nav__link">
+      <a href="../debug/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2327,7 +2331,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../encrypt_password/" class="md-nav__link">
+      <a href="../encrypt_password/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2347,7 +2351,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../statsreport/" class="md-nav__link">
+      <a href="../statsreport/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2367,7 +2371,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../transformer/" class="md-nav__link">
+      <a href="../transformer/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2387,7 +2391,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../plugin_development/" class="md-nav__link">
+      <a href="../plugin_development/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2404,10 +2408,30 @@
       
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../../server/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Server模块
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -2416,6 +2440,137 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      功能简介
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#http" class="md-nav__link">
+    <span class="md-ellipsis">
+      HTTP接口说明
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="HTTP接口说明">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. 提交任务
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. 查询任务状态
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      启动与停止
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="启动与停止">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      启动服务
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#50" class="md-nav__link">
+    <span class="md-ellipsis">
+      设置最大并发数（如50）并后台运行
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      停止服务
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      并发数配置
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      依赖说明
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      注意事项
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -2447,18 +2602,111 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      功能简介
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#http" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      HTTP接口说明
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="HTTP接口说明">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. 提交任务
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. 查询任务状态
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      启动与停止
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="启动与停止">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      启动服务
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#50" class="md-nav__link">
+    <span class="md-ellipsis">
+      设置最大并发数（如50）并后台运行
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      停止服务
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      并发数配置
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      依赖说明
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      注意事项
     </span>
   </a>
   
@@ -2479,61 +2727,79 @@
                   
 
 
-<h1 id="paimon-writer">Paimon Writer<a class="headerlink" href="#paimon-writer" title="Permanent link">&para;</a></h1>
-<p>Paimon Writer plugin implements writing data to Apache Paimon.</p>
-<h2 id="configuration-example">Configuration Example<a class="headerlink" href="#configuration-example" title="Permanent link">&para;</a></h2>
-<p>This plugin is used to write data to Paimon tables. For detailed configuration and parameters, please refer to the original Paimon Writer documentation.</p>
+<h1 id="server">Server模块<a class="headerlink" href="#server" title="Permanent link">&para;</a></h1>
+<p>Server模块用于通过HTTP接口提交和管理数据采集任务。用户可通过POST方式提交JSON任务配置，服务端异步执行采集任务并返回唯一任务ID，随后可通过任务ID查询任务进度和结果。</p>
+<h2 id="_1">功能简介<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<ul>
+<li>提供RESTful接口，支持任务提交与状态查询</li>
+<li>支持最大并发任务数限制（默认30，可配置）</li>
+<li>集成Addax核心Engine，直接执行采集任务</li>
+<li>支持命令行和环境变量设置并发数</li>
+<li>提供启动/停止脚本，支持后台运行</li>
+</ul>
+<h2 id="http">HTTP接口说明<a class="headerlink" href="#http" title="Permanent link">&para;</a></h2>
+<h3 id="1">1. 提交任务<a class="headerlink" href="#1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>URL: <code>/api/submit?k1=v1&amp;k2=v2</code></li>
+<li>方法: POST</li>
+<li>请求体示例：
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span><span class="s1">&#39;http://localhost:10601/api/submit?jobName=example-job&#39;</span><span class="w"> </span><span class="se">\</span>
+-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
+-d<span class="w"> </span>@job/job.json
+</code></pre></div></li>
+<li>返回示例：
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;job&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;setting&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;speed&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;channel&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span>
-<span class="w">      </span><span class="p">},</span>
-<span class="w">      </span><span class="nt">&quot;errorLimit&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;record&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;percentage&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span>
-<span class="w">      </span><span class="p">}</span>
-<span class="w">    </span><span class="p">},</span>
-<span class="w">    </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;reader&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">          </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;rdbmsreader&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;parameter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;root&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;password&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;root&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">              </span><span class="s2">&quot;*&quot;</span>
-<span class="w">            </span><span class="p">],</span>
-<span class="w">            </span><span class="nt">&quot;connection&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">              </span><span class="p">{</span>
-<span class="w">                </span><span class="nt">&quot;querySql&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">                  </span><span class="s2">&quot;select 1+0 id ,&#39;test1&#39; as name&quot;</span>
-<span class="w">                </span><span class="p">],</span>
-<span class="w">                </span><span class="nt">&quot;jdbcUrl&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;jdbc:mysql://localhost:3306/ruoyi_vue_camunda?allowPublicKeyRetrieval=true&quot;</span><span class="p">,]</span>
-<span class="w">              </span><span class="p">}</span>
-<span class="w">            </span><span class="p">],</span>
-<span class="w">            </span><span class="nt">&quot;fetchSize&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1024</span>
-<span class="w">          </span><span class="p">}</span>
-<span class="w">        </span><span class="p">},</span>
-<span class="w">        </span><span class="nt">&quot;writer&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">          </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;paimonwriter&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;parameter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="nt">&quot;dbName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;test&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;tableName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;test2&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;writeMode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;truncate&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;paimonConfig&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">              </span><span class="nt">&quot;warehouse&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;file:///g:/paimon&quot;</span><span class="p">,</span>
-<span class="w">              </span><span class="nt">&quot;metastore&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;filesystem&quot;</span>
-<span class="w">            </span><span class="p">}</span>
-<span class="w">          </span><span class="p">}</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">      </span><span class="p">}</span>
-<span class="w">    </span><span class="p">]</span>
-<span class="w">  </span><span class="p">}</span>
+<span class="w">    </span><span class="nt">&quot;taskId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;xxxx-xxxx-xxxx&quot;</span>
 <span class="p">}</span>
+</code></pre></div></li>
+<li>当并发数达到上限时：
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ERROR: Maximum number of concurrent tasks reached.&quot;</span>
+<span class="p">}</span>
+</code></pre></div></li>
+</ul>
+<h3 id="2">2. 查询任务状态<a class="headerlink" href="#2" title="Permanent link">&para;</a></h3>
+<ul>
+<li>URL: <code>/api/status?taskId={taskId}</code></li>
+<li>方法: GET</li>
+<li>返回示例：
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;taskId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;xxxx-xxxx-xxxx&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;SUCCESS&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;result&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Job example-job executed.&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="p">}</span>
+</code></pre></div></li>
+</ul>
+<h2 id="_2">启动与停止<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>推荐使用脚本 <code>core/src/main/bin/addax-server.sh</code> 启动和停止服务。</p>
+<h3 id="_3">启动服务<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>./addax-server.sh<span class="w"> </span>start
 </code></pre></div>
-<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
-<p>This plugin supports writing data to Paimon with configurable catalog, table, and schema options.</p>
+<h3 id="50">设置最大并发数（如50）并后台运行<a class="headerlink" href="#50" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>./addax-server.sh<span class="w"> </span>start<span class="w"> </span>-p<span class="w"> </span><span class="m">50</span><span class="w"> </span>--daemon
+</code></pre></div>
+<h3 id="_4">停止服务<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>./addax-server.sh<span class="w"> </span>stop
+</code></pre></div>
+<h2 id="_5">并发数配置<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<ul>
+<li>命令行参数 <code>-p</code> 或 <code>--parallel</code> 优先</li>
+<li>环境变量 <code>ADDAX_SERVER_PARALLEL</code> 其次</li>
+<li>默认并发数为30</li>
+</ul>
+<h2 id="_6">依赖说明<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<ul>
+<li>仅依赖Spring Boot最小化Web组件</li>
+<li>依赖core模块的Engine类</li>
+</ul>
+<h2 id="_7">注意事项<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
+<ul>
+<li>任务提交时请确保job参数为合法的Addax任务JSON</li>
+<li>并发数过高可能影响系统性能</li>
+</ul>
+<hr />
+<p>如需更多帮助，请参考其他文档或联系项目维护者。</p>
 
 
 
@@ -2566,6 +2832,28 @@
       
         <footer class="md-footer">
   
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../plugin_development/" class="md-footer__link md-footer__link--prev" aria-label="Previous: 插件开发">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                插件开发
+              </div>
+            </div>
+          </a>
+        
+        
+      </nav>
     
   
   <div class="md-footer-meta md-typeset">
@@ -2620,10 +2908,10 @@
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "../../..", "features": ["announce.dismiss", "content.action.edit", "content.action.view", "content.code.annotate", "content.code.copy", "content.tooltips", "navigation.footer", "navigation.indexes", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "toc.follow"], "search": "../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["announce.dismiss", "content.action.edit", "content.action.view", "content.code.annotate", "content.code.copy", "content.tooltips", "navigation.footer", "navigation.indexes", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "toc.follow"], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.081f42fc.min.js"></script>
+      <script src="../assets/javascripts/bundle.081f42fc.min.js"></script>
       
     
   </body>
