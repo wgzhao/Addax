@@ -341,7 +341,7 @@ public class OrcWriter
             if ("decimal".equalsIgnoreCase(typeName)) {
                 int precision = column.getInt(Key.PRECISION, Constant.DEFAULT_DECIMAL_MAX_PRECISION);
                 int scale = column.getInt(Key.SCALE, Constant.DEFAULT_DECIMAL_MAX_SCALE);
-                schema.addField(fieldName, TypeDescription.createDecimal().withPrecision(precision).withScale(scale));
+                schema.addField(fieldName, TypeDescription.createDecimal().withScale(scale).withPrecision(precision));
             }
             else if (typeName.startsWith("array")) {
                 String elementType = typeName.substring(typeName.indexOf("<") + 1, typeName.indexOf(">"));
