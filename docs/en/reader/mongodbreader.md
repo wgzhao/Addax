@@ -53,6 +53,19 @@ Based on the above assumptions, we can simplify the `column` configuration while
 
 The last three fields in the above configuration are constants, treated as string type, integer type, and floating point type respectively.
 
+If the field is nested, you can use a dot (`.`) to indicate the hierarchical relationship, for example:
+
+```json
+{
+  "column": [
+    "col1",
+    "col2.subcol1",
+    "col2.subcol2",
+    "col3"
+  ]
+}
+```
+
 ### query
 
 `query` is a BSON string that conforms to MongoDB query format, for example:

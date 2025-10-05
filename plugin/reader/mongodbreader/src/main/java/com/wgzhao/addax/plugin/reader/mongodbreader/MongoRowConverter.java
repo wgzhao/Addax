@@ -28,6 +28,7 @@ import com.wgzhao.addax.core.element.Record;
 import com.mongodb.client.MongoCollection;
 import com.wgzhao.addax.core.element.StringColumn;
 import org.bson.BsonDocument;
+import org.bson.BsonInvalidOperationException;
 import org.bson.BsonType;
 import org.bson.BsonValue;
 
@@ -52,9 +53,31 @@ public class MongoRowConverter
     private final Map<String, BiConsumer<BsonValue, Record>> handlers = new ConcurrentHashMap<>();
 
     /**
+     * Get nested field value from a BSON document, supporting dot notation like "col.subcol1", "col.subcol2.subsubcol3".
+     */
+    private BsonValue getNestedValue(BsonDocument doc, String columnPath) {
+        String[] keys = columnPath.split("\\.");
+        BsonValue current = doc;
+        for (String key : keys) {
+            if (current == null || current.isNull()) {
+                return null;
+            }
+            if (!current.isDocument()) {
+                return null;
+            }
+            BsonDocument currentDoc = current.asDocument();
+            if (!currentDoc.containsKey(key)) {
+                return null;
+            }
+            current = currentDoc.get(key);
+        }
+        return current;
+    }
+
+    /**
      * Processes a single BSON document and converts specified columns to record format.
      * This method iterates through the provided columns and converts each BSON value
-     * to the appropriate Addax column type.
+     * to the appropriate Addax column type. Supports nested fields using dot notation.
      *
      * @param doc the BSON document to process
      * @param record the target record to populate with converted columns
@@ -67,14 +90,18 @@ public class MongoRowConverter
                 record.addColumn(new StringColumn(col.substring(1, col.length() - 1)));
                 continue;
             }
-            BsonValue val = doc.get(col);
+            BsonValue val = getNestedValue(doc, col); // Support nested fields
             if (val == null || val.isNull()) {
                 record.addColumn(new StringColumn());
                 continue;
             }
             BiConsumer<BsonValue, Record> h = handlers.get(col);
             if (h != null) {
-                h.accept(val, record);
+                try {
+                    h.accept(val, record);
+                } catch(BsonInvalidOperationException e) {
+                    record.addColumn(new StringColumn());
+                }
                 continue;
             }
             BiConsumer<BsonValue, Record> generated = createHandler(val.getBsonType());
