@@ -53,6 +53,19 @@ MongoDBReader 插件利用 MongoDB 的java客户端MongoClient进行MongoDB的�
 
 上述配置的后三个字段就是常量，分别当作字符类型，整型和浮点型处理。
 
+如果字段是嵌入式的，可以用点(`.`)来表示层级关系，比如：
+
+```json
+{
+  "column": [
+    "col1",
+    "col2",
+    "col3.subcol1",
+    "col3.subcol2"
+  ]
+}
+```
+
 ### query
 
 `query` 是只符合 MongoDB 查询格式的 BSON 字符串，比如：
