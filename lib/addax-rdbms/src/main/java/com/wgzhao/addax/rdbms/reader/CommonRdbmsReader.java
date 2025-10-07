@@ -166,9 +166,12 @@ public class CommonRdbmsReader
     public static class Task
     {
         private static final Logger LOG = LoggerFactory.getLogger(Task.class);
-        private static final boolean IS_DEBUG = LOG.isDebugEnabled();
+        private static final int SQL_LOG_MAX_LENGTH = 256;
+        private static final Calendar CALENDAR_INSTANCE = Calendar.getInstance();
 
-        /** Empty byte array constant used for string encoding operations when source bytes are null */
+        /**
+         * Empty byte array constant used for string encoding operations when source bytes are null
+         */
         protected final byte[] EMPTY_CHAR_ARRAY = new byte[0];
 
         private final DataBaseType dataBaseType;
@@ -234,30 +237,27 @@ public class CommonRdbmsReader
                 TaskPluginCollector taskPluginCollector, int fetchSize)
         {
             String querySql = readerSliceConfig.getString(Key.QUERY_SQL);
-
-            LOG.info("Begin reading records by executing SQL query: [{}].", querySql);
+            String logSql = querySql.length() > SQL_LOG_MAX_LENGTH ?
+                    StringUtils.abbreviate(querySql, SQL_LOG_MAX_LENGTH) : querySql;
+            LOG.info("Begin reading records by executing SQL query: [{}].", logSql);
             PerfRecord queryPerfRecord = new PerfRecord(taskGroupId, taskId, PerfRecord.PHASE.SQL_QUERY);
             queryPerfRecord.start();
-
             Connection conn = DBUtil.getConnection(this.dataBaseType, jdbcUrl, username, password);
 
             // session config related
             DBUtil.dealWithSessionConfig(conn, readerSliceConfig, this.dataBaseType, basicMsg);
 
             int columnNumber;
-            ResultSet rs;
-            try {
-                rs = DBUtil.query(conn, querySql, fetchSize);
+            try (ResultSet rs = DBUtil.query(conn, querySql, fetchSize)) {
                 queryPerfRecord.end();
-
                 ResultSetMetaData metaData = rs.getMetaData();
                 columnNumber = metaData.getColumnCount();
 
                 PerfRecord allResultPerfRecord = new PerfRecord(taskGroupId, taskId, PerfRecord.PHASE.RESULT_NEXT_ALL);
                 allResultPerfRecord.start();
-
                 long rsNextUsedTime = 0;
                 long lastTime = System.nanoTime();
+
                 while (rs.next()) {
                     rsNextUsedTime += (System.nanoTime() - lastTime);
                     transportOneRecord(recordSender, rs, metaData, columnNumber, taskPluginCollector);
@@ -265,9 +265,10 @@ public class CommonRdbmsReader
                 }
 
                 allResultPerfRecord.end(rsNextUsedTime);
-                LOG.info("Finished reading records by executing SQL query: [{}].", querySql);
+                LOG.info("Finished reading records by executing SQL query: [{}].", logSql);
             }
             catch (Exception e) {
+                queryPerfRecord.end();
                 throw RdbmsException.asQueryException(e, querySql);
             }
             finally {
@@ -327,57 +328,52 @@ public class CommonRdbmsReader
         protected Column createColumn(ResultSet rs, ResultSetMetaData metaData, int i)
                 throws SQLException, UnsupportedEncodingException
         {
-            switch (metaData.getColumnType(i)) {
+            int colType = metaData.getColumnType(i);
+            String colTypeName = metaData.getColumnTypeName(i);
+            switch (colType) {
                 case Types.CHAR:
                 case Types.NCHAR:
                 case Types.VARCHAR:
                 case Types.LONGVARCHAR:
                 case Types.NVARCHAR:
-                case Types.LONGNVARCHAR:
+                case Types.LONGNVARCHAR: {
+                    byte[] rawBytes = rs.getBytes(i);
                     String rawData;
                     if (StringUtils.isBlank(mandatoryEncoding)) {
                         rawData = rs.getString(i);
                     }
                     else {
-                        rawData = new String((rs.getBytes(i) == null ? EMPTY_CHAR_ARRAY : rs.getBytes(i)), mandatoryEncoding);
+                        rawData = new String((rawBytes == null ? EMPTY_CHAR_ARRAY : rawBytes), mandatoryEncoding);
                     }
                     return new StringColumn(rawData);
-
+                }
                 case Types.CLOB:
                 case Types.NCLOB:
                     return new StringColumn(rs.getString(i));
-
                 case Types.SMALLINT:
                 case Types.TINYINT:
                 case Types.INTEGER:
                 case Types.BIGINT:
                     return new LongColumn(rs.getString(i));
-
                 case Types.NUMERIC:
                 case Types.DECIMAL:
                 case Types.FLOAT:
                 case Types.REAL:
                 case Types.DOUBLE:
                     return new DoubleColumn(rs.getString(i));
-
                 case Types.TIME:
                     return new DateColumn(rs.getTime(i));
-
                 case Types.DATE:
                     return new DateColumn(rs.getDate(i));
-
                 case Types.TIMESTAMP:
-                    return new TimestampColumn(rs.getTimestamp(i, Calendar.getInstance()));
-
+                    return new TimestampColumn(rs.getTimestamp(i, CALENDAR_INSTANCE));
                 case Types.BINARY:
                 case Types.VARBINARY:
                 case Types.BLOB:
                 case Types.LONGVARBINARY:
                     return new BytesColumn(rs.getBytes(i));
-
                 case Types.BOOLEAN:
                     return new BoolColumn(rs.getBoolean(i));
-
                 case Types.BIT:
                     // bit(1) -> Types.BIT  use BooleanColumn
                     // bit(>1) -> Types.VARBINARY use BytesColumn
@@ -390,13 +386,10 @@ public class CommonRdbmsReader
 
                 case Types.ARRAY:
                     return new StringColumn(Objects.isNull(rs.getObject(i)) ? null : rs.getArray(i).toString());
-
                 case Types.SQLXML:
                     return new StringColumn(rs.getSQLXML(i).getString());
-
                 default:
-                    // use object as default data type for all unknown datatype
-                    LOG.debug("Unknown data type: {} at field name: {}, using getObject().", metaData.getColumnType(i), metaData.getColumnName(i));
+                    LOG.debug("Unknown data type: {} (typeName: {}) at field name: {}, using getObject().", colType, colTypeName, metaData.getColumnName(i));
                     String stringData = null;
                     if (rs.getObject(i) != null) {
                         stringData = rs.getObject(i).toString();
@@ -419,22 +412,21 @@ public class CommonRdbmsReader
                 TaskPluginCollector taskPluginCollector)
         {
             Record record = recordSender.createRecord();
-
+            Column[] columns = new Column[columnNumber];
             try {
                 for (int i = 1; i <= columnNumber; i++) {
-                    record.addColumn(createColumn(rs, metaData, i));
+                    columns[i - 1] = createColumn(rs, metaData, i);
                 }
+                for (Column col : columns) {
+                    record.addColumn(col);
+                }
+                return record;
             }
             catch (Exception e) {
-                if (IS_DEBUG) {
-                    LOG.debug("Exception occurred while reading {} : {}", record, e.getMessage());
-                }
+                LOG.warn("Exception occurred while reading record: {} : {}", record, e.getMessage());
                 taskPluginCollector.collectDirtyRecord(record, e);
-                if (e instanceof AddaxException) {
-                    throw (AddaxException) e;
-                }
+                return null;
             }
-            return record;
         }
     }
 }
