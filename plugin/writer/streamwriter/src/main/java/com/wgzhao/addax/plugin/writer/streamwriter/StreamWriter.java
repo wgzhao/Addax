@@ -27,6 +27,7 @@ import com.wgzhao.addax.core.spi.Writer;
 import com.wgzhao.addax.core.util.Configuration;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -125,6 +126,8 @@ public class StreamWriter
     {
         private static final Logger LOG = LoggerFactory.getLogger(Task.class);
         private static final String NEWLINE_FLAG = System.lineSeparator();
+        // The max length of binary preview is 64 bytes
+        private static final int MAX_BINARY_PREVIEW = 64;
 
         private String fieldDelimiter;
         private boolean print;
@@ -222,16 +225,39 @@ public class StreamWriter
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < recordLength; i++) {
                 Column column = record.getColumn(i);
-                sb.append(column != null && column.getRawData() != null
-                                ? column.asString()
-                                : nullFormat)
-                        .append(fieldDelimiter);
+                sb.append(formatColumn(column)).append(fieldDelimiter);
             }
 
             if (!sb.isEmpty()) {
                 sb.setLength(sb.length() - fieldDelimiter.length());
             }
             return sb.append(NEWLINE_FLAG).toString();
+        }
+
+        private String formatColumn(Column column)
+        {
+            if (column == null || column.getRawData() == null) {
+                return nullFormat;
+            }
+            Object raw = column.getRawData();
+            // handle bytes , using hex to display
+            if (raw instanceof byte[] bytes) {
+                int len = bytes.length;
+                if (len == 0) {
+                    return "0x";
+                }
+                int show = Math.min(len, MAX_BINARY_PREVIEW);
+                StringBuilder hex = new StringBuilder(2 + show * 2 + (len > show ? 16 : 0));
+                hex.append("0x");
+                for (int i = 0; i < show; i++) {
+                    hex.append(String.format("%02X", bytes[i]));
+                }
+                if (len > show) {
+                    hex.append("...(").append(len).append(" bytes)");
+                }
+                return hex.toString();
+            }
+            return column.asString();
         }
 
         @Override
