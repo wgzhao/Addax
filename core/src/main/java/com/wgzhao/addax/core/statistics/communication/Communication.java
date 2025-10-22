@@ -35,8 +35,9 @@ public class Communication
 {
 
     // Message about the task is given to the job
-    Map<String, List<String>> message;
-    private Map<String, Number> counter;
+    // Made final and initialized at declaration to ensure the map reference never changes.
+    private final Map<String, List<String>> message = new ConcurrentHashMap<>();
+    private final Map<String, Number> counter = new ConcurrentHashMap<>();
     // Running status
     private State state;
     private Throwable throwable;
@@ -79,12 +80,10 @@ public class Communication
         this.setTimestamp(source.getTimestamp());
 
         // clone messages
-        if (source.message != null) {
-            for (Map.Entry<String, List<String>> entry : source.message.entrySet()) {
-                String key = entry.getKey();
-                List<String> value = new ArrayList<>(entry.getValue());
-                this.getMessage().put(key, value);
-            }
+        for (Map.Entry<String, List<String>> entry : source.message.entrySet()) {
+            String key = entry.getKey();
+            List<String> value = new ArrayList<>(entry.getValue());
+            this.getMessage().put(key, value);
         }
     }
 
@@ -95,10 +94,11 @@ public class Communication
 
     private void init()
     {
-        this.counter = new ConcurrentHashMap<>();
+        // clear the maps instead of reassigning to keep the references final
+        this.counter.clear();
         this.state = State.RUNNING;
         this.throwable = null;
-        this.message = new ConcurrentHashMap<>();
+        this.message.clear();
         this.timestamp = System.currentTimeMillis();
     }
 
@@ -208,9 +208,8 @@ public class Communication
     {
         Validate.isTrue(StringUtils.isNotBlank(key), "The key of the added counter can not be empty.");
 
-        long value = this.getLongCounter(key);
-
-        this.counter.put(key, value + deltaValue);
+        // Use Map.merge to atomically update numeric counters. Primitive deltaValue is autoboxed to Long.
+        this.counter.merge(key, deltaValue, (oldVal, newVal) -> Long.sum(oldVal.longValue(), newVal.longValue()));
     }
 
     public synchronized void mergeFrom(Communication otherComm)
@@ -227,20 +226,17 @@ public class Communication
                 continue;
             }
 
-            Number value = this.counter.get(key);
-            if (value == null) {
-                value = otherValue;
-            }
-            else {
-                if (value instanceof Long && otherValue instanceof Long) {
-                    value = value.longValue() + otherValue.longValue();
+            // Use merge to combine numbers while preserving integer/double semantics
+            this.counter.merge(key, otherValue, (current, incoming) -> {
+                // both integer-like -> keep as Long
+                if (current instanceof Long && incoming instanceof Long) {
+                    return Long.sum(current.longValue(), incoming.longValue());
                 }
                 else {
-                    value = value.doubleValue() + otherValue.doubleValue();
+                    // otherwise, use double arithmetic
+                    return Double.sum(current.doubleValue(), incoming.doubleValue());
                 }
-            }
-
-            this.counter.put(key, value);
+            });
         }
 
         mergeStateFrom(otherComm);
@@ -257,7 +253,7 @@ public class Communication
     }
 
     /**
-     * Merge state, priority: (Failed | Killed)  &gt; Running &gt; Success
+     * Merge state, priority: (Failed | Killed) &gt; Running &gt; Success
      * Killing state only exists in Job's own state.
      *
      * @param otherComm communication

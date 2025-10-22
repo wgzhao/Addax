@@ -23,6 +23,7 @@ import com.wgzhao.addax.core.meta.State;
 import org.apache.commons.lang3.Validate;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class LocalTGCommunicationManager
@@ -41,8 +42,12 @@ public final class LocalTGCommunicationManager
         Communication communication = new Communication();
         communication.setState(State.SUCCEEDED);
 
-        for (Communication taskGroupCommunication : taskGroupCommunicationMap.values()) {
-            communication.mergeFrom(taskGroupCommunication);
+        // use snapshot to prevent ConcurrentModificationException
+        Communication[] snapshot = taskGroupCommunicationMap.values().toArray(new Communication[0]);
+        for (Communication taskGroupCommunication : snapshot) {
+            if (taskGroupCommunication != null) {
+                communication.mergeFrom(taskGroupCommunication);
+            }
         }
 
         return communication;
@@ -64,10 +69,11 @@ public final class LocalTGCommunicationManager
     public static void updateTaskGroupCommunication(final int taskGroupId,
             final Communication communication)
     {
-        Validate.isTrue(taskGroupCommunicationMap.containsKey(taskGroupId),
-                String.format("There is no communication registered for taskGroupId[%d] in taskGroupCommunicationMap," +
-                "Unable to update the information for this taskGroup", taskGroupId));
-        taskGroupCommunicationMap.put(taskGroupId, communication);
+        boolean replaced = Objects.requireNonNull(taskGroupCommunicationMap.replace(taskGroupId, communication)).isFinished();
+
+        Validate.isTrue(replaced,
+                "There is no communication registered for taskGroupId[" + taskGroupId + "] in taskGroupCommunicationMap," +
+                "Unable to update the information for this taskGroup");
     }
 
     public static void clear()
@@ -77,6 +83,6 @@ public final class LocalTGCommunicationManager
 
     public static Map<Integer, Communication> getTaskGroupCommunicationMap()
     {
-        return taskGroupCommunicationMap;
+        return Map.copyOf(taskGroupCommunicationMap);
     }
 }

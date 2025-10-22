@@ -122,7 +122,8 @@ public final class CommunicationTool
 
     public static class Stringify
     {
-        private final static DecimalFormat df = new DecimalFormat("0.00");
+        // DecimalFormat is not thread-safe. Use ThreadLocal to ensure thread safety in concurrent environments.
+        private final static ThreadLocal<DecimalFormat> DF = ThreadLocal.withInitial(() -> new DecimalFormat("0.00"));
 
         private Stringify() {}
 
@@ -183,7 +184,8 @@ public final class CommunicationTool
 
         private static String getPercentage(Communication communication)
         {
-            return df.format(communication.getDoubleCounter(PERCENTAGE) * 100) + "%";
+            // use thread-local DecimalFormat for thread-safety
+            return DF.get().format(communication.getDoubleCounter(PERCENTAGE) * 100) + "%";
         }
     }
 }
