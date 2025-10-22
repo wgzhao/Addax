@@ -69,9 +69,9 @@ public final class LocalTGCommunicationManager
     public static void updateTaskGroupCommunication(final int taskGroupId,
             final Communication communication)
     {
-        boolean replaced = Objects.requireNonNull(taskGroupCommunicationMap.replace(taskGroupId, communication)).isFinished();
+        Communication previous = taskGroupCommunicationMap.replace(taskGroupId, communication);
 
-        Validate.isTrue(replaced,
+        Validate.isTrue(previous!=null,
                 "There is no communication registered for taskGroupId[" + taskGroupId + "] in taskGroupCommunicationMap," +
                 "Unable to update the information for this taskGroup");
     }
