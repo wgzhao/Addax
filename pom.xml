@@ -91,7 +91,7 @@
         <joda.time.version>2.14.0</joda.time.version>
         <jackson.version>2.20.0</jackson.version>
         <jedis.version>3.7.0</jedis.version>
-        <jsch.version>2.27.3</jsch.version>
+        <jsch.version>2.27.5</jsch.version>
         <jts.version>1.20.0</jts.version>
         <kafka.version>3.2.3</kafka.version>
         <kryo.version>5.6.2</kryo.version>
