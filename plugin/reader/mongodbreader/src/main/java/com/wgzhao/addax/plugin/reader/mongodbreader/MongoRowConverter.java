@@ -32,6 +32,8 @@ import org.bson.BsonInvalidOperationException;
 import org.bson.BsonType;
 import org.bson.BsonValue;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
@@ -47,10 +49,14 @@ import java.util.function.BiConsumer;
 public class MongoRowConverter
 {
     /**
-     * Cache for column handlers to improve performance by avoiding repeated
-     * handler creation for the same column types.
+     * Cache for column handlers keyed by explicit column name (used in explicit-mode).
      */
     private final Map<String, BiConsumer<BsonValue, Record>> handlers = new ConcurrentHashMap<>();
+
+    /**
+     * Cache for handlers keyed by BSON type (used in wildcard-mode).
+     */
+    private final Map<BsonType, BiConsumer<BsonValue, Record>> typeHandlers = new ConcurrentHashMap<>();
 
     /**
      * Get nested field value from a BSON document, supporting dot notation like "col.subcol1", "col.subcol2.subsubcol3".
@@ -76,8 +82,10 @@ public class MongoRowConverter
 
     /**
      * Processes a single BSON document and converts specified columns to record format.
-     * This method iterates through the provided columns and converts each BSON value
-     * to the appropriate Addax column type. Supports nested fields using dot notation.
+     * Supports two modes:
+     *  - explicit columns: the provided columns are treated as the target schema (supports nested fields via dot notation)
+     *  - wildcard mode (single column "*"): iterate the document's top-level fields in document order and convert each
+     *    field value into a column on-the-fly. Top-level complex types (DOCUMENT/ARRAY) are serialized to JSON/string.
      *
      * @param doc the BSON document to process
      * @param record the target record to populate with converted columns
@@ -85,7 +93,42 @@ public class MongoRowConverter
      */
     public void processOne(BsonDocument doc, Record record, Iterable<String> columns)
     {
-        for (String col : columns) {
+        // Normalize columns into a list so we can inspect size and reuse easily
+        List<String> cols = new ArrayList<>();
+        columns.forEach(cols::add);
+
+        boolean wildcard = cols.size() == 1 && "*".equals(cols.get(0));
+
+        if (wildcard) {
+            // Wildcard mode: iterate top-level fields in this document
+            for (Map.Entry<String, BsonValue> e : doc.entrySet()) {
+                BsonValue val = e.getValue();
+                if (val == null || val.isNull()) {
+                    record.addColumn(new StringColumn());
+                    continue;
+                }
+                BiConsumer<BsonValue, Record> h = typeHandlers.get(val.getBsonType());
+                if (h != null) {
+                    try {
+                        h.accept(val, record);
+                    } catch (BsonInvalidOperationException ex) {
+                        record.addColumn(new StringColumn());
+                    }
+                    continue;
+                }
+                BiConsumer<BsonValue, Record> generated = createHandler(val.getBsonType());
+                typeHandlers.put(val.getBsonType(), generated);
+                try {
+                    generated.accept(val, record);
+                } catch (BsonInvalidOperationException ex) {
+                    record.addColumn(new StringColumn());
+                }
+            }
+            return;
+        }
+
+        // Explicit columns mode (keep previous behavior and caching by column name)
+        for (String col : cols) {
             if (col.startsWith("'")) {
                 record.addColumn(new StringColumn(col.substring(1, col.length() - 1)));
                 continue;
@@ -106,7 +149,11 @@ public class MongoRowConverter
             }
             BiConsumer<BsonValue, Record> generated = createHandler(val.getBsonType());
             handlers.put(col, generated);
-            generated.accept(val, record);
+            try {
+                generated.accept(val, record);
+            } catch (BsonInvalidOperationException e) {
+                record.addColumn(new StringColumn());
+            }
         }
     }
 
@@ -114,6 +161,9 @@ public class MongoRowConverter
      * Creates a handler function for converting BSON values to Addax columns
      * based on the BSON type. This method uses a switch expression to map
      * each BSON type to its corresponding Addax column type.
+     *
+     * Note: DECIMAL128 is converted to StringColumn to preserve precision.
+     * Complex types (DOCUMENT/ARRAY) are serialized to JSON/string.
      *
      * @param t the BSON type to create a handler for
      * @return a BiConsumer that can convert BSON values of the specified type
@@ -125,7 +175,7 @@ public class MongoRowConverter
             case DOUBLE -> (v, r) -> r.addColumn(new DoubleColumn(v.asDouble().getValue()));
             case INT32 -> (v, r) -> r.addColumn(new LongColumn(v.asInt32().getValue()));
             case INT64 -> (v, r) -> r.addColumn(new LongColumn(v.asInt64().getValue()));
-            case DECIMAL128 -> (v, r) -> r.addColumn(new DoubleColumn(v.asDecimal128().getValue().toString()));
+            case DECIMAL128 -> (v, r) -> r.addColumn(new StringColumn(v.asDecimal128().getValue().toString()));
             case BOOLEAN -> (v, r) -> r.addColumn(new BoolColumn(v.asBoolean().getValue()));
             case DATE_TIME -> (v, r) -> r.addColumn(new DateColumn(new java.util.Date(v.asDateTime().getValue())));
             case DOCUMENT -> (v, r) -> r.addColumn(new StringColumn(v.asDocument().toJson()));
