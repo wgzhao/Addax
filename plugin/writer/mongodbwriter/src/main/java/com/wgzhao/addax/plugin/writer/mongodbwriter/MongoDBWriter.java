@@ -177,6 +177,7 @@ public class MongoDBWriter
         private JSONArray mongodbColumnMeta = null;
         private String writeMode = null;
         private String updateKey;
+        private boolean wildcardMode = false;
 
         @Override
         public void init()
@@ -196,7 +197,17 @@ public class MongoDBWriter
 
             this.collection = connConf.getString(KeyConstant.MONGO_COLLECTION_NAME);
             this.batchSize = writerSliceConfig.getInt(BATCH_SIZE, DEFAULT_BATCH_SIZE);
-            this.mongodbColumnMeta = JSON.parseArray(writerSliceConfig.getString(COLUMN));
+
+            // support wildcard column config: if COLUMN is exactly "*", we operate in wildcardMode
+            List<String> columnConf = writerSliceConfig.getList(COLUMN, String.class);
+            if (columnConf.size() == 1 && "*".equals(columnConf.get(0))) {
+                this.wildcardMode = true;
+                this.mongodbColumnMeta = null;
+            }
+            else {
+                this.mongodbColumnMeta = JSON.parseArray(writerSliceConfig.getString(COLUMN));
+            }
+
             this.writeMode = writerSliceConfig.getString(WRITE_MODE, "insert");
 
             if (this.writeMode.startsWith("update")) {
@@ -239,6 +250,11 @@ public class MongoDBWriter
                 }
             }
 
+            // If there's nothing to write (all records were dirty or filtered), skip DB call to avoid driver error
+            if (dataList.isEmpty()) {
+                return;
+            }
+
             if ("update".equals(writeMode)) {
                 List<ReplaceOneModel<BasicDBObject>> replaceOneModelList = dataList.stream()
                         .map(data -> {
@@ -259,6 +275,18 @@ public class MongoDBWriter
         private BasicDBObject processRecord(Record record, JSONArray columnMeta)
         {
             BasicDBObject data = new BasicDBObject();
+            if (this.wildcardMode) {
+                // take the record as a full JSON document
+                Column jsonColumn = record.getColumn(0);
+                if (StringUtils.isEmpty(jsonColumn.asString())) {
+                    return data;
+                } else {
+                    // Use MongoDB driver's extended JSON parser so constructs like
+                    // {"_id": {"$oid": "..."}} are converted to ObjectId, etc.
+                    Document doc = Document.parse(jsonColumn.asString());
+                    return new BasicDBObject(doc);
+                }
+            }
             try {
                 for (int i = 0; i < record.getColumnNumber(); i++) {
                     processColumn(record.getColumn(i), columnMeta.getJSONObject(i), data);
@@ -407,7 +435,8 @@ public class MongoDBWriter
         @Override
         public void destroy()
         {
-            mongoClient.close();
+            //
         }
     }
 }
+
