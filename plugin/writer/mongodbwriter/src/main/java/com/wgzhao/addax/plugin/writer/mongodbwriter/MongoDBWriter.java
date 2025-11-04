@@ -242,7 +242,10 @@ public class MongoDBWriter
             if ("update".equals(writeMode)) {
                 List<ReplaceOneModel<BasicDBObject>> replaceOneModelList = dataList.stream()
                         .map(data -> {
-                            BasicDBObject query = new BasicDBObject(updateKey, data.get(updateKey));
+                            BasicDBObject query = new BasicDBObject();
+                            Object updateKeyValue = getNestedValue(data, updateKey);
+                            // build nested query with the same dotted path
+                            setNestedField(query, updateKey, updateKeyValue);
                             return new ReplaceOneModel<>(query, data, new ReplaceOptions().upsert(true));
                         })
                         .toList();
@@ -274,7 +277,8 @@ public class MongoDBWriter
             String name = meta.getString(KeyConstant.COLUMN_NAME);
 
             if (StringUtils.isEmpty(column.asString())) {
-                data.put(name, KeyConstant.isArrayType(type.toLowerCase()) ? new Object[0] : column.asString());
+                // use helper to support nested dotted names
+                setNestedField(data, name, KeyConstant.isArrayType(type.toLowerCase()) ? new Object[0] : column.asString());
                 return;
             }
 
@@ -290,7 +294,7 @@ public class MongoDBWriter
         {
             try {
                 if (KeyConstant.isObjectIdType(type.toLowerCase())) {
-                    data.put(name, new ObjectId(column.asString()));
+                    setNestedField(data, name, new ObjectId(column.asString()));
                 }
                 else if (KeyConstant.isArrayType(type.toLowerCase())) {
                     String splitter = meta.getString(KeyConstant.COLUMN_SPLITTER);
@@ -301,24 +305,24 @@ public class MongoDBWriter
                     if (StringUtils.isNotEmpty(itemType)) {
                         String[] item = column.asString().split(splitter);
                         switch (itemType.toUpperCase()) {
-                            case "DOUBLE" -> data.put(name, parseArray(item, Double::parseDouble));
-                            case "INT" -> data.put(name, parseArray(item, Integer::parseInt));
-                            case "LONG" -> data.put(name, parseArray(item, Long::parseLong));
-                            case "BOOL" -> data.put(name, parseArray(item, Boolean::parseBoolean));
-                            case "BYTES" -> data.put(name, parseArray(item, Byte::parseByte));
-                            default -> data.put(name, item);
+                            case "DOUBLE" -> setNestedField(data, name, parseArray(item, Double::parseDouble));
+                            case "INT" -> setNestedField(data, name, parseArray(item, Integer::parseInt));
+                            case "LONG" -> setNestedField(data, name, parseArray(item, Long::parseLong));
+                            case "BOOL" -> setNestedField(data, name, parseArray(item, Boolean::parseBoolean));
+                            case "BYTES" -> setNestedField(data, name, parseArray(item, Byte::parseByte));
+                            default -> setNestedField(data, name, item);
                         }
                     }
                     else {
-                        data.put(name, column.asString().split(splitter));
+                        setNestedField(data, name, column.asString().split(splitter));
                     }
                 }
                 else if ("json".equalsIgnoreCase(type)) {
                     Object mode = JSON.parse(column.asString());
-                    data.put(name, JSON.toJSON(mode));
+                    setNestedField(data, name, JSON.toJSON(mode));
                 }
                 else {
-                    data.put(name, column.asString());
+                    setNestedField(data, name, column.asString());
                 }
             }
             catch (Exception e) {
@@ -334,13 +338,70 @@ public class MongoDBWriter
         private void processPrimitiveColumn(Column column, String type, String name, BasicDBObject data)
         {
             switch (type.toUpperCase()) {
-                case "LONG" -> data.put(name, column.asLong());
-                case "DATE" -> data.put(name, column.asDate());
-                case "DOUBLE" -> data.put(name, column.asDouble());
-                case "BOOL" -> data.put(name, column.asBoolean());
-                case "BYTES" -> data.put(name, column.asBytes());
-                default -> data.put(name, column.asString());
+                case "LONG" -> setNestedField(data, name, column.asLong());
+                case "DATE" -> setNestedField(data, name, column.asDate());
+                case "DOUBLE" -> setNestedField(data, name, column.asDouble());
+                case "BOOL" -> setNestedField(data, name, column.asBoolean());
+                case "BYTES" -> setNestedField(data, name, column.asBytes());
+                default -> setNestedField(data, name, column.asString());
             }
+        }
+
+        // Helper to set a value into a BasicDBObject using dotted path names.
+        // If the path is simple (no dot) it behaves like put; otherwise it creates nested BasicDBObject as needed.
+        private void setNestedField(BasicDBObject root, String dottedName, Object value)
+        {
+            if (dottedName == null || !dottedName.contains(".")) {
+                root.put(dottedName, value);
+                return;
+            }
+            String[] parts = dottedName.split("\\.");
+            BasicDBObject current = root;
+            for (int i = 0; i < parts.length - 1; i++) {
+                String part = parts[i];
+                Object child = current.get(part);
+                if (child == null) {
+                    BasicDBObject next = new BasicDBObject();
+                    current.put(part, next);
+                    current = next;
+                }
+                else if (child instanceof BasicDBObject) {
+                    current = (BasicDBObject) child;
+                }
+                else if (child instanceof Document docChild) {
+                    // convert org.bson.Document to BasicDBObject for consistent operations
+                    BasicDBObject next = new BasicDBObject(docChild);
+                    current.put(part, next);
+                    current = next;
+                }
+                else {
+                    // existing non-document value at intermediary path, overwrite with nested object
+                    BasicDBObject next = new BasicDBObject();
+                    current.put(part, next);
+                    current = next;
+                }
+            }
+            current.put(parts[parts.length - 1], value);
+        }
+
+        // Helper to read a nested value from BasicDBObject by dotted path.
+        private Object getNestedValue(BasicDBObject root, String dottedName)
+        {
+            if (dottedName == null || !dottedName.contains(".")) {
+                return root.get(dottedName);
+            }
+            String[] parts = dottedName.split("\\.");
+            Object current = root;
+            for (String part : parts) {
+                if (!(current instanceof BasicDBObject currentObj)) {
+                    return null;
+                }
+                current = currentObj.get(part);
+                if (current == null) {
+                    return null;
+                }
+            }
+            return current;
         }
 
         @Override
