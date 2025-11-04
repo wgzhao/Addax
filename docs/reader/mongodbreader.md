@@ -14,16 +14,16 @@ MongoDBReader 插件利用 MongoDB 的java客户端MongoClient进行MongoDB的�
 
 ## 参数说明
 
-| 配置项     | 是否必须 | 类型   | 默认值 | 描述                                              |
-| :--------- | :------: | ------ | ------ | ------------------------------------------------- |
-| address    |    是    | list   | 无     | MongoDB 的数据地址信息, 可写多个                  |
-| username   |    否    | string | 无     | MongoDB 用户名                                    |
-| password   |    否    | string | 无     | MongoDB 密码                                      |
-| database   |    是    | string | 无     | MongoDB 数据库                                    |
-| collection |    是    | string | 无     | MongoDB 的集合名                                  |
-| column     |    是    | list   | 无     | MongoDB 的文档列名，不支持 `["*"]` 获取所有列方式 |
-| query      |    否    | string | 无     | 自定义查询条件                                    |
-| fetchSize  |    否    | int    | 2048   | 批量获取的记录数                                  |
+| 配置项     | 是否必须 | 类型   | 默认值 | 描述                              |
+| :--------- | :------: | ------ | ------ |---------------------------------|
+| address    |    是    | list   | 无     | MongoDB 的数据地址信息, 可写多个           |
+| username   |    否    | string | 无     | MongoDB 用户名                     |
+| password   |    否    | string | 无     | MongoDB 密码                      |
+| database   |    是    | string | 无     | MongoDB 数据库                     |
+| collection |    是    | string | 无     | MongoDB 的集合名                    |
+| column     |    是    | list   | 无     | MongoDB 的文档列名, 配置 `["*"]` 获取所有列 |
+| query      |    否    | string | 无     | 自定义查询条件                         |
+| fetchSize  |    否    | int    | 2048   | 批量获取的记录数                        |
 
 ### collection
 

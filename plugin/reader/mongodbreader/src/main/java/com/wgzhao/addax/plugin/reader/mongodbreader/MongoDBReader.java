@@ -95,9 +95,9 @@ public class MongoDBReader
             String authDb = connConf.getString(KeyConstant.MONGO_AUTH_DB, database);
             List<Object> addressList = connConf.getList(KeyConstant.MONGO_ADDRESS, Object.class);
             List<String> columns = originalConfig.getList(COLUMN, String.class);
-            if (columns == null || (columns.size() == 1 && "*".equals(columns.get(0)))) {
+            if (columns == null) {
                 throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                        "The configuration column must be required and DOES NOT support \"*\" yet");
+                        "The configuration column must be required and DOES NOT support null columns");
             }
             if (notNullAndEmpty((userName)) && notNullAndEmpty((password))) {
                 this.mongoClient = MongoUtil.initCredentialMongoClient(addressList, userName, password, authDb);
