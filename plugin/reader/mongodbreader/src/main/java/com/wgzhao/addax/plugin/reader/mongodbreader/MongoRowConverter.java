@@ -54,11 +54,6 @@ public class MongoRowConverter
     private final Map<String, BiConsumer<BsonValue, Record>> handlers = new ConcurrentHashMap<>();
 
     /**
-     * Cache for handlers keyed by BSON type (used in wildcard-mode).
-     */
-    private final Map<BsonType, BiConsumer<BsonValue, Record>> typeHandlers = new ConcurrentHashMap<>();
-
-    /**
      * Get nested field value from a BSON document, supporting dot notation like "col.subcol1", "col.subcol2.subsubcol3".
      */
     private BsonValue getNestedValue(BsonDocument doc, String columnPath) {
@@ -100,30 +95,9 @@ public class MongoRowConverter
         boolean wildcard = cols.size() == 1 && "*".equals(cols.get(0));
 
         if (wildcard) {
-            // Wildcard mode: iterate top-level fields in this document
-            for (Map.Entry<String, BsonValue> e : doc.entrySet()) {
-                BsonValue val = e.getValue();
-                if (val == null || val.isNull()) {
-                    record.addColumn(new StringColumn());
-                    continue;
-                }
-                BiConsumer<BsonValue, Record> h = typeHandlers.get(val.getBsonType());
-                if (h != null) {
-                    try {
-                        h.accept(val, record);
-                    } catch (BsonInvalidOperationException ex) {
-                        record.addColumn(new StringColumn());
-                    }
-                    continue;
-                }
-                BiConsumer<BsonValue, Record> generated = createHandler(val.getBsonType());
-                typeHandlers.put(val.getBsonType(), generated);
-                try {
-                    generated.accept(val, record);
-                } catch (BsonInvalidOperationException ex) {
-                    record.addColumn(new StringColumn());
-                }
-            }
+            // Wildcard mode: emit the whole BSON document as a single JSON string column
+            // so downstream writer can parse and write the full document back to MongoDB.
+            record.addColumn(new StringColumn(doc.toJson()));
             return;
         }
 
