@@ -169,7 +169,7 @@ public final class CommunicationTool
 
         private static String getTotal(Communication communication)
         {
-            return String.format("%d records, %d bytes", communication.getLongCounter(TOTAL_READ_RECORDS), communication.getLongCounter(TOTAL_READ_BYTES));
+            return String.format("%,d records, %,d bytes", communication.getLongCounter(TOTAL_READ_RECORDS), communication.getLongCounter(TOTAL_READ_BYTES));
         }
 
         private static String getSpeed(Communication communication)

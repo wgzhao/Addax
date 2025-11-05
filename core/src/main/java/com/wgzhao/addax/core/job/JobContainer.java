@@ -577,11 +577,11 @@ public class JobContainer
             LOG.debug("The report contents: {}", jsonStr);
             postJobRunStatistic(jobResultReportUrl, timeoutMills, jsonStr);
         }
-        String statMsg = String.format("%n" + "%-26s: %-18s%n" + "%-26s: %-18s%n" + "%-26s: %19s%n"
-                        + "%-26s: %19s%n" + "%-26s: %19s%n" + "%-26s: %19s%n" + "%-26s: %19s%n" + "%-26s: %19s%n",
+        String statMsg = String.format("%n" + "%-26s: %-18s%n" + "%-26s: %-18s%n" + "%-26s: %,18d%s%n"
+                        + "%-26s: %,19d%n" + "%-26s: %19s%n" + "%-26s: %19s%n" + "%-26s: %,19d%n" + "%-26s: %,19d%n",
                 "Job start  at", dateFormat.format(startTimeStamp),
                 "Job end    at", dateFormat.format(endTimeStamp),
-                "Job took secs", totalCosts + "s",
+                "Job took secs", totalCosts, "s",
                 "Total   bytes", totalReadBytes,
                 "Average   bps", StrUtil.stringify(byteSpeedPerSecond) + "/s",
                 "Average   rps", recordSpeedPerSecond + "rec/s",
@@ -593,7 +593,7 @@ public class JobContainer
         final Long counterFail = communication.getLongCounter(CommunicationTool.TRANSFORMER_FAILED_RECORDS);
         final Long counterFilter = communication.getLongCounter(CommunicationTool.TRANSFORMER_FILTER_RECORDS);
         if (counterSucc + counterFail + counterFilter > 0) {
-            String transStatMsg = String.format("%n" + "%-26s: %19s%n" + "%-26s: %19s%n" + "%-26s: %19s%n",
+            String transStatMsg = String.format("%n" + "%-26s: %,19ds%n" + "%-26s: %,19ds%n" + "%-26s: %,19ds%n",
                     "Transformer success records", counterSucc,
                     "Transformer failed  records", counterFail,
                     "Transformer filter  records", counterFilter
