@@ -131,7 +131,7 @@ public class EsReader
         @Override
         public void destroy()
         {
-            log.info("============elasticsearch reader job destroy=================");
+            //
         }
     }
 

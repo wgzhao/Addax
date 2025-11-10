@@ -22,6 +22,7 @@ package com.wgzhao.addax.plugin.reader.elasticsearchreader;
 import com.wgzhao.addax.core.util.Configuration;
 import io.searchbox.params.SearchType;
 import org.apache.commons.lang3.StringUtils;
+import com.google.gson.Gson;
 
 import java.util.HashMap;
 import java.util.List;
@@ -112,7 +113,21 @@ public final class ESKey
 
     public static String getQuery(Configuration conf)
     {
-        return conf.getConfiguration(ESKey.SEARCH_KEY).toString();
+        if (conf == null) {
+            return null;
+        }
+        // The search configuration may be provided as a raw JSON string or as a nested configuration/map.
+        // If it's a string, return it directly. Otherwise, serialize the object to a JSON string so
+        // Jest receives valid JSON (Configuration.toString() may not produce valid ES JSON).
+        Object searchObj = conf.get(SEARCH_KEY);
+        if (searchObj == null) {
+            return null;
+        }
+        if (searchObj instanceof String) {
+            return (String) searchObj;
+        }
+        // use Gson to serialize map/objects to a valid JSON string
+        return new Gson().toJson(searchObj);
     }
 
     public static String getScroll(Configuration conf)
