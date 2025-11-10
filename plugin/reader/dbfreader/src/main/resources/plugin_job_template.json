@@ -28,7 +28,9 @@
       }
     ],
     "path": [
-      "/tmp/out"
+      "/tmp/out",
+      "/tmp/out2/*.dbf",
+      "/tmp/out3/d[123].dbf"
     ],
     "encoding": "GBK"
   }

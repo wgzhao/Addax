@@ -3,11 +3,17 @@
   "parameter": {
     "username": "default",
     "password": "",
-    "column": ["*"],
+    "column": [
+      "*"
+    ],
+    "autoPk": true,
+    "splitPk": "",
     "connection": {
-        "jdbcUrl": "jdbc:clickhouse://127.0.0.1:8123/default",
-        "table": ["yourtable"]
-      },
+      "jdbcUrl": "jdbc:clickhouse://127.0.0.1:8123/default",
+      "table": [
+        "yourtable"
+      ]
+    },
     "where": ""
   }
 }

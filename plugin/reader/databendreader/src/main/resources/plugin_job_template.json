@@ -6,6 +6,8 @@
     "column": [
       "*"
     ],
+    "autoPk": true,
+    "splitPk": "",
     "connection": {
       "jdbcUrl": "jdbc:databend://127.0.0.1:8000/test",
       "table": [

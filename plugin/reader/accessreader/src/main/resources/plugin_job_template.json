@@ -6,13 +6,12 @@
     "column": [
       "*"
     ],
-    "connection":
-      {
-        "table": [
-          "addax_reader"
-        ],
-        "jdbcUrl": "jdbc:ucanaccess://<mdb or accdb file path>"
-      },
+    "connection": {
+      "table": [
+        "addax_reader"
+      ],
+      "jdbcUrl": "jdbc:ucanaccess://<mdb or accdb file path>"
+    },
     "where": ""
   }
 }

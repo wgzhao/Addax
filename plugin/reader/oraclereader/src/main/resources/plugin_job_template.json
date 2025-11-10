@@ -8,8 +8,9 @@
     ],
     "splitPk": "",
     "autoPk": false,
+    "preSql": [],
     "connection": {
-      "jdbcUrl": "jdbc:oracle:thin:@<HOST_NAME>:PORT:<DATABASE_NAME>",
+      "jdbcUrl": "jdbc:oracle:thin:@127.0.0.1:1521/orcl",
       "table": [
         "table"
       ]

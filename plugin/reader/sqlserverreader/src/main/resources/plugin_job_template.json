@@ -1,17 +1,20 @@
 {
   "name": "sqlserverreader",
   "parameter": {
-    "username": "",
-    "password": "",
+    "username": "sa",
+    "password": "passw0rd",
+    "column": [
+      "*"
+    ],
+    "autoPk": false,
+    "fetchSize": 2048,
+    "splitPk": "",
     "connection": {
       "jdbcUrl": "jdbc:sqlserver://localhost:3433;DatabaseName=dbname",
       "table": [
         "table"
       ]
     },
-    "where": "1=1",
-    "autoPk": false,
-    "fetchSize": 2048,
-    "splitPk": ""
+    "where": ""
   }
 }

@@ -8,6 +8,7 @@
     "column": [
       "*"
     ],
+    "preSql": [],
     "connection": {
       "jdbcUrl": "jdbc:mysql://127.0.0.1:3306/test",
       "table": [
