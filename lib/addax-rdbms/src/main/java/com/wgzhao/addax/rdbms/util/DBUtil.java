@@ -23,7 +23,6 @@ package com.wgzhao.addax.rdbms.util;
 
 import com.alibaba.druid.sql.parser.SQLParserUtils;
 import com.alibaba.druid.sql.parser.SQLStatementParser;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.wgzhao.addax.core.base.Key;
 import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.util.Configuration;
@@ -45,10 +44,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.CONNECT_ERROR;
@@ -64,11 +59,7 @@ public final class DBUtil
     private static final Logger LOG = LoggerFactory.getLogger(DBUtil.class);
     private static final int DEFAULT_SOCKET_TIMEOUT_SEC = 20_000;
 
-    // Use ThreadLocal.withInitial() for cleaner initialization
-    private static final ThreadLocal<ExecutorService> RS_EXECUTORS = ThreadLocal.withInitial(() -> Executors.newFixedThreadPool(1, new ThreadFactoryBuilder()
-            .setNameFormat("rsExecutors-%d")
-            .setDaemon(true)
-            .build()));
+    // No asynchronous executor — call ResultSet.next() directly to avoid cross-thread ResultSet access
 
     private DBUtil()
     {
@@ -382,8 +373,18 @@ public final class DBUtil
      */
     public static void closeDBResources(ResultSet rs, Statement stmt, Connection conn)
     {
+        Statement stmtToClose = stmt;
         if (rs != null) {
             try {
+                // Try to capture the statement from the ResultSet if no explicit statement is provided
+                if (stmtToClose == null) {
+                    try {
+                        stmtToClose = rs.getStatement();
+                    }
+                    catch (SQLException ignored) {
+                        // ignore, we may not be able to get the statement
+                    }
+                }
                 rs.close();
             }
             catch (SQLException ignored) {
@@ -391,9 +392,9 @@ public final class DBUtil
             }
         }
 
-        if (stmt != null) {
+        if (stmtToClose != null) {
             try {
-                stmt.close();
+                stmtToClose.close();
             }
             catch (SQLException ignored) {
                 // Exception ignored during cleanup
@@ -542,15 +543,24 @@ public final class DBUtil
     public static ResultSet query(Connection conn, String sql)
             throws SQLException
     {
-        try (Statement stmt = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)) {
-            stmt.setQueryTimeout(DEFAULT_SOCKET_TIMEOUT_SEC);
-            boolean hasResultSet = stmt.execute(sql);
-            if (hasResultSet) {
-                return stmt.getResultSet();
+        // Create the statement and return its ResultSet without closing the statement here.
+        // Callers are expected to close the ResultSet and the Statement (or use closeDBResources)
+        // to avoid closing the Statement before the ResultSet is consumed.
+        Statement stmt = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY); //NOSONAR
+        stmt.setQueryTimeout(DEFAULT_SOCKET_TIMEOUT_SEC);
+        boolean hasResultSet = stmt.execute(sql);
+        if (hasResultSet) {
+            return stmt.getResultSet();
+        }
+        else {
+            // no ResultSet produced, close the statement immediately
+            try {
+                stmt.close();
             }
-            else {
-                return null;
+            catch (SQLException ignored) {
+                // ignore
             }
+            return null;
         }
     }
 
@@ -563,10 +573,27 @@ public final class DBUtil
      */
     private static boolean doPreCheck(Connection conn, String pre)
     {
-        try (ResultSet rs = query(conn, pre)) {
+        ResultSet rs = null;
+        try {
+            rs = query(conn, pre);
+            if (rs == null) {
+                LOG.warn("Pre-check SQL [{}] returned no ResultSet.", pre);
+                return false;
+            }
             int checkResult = -1;
             if (DBUtil.asyncResultSetNext(rs)) {
-                checkResult = rs.getInt(1);
+                Object obj = rs.getObject(1);
+                if (obj instanceof Number) {
+                    checkResult = ((Number) obj).intValue();
+                }
+                else if (obj != null) {
+                    try {
+                        checkResult = Integer.parseInt(obj.toString());
+                    }
+                    catch (NumberFormatException ignored) {
+                        // leave checkResult as -1
+                    }
+                }
                 if (DBUtil.asyncResultSetNext(rs)) {
                     LOG.warn("Failed to pre-check with [{}]. It should return 0.", pre);
                     return false;
@@ -577,6 +604,9 @@ public final class DBUtil
         catch (Exception e) {
             LOG.warn("Failed to pre-check with [{}], errorMessage: [{}].", pre, e.getMessage());
             return false;
+        }
+        finally {
+            DBUtil.closeDBResources(rs, null, null);
         }
     }
 
@@ -650,25 +680,11 @@ public final class DBUtil
      */
     public static boolean asyncResultSetNext(ResultSet resultSet)
     {
-        return asyncResultSetNext(resultSet, 3600);
-    }
-
-    /**
-     * Asynchronously advances ResultSet to next row with specified timeout.
-     *
-     * @param resultSet ResultSet to advance
-     * @param timeout Timeout in seconds
-     * @return true if there is a next row, false otherwise
-     */
-    public static boolean asyncResultSetNext(ResultSet resultSet, int timeout)
-    {
-        // Use a method reference for cleaner code
-        Future<Boolean> future = RS_EXECUTORS.get().submit(resultSet::next);
         try {
-            return future.get(timeout, TimeUnit.SECONDS);
+            return resultSet.next();
         }
-        catch (Exception e) {
-            throw AddaxException.asAddaxException(RUNTIME_ERROR, "Asynchronous retrieval of ResultSet failed.", e);
+        catch (SQLException e) {
+            throw AddaxException.asAddaxException(RUNTIME_ERROR, "Failed to advance ResultSet.", e);
         }
     }
 
