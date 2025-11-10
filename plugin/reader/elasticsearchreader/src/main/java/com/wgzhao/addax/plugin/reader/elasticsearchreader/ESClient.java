@@ -73,6 +73,7 @@ public class ESClient
             boolean compression,
             boolean discovery)
     {
+        log.info("creating jest client for endpoint: {}", endpoint);
 
         JestClientFactory factory = new JestClientFactory();
         HttpClientConfig.Builder httpClientConfig = new HttpClientConfig.Builder(endpoint)
@@ -123,9 +124,14 @@ public class ESClient
             List<String> columns)
             throws IOException
     {
+        // Log query for debugging to compare with curl body
+        log.debug("es search index={}, type={}, query={}", index, type, query);
+        // Always search by index -> /{index}/_search. Types are deprecated in ES 7+ and
+        // using a type in the path can result in no matches. Avoid adding type to the path.
         Search.Builder searchBuilder = new Search.Builder(query)
                 .setSearchType(searchType)
-                .addIndex(index).addType(type).setHeader(headers);
+                .addIndex(index)
+                .setHeader(headers);
         for (String column: columns) {
             searchBuilder.addSourceIncludePattern(column);
         }
@@ -159,7 +165,13 @@ public class ESClient
         JestResult rst;
         rst = jestClient.execute(clientRequest);
         if (!rst.isSucceeded()) {
-            log.warn(rst.getErrorMessage());
+            // Log detailed info to help debugging (endpoint, status, error and response body)
+            try {
+                log.warn("ES request failed, code={}, error={}, json={}", rst.getResponseCode(), rst.getErrorMessage(), rst.getJsonString());
+            }
+            catch (Exception e) {
+                log.warn("ES request failed and failed to log details: {}", e.getMessage());
+            }
         }
         return rst;
     }
