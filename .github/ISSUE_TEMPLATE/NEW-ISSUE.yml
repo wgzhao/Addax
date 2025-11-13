@@ -42,7 +42,10 @@ body:
         - 如果您的版本不在列表中，请选择 "4.3.0 or older" 并在问题描述中补充准确的版本号。  
           *If your version is not listed, select "4.3.0 or older" and specify the exact version in the description.*
       options:
-        - 6.0.4 (Default)
+        - 6.0.7 (Default)
+        - 6.0.6
+        - 6.0.5
+        - 6.0.4
         - 6.0.3
         - 6.0.2
         - 6.0.1
