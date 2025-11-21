@@ -17,7 +17,7 @@ jobs:
 
     steps:
       # Step 1: checkout code
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       # Step 2: get the current release version
       - name: version
         id: version
