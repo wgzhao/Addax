@@ -158,12 +158,7 @@ public enum DataBaseType
     {
         if (this == MySql) {
             String suffix = "yearIsDateType=false&zeroDateTimeBehavior=convertToNull&tinyInt1isBit=false&rewriteBatchedStatements=true";
-            // Add timezone configuration
-            if (!jdbc.contains("serverTimezone")) {
-                int offsetHours = TimeZone.getDefault().getRawOffset() / 3600000;
-                suffix += "&serverTimezone=GMT" + (offsetHours < 0 ? "-" : "%2B") + offsetHours;
-            }
-            if (!"com.mysql.jdbc.Driver".equals(this.driverClassName)) {
+            if (!"com.mysql.jdbc.Driver".equals(this.driverClassName) && !jdbc.contains("useSSL=")) {
                 suffix += "&useSSL=false";
             }
 
