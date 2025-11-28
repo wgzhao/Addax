@@ -457,7 +457,7 @@ public final class DBUtil
         // Using Stream API to transform metadata to column names
         return rsMetaData.stream()
                 .skip(1) // Skip the first null element
-                .map(map ->  dataBaseType.quoteColumnName(map.get("name").toString()))
+                .map(map ->  dataBaseType.quoteColumnName(map.get("name").toString(), true))
                 .toList();
     }
 

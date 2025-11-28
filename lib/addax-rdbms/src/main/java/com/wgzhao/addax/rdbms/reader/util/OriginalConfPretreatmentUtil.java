@@ -225,7 +225,7 @@ public final class OriginalConfPretreatmentUtil
 
                     // Each column in allColumns should be quoted appropriately
                     var quotedColumns = allColumns.stream()
-                            .map(dataBaseType::quoteColumnName)
+                            .map(r -> dataBaseType.quoteColumnName(r, true))
                             .toList();
 
                     originalConfig.set(Key.COLUMN, String.join(",", quotedColumns));
