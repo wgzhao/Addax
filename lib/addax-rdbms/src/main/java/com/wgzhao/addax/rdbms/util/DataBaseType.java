@@ -230,7 +230,7 @@ public enum DataBaseType
             return columnName;
         }
         // If the column is null string, means use null as column value
-        if ("null".equals(columnName)) {
+        if ("null".equalsIgnoreCase(columnName)) {
             return columnName;
         }
         if (this == MySql || this == Hive) {
