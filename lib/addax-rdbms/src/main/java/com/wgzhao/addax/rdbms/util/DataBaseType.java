@@ -158,12 +158,7 @@ public enum DataBaseType
     {
         if (this == MySql) {
             String suffix = "yearIsDateType=false&zeroDateTimeBehavior=convertToNull&tinyInt1isBit=false&rewriteBatchedStatements=true";
-            // Add timezone configuration
-            if (!jdbc.contains("serverTimezone")) {
-                int offsetHours = TimeZone.getDefault().getRawOffset() / 3600000;
-                suffix += "&serverTimezone=GMT" + (offsetHours < 0 ? "-" : "%2B") + offsetHours;
-            }
-            if (!"com.mysql.jdbc.Driver".equals(this.driverClassName)) {
+            if (!"com.mysql.jdbc.Driver".equals(this.driverClassName) && !jdbc.contains("useSSL=")) {
                 suffix += "&useSSL=false";
             }
 
@@ -204,6 +199,10 @@ public enum DataBaseType
         return jdbc;
     }
 
+    public String quoteColumnName(String columnName) {
+        return quoteColumnName(columnName, false);
+    }
+
     /**
      * Quotes column names according to database-specific conventions.
      * Handles reserved words, special characters, and null values appropriately.
@@ -211,8 +210,11 @@ public enum DataBaseType
      * @param columnName The column name to quote
      * @return Properly quoted column name or original if no quoting needed
      */
-    public String quoteColumnName(String columnName)
+    public String quoteColumnName(String columnName, boolean forceQuote)
     {
+        if (forceQuote) {
+            return quoteColumn(columnName);
+        }
         String quoteChar = "'`\"";
         // If the column is not a reserved word, it's a constant value
         if (!SQL_RESERVED_WORDS.contains(columnName.toUpperCase())) {
@@ -233,6 +235,15 @@ public enum DataBaseType
         if ("null".equalsIgnoreCase(columnName)) {
             return columnName;
         }
+        String columnName1 = quoteColumn(columnName);
+        if (columnName1 != null) {
+            return columnName1;
+        }
+        return columnName;
+    }
+
+    private String quoteColumn(String columnName)
+    {
         if (this == MySql || this == Hive) {
             return "`" + columnName.replace("`", "``") + "`";
         }
@@ -242,7 +253,7 @@ public enum DataBaseType
         if (this == SQLServer) {
             return columnName.startsWith("[") ? columnName : "[" + columnName + "]";
         }
-        return columnName;
+        return null;
     }
 
     /**

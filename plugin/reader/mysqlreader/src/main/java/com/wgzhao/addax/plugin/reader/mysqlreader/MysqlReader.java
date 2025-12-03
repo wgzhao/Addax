@@ -122,14 +122,20 @@ public class MysqlReader
                         WKBReader wkbReader = new WKBReader();
                         try {
                             byte[] wkbWithSRID = rs.getBytes(i);
-                            if (wkbWithSRID != null && wkbWithSRID.length > 0) {
-                                // Remove the SRID prefix (4 bytes) if present
-                                if (wkbWithSRID.length > 4) {
-                                    byte[] wkbWithoutSRID = new byte[wkbWithSRID.length - 4];
-                                    System.arraycopy(wkbWithSRID, 4, wkbWithoutSRID, 0, wkbWithoutSRID.length);
-                                    wkbWithSRID = wkbWithoutSRID;
-                                }
+                            // If the column is SQL NULL or empty, return a NULL StringColumn to avoid NPE
+                            if (wkbWithSRID == null || wkbWithSRID.length == 0) {
+                                return new StringColumn((String) null);
                             }
+                            // Remove the SRID prefix (4 bytes) if present
+                            if (wkbWithSRID.length > 4) {
+                                byte[] wkbWithoutSRID = new byte[wkbWithSRID.length - 4];
+                                System.arraycopy(wkbWithSRID, 4, wkbWithoutSRID, 0, wkbWithoutSRID.length);
+                                wkbWithSRID = wkbWithoutSRID;
+                            } else {
+                                // Only 4 bytes or fewer, no actual WKB payload, treat as NULL
+                                return new StringColumn((String) null);
+                            }
+                            // Double-check to be safe before parsing
                             Geometry geometry = wkbReader.read(wkbWithSRID);
                             return new StringColumn(geometry.toText());
                         }

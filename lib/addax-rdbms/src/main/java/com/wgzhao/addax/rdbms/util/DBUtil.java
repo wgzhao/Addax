@@ -40,6 +40,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.sql.Statement;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -59,7 +60,8 @@ public final class DBUtil
     private static final Logger LOG = LoggerFactory.getLogger(DBUtil.class);
     private static final int DEFAULT_SOCKET_TIMEOUT_SEC = 20_000;
 
-    // No asynchronous executor — call ResultSet.next() directly to avoid cross-thread ResultSet access
+    private static final Map<String, BasicDataSource> DS_CACHE = new java.util.concurrent.ConcurrentHashMap<>();
+    private static volatile boolean shutdownHookRegistered = false;
 
     private DBUtil()
     {
@@ -241,36 +243,16 @@ public final class DBUtil
      */
     public static synchronized Connection getConnection(DataBaseType dataBaseType, String jdbcUrl, String username, String password, int socketTimeout)
     {
-
-        try (BasicDataSource bds = new BasicDataSource()) {
-            bds.setUrl(jdbcUrl);
-            bds.setUsername(username);
-            bds.setPassword(password);
-
-            if (dataBaseType == DataBaseType.Oracle) {
-                // oracle.net.READ_TIMEOUT for jdbc versions < 10.1.0.5 
-                // oracle.jdbc.ReadTimeout for jdbc versions >= 10.1.0.5
-                // unit: ms
-                bds.addConnectionProperty("oracle.jdbc.ReadTimeout", String.valueOf(socketTimeout * 1000L));
+        try {
+            if (jdbcUrl == null) {
+                throw new IllegalArgumentException("jdbcUrl must not be null");
             }
-            if ("org.apache.hive.jdbc.HiveDriver".equals(bds.getDriverClassName())) {
-                DriverManager.setLoginTimeout(DEFAULT_SOCKET_TIMEOUT_SEC);
-            }
-            if (jdbcUrl.contains("inceptor2")) {
-                LOG.warn("inceptor2 must be processed specially");
-                jdbcUrl = jdbcUrl.replace("inceptor2", "hive2");
-                bds.setUrl(jdbcUrl);
-                bds.setDriverClassName("org.apache.hive.jdbc.HiveDriver");
-                DriverManager.setLoginTimeout(DEFAULT_SOCKET_TIMEOUT_SEC);
-            }
-            else {
-                LOG.debug("Connecting to database with driver {}", dataBaseType.getDriverClassName());
-                bds.setDriverClassName(dataBaseType.getDriverClassName());
-            }
-            bds.setMinIdle(2);
-            // bds.setMaxActive(5); // Deprecated method, use setMaxTotal instead
-            bds.setMaxOpenPreparedStatements(200);
-            return bds.getConnection();
+            // Use shared cached datasource
+            BasicDataSource ds = getOrCreateDataSource(dataBaseType, jdbcUrl, username, password, socketTimeout);
+            try {
+                DriverManager.setLoginTimeout(socketTimeout);
+            } catch (Exception ignore) {}
+            return ds.getConnection();
         }
         catch (Exception e) {
             throw RdbmsException.asConnException(e, jdbcUrl);
@@ -457,7 +439,7 @@ public final class DBUtil
         // Using Stream API to transform metadata to column names
         return rsMetaData.stream()
                 .skip(1) // Skip the first null element
-                .map(map ->  dataBaseType.quoteColumnName(map.get("name").toString()))
+                .map(map ->  dataBaseType.quoteColumnName(map.get("name").toString(), true))
                 .toList();
     }
 
@@ -725,5 +707,57 @@ public final class DBUtil
             }
             throw e;
         }
+    }
+
+    private static String dsKey(String driver, String url, String user) {
+        return driver + "|" + url + "|" + (user == null ? "" : user);
+    }
+
+    private static BasicDataSource getOrCreateDataSource(DataBaseType dataBaseType, String jdbcUrl, String username, String password, int socketTimeout) {
+        String driverClassName;
+        String effectiveUrl = jdbcUrl;
+        if (effectiveUrl != null && effectiveUrl.contains("inceptor2")) {
+            LOG.warn("Detected 'inceptor2' in jdbcUrl; replacing with 'hive2' and using HiveDriver.");
+            effectiveUrl = effectiveUrl.replace("inceptor2", "hive2");
+            driverClassName = "org.apache.hive.jdbc.HiveDriver";
+        } else if (effectiveUrl != null && effectiveUrl.startsWith("jdbc:hive2")) {
+            driverClassName = "org.apache.hive.jdbc.HiveDriver";
+        } else {
+            driverClassName = dataBaseType.getDriverClassName();
+        }
+        String key = dsKey(driverClassName, effectiveUrl, username);
+        BasicDataSource ds = DS_CACHE.get(key);
+        if (ds != null) {
+            return ds;
+        }
+        ds = new BasicDataSource();
+        ds.setDriverClassName(driverClassName);
+        ds.setUrl(effectiveUrl);
+        ds.setUsername(username);
+        ds.setPassword(password);
+        // Pool config (tuned conservatively)
+        ds.setMinIdle(2);
+        ds.setMaxTotal(8);
+        ds.setMaxOpenPreparedStatements(200);
+        ds.setValidationQueryTimeout(Duration.ofSeconds(socketTimeout));
+        // Vendor-specific properties
+        if (dataBaseType == DataBaseType.Oracle) {
+            ds.addConnectionProperty("oracle.jdbc.ReadTimeout", String.valueOf(socketTimeout * 1000L));
+        }
+        // Register shutdown hook once
+        if (!shutdownHookRegistered) {
+            synchronized (DBUtil.class) {
+                if (!shutdownHookRegistered) {
+                    Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                        DS_CACHE.values().forEach(d -> {
+                            try { d.close(); } catch (Exception ignore) {}
+                        });
+                    }, "addax-ds-shutdown"));
+                    shutdownHookRegistered = true;
+                }
+            }
+        }
+        BasicDataSource prev = DS_CACHE.putIfAbsent(key, ds);
+        return prev != null ? prev : ds;
     }
 }
