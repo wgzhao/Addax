@@ -256,6 +256,20 @@ public enum DataBaseType
         return null;
     }
 
+    public String unQuote(String field) {
+        if (field == null || field.length() < 2) {
+            return field;
+        }
+        char firstChar = field.charAt(0);
+        char lastChar = field.charAt(field.length() - 1);
+        if ((firstChar == '`' && lastChar == '`')
+                || (firstChar == '"' && lastChar == '"')
+                || (firstChar == '[' && lastChar == ']')) {
+            return field.substring(1, field.length() - 1);
+        }
+        return field;
+    }
+
     /**
      * Gets the type name identifier for this database type.
      *

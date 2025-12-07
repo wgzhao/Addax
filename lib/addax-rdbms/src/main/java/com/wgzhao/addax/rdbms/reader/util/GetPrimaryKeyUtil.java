@@ -151,6 +151,10 @@ public class GetPrimaryKeyUtil
             return null;
         }
 
+        // unquote table name for databases that are case-insensitive unless quoted
+        tableName = dataBaseType.unQuote(tableName);
+        schema = dataBaseType.unQuote(schema);
+
         return switch (dataBaseType) {
             case MySql -> {
                 var schemaExpr = schema == null ? "(SELECT SCHEMA()) " : "'" + schema + "'";
