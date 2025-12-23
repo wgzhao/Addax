@@ -117,14 +117,12 @@ public class PaimonWriter
             if ("truncate".equalsIgnoreCase(writeMode)) {
                 if (writeBuilder != null) {
                     LOG.info("You specify truncate writeMode, begin to clean history data.");
-                    BatchTableWrite write = writeBuilder.withOverwrite().newWrite();
                     BatchTableCommit commit = writeBuilder.newCommit();
-                    commit.commit(new ArrayList<>());
                     try {
-                        write.close();
+                        commit.truncateTable();
                     }
                     catch (Exception e) {
-                        LOG.error("close paimon write error", e);
+                        LOG.error("Failed to truncate table ", e);
                         throw new RuntimeException(e);
                     }
                 }
