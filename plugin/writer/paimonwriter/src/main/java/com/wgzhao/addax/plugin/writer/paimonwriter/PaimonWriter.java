@@ -221,7 +221,7 @@ public class PaimonWriter
 
                 columnList = table.rowType().getFields();
                 typeList = table.rowType().getFieldTypes();
-                writeBuilder = table.newBatchWriteBuilder().withOverwrite();
+                writeBuilder = table.newBatchWriteBuilder();
             }
             catch (Exception e) {
                 log.error("init paimon error", e);
