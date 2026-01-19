@@ -23,7 +23,7 @@ jobs:
         with:
           maven-version: 3.8.8
       - name: Set up JDK 17
-        uses: actions/setup-java@v5.0.0
+        uses: actions/setup-java@v5.1.0
         with:
           java-version: '17'
           distribution: 'adopt'
