@@ -252,14 +252,14 @@ public final class OriginalConfPretreatmentUtil
                 originalConfig.set(Key.COLUMN, String.join(",", quotedColumns));
 
                 // Validate splitPk exists in the table
-                Optional.ofNullable(originalConfig.getString(Key.SPLIT_PK))
-                        .filter(StringUtils::isNotBlank)
-                        .ifPresent(splitPk -> {
-                            if (!allColumns.contains(splitPk.toLowerCase())) {
-                                throw AddaxException.asAddaxException(CONFIG_ERROR,
-                                        "The table " + tableName + " has not the primary key " + splitPk);
-                            }
-                        });
+//                Optional.ofNullable(originalConfig.getString(Key.SPLIT_PK))
+//                        .filter(StringUtils::isNotBlank)
+//                        .ifPresent(splitPk -> {
+//                            if (!quotedColumns.contains(splitPk)) {
+//                                throw AddaxException.asAddaxException(CONFIG_ERROR,
+//                                        "The table " + tableName + " has not the primary key " + splitPk);
+//                            }
+//                        });
             }
         } else {
             // Column is not allowed in querySql mode

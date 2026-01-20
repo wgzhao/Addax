@@ -69,6 +69,8 @@ public class OrcWriter
     private static final int DEFAULT_BATCH_SIZE = 1024;
     private static final ThreadLocal<SimpleDateFormat> DATE_FORMAT =
             ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd"));
+    private static final ThreadLocal<SimpleDateFormat> TIMESTAMP_FORMAT =
+            ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
     // the type of the element in the array
     private SupportHiveDataType elementType;
     // the type of the value in the map
@@ -275,6 +277,9 @@ public class OrcWriter
             else {
                 buffer = DATE_FORMAT.get().format(column.asDate()).getBytes(StandardCharsets.UTF_8);
             }
+        }
+        else if (column.getRawData() instanceof java.sql.Timestamp ts) {
+            buffer = TIMESTAMP_FORMAT.get().format(ts).getBytes(StandardCharsets.UTF_8);
         }
         else {
             buffer = column.getRawData().toString().getBytes(StandardCharsets.UTF_8);
