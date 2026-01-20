@@ -218,7 +218,7 @@ public final class OriginalConfPretreatmentUtil
 
                 if (!excludeColumns.isEmpty()) {
                     // Get all columns of table and exclude the excludeColumns
-                    List<String> allColumns = DBUtil.getTableColumns(dataBaseType, jdbcUrl, username, password, tableName);
+                    List<String> allColumns = new ArrayList<>(DBUtil.getTableColumns(dataBaseType, jdbcUrl, username, password, tableName));
                     // Note: Consider if table column comparison should be case-insensitive
                     allColumns.removeAll(excludeColumns);
                     originalConfig.set(Key.COLUMN_LIST, allColumns);
