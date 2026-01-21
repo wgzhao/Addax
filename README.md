@@ -171,6 +171,8 @@ Explore more [example jobs](docs/assets/jobs)
 
 ## 🧩 Developing Addax
 
+For AI assistants: project-specific knowledge and conventions are documented in [SKILL.md](./SKILL.md). Please read it before working on this repo.
+
 ### Building Documentation
 
 Generate or preview online documentation locally using [mkdocs](https://www.mkdocs.org):
