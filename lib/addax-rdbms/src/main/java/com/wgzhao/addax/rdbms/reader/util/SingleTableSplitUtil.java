@@ -162,6 +162,7 @@ public class SingleTableSplitUtil
         String username = configuration.getString(Key.USERNAME);
         String password = configuration.getString(Key.PASSWORD);
 
+        LOG.info("Get split pk min and max value sql [{}] is running...", pkRangeSQL);
         try (Connection conn = DBUtil.getConnection(dataBaseType, jdbcURL, username, password);
                 ResultSet rs = DBUtil.query(conn, pkRangeSQL, 1)) {
 
