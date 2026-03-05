@@ -60,6 +60,7 @@
             <directory>src/main/job/</directory>
             <includes>
                 <include>*.json</include>
+                <include>*.yaml</include>
             </includes>
             <outputDirectory>job</outputDirectory>
         </fileSet>
