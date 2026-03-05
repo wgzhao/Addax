@@ -23,11 +23,7 @@ import com.wgzhao.addax.core.exception.AddaxException;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -36,16 +32,19 @@ import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.yaml.snakeyaml.LoaderOptions;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.SafeConstructor;
+import org.yaml.snakeyaml.error.YAMLException;
 
 import static com.wgzhao.addax.core.base.Key.CONNECTION;
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.PLUGIN_INIT_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 import static com.wgzhao.addax.core.util.container.CoreConstant.CONF_PATH;
-import static com.wgzhao.addax.core.util.container.CoreConstant.CORE_SERVER_TIMEOUT_SEC;
 import static com.wgzhao.addax.core.util.container.CoreConstant.JOB_CONTENT;
 import static com.wgzhao.addax.core.util.container.CoreConstant.JOB_CONTENT_READER;
 import static com.wgzhao.addax.core.util.container.CoreConstant.JOB_CONTENT_READER_NAME;
@@ -161,7 +160,41 @@ public final class ConfigParser
     public static Configuration parseJobConfig(String path)
     {
         String jobContent = getJobContent(path);
+        if (isYamlPath(path)) {
+            return parseYamlJobConfig(jobContent, path);
+        }
         return Configuration.from(jobContent);
+    }
+
+    private static boolean isYamlPath(String path)
+    {
+        return Strings.CI.endsWith(path, ".yaml") || Strings.CI.endsWith(path, ".yml");
+    }
+
+    private static Configuration parseYamlJobConfig(String jobContent, String path)
+    {
+        if (StringUtils.isBlank(jobContent)) {
+            throw AddaxException.asAddaxException(CONFIG_ERROR, "The configure file is empty.");
+        }
+        try {
+            Yaml yaml = new Yaml(new SafeConstructor(new LoaderOptions()));
+            Object yamlObject = yaml.load(jobContent);
+            if (yamlObject == null) {
+                throw AddaxException.asAddaxException(CONFIG_ERROR, "The configure file is empty.");
+            }
+            if (yamlObject instanceof Map) {
+                return Configuration.from((Map<String, Object>) yamlObject);
+            }
+            if (yamlObject instanceof List) {
+                return Configuration.from((List<Object>) yamlObject);
+            }
+            throw AddaxException.asAddaxException(CONFIG_ERROR,
+                    "The configuration is incorrect. The configuration you provided is not in valid YAML format: top-level node must be a map or list.");
+        }
+        catch (YAMLException e) {
+            throw AddaxException.asAddaxException(CONFIG_ERROR,
+                    String.format("The configuration is incorrect. The configuration you provided is not in valid YAML format: %s.", e.getMessage()));
+        }
     }
 
     private static String getJobContent(String jobResource)
