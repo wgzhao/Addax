@@ -63,6 +63,7 @@ The output of the above command is roughly as follows:
 | column        | Yes      |   list    |     None      | Keys to get, configure as `"*"` to get all key values                              |
 | username      | No       |  string   |     None      | Authentication account required for interface request (if any)                      |
 | password      | No       |  string   |     None      | Password required for interface request (if any)                                   |
+| authConfig    | No       |    map    |     None      | Auth endpoint config; fetch token first, then inject it into business request headers |
 | proxy         | No       |    map    |     None      | Proxy address, see description below                                                |
 | headers       | No       |    map    |     None      | Custom request header information                                                    |
 | isPage        | No       | boolean   |     None      | Whether interface supports pagination                                                |
@@ -83,6 +84,43 @@ In particular, in `POST` mode, if your request body is not a `k-v` structure, yo
 ```
 
 The program will handle this case specially.
+
+### authConfig
+
+`authConfig` is used for "authenticate first, then read business data" scenarios.
+When configured, `httpreader` calls the auth endpoint first, extracts a token from
+the auth response, and injects it into business request headers.
+
+Example:
+
+```json
+{
+  "authConfig": {
+    "url": "http://127.0.0.1:9090/auth/login",
+    "method": "POST",
+    "reqParams": {
+      "username": "demo",
+      "password": "demo"
+    },
+    "headers": {
+      "X-Auth-Client": "Addax"
+    },
+    "resultKey": "data.token",
+    "tokenHeader": "Authorization",
+    "tokenPrefix": "Bearer "
+  }
+}
+```
+
+Field description:
+
+- `url`: Auth endpoint URL (required).
+- `method`: Auth request method, supports `GET`/`POST`, default `POST`.
+- `reqParams`: Auth request parameters; for `POST` they are sent as JSON body, for `GET` they are appended to URL.
+- `headers`: Extra request headers for auth endpoint.
+- `resultKey`: Token extraction path. JSONPath style is supported (for example `data.token` or `$.data.token`), default `token`.
+- `tokenHeader`: Target header name for token injection in business requests, default `Authorization`.
+- `tokenPrefix`: Prefix used when injecting token, default `Bearer `.
 
 ### proxy
 
@@ -242,6 +280,4 @@ This means the pagination parameters passed to the interface are `page=1&size=10
 
 1. The returned result must be JSON type
 2. Currently all key values are treated as string type
-3. Interface Token authentication mode not yet supported
-4. Pagination retrieval not yet supported
-5. Proxy only supports `http` mode
+3. Currently only one auth call is performed at task startup; automatic token refresh is not supported
