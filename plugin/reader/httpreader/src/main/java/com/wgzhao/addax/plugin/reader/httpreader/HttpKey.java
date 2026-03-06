@@ -42,6 +42,12 @@ public final class HttpKey
     public static final String TOKEN = "token";
     // api parameters
     public static final String REQUEST_PARAMETERS = "reqParams";
+    // dynamic token acquisition config
+    public static final String AUTH_CONFIG = "authConfig";
+    // request header name that receives token, e.g. Authorization or X-Auth-Token
+    public static final String TOKEN_HEADER = "tokenHeader";
+    // token value prefix, e.g. Bearer 
+    public static final String TOKEN_PREFIX = "tokenPrefix";
     // custom http headers
     public static final String HEADERS = "headers";
     // timeout in seconds

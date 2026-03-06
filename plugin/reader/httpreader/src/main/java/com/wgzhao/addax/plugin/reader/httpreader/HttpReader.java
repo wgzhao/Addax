@@ -29,39 +29,39 @@ import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.plugin.RecordSender;
 import com.wgzhao.addax.core.spi.Reader;
 import com.wgzhao.addax.core.util.Configuration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLEngine;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509ExtendedTrustManager;
-import javax.net.ssl.SSLParameters;
-
-import java.net.Socket;
-import java.security.KeyManagementException;
-import java.security.cert.X509Certificate;
 
 import java.io.IOException;
+import java.net.Authenticator;
+import java.net.InetSocketAddress;
+import java.net.PasswordAuthentication;
+import java.net.ProxySelector;
+import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.net.InetSocketAddress;
-import java.net.ProxySelector;
-import java.net.Authenticator;
-import java.net.PasswordAuthentication;
-import java.time.Duration;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLParameters;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509ExtendedTrustManager;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
@@ -78,6 +78,13 @@ public class HttpReader
             return new PageConfig(HttpKey.PAGE_SIZE, HttpKey.PAGE_INDEX,
                     Task.DEFAULT_PAGE_SIZE, Task.DEFAULT_PAGE_INDEX);
         }
+    }
+
+    // Auth endpoint configuration used to fetch token before reading business data.
+    private record AuthConfig(URI uri, String method, Map<String, String> requestParams,
+                              Map<String, Object> headers, String resultKey,
+                              String tokenHeader, String tokenPrefix)
+    {
     }
 
     public static class Job
@@ -113,6 +120,8 @@ public class HttpReader
         private static final int DEFAULT_PAGE_INDEX = 1;
         private static final int DEFAULT_PAGE_SIZE = 20;
         private static final int DEFAULT_TIMEOUT_SEC = 60;
+        private static final String DEFAULT_TOKEN_HEADER = "Authorization";
+        private static final String DEFAULT_TOKEN_PREFIX = "Bearer ";
 
         private Configuration readerSliceConfig = null;
         private URI baseUri;
@@ -126,6 +135,7 @@ public class HttpReader
         private String method;
         private HttpClient httpClient;
         private int timeout;
+        private AuthConfig authConfig;
 
         @Override
         public void init()
@@ -139,6 +149,11 @@ public class HttpReader
             Configuration conn = readerSliceConfig.getConfiguration(HttpKey.CONNECTION);
             this.baseUri = URI.create(conn.getString(HttpKey.URL));
 
+            Configuration authConf = readerSliceConfig.getConfiguration(HttpKey.AUTH_CONFIG);
+            if (authConf != null) {
+                this.authConfig = parseAuthConfig(authConf);
+            }
+
             if (conn.getString(HttpKey.PROXY, null) != null) {
                 setProxy(conn.getConfiguration(HttpKey.PROXY));
             }
@@ -151,22 +166,55 @@ public class HttpReader
 
         private URI buildUri()
         {
-            StringBuilder uriBuilder = new StringBuilder();
-            uriBuilder.append(baseUri.getScheme()).append("://")
-                    .append(baseUri.getAuthority())
-                    .append(baseUri.getPath());
+            return buildUri(baseUri, method, queryParams);
+        }
 
-            if ("GET".equalsIgnoreCase(method)) {
+        private AuthConfig parseAuthConfig(Configuration authConf)
+        {
+            String authUrl = authConf.getString(HttpKey.URL, null);
+            if (authUrl == null || authUrl.isBlank()) {
+                throw AddaxException.asAddaxException(REQUIRED_VALUE,
+                        "The parameter [authConfig.url] is required when authConfig is configured");
+            }
+
+            String authMethod = authConf.getString(HttpKey.METHOD, "POST");
+            Map<String, String> authParams = new HashMap<>();
+            authConf.getMap(HttpKey.REQUEST_PARAMETERS, new HashMap<>())
+                    .forEach((k, v) -> authParams.put(k, String.valueOf(v)));
+
+            String resultKey = authConf.getString(HttpKey.RESULT_KEY, "token");
+            String tokenHeader = authConf.getString(HttpKey.TOKEN_HEADER, DEFAULT_TOKEN_HEADER);
+            String tokenPrefix = authConf.getString(HttpKey.TOKEN_PREFIX, DEFAULT_TOKEN_PREFIX);
+
+            return new AuthConfig(
+                    URI.create(authUrl),
+                    authMethod,
+                    authParams,
+                    authConf.getMap(HttpKey.HEADERS, new HashMap<>()),
+                    resultKey,
+                    tokenHeader,
+                    tokenPrefix
+            );
+        }
+
+        private URI buildUri(URI targetUri, String requestMethod, Map<String, String> requestParams)
+        {
+            StringBuilder uriBuilder = new StringBuilder();
+            uriBuilder.append(targetUri.getScheme()).append("://")
+                    .append(targetUri.getAuthority())
+                    .append(targetUri.getPath() == null ? "" : targetUri.getPath());
+
+            if ("GET".equalsIgnoreCase(requestMethod)) {
                 Map<String, String> allParams = new HashMap<>();
-                if (baseUri.getQuery() != null) {
-                    for (String param : baseUri.getQuery().split("&")) {
+                if (targetUri.getQuery() != null) {
+                    for (String param : targetUri.getQuery().split("&")) {
                         String[] parts = param.split("=", 2);
                         if (parts.length == 2) {
                             allParams.put(parts[0], parts[1]);
                         }
                     }
                 }
-                allParams.putAll(queryParams);
+                allParams.putAll(requestParams);
 
                 if (!allParams.isEmpty()) {
                     uriBuilder.append('?');
@@ -245,6 +293,11 @@ public class HttpReader
         @Override
         public void startRead(RecordSender recordSender)
         {
+            if (authConfig != null) {
+                this.token = fetchTokenFromAuthConfig();
+                LOG.info("Token fetched successfully from authConfig.");
+            }
+
             var isPage = readerSliceConfig.getBool(HttpKey.IS_PAGE, false);
             if (isPage) {
                 processPagedRequest(recordSender);
@@ -291,43 +344,80 @@ public class HttpReader
             );
         }
 
+        private String fetchTokenFromAuthConfig()
+        {
+            String responseBody = executeRequest(
+                    authConfig.uri(),
+                    authConfig.method(),
+                    authConfig.requestParams(),
+                    authConfig.headers(),
+                    false
+            );
+
+            Object authPayload = JSON.parse(responseBody);
+            String resultPath = authConfig.resultKey();
+            Object tokenValue = resultPath.startsWith("$")
+                    ? JSONPath.eval(authPayload, resultPath)
+                    : JSONPath.eval(authPayload, "$." + resultPath);
+
+            if (tokenValue == null || tokenValue.toString().isBlank()) {
+                throw AddaxException.asAddaxException(RUNTIME_ERROR,
+                        "Failed to fetch token from authConfig. Result key '%s' not found or empty".formatted(resultPath));
+            }
+            return tokenValue.toString();
+        }
+
         private String executeRequest()
         {
+            return executeRequest(
+                    baseUri,
+                    method,
+                    queryParams,
+                    readerSliceConfig.getMap(HttpKey.HEADERS, new HashMap<>()),
+                    true
+            );
+        }
+
+        private String executeRequest(URI targetUri, String requestMethod, Map<String, String> requestParams,
+                Map<String, Object> headers, boolean withAuth)
+        {
             var charset = Charset.forName(readerSliceConfig.getString(HttpKey.ENCODING, StandardCharsets.UTF_8.name()));
-            URI requestUri = buildUri();
+            URI requestUri = buildUri(targetUri, requestMethod, requestParams);
             HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                     .uri(requestUri)
                     .timeout(Duration.ofMinutes(2));
             // Add headers
-            readerSliceConfig.getMap(HttpKey.HEADERS, new HashMap<>())
-                    .forEach((k, v) -> requestBuilder.header(k, v.toString()));
+            headers.forEach((k, v) -> requestBuilder.header(k, v.toString()));
 
             // Add authentication
-            if (username != null && password != null) {
+            if (withAuth && username != null && password != null) {
                 String auth = Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
-                requestBuilder.header("Authorization", "Basic " + auth);
+                requestBuilder.setHeader("Authorization", "Basic " + auth);
             }
-            if (token != null) {
-                requestBuilder.header("Authorization", "Bearer " + token);
+            if (withAuth && token != null) {
+                String tokenHeader = authConfig == null ? DEFAULT_TOKEN_HEADER : authConfig.tokenHeader();
+                String tokenPrefix = authConfig == null ? DEFAULT_TOKEN_PREFIX : authConfig.tokenPrefix();
+                requestBuilder.setHeader(tokenHeader, (tokenPrefix == null ? "" : tokenPrefix) + token);
             }
+
             // Set method and handle body for POST
             String jsonBody;
-            if ("POST".equalsIgnoreCase(method)) {
-                if (queryParams.containsKey("")) {
+            if ("POST".equalsIgnoreCase(requestMethod)) {
+                if (requestParams.containsKey("")) {
                     // maybe just one parameter, like ["123","456"], or [1,2,3], or "123,456"
-                    jsonBody = queryParams.get("").trim();
+                    jsonBody = requestParams.get("").trim();
                 }
                 else {
-                    jsonBody = JSON.toJSONString(queryParams);
+                    jsonBody = JSON.toJSONString(requestParams);
                 }
                 requestBuilder.header("Content-Type", "application/json");
                 requestBuilder.POST(HttpRequest.BodyPublishers.ofString(jsonBody));
             }
-            else if ("GET".equalsIgnoreCase(method)) {
+            else if ("GET".equalsIgnoreCase(requestMethod)) {
                 requestBuilder.GET();
             }
             else {
-                throw new IllegalArgumentException("Unsupported HTTP method: " + method);
+                throw new IllegalArgumentException("Unsupported HTTP method: " + requestMethod);
             }
 
             try {

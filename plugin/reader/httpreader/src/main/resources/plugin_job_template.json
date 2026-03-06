@@ -25,6 +25,20 @@
     },
     "resultKey": "result",
     "method": "GET",
+    "authConfig": {
+      "url": "http://127.0.0.1:9090/mock/auth/login",
+      "method": "POST",
+      "reqParams": {
+        "username": "demo",
+        "password": "demo"
+      },
+      "headers": {
+        "X-Auth-Client": "Addax"
+      },
+      "resultKey": "data.token",
+      "tokenHeader": "Authorization",
+      "tokenPrefix": "Bearer "
+    },
     "column": [
       "CURR_DATE",
       "DEPT",
