@@ -29,39 +29,39 @@ import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.plugin.RecordSender;
 import com.wgzhao.addax.core.spi.Reader;
 import com.wgzhao.addax.core.util.Configuration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLEngine;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509ExtendedTrustManager;
-import javax.net.ssl.SSLParameters;
-
-import java.net.Socket;
-import java.security.KeyManagementException;
-import java.security.cert.X509Certificate;
 
 import java.io.IOException;
+import java.net.Authenticator;
+import java.net.InetSocketAddress;
+import java.net.PasswordAuthentication;
+import java.net.ProxySelector;
+import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.net.InetSocketAddress;
-import java.net.ProxySelector;
-import java.net.Authenticator;
-import java.net.PasswordAuthentication;
-import java.time.Duration;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLParameters;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509ExtendedTrustManager;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
@@ -379,7 +379,7 @@ public class HttpReader
         }
 
         private String executeRequest(URI targetUri, String requestMethod, Map<String, String> requestParams,
-                                      Map<String, Object> headers, boolean withAuth)
+                Map<String, Object> headers, boolean withAuth)
         {
             var charset = Charset.forName(readerSliceConfig.getString(HttpKey.ENCODING, StandardCharsets.UTF_8.name()));
             URI requestUri = buildUri(targetUri, requestMethod, requestParams);
