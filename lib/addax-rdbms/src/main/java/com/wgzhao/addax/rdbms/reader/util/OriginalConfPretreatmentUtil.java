@@ -218,17 +218,17 @@ public final class OriginalConfPretreatmentUtil
 
                 if (!excludeColumns.isEmpty()) {
                     // Get all columns of table and exclude the excludeColumns
+                    // Note: getTableColumns returns already-quoted column names,
+                    // so we need to quote excludeColumns the same way for comparison
                     List<String> allColumns = new ArrayList<>(DBUtil.getTableColumns(dataBaseType, jdbcUrl, username, password, tableName));
-                    // Note: Consider if table column comparison should be case-insensitive
-                    allColumns.removeAll(excludeColumns);
-                    originalConfig.set(Key.COLUMN_LIST, allColumns);
-
-                    // Each column in allColumns should be quoted appropriately
-                    var quotedColumns = allColumns.stream()
+                    var quotedExcludeColumns = excludeColumns.stream()
                             .map(r -> dataBaseType.quoteColumnName(r, true))
                             .toList();
+                    allColumns.removeAll(quotedExcludeColumns);
+                    originalConfig.set(Key.COLUMN_LIST, allColumns);
 
-                    originalConfig.set(Key.COLUMN, String.join(",", quotedColumns));
+                    // allColumns are already quoted, no need to quote again
+                    originalConfig.set(Key.COLUMN, String.join(",", allColumns));
                 } else {
                     originalConfig.set(Key.COLUMN, "*");
                 }
