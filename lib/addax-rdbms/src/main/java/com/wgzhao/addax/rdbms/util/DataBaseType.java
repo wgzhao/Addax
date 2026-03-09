@@ -213,7 +213,8 @@ public enum DataBaseType
     public String quoteColumnName(String columnName, boolean forceQuote)
     {
         if (forceQuote) {
-            return quoteColumn(columnName);
+            String quoted = quoteColumn(columnName);
+            return quoted != null ? quoted : columnName;
         }
         String quoteChar = "'`\"";
         // If the column is not a reserved word, it's a constant value
@@ -247,7 +248,7 @@ public enum DataBaseType
         if (this == MySql || this == Hive) {
             return "`" + columnName.replace("`", "``") + "`";
         }
-        if (this == Presto || this == Trino || this == Oracle) {
+        if (this == Presto || this == Trino || this == Oracle || this == PostgreSQL) {
             return columnName.startsWith("\"") ? columnName : "\"" + columnName + "\"";
         }
         if (this == SQLServer) {
