@@ -1,0 +1,61 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 1,
+        "bytes": -1
+      }
+    },
+    "content": {
+      "reader": {
+        "name": "streamreader",
+        "parameter": {
+          "column": [
+            {
+              "value": "Addax",
+              "type": "string"
+            },
+            {
+              "value": 19880808,
+              "type": "long"
+            },
+            {
+              "value": "1988-08-08 08:08:08",
+              "type": "date"
+            },
+            {
+              "value": true,
+              "type": "bool"
+            },
+            {
+              "value": "test",
+              "type": "bytes"
+            }
+          ],
+          "sliceRecordCount": 1000
+        }
+      },
+      "writer": {
+        "name": "accesswriter",
+        "parameter": {
+          "username": "wgzhao",
+          "password": "",
+          "column": [
+            "name",
+            "file_size",
+            "file_date",
+            "file_open",
+            "memo"
+          ],
+          "ddl": "create table tbl_test(name varchar(20), file_size int, file_date date, file_open boolean, memo blob);",
+          "connection": {
+            "jdbcUrl": "jdbc:ucanaccess:////Users/wgzhao/Downloads/AccessThemeDemo.mdb",
+            "table": [
+              "tbl_test"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

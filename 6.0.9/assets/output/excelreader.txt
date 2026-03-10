@@ -1,0 +1,151 @@
+ ___      _     _
+ / _ \    | |   | |
+/ /_\ \ __| | __| | __ ___  __
+|  _  |/ _` |/ _` |/ _` \ \/ /
+| | | | (_| | (_| | (_| |>  <
+\_| |_/\__,_|\__,_|\__,_/_/\_\
+
+:: Addax version ::    (v4.0.3)
+
+2021-09-09 14:43:42.579 [        main] INFO  VMInfo               - VMInfo# operatingSystem class => sun.management.OperatingSystemImpl
+2021-09-09 14:43:42.621 [        main] INFO  Engine               -
+{
+	"content":
+		{
+			"reader":{
+				"parameter":{
+					"path":[
+						"/tmp/in"
+					],
+					"column":[
+						{
+							"name":"no",
+							"type":"long"
+						},
+						{
+							"name":"birth",
+							"format":"yyyy-MM-dd HH:mm:ss",
+							"type":"date"
+						},
+						{
+							"name":"kk",
+							"type":"string"
+						}
+					],
+					"header":true,
+					"skipHeader":true,
+					"encoding":"UTF-8",
+					"fieldDelimiter":","
+				},
+				"name":"excelreader"
+			},
+			"writer":{
+				"parameter":{
+					"print":true
+				},
+				"name":"streamwriter"
+			}
+		},
+	"setting":{
+		"speed":{
+			"bytes":-1,
+			"channel":2
+		}
+	}
+}
+
+2021-09-09 14:43:42.653 [        main] INFO  PerfTrace            - PerfTrace traceId=job_-1, isEnable=false, priority=0
+2021-09-09 14:43:42.653 [        main] INFO  JobContainer         - Addax jobContainer starts job.
+2021-09-09 14:43:42.655 [        main] INFO  JobContainer         - Set jobId = 0
+2021-09-09 14:43:42.669 [       job-0] INFO  ExcelReader$Job      - add file [/tmp/in/demo_old.xls] as a candidate to be read.
+2021-09-09 14:43:42.669 [       job-0] INFO  ExcelReader$Job      - add file [/tmp/in/demo_gbk.xlsx] as a candidate to be read.
+2021-09-09 14:43:42.670 [       job-0] INFO  ExcelReader$Job      - add file [/tmp/in/demo.xlsx] as a candidate to be read.
+2021-09-09 14:43:42.670 [       job-0] INFO  ExcelReader$Job      - The number of files to read is: [3]
+2021-09-09 14:43:42.677 [       job-0] INFO  JobContainer         - Addax Reader.Job [excelreader] do prepare work .
+2021-09-09 14:43:42.678 [       job-0] INFO  JobContainer         - Addax Writer.Job [streamwriter] do prepare work .
+2021-09-09 14:43:42.679 [       job-0] INFO  JobContainer         - Job set Channel-Number to 2 channels.
+2021-09-09 14:43:42.681 [       job-0] INFO  JobContainer         - Addax Reader.Job [excelreader] splits to [3] tasks.
+2021-09-09 14:43:42.682 [       job-0] INFO  JobContainer         - Addax Writer.Job [streamwriter] splits to [3] tasks.
+2021-09-09 14:43:42.727 [       job-0] INFO  JobContainer         - Scheduler starts [1] taskGroups.
+2021-09-09 14:43:42.736 [ taskGroup-0] INFO  TaskGroupContainer   - taskGroupId=[0] start [2] channels for [3] tasks.
+2021-09-09 14:43:42.741 [ taskGroup-0] INFO  Channel              - Channel set byte_speed_limit to -1, No bps activated.
+2021-09-09 14:43:42.742 [ taskGroup-0] INFO  Channel              - Channel set record_speed_limit to -1, No tps activated.
+2021-09-09 14:43:42.755 [0-0-1-reader] INFO  ExcelReader$Task     - The first row is skipped as a table header
+2021-09-09 14:43:42.755 [0-0-1-reader] INFO  ExcelReader$Task     - begin read file /tmp/in/demo.xlsx
+2021-09-09 14:43:42.757 [0-0-0-reader] INFO  ExcelReader$Task     - The first row is skipped as a table header
+2021-09-09 14:43:42.758 [0-0-0-reader] INFO  ExcelReader$Task     - begin read file /tmp/in/demo_gbk.xlsx
+1	11	1102.234	Addax加上中文	2021-09-10 00:00:00	5544.17	1102.234
+1	12	1103.234	Addax加上中文	2021-09-11 00:00:00	5552.17	1103.234
+1	13	1104.234	Addax加上中文	2021-09-12 00:00:00	5560.17	1104.234
+1	14	1105.234	Addax加上中文	2021-09-13 00:00:00	5568.17	1105.234
+1	15	1106.234	Addax加上中文	2021-09-14 00:00:00	5576.17	1106.234
+1	16	1107.234	Addax加上中文	2021-09-15 00:00:00	5584.17	1107.234
+1	17	1108.234	Addax加上中文	2021-09-16 00:00:00	5592.17	1108.234
+1	18	1109.234	Addax加上中文	2021-09-17 00:00:00	5600.17	1109.234
+1	19	1110.234	Addax加上中文	2021-09-18 00:00:00	5608.17	1110.234
+1	20	1111.234	Addax加上中文	2021-09-19 00:00:00	5616.17	1111.234
+1	21	1112.234	Addax加上中文	2021-09-20 00:00:00	5624.17	1112.234
+1	22	1113.234	Addax加上中文	2021-09-21 00:00:00	5632.17	1113.234
+1	23	1114.234	Addax加上中文	2021-09-22 00:00:00	5640.17	1114.234
+1	24	1115.234	Addax加上中文	2021-09-23 00:00:00	5648.17	1115.234
+1	25	1116.234	Addax加上中文	2021-09-24 00:00:00	5656.17	1116.234
+1	26	1117.234	Addax加上中文	2021-09-25 00:00:00	5664.17	1117.234
+1	27	1118.234	Addax加上中文	2021-09-26 00:00:00	5672.17	1118.234
+1	28	1119.234	Addax加上中文	2021-09-27 00:00:00	5680.17	1119.234
+1	29	1120.234	Addax加上中文	2021-09-28 00:00:00	5688.17	1120.234
+1	30	1121.234	Addax加上中文	2021-09-29 00:00:00	5696.17	1121.234
+1	11	1102.234	Addax加上中文	2021-09-10 00:00:00	5544.17	1102.234
+2	12	1103.234	Addax加上中文	2021-09-11 00:00:00	5552.17	1103.234
+3	13	1104.234	Addax加上中文	2021-09-12 00:00:00	5560.17	1104.234
+4	14	1105.234	Addax加上中文	2021-09-13 00:00:00	5568.17	1105.234
+5	15	1106.234	Addax加上中文	2021-09-14 00:00:00	5576.17	1106.234
+6	16	1107.234	Addax加上中文	2021-09-15 00:00:00	5584.17	1107.234
+7	17	1108.234	Addax加上中文	2021-09-16 00:00:00	5592.17	1108.234
+8	18	1109.234	Addax加上中文	2021-09-17 00:00:00	5600.17	1109.234
+9	19	1110.234	Addax加上中文	2021-09-18 00:00:00	5608.17	1110.234
+10	20	1111.234	Addax加上中文	2021-09-19 00:00:00	5616.17	1111.234
+11	21	1112.234	Addax加上中文	2021-09-20 00:00:00	5624.17	1112.234
+12	22	1113.234	Addax加上中文	2021-09-21 00:00:00	5632.17	1113.234
+13	23	1114.234	Addax加上中文	2021-09-22 00:00:00	5640.17	1114.234
+14	24	1115.234	Addax加上中文	2021-09-23 00:00:00	5648.17	1115.234
+15	25	1116.234	Addax加上中文	2021-09-24 00:00:00	5656.17	1116.234
+16	26	1117.234	Addax加上中文	2021-09-25 00:00:00	5664.17	1117.234
+17	27	1118.234	Addax加上中文	2021-09-26 00:00:00	5672.17	1118.234
+18	28	1119.234	Addax加上中文	2021-09-27 00:00:00	5680.17	1119.234
+19	29	1120.234	Addax加上中文	2021-09-28 00:00:00	5688.17	1120.234
+20	30	1121.234	Addax加上中文	2021-09-29 00:00:00	5696.17	1121.234
+2021-09-09 14:43:43.894 [0-0-2-reader] INFO  ExcelReader$Task     - The first row is skipped as a table header
+2021-09-09 14:43:43.894 [0-0-2-reader] INFO  ExcelReader$Task     - begin read file /tmp/in/demo_old.xls
+1	11	1102.234	Addax加上中文	2021-09-10 00:00:00	5544.17	1102.234
+2	12	1103.234	Addax加上中文	2021-09-11 00:00:00	5552.17	1103.234
+3	13	1104.234	Addax加上中文	2021-09-12 00:00:00	5560.17	1104.234
+4	14	1105.234	Addax加上中文	2021-09-13 00:00:00	5568.17	1105.234
+5	15	1106.234	Addax加上中文	2021-09-14 00:00:00	5576.17	1106.234
+6	16	1107.234	Addax加上中文	2021-09-15 00:00:00	5584.17	1107.234
+7	17	1108.234	Addax加上中文	2021-09-16 00:00:00	5592.17	1108.234
+8	18	1109.234	Addax加上中文	2021-09-17 00:00:00	5600.17	1109.234
+9	19	1110.234	Addax加上中文	2021-09-18 00:00:00	5608.17	1110.234
+10	20	1111.234	Addax加上中文	2021-09-19 00:00:00	5616.17	1111.234
+11	21	1112.234	Addax加上中文	2021-09-20 00:00:00	5624.17	1112.234
+12	22	1113.234	Addax加上中文	2021-09-21 00:00:00	5632.17	1113.234
+13	23	1114.234	Addax加上中文	2021-09-22 00:00:00	5640.17	1114.234
+14	24	1115.234	Addax加上中文	2021-09-23 00:00:00	5648.17	1115.234
+15	25	1116.234	Addax加上中文	2021-09-24 00:00:00	5656.17	1116.234
+16	26	1117.234	Addax加上中文	2021-09-25 00:00:00	5664.17	1117.234
+17	27	1118.234	Addax加上中文	2021-09-26 00:00:00	5672.17	1118.234
+18	28	1119.234	Addax加上中文	2021-09-27 00:00:00	5680.17	1119.234
+19	29	1120.234	Addax加上中文	2021-09-28 00:00:00	5688.17	1120.234
+20	30	1121.234	Addax加上中文	2021-09-29 00:00:00	5696.17	1121.234
+2021-09-09 14:43:45.753 [       job-0] INFO  AbstractScheduler    - Scheduler accomplished all tasks.
+2021-09-09 14:43:45.754 [       job-0] INFO  JobContainer         - Addax Writer.Job [streamwriter] do post work.
+2021-09-09 14:43:45.756 [       job-0] INFO  JobContainer         - Addax Reader.Job [excelreader] do post work.
+2021-09-09 14:43:45.761 [       job-0] INFO  JobContainer         - PerfTrace not enable!
+2021-09-09 14:43:45.762 [       job-0] INFO  StandAloneJobContainerCommunicator - Total 60 records, 3360 bytes | Speed 1.09KB/s, 20 records/s | Error 0 records, 0 bytes |  All Task WaitWriterTime 0.000s |  All Task WaitReaderTime 0.993s | Percentage 100.00%
+2021-09-09 14:43:45.764 [       job-0] INFO  JobContainer         -
+任务启动时刻                    : 2021-09-09 14:43:42
+任务结束时刻                    : 2021-09-09 14:43:45
+任务总计耗时                    :                  3s
+任务平均流量                    :            1.09KB/s
+记录写入速度                    :             20rec/s
+读出记录总数                    :                  60
+读写失败总数                    :                   0

@@ -1,0 +1,85 @@
+2021-02-19 13:38:15.860 [main] INFO  VMInfo - VMInfo# operatingSystem class => com.sun.management.internal.OperatingSystemImpl
+2021-02-19 13:38:15.895 [main] INFO  Engine -
+{
+	"content":
+		{
+			"reader":{
+				"parameter":{
+					"accessId":"",
+					"headers":{},
+					"endpoint":"http://127.0.0.1:9200",
+					"search":[
+                      {
+                        "query": {
+                          "match": {
+                            "col_ip": "1.1.1.1"
+                          }
+                        },
+                        "aggregations": {
+                          "top_10_states": {
+                            "terms": {
+                              "field": "col_date",
+                              "size": 10
+                            }
+                          }
+                        }
+                      }
+					],
+					"accesskey":"*****",
+					"searchType":"dfs_query_then_fetch",
+					"scroll":"3m",
+					"column":[
+						"col_ip",
+						"col_double",
+						"col_long",
+						"col_integer",
+						"col_keyword",
+						"col_text",
+						"col_geo_point",
+						"col_date"
+					],
+					"index":"test-1",
+					"type":"default"
+				},
+				"name":"elasticsearchreader"
+			},
+			"writer":{
+				"parameter":{
+					"print":true,
+					"encoding":"UTF-8"
+				},
+				"name":"streamwriter"
+			}
+		},
+	"setting":{
+		"errorLimit":{
+			"record":0,
+			"percentage":0.02
+		},
+		"speed":{
+			"byte":-1,
+			"channel":1
+		}
+	}
+}
+
+2021-02-19 13:38:15.934 [main] INFO  PerfTrace - PerfTrace traceId=job_-1, isEnable=false, priority=0
+2021-02-19 13:38:15.934 [main] INFO  JobContainer - Addax jobContainer starts job.
+2021-02-19 13:38:15.937 [main] INFO  JobContainer - Set jobId = 0
+
+2017-05-25T11:22:33.000+08:00	19890604	hello world	1.1.1.1	long text	19890604	19890604	41.12,-71.34
+2017-05-25T11:22:33.000+08:00	19890604	hello world	1.1.1.1	long text	19890604	19890604	41.12,-71.34
+
+2021-02-19 13:38:19.845 [job-0] INFO  AbstractScheduler - Scheduler accomplished all tasks.
+2021-02-19 13:38:19.848 [job-0] INFO  JobContainer - Addax Writer.Job [streamwriter] do post work.
+2021-02-19 13:38:19.849 [job-0] INFO  JobContainer - Addax Reader.Job [elasticsearchreader] do post work.
+2021-02-19 13:38:19.855 [job-0] INFO  JobContainer - PerfTrace not enable!
+2021-02-19 13:38:19.858 [job-0] INFO  StandAloneJobContainerCommunicator - Total 95 records, 8740 bytes | Speed 2.84KB/s, 31 records/s | Error 0 records, 0 bytes |  All Task WaitWriterTime 0.000s |  All Task WaitReaderTime 0.103s | Percentage 100.00%
+2021-02-19 13:38:19.861 [job-0] INFO  JobContainer -
+任务启动时刻                    : 2021-02-19 13:38:15
+任务结束时刻                    : 2021-02-19 13:38:19
+任务总计耗时                    :                  3s
+任务平均流量                    :            2.84KB/s
+记录写入速度                    :             31rec/s
+读出记录总数                    :                   2
+读写失败总数                    :                   0

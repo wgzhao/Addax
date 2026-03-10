@@ -1,0 +1,34 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "byte": -1,
+        "channel": 1
+      }
+    },
+    "content": {
+      "reader": {
+        "name": "postgresqlreader",
+        "parameter": {
+          "username": "pgtest",
+          "password": "pgtest",
+          "column": [
+            "*"
+          ],
+          "connection": {
+            "table": [
+              "addax_tbl"
+            ],
+            "jdbcUrl": "jdbc:postgresql://127.0.0.1:5432/pgtest"
+          }
+        }
+      },
+      "writer": {
+        "name": "streamwriter",
+        "parameter": {
+          "print": true
+        }
+      }
+    }
+  }
+}

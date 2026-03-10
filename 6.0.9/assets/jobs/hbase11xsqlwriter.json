@@ -1,0 +1,59 @@
+{
+  "job": {
+    "content": {
+      "reader": {
+        "name": "txtfilereader",
+        "parameter": {
+          "path": "/tmp/normal.txt",
+          "charset": "UTF-8",
+          "column": [
+            {
+              "index": 0,
+              "type": "String"
+            },
+            {
+              "index": 1,
+              "type": "string"
+            },
+            {
+              "index": 2,
+              "type": "string"
+            },
+            {
+              "index": 3,
+              "type": "string"
+            }
+          ],
+          "fieldDelimiter": ","
+        }
+      },
+      "writer": {
+        "name": "hbase11xsqlwriter",
+        "parameter": {
+          "batchSize": "256",
+          "column": [
+            "UID",
+            "TS",
+            "EVENTID",
+            "CONTENT"
+          ],
+          "haveKerberos": "true",
+          "kerberosPrincipal": "hive@EXAMPLE.COM",
+          "kerberosKeytabFilePath": "/tmp/hive.headless.keytab",
+          "hbaseConfig": {
+            "hbase.zookeeper.quorum": "node1,node2,node3:2181",
+            "zookeeper.znode.parent": "/hbase-secure"
+          },
+          "nullMode": "skip",
+          "table": "TEST_TBL"
+        }
+      }
+    },
+    "setting": {
+      "speed": {
+        "channel": 5,
+        "bytes": -1
+      }
+    }
+  }
+}

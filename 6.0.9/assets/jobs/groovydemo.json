@@ -1,0 +1,64 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "byte": -1,
+        "channel": 1
+      },
+      "errorLimit": {
+        "record": 0,
+        "percentage": 0.02
+      }
+    },
+    "content": {
+      "reader": {
+        "name": "streamreader",
+        "parameter": {
+          "column": [
+            {
+              "value": "Addax",
+              "type": "string"
+            },
+            {
+              "incr": "1",
+              "type": "long"
+            },
+            {
+              "incr": "1989/06/04 00:00:01,-1",
+              "type": "date",
+              "dateFormat": "yyyy/MM/dd hh:mm:ss"
+            },
+            {
+              "value": true,
+              "type": "bool"
+            },
+            {
+              "value": "test",
+              "type": "bytes"
+            }
+          ],
+          "sliceRecordCount": 10
+        }
+      },
+      "writer": {
+        "name": "streamwriter",
+        "parameter": {
+          "print": true,
+          "column": [
+            "col1"
+          ],
+          "encoding": "UTF-8"
+        }
+      },
+      "transformer": [
+        {
+          "name": "dx_groovy",
+          "description": "Add string 'Header_' to the first column value;Double the value of the second field",
+          "parameter": {
+            "code": "record.setColumn(0, new StringColumn('Header_' + record.getColumn(0).asString()));record.setColumn(1, new LongColumn(record.getColumn(1).asLong() * 2));return record;"
+          }
+        }
+      ]
+    }
+  }
+}

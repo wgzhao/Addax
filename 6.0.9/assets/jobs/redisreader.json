@@ -1,0 +1,40 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 1
+      }
+    },
+    "content": {
+      "reader": {
+        "name": "redisreader",
+        "parameter": {
+          "connection": {
+            "uri": ["tcp://127.0.0.1:6379", "file:///data/dump.rdb", "http://localhost/dump.rdb"],
+            "auth": "password"
+          },
+          "include": [
+            "^user"
+          ],
+          "exclude": [
+            "^password"
+          ],
+          "db": [
+            0,
+            1
+          ]
+        }
+      },
+      "writer": {
+        "name": "rediswriter",
+        "parameter": {
+          "connection": {
+            "uri": "tcp://127.0.0.1:6379",
+            "auth": "123456"
+          },
+          "timeout": 60000
+        }
+      }
+    }
+  }
+}
