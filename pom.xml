@@ -176,6 +176,7 @@
         <module>plugin/reader/kudureader</module>
         <module>plugin/reader/mongodbreader</module>
         <module>plugin/reader/mysqlreader</module>
+        <module>plugin/reader/dorisreader</module>
         <module>plugin/reader/oraclereader</module>
         <module>plugin/reader/postgresqlreader</module>
         <module>plugin/reader/rdbmsreader</module>
