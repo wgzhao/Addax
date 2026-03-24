@@ -47,7 +47,7 @@
 
     <properties>
         <!-- basic components -->
-        <aircompressor.version>0.27</aircompressor.version>
+        <aircompressor.version>2.0.3</aircompressor.version>
         <awssdk.version>2.29.20</awssdk.version>
         <avro.version>1.12.0</avro.version>
         <commons.beanutils.version>1.10.1</commons.beanutils.version>
@@ -66,8 +66,8 @@
         <commons.text.version>1.13.1</commons.text.version>
         <curator.version>4.2.0</curator.version>
         <diamond.version>3.7.3</diamond.version>
-        <dbcp2.version>2.13.0</dbcp2.version>
-        <druid.version>1.2.25</druid.version>
+        <dbcp2.version>2.14.0</dbcp2.version>
+        <druid.version>1.2.28</druid.version>
         <fastjson2.version>2.0.60</fastjson2.version>
         <findbugs.version>3.0.1</findbugs.version>
         <guava.version>32.0.1-jre</guava.version>
@@ -402,7 +402,7 @@
             <dependency>
                 <groupId>com.jayway.jsonpath</groupId>
                 <artifactId>json-path</artifactId>
-                <version>2.9.0</version>
+                <version>3.0.0</version>
             </dependency>
 
             <dependency>

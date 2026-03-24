@@ -33,3 +33,5 @@ __pycache__/
 .project
 *.secret
 site
+.alma-snapshots/
+.venv/
