@@ -1,8 +1,8 @@
 <p align="center">
-    <img alt="Addax Logo" src="https://github.com/wgzhao/Addax/blob/master/docs/images/logo.svg?raw=true" width="205" />
+    <img alt="Addax Logo" src="https://github.com/wgzhao/Addax/blob/master/images/logo.svg?raw=true" width="205" />
 </p>
 <p align="center">Addax 是一个支持主流数据库的通用数据采集工具</p>
-<p align="center"><a href="https://wgzhao.github.io/Addax">使用文档</a> 详细描述了如何安装使用，针对每个插件都有详细的说明和样例配置文档 </p>
+<p align="center"><a href="https://addax.wgzhao.com">使用文档</a> 详细描述了如何安装使用，针对每个插件都有详细的说明和样例配置文档 </p>
 <p align="center">
    <a href="https://github.com/wgzhao/Addax/releases">
       <img src="https://img.shields.io/github/release/wgzhao/addax.svg" alt="release version"/>
@@ -20,55 +20,55 @@ Addax 支持超过 20 种[关系型和非关系型数据库](support_data_source
 
 <table>
 <tr>
-<td><img src="./docs/images/logos/cassandra.svg" height="50px" alt="Cassandra" style="border: 1px solid #ddd;"></td>
-<td><img src="./docs/images/logos/clickhouse.svg" height="50px" alt="Clickhouse" style="border: 1px solid #ddd;"></td>
-<td><img src="./docs/images/logos/databend.svg" height="50px" alt="DataBend" style="border: 1px solid #ddd;"></td>
-<td><img src="./docs/images/logos/db2.svg" height="50px" alt="IMB DB2" style="border: 1px solid #ddd;"></td>
+<td><img src="./images/logos/cassandra.svg" height="50px" alt="Cassandra" style="border: 1px solid #ddd;"></td>
+<td><img src="./images/logos/clickhouse.svg" height="50px" alt="Clickhouse" style="border: 1px solid #ddd;"></td>
+<td><img src="./images/logos/databend.svg" height="50px" alt="DataBend" style="border: 1px solid #ddd;"></td>
+<td><img src="./images/logos/db2.svg" height="50px" alt="IMB DB2" style="border: 1px solid #ddd;"></td>
 </tr>
 <tr>
-<td><img src="./docs/images/logos/dbase.svg" height="50px" alt="dBase" style="border: 1px solid #ddd;"></td>
-<td><img src="./docs/images/logos/doris.svg"  height="50px" alt="Doris" style="border: 1px solid #ddd;"></td>
-<td><img src="./docs/images/logos/elasticsearch.svg" height="50px" alt="Elasticsearch" style="border: 1px solid #ddd;"></td>
-<td><img src="./docs/images/logos/excel.svg" height="50px" alt="Excel" style="border: 1px solid #ddd;"></td>
+<td><img src="./images/logos/dbase.svg" height="50px" alt="dBase" style="border: 1px solid #ddd;"></td>
+<td><img src="./images/logos/doris.svg"  height="50px" alt="Doris" style="border: 1px solid #ddd;"></td>
+<td><img src="./images/logos/elasticsearch.svg" height="50px" alt="Elasticsearch" style="border: 1px solid #ddd;"></td>
+<td><img src="./images/logos/excel.svg" height="50px" alt="Excel" style="border: 1px solid #ddd;"></td>
 </tr>
 <tr>
-<td><img src="./docs/images/logos/greenplum.svg" height="50px" alt="Greenplum" style="border: 1px solid #ddd;"></td>
-<td><img src="./docs/images/logos/hbase.svg" height="50px" alt="Apache HBase" style="border: 1px solid #ddd;"></td>
-<td><img src="./docs/images/logos/hive.svg" height="50px" alt="Hive" style="border: 1px solid #ddd;"></td>
-<td><img src="./docs/images/logos/influxdata.svg" height="50px" alt="InfluxDB" style="border: 1px solid #ddd;"></td>
+<td><img src="./images/logos/greenplum.svg" height="50px" alt="Greenplum" style="border: 1px solid #ddd;"></td>
+<td><img src="./images/logos/hbase.svg" height="50px" alt="Apache HBase" style="border: 1px solid #ddd;"></td>
+<td><img src="./images/logos/hive.svg" height="50px" alt="Hive" style="border: 1px solid #ddd;"></td>
+<td><img src="./images/logos/influxdata.svg" height="50px" alt="InfluxDB" style="border: 1px solid #ddd;"></td>
 </tr>
 <tr>
-<td><img src="./docs/images/logos/kafka.svg" height="50px" alt="Kafka" style="border: 1px solid #ddd;"></td>
-<td><img src="./docs/images/logos/kudu.svg" height="50px" alt="Kudu" style="border: 1px solid #ddd;"></td>
-<td><img src="./docs/images/logos/minio.svg" height="50px" alt="MinIO" style="border: 1px solid #ddd;"></td>
-<td><img src="./docs/images/logos/mongodb.svg" height="50px" alt="MongoDB" style="border: 1px solid #ddd;"></td>
+<td><img src="./images/logos/kafka.svg" height="50px" alt="Kafka" style="border: 1px solid #ddd;"></td>
+<td><img src="./images/logos/kudu.svg" height="50px" alt="Kudu" style="border: 1px solid #ddd;"></td>
+<td><img src="./images/logos/minio.svg" height="50px" alt="MinIO" style="border: 1px solid #ddd;"></td>
+<td><img src="./images/logos/mongodb.svg" height="50px" alt="MongoDB" style="border: 1px solid #ddd;"></td>
 </tr>
 <tr>
-<td><img src="./docs/images/logos/mysql.svg" height="50px" alt="MySQL" style="border: 1px solid #ddd;"></td>
-<td><img src="./docs/images/logos/oracle.svg" height="50px" alt="Oracle" style="border: 1px solid #ddd;"></td>
-<td><img src="./docs/images/logos/phoenix.svg" height="50px" alt="Phoenix" style="border: 1px solid #ddd;"></td>
-<td><img src="./docs/images/logos/postgresql.svg" height="50px" alt="PostgreSQL" style="border: 1px solid #ddd;"></td>
+<td><img src="./images/logos/mysql.svg" height="50px" alt="MySQL" style="border: 1px solid #ddd;"></td>
+<td><img src="./images/logos/oracle.svg" height="50px" alt="Oracle" style="border: 1px solid #ddd;"></td>
+<td><img src="./images/logos/phoenix.svg" height="50px" alt="Phoenix" style="border: 1px solid #ddd;"></td>
+<td><img src="./images/logos/postgresql.svg" height="50px" alt="PostgreSQL" style="border: 1px solid #ddd;"></td>
 </tr>
 <tr>
-<td><img src="./docs/images/logos/presto.svg" height="50px" alt="Presto" style="border: 1px solid #ddd;"></td>
-<td><img src="./docs/images/logos/redis.svg" height="50px" alt="Redis" style="border: 1px solid #ddd;"></td>
-<td><img src="./docs/images/logos/s3.svg" height="50px" alt="Amazon S3" style="border: 1px solid #ddd;"></td>
-<td><img src="./docs/images/logos/sqlite.svg" height="50px" alt="SQLite" style="border: 1px solid #ddd;"></td>
+<td><img src="./images/logos/presto.svg" height="50px" alt="Presto" style="border: 1px solid #ddd;"></td>
+<td><img src="./images/logos/redis.svg" height="50px" alt="Redis" style="border: 1px solid #ddd;"></td>
+<td><img src="./images/logos/s3.svg" height="50px" alt="Amazon S3" style="border: 1px solid #ddd;"></td>
+<td><img src="./images/logos/sqlite.svg" height="50px" alt="SQLite" style="border: 1px solid #ddd;"></td>
 </tr>
 <tr>
-<td><img src="./docs/images/logos/sqlserver.svg" height="50px" alt="SQLServer" style="border: 1px solid #ddd;"></td>
-<td><img src="./docs/images/logos/starrocks.svg" height="50px" alt="Starrocks" style="border: 1px solid #ddd;"></td>
-<td><img src="./docs/images/logos/sybase.svg" height="50px" alt="Sybase" style="border: 1px solid #ddd;"></td>
-<td><img src="./docs/images/logos/tdengine.svg" height="50px" alt="TDengine"  style="border: 1px solid #ddd;"></td>
+<td><img src="./images/logos/sqlserver.svg" height="50px" alt="SQLServer" style="border: 1px solid #ddd;"></td>
+<td><img src="./images/logos/starrocks.svg" height="50px" alt="Starrocks" style="border: 1px solid #ddd;"></td>
+<td><img src="./images/logos/sybase.svg" height="50px" alt="Sybase" style="border: 1px solid #ddd;"></td>
+<td><img src="./images/logos/tdengine.svg" height="50px" alt="TDengine"  style="border: 1px solid #ddd;"></td>
 </tr>
 <tr>
-<td><img src="./docs/images/logos/trino.svg" height="50px" alt="Trino" style="border: 1px solid #ddd;"></td>
-<td><img src="./docs/images/logos/access.svg" height="50px" alt="Access" style="border: 1px solid #add;"></td>
-<td><img src="./docs/images/logos/sap.svg" height="50px" alt="SAP HANA" style="border: 1px solid #add;"></td>
-<td><img src="./docs/images/logos/paimon.svg" height="50px" alt="Paimon" style="border: 1px solid #add;"></td>
+<td><img src="./images/logos/trino.svg" height="50px" alt="Trino" style="border: 1px solid #ddd;"></td>
+<td><img src="./images/logos/access.svg" height="50px" alt="Access" style="border: 1px solid #add;"></td>
+<td><img src="./images/logos/sap.svg" height="50px" alt="SAP HANA" style="border: 1px solid #add;"></td>
+<td><img src="./images/logos/paimon.svg" height="50px" alt="Paimon" style="border: 1px solid #add;"></td>
 </tr>
 <tr>
-<td><img src="./docs/images/logos/iceberg.svg" height="50px" alt="Iceberg" style="border: 1px solid #add;"></td>
+<td><img src="./images/logos/iceberg.svg" height="50px" alt="Iceberg" style="border: 1px solid #add;"></td>
 </tr>
 </table>
 
