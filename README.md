@@ -166,31 +166,12 @@ Explore more [example jobs](docs/assets/jobs)
 ## 🔗 Related Projects
 
 - [addax-admin](https://github.com/wgzhao/addax-admin) - A web-based management tool for administering Addax data collection tasks
-- [addax-ui](https://github.com/wgzhao/addax-ui) - Frontend implementation for addax-admin
-
+- [addax-docs](https://github.com/wgzhao/addax-docs) - Comprehensive documentation for Addax, including user guides and API references
 ---
 
 ## 🧩 Developing Addax
 
 For AI assistants: project-specific knowledge and conventions are documented in [SKILL.md](./SKILL.md). Please read it before working on this repo.
-
-### Building Documentation
-
-Generate or preview online documentation locally using [mkdocs](https://www.mkdocs.org):
-
-```shell
-python3 -m pip install mkdocs-material
-mkdocs build
-mkdocs serve -a 0.0.0.0:8888
-```
-
-For publishing:
-
-```shell
-export version=4.1.5
-git checkout $version
-mike deploy -p $version
-```
 
 ---
 
@@ -202,7 +183,7 @@ Follow general Java conventions and patterns:
 2. Categorize exceptions clearly with AddaxException (e.g., `AddaxException(REQUIRE_VALUE, "missing required parameter")`).
 3. Use the Java 8 Stream API cautiously (avoid in performance-sensitive areas).
 4. Avoid ternary operators for non-trivial expressions.
-5. Include proper Apache license headers in every file.
+5. Include proper Apache License headers in every file.
 
 > Refer to our [Programming Guidelines](https://cbea.ms/git-commit/) for commit message formats.
 

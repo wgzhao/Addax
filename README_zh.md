@@ -214,7 +214,7 @@ Failed record             :                   0
 
 </details>
 
-[这里](core/src/main/job) 以及[文档中心](docs/assets/jobs) 提供了大量作业配置样例
+[这里](core/src/main/job) 以及[文档中心](https://github.com/wgzhao/addax-docs/tree/master/docs/public/assets/jobs) 提供了大量作业配置样例
 
 ## 运行要求
 
@@ -223,13 +223,13 @@ Failed record             :                   0
 
 ## 文档
 
-- [在线文档](https://wgzhao.github.io/Addax/)
-- [项目内文档](docs/index.md)
+- [在线文档](https://addax.wgzhao.com)
+- [项目内文档](https://github.com/wgzhao/addax-docs)
 
 ## 相关项目
 
 - [addax-admin](https://github.com/wgzhao/addax-admin) - 基于web的管理工具，用于管理基于Addax的数据采集任务
-- [addax-ui](https://github.com/wgzhao/addax-ui) - addax-admin的前端实现
+- [addax-docs](https://github.com/wgzhao/addax-docs) - Addax的文档资源库，包含使用指南、插件开发文档、示例配置等
 
 ## 代码风格
 
