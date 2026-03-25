@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements.  See the NOTICE file
@@ -17,7 +17,11 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"
+>
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.wgzhao.addax</groupId>
@@ -33,14 +37,16 @@
     <licenses>
         <license>
             <name>Apache License</name>
-            <url>https://raw.githubusercontent.com/wgzhao/Addax/master/LICENSE</url>
+            <url
+            >https://raw.githubusercontent.com/wgzhao/Addax/master/LICENSE</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
 
     <scm>
         <connection>scm:git:https://github.com/wgzhao/addax.git</connection>
-        <developerConnection>scm:git:git@github.com:wgzhao/addax.git</developerConnection>
+        <developerConnection
+        >scm:git:git@github.com:wgzhao/addax.git</developerConnection>
         <url>https://github.com/wgzhao/addax</url>
         <tag>4.2.3</tag>
     </scm>
@@ -158,6 +164,7 @@
         <module>plugin/reader/databendreader</module>
         <module>plugin/reader/datareader</module>
         <module>plugin/reader/dbfreader</module>
+        <module>plugin/reader/dorisreader</module>
         <module>plugin/reader/elasticsearchreader</module>
         <module>plugin/reader/excelreader</module>
         <module>plugin/reader/ftpreader</module>
@@ -891,7 +898,8 @@
                     </exclusion>
                     <exclusion>
                         <groupId>org.apache.hadoop</groupId>
-                        <artifactId>hadoop-yarn-server-resourcemanager</artifactId>
+                        <artifactId
+                        >hadoop-yarn-server-resourcemanager</artifactId>
                     </exclusion>
                     <exclusion>
                         <groupId>org.apache.hadoop</groupId>
@@ -1327,7 +1335,8 @@
                     <artifactId>maven-assembly-plugin</artifactId>
                     <version>3.6.0</version>
                     <configuration>
-                        <finalName>${project.artifactId}-${project.version}</finalName>
+                        <finalName
+                        >${project.artifactId}-${project.version}</finalName>
                         <descriptors>
                             <descriptor>package.xml</descriptor>
                         </descriptors>
@@ -1399,25 +1408,35 @@
                 </executions>
                 <configuration>
                     <rules>
-                        <compound implementation="com.github.ferstl.maven.pomenforcers.CompoundPedanticEnforcer">
-                            <enforcers>POM_SECTION_ORDER,MODULE_ORDER,DEPENDENCY_MANAGEMENT_ORDER,DEPENDENCY_ORDER,PLUGIN_MANAGEMENT_ORDER
+                        <compound
+                            implementation="com.github.ferstl.maven.pomenforcers.CompoundPedanticEnforcer"
+                        >
+                            <enforcers
+                            >POM_SECTION_ORDER,MODULE_ORDER,DEPENDENCY_MANAGEMENT_ORDER,DEPENDENCY_ORDER,PLUGIN_MANAGEMENT_ORDER
                             </enforcers>
                             <pomSectionPriorities>
                                 modelVersion,parent,groupId,artifactId,version,name,description,packaging,url,inceptionYear,licenses,scm,properties,modules
                             </pomSectionPriorities>
-                            <dependenciesGroupIdPriorities>com.wgzhao.addax</dependenciesGroupIdPriorities>
-                            <dependenciesOrderBy>groupId,artifactId,scope</dependenciesOrderBy>
-                            <dependenciesScopePriorities>compile,runtime,provided,test</dependenciesScopePriorities>
-                            <dependencyManagementOrderBy>groupId,artifactId</dependencyManagementOrderBy>
-                            <dependencyManagementGroupIdPriorities>com.wgzhao</dependencyManagementGroupIdPriorities>
+                            <dependenciesGroupIdPriorities
+                            >com.wgzhao.addax</dependenciesGroupIdPriorities>
+                            <dependenciesOrderBy
+                            >groupId,artifactId,scope</dependenciesOrderBy>
+                            <dependenciesScopePriorities
+                            >compile,runtime,provided,test</dependenciesScopePriorities>
+                            <dependencyManagementOrderBy
+                            >groupId,artifactId</dependencyManagementOrderBy>
+                            <dependencyManagementGroupIdPriorities
+                            >com.wgzhao</dependencyManagementGroupIdPriorities>
                         </compound>
                         <bannedPlugins>
                             <!-- will only display a warning but does not fail the build. -->
                             <level>WARN</level>
                             <excludes>
-                                <exclude>org.apache.maven.plugins:maven-verifier-plugin</exclude>
+                                <exclude
+                                >org.apache.maven.plugins:maven-verifier-plugin</exclude>
                             </excludes>
-                            <message>Please consider using the maven-invoker-plugin</message>
+                            <message
+                            >Please consider using the maven-invoker-plugin</message>
                         </bannedPlugins>
                         <requireMavenVersion>
                             <version>(3.5.4,)</version>
@@ -1470,7 +1489,8 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <version>3.1.1</version>
                 <configuration>
-                    <preparationGoals>clean compile -DskipTests</preparationGoals>
+                    <preparationGoals
+                    >clean compile -DskipTests</preparationGoals>
                     <tagNameFormat>@{project.version}</tagNameFormat>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                 </configuration>

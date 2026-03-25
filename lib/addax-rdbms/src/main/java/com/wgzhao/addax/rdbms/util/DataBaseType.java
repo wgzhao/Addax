@@ -35,6 +35,9 @@ public enum DataBaseType
     /** MySQL database with modern Connector/J driver */
     MySql("mysql", "com.mysql.cj.jdbc.Driver"),
 
+    /** Apache Doris via Arrow Flight SQL (MySQL-compatible SQL dialect) */
+    Doris("mysql", "org.apache.arrow.driver.jdbc.ArrowFlightJdbcDriver"),
+
     /** Apache Hive data warehouse software using HiveServer2 */
     Hive("hive2", "org.apache.hive.jdbc.HiveDriver"),
 
@@ -95,7 +98,7 @@ public enum DataBaseType
     /** SAP HANA in-memory database platform */
     HANA("hana", "com.sap.db.jdbc.Driver");
 
-    private static final Pattern jdbcUrlPattern = Pattern.compile("jdbc:\\w+:(?:thin:url=|//|thin:@|)([\\w\\d.,]+).*");
+    private static final Pattern jdbcUrlPattern = Pattern.compile("jdbc:[\\w-]+:(?:thin:url=|//|thin:@|)([\\w\\d.,]+).*");
 
     private String driverClassName;
     private final String typeName;
@@ -245,7 +248,7 @@ public enum DataBaseType
 
     private String quoteColumn(String columnName)
     {
-        if (this == MySql || this == Hive) {
+        if (this == MySql || this == Doris || this == Hive) {
             return "`" + columnName.replace("`", "``") + "`";
         }
         if (this == Presto || this == Trino || this == Oracle || this == PostgreSQL) {

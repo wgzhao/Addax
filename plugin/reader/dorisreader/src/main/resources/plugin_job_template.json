@@ -1,0 +1,22 @@
+{
+  "name": "dorisreader",
+  "parameter": {
+    "username": "root",
+    "password": "root",
+    "autoPk": "false",
+    "splitPk": "",
+    "column": [
+      "*"
+    ],
+    "preSql": [],
+    "fetchSize": 2048,
+    "connection": {
+      "jdbcUrl": "jdbc:arrow-flight-sql://127.0.0.1:9030?useServerPrepStmts=false&cachePrepStmts=true&useSSL=false&useEncryption=false",
+      "table": [
+        "addax_reader"
+      ],
+      "driver": ""
+    },
+    "where": ""
+  }
+}

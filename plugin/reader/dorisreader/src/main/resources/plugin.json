@@ -1,0 +1,6 @@
+{
+  "name": "dorisreader",
+  "class": "com.wgzhao.addax.plugin.reader.dorisreader.DorisReader",
+  "description": "useScene: prod. mechanism: Jdbc connection using Apache Doris (Arrow Flight SQL or MySQL protocol), execute select sql, retrieve data from the ResultSet.",
+  "developer": "alibaba"
+}
