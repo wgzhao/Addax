@@ -56,7 +56,6 @@ import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
-
 import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
 import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
@@ -298,11 +297,10 @@ public class OrcWriter
 
         TypeDescription schema = buildOrcSchema(columns);
         Path filePath = new Path(fileName);
+        org.apache.orc.OrcFile.WriterOptions writerOptions =
+                buildWriterOptions(conf, config, schema, columns, compress);
 
-        try (Writer writer = OrcFile.createWriter(filePath,
-                OrcFile.writerOptions(conf)
-                        .setSchema(schema)
-                        .compress(CompressionKind.valueOf(compress)))) {
+        try (Writer writer = OrcFile.createWriter(filePath, writerOptions)) {
 
             Record record;
             VectorizedRowBatch batch = schema.createRowBatch(batchSize);
@@ -366,7 +364,22 @@ public class OrcWriter
                 schema.addField(fieldName, TypeDescription.fromString(typeName));
             }
         }
-
         return schema;
+    }
+
+    private org.apache.orc.OrcFile.WriterOptions buildWriterOptions(org.apache.hadoop.conf.Configuration hadoopConf,
+            Configuration config, TypeDescription schema, List<Configuration> columns, String compress)
+    {
+        org.apache.orc.OrcFile.WriterOptions writerOptions = OrcFile.writerOptions(hadoopConf)
+                .setSchema(schema)
+                .compress(CompressionKind.valueOf(compress));
+
+        BloomFilterConfig bloomFilterConfig = resolveBloomFilterConfiguration(config, columns);
+        if (bloomFilterConfig != null) {
+            writerOptions.bloomFilterColumns(bloomFilterConfig.columns())
+                    .bloomFilterFpp(bloomFilterConfig.fpp());
+        }
+
+        return writerOptions;
     }
 }

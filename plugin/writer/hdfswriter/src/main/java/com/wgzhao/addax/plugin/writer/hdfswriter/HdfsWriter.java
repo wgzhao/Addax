@@ -84,11 +84,9 @@ public class HdfsWriter
         public void init()
         {
             this.writerSliceConfig = this.getPluginJobConf();
-            this.validateParameter();
-
             hdfsHelper = new HdfsHelper();
-
             hdfsHelper.getFileSystem(this.writerSliceConfig);
+            this.validateParameter();
         }
 
         private void validateParameter()
@@ -145,6 +143,9 @@ public class HdfsWriter
 
             //compress check
             validateCompression(fileType);
+            if ("ORC".equals(fileType)) {
+                hdfsHelper.validateBloomFilterConfiguration(this.writerSliceConfig, columns);
+            }
             //Kerberos check
             validateKerberos();
             // encoding check
