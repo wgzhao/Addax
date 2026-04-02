@@ -1,95 +1,58 @@
-AGENTS.md
-=========
+# AGENTS.md
 
-Purpose
--------
-This file is written for AI coding agents that are assigned to work in the Addax repository. It contains the minimal, concrete, and discoverable knowledge needed to be productive quickly: the high-level architecture, key developer workflows (build/test/debug), codebase-specific conventions, integration points, and a short troubleshooting example (protobuf runtime issue found in `plugin/reader/dorisreader`).
+## 概述
 
-High-level architecture (big picture)
-------------------------------------
-- Monorepo built with Maven. Parent POM at project root (`pom.xml`) aggregates modules (core, plugin, server, etc.).
-- Major components:
-  - `core/` : Addax core framework and runtime (Engine, JobContainer, common utils).
-  - `plugin/` : Source for reader/writer plugins. Each plugin is a separate Maven module (e.g., `plugin/reader/dorisreader`). Plugins implement `com.wgzhao.addax.core.spi.Reader`/Writer interfaces.
-  - `docs/`, `overrides/`, `server/` : documentation, server-side web templates and pages.
-- Dataflow: a Job is created by the `Engine` which uses `JobContainer` → `Reader.Job` splits into slices → `Reader.Task` runs and uses `RecordSender` to send records into downstream Writer. See `com.wgzhao.addax.core.job.JobContainer` and `com.wgzhao.addax.core.Engine` for orchestration.
+该项目是一个离线的 ETL 工具，通过插件化架构支持多种数据源和目标。核心组件包括 Engine、JobContainer，以及各种 Reader/Writer 插件。项目使用 Maven 管理构建和依赖。
 
-Key developer workflows
------------------------
-- Build whole repository:
+## 编译
 
-  mvn -T1C -DskipTests package
+### 整体编译
 
-  (Use the parent `pom.xml` in repo root. Some modules produce jars under `target/`.)
+```bash
+mvn clean package -T1C -DskipTests
+```
 
-- Build a single plugin module (example: dorisreader):
+### 单模块编译（以 dorisreader 为例）
 
-  cd plugin/reader/dorisreader
-  mvn -DskipTests package
+```bash
+mvn clean package -pl :dorisreader -am
+```
 
-- Run docs build: `./build-docs.sh` (see `mkdocs.yml` and `docs/` folder)
-- Running the engine locally: the runtime entrypoint is `com.wgzhao.addax.core.Engine` (check `core/src/main/java`). Use `java -jar` on an assembled `addax-core` jar or run with `mvn -pl core -am exec:java` adjusted to your environment.
+## 禁止
+- `core` 为核心模块，包含 Engine 和 JobContainer 等核心类。修改此模块需谨慎，确保不破坏核心运行逻辑。
+- `addax-rdbms` 包含多个 JDBC/SQL 相关的工具类
+- `addax-lib` 包含一些通用工具类和依赖管理, 若无必要，避免修改核心工具类。
+- 尽可能不要引入新的依赖库，尤其是核心模块和公共库。新增依赖可能引入版本冲突或增加维护负担。
+- 考虑到兼容各类 RDBMS 的最低版本，因此各依赖库的版本请勿修改，除非确实需要修复安全漏洞或兼容性问题，并且在修改前先评估对现有插件的影响。
+- 不需要写单元测试，所有的测试都会在目前特定构建的环境下手工执行
 
-Project-specific conventions and patterns
----------------------------------------
-- Plugins follow a standard pattern: outer class extends `Reader` or `Writer` with static nested `Job` and `Task` classes. Example: `plugin/reader/dorisreader/src/main/java/com/wgzhao/addax/plugin/reader/dorisreader/DorisReader.java`.
-- Plugins often delegate heavy lifting to shared helpers in `addax-rdbms` (e.g., `CommonRdbmsReader.Job/Task`). Prefer reusing these common classes for JDBC/SQL-based readers.
-- Configuration is handled via `com.wgzhao.addax.core.util.Configuration` and constants/keys in `com.wgzhao.addax.core.base.Key`. Look up how values are read/set in existing plugins before adding new config keys.
-- Error handling: the code raises `AddaxException.asAddaxException(ErrorCode.<...>, "message")` for input validation and fatal plugin errors. Follow the same pattern.
+## 运行流程
 
-Integration points and notable external dependencies
----------------------------------------------------
-- JDBC-based readers/writers use `BasicDataSource` (commons-dbcp2) and utility `com.wgzhao.addax.rdbms.util.DBUtil`.
-- Some plugins (e.g., `dorisreader`) depend on Apache Arrow Flight and the Arrow JDBC driver: `org.apache.arrow:flight-sql-jdbc-core`. Arrow transitively depends on `protobuf` runtime. Be careful: many protobuf versions exist across the JVM classpath; prefer adding an explicit `com.google.protobuf:protobuf-java` dependency in the plugin or managing it centrally in the parent POM.
+1. 编辑一个 `json` 格式或者 `yaml` 格式的 Job 配置文件，指定 Reader、Writer 以及相关参数，可以参考 `core/src/main/job` 下的例子
+2. 执行 `addax.sh` 脚本，传入 Job 配置文件路径，例如：
 
-Troubleshooting example: NoClassDefFoundError for protobuf RuntimeVersion
----------------------------------------------------------------------
-- Symptom: plugin fails at runtime with
+```bash
+sh addax.sh -job /path/to/job.json
+```
 
-  java.lang.NoClassDefFoundError: com/google/protobuf/RuntimeVersion$RuntimeDomain
+程序运行的内部流程可以参考[这个文档](https://github.com/wgzhao/addax-docs/raw/refs/heads/master/docs/plugin-development.md)
 
-  stack shows Arrow Flight classes (Flight$Ticket) failing to initialize.
+## 插件开发
 
-- Root cause: Arrow Flight requires a protobuf runtime class that isn't on the runtime classpath or a mismatched protobuf version is present. The missing nested class `RuntimeVersion$RuntimeDomain` indicates protobuf runtime incompatible or absent.
-- Fix used in this repo (concrete change): add explicit dependency in `plugin/reader/dorisreader/pom.xml`:
+新增插件的开发流程可以参考[plugin development 文档](https://github.com/wgzhao/addax-docs/raw/refs/heads/master/docs/plugin-development.md)
 
-  <dependency>
-    <groupId>com.google.protobuf</groupId>
-    <artifactId>protobuf-java</artifactId>
-    <version>3.21.12</version>
-  </dependency>
 
-  If your environment manages protobuf at the parent level, prefer adding the version into the parent POM `dependencyManagement` so all modules use a consistent protobuf runtime.
+## Git / PR 标准流程
 
-Where to look next when similar errors appear
---------------------------------------------
-- Inspect the dependency tree for conflicting protobuf versions:
+当用户明确提出“提交并创建 PR”时，默认按以下流程执行（除非用户另有说明）：
 
-  mvn dependency:tree -Dincludes=com.google.protobuf:protobuf-java
+1. 创建新分支后再提交，分支名建议使用 `feat/<topic>` 或 `fix/<topic>` 格式，根据本次修改的性质选择 `feat`（新功能）或 `fix`（修复）。例如：`feat/add-protobuf-dependency`。
+2. 使用英文编写 commit message：
+   - `title` 简洁明确（建议 Conventional Commits 风格）。
+   - `description/body` 说明动机、核心改动、验证情况。
+3. 使用 `gh` 命令创建 PR，不只推送分支：
+   - 示例：`gh pr create --base master --head <branch> --title "<english title>" --body-file <file>`
+4. PR 内容必须使用英文，遵循 [PR 模板](.github/pull_request_template.md) 进行填写
+5. 若无特别要求，PR 设为 Ready for review（非 Draft）。
 
-- If you find multiple versions, prefer aligning them in parent `dependencyManagement` or exclude older versions from transitive dependencies.
-- Check the runtime classpath used by the process starting `Engine`. When running via IDE or custom launcher, ensure it uses the Maven-built classpath or an assembly jar that includes required dependencies.
-
-Key files and locations to inspect
----------------------------------
-- Parent build: `pom.xml` at repo root
-- Core runtime: `core/src/main/java/com/wgzhao/addax/core` (Engine, JobContainer)
-- RDBMS helpers: `lib/addax-rdbms` and package `com.wgzhao.addax.rdbms` (watch for `DBUtil`, `CommonRdbmsReader`)
-- Plugins: `plugin/reader/*` and `plugin/writer/*` (follow plugin template)
-- Docs: `docs/` and `docs/en/` for example configurations
-
-If you are an AI agent assigned to modify code
--------------------------------------------
-- Keep changes minimal and module-scoped (avoid large parent POM edits without justification).
-- When adding runtime dependencies to fix NoClassDefFoundError, add them into the module POM and explain why in the commit message, then propose moving them to `dependencyManagement` if multiple modules need the same fix.
-
-Contact/Owner notes
--------------------
-- No explicit owners declared in repository files. Use the commit log and existing PRs to identify maintainers.
-
-Short changelog entry for today's fix
-------------------------------------
-- Added explicit protobuf-java dependency to `plugin/reader/dorisreader/pom.xml` to avoid NoClassDefFoundError at runtime when using Arrow Flight.
-
-End of AGENTS.md
-
+以上流程可由一句 "提交并创建 PR" 触发，不需要用户重复描述细节格式要求。
