@@ -38,7 +38,6 @@ import org.slf4j.LoggerFactory;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -84,11 +83,9 @@ public class HdfsWriter
         public void init()
         {
             this.writerSliceConfig = this.getPluginJobConf();
-            this.validateParameter();
-
             hdfsHelper = new HdfsHelper();
-
             hdfsHelper.getFileSystem(this.writerSliceConfig);
+            this.validateParameter();
         }
 
         private void validateParameter()
@@ -145,6 +142,9 @@ public class HdfsWriter
 
             //compress check
             validateCompression(fileType);
+            if ("ORC".equals(fileType)) {
+                hdfsHelper.validateBloomFilterConfiguration(this.writerSliceConfig, columns);
+            }
             //Kerberos check
             validateKerberos();
             // encoding check

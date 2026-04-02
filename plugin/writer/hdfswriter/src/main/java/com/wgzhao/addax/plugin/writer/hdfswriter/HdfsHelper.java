@@ -42,14 +42,19 @@ import org.slf4j.LoggerFactory;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.wgzhao.addax.core.base.Key.HAVE_KERBEROS;
 import static com.wgzhao.addax.core.base.Key.HDFS_SITE_PATH;
 import static com.wgzhao.addax.core.base.Key.KERBEROS_KEYTAB_FILE_PATH;
 import static com.wgzhao.addax.core.base.Key.KERBEROS_PRINCIPAL;
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.LOGIN_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
@@ -62,6 +67,11 @@ public class HdfsHelper
     protected FileSystem fileSystem = null;
     protected JobConf conf = null;
     protected org.apache.hadoop.conf.Configuration hadoopConf = null;
+    private static final double DEFAULT_BLOOM_FILTER_FPP = 0.05d;
+
+    record BloomFilterConfig(String columns, double fpp)
+    {
+    }
 
     protected void getFileSystem(Configuration taskConfig)
     {
@@ -295,5 +305,52 @@ public class HdfsHelper
         } catch (IOException | IllegalArgumentException e) {
             return false;
         }
+    }
+
+    public void validateBloomFilterConfiguration(Configuration config, List<Configuration> columns)
+    {
+        resolveBloomFilterConfiguration(config, columns);
+    }
+
+    public BloomFilterConfig resolveBloomFilterConfiguration(Configuration config, List<Configuration> columns)
+    {
+        List<String> bloomFilterColumns = config.getList(Key.BLOOM_FILTER_COLUMNS, String.class);
+        if (bloomFilterColumns == null || bloomFilterColumns.isEmpty()) {
+            return null;
+        }
+
+        Set<String> availableColumns = columns.stream()
+                .map(column -> column.getString(Key.NAME).trim())
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+
+        List<String> normalizedBloomColumns = new ArrayList<>();
+        for (String bloomColumn : bloomFilterColumns) {
+            if (bloomColumn == null || bloomColumn.trim().isEmpty()) {
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                        "The item [bloomColumns] contains empty column name.");
+            }
+
+            String normalizedColumn = bloomColumn.trim();
+            if (!availableColumns.contains(normalizedColumn)) {
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                        String.format("The item [bloomColumns] contains unknown column [%s].", normalizedColumn));
+            }
+
+            if (!normalizedBloomColumns.contains(normalizedColumn)) {
+                normalizedBloomColumns.add(normalizedColumn);
+            }
+        }
+
+        if (normalizedBloomColumns.isEmpty()) {
+            return null;
+        }
+
+        double fpp = config.getDouble(Key.BLOOM_FILTER_FPP, DEFAULT_BLOOM_FILTER_FPP);
+        if (fpp <= 0.0d || fpp >= 1.0d) {
+            throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                    String.format("The item [bloom.filter.fpp] must be between 0 and 1, but got [%s].", fpp));
+        }
+
+        return new BloomFilterConfig(String.join(",", normalizedBloomColumns), fpp);
     }
 }
