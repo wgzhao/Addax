@@ -348,7 +348,7 @@ public class HdfsHelper
         double fpp = config.getDouble(Key.BLOOM_FILTER_FPP, DEFAULT_BLOOM_FILTER_FPP);
         if (fpp <= 0.0d || fpp >= 1.0d) {
             throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                    String.format("The item [bloom.filter.fpp] must be between 0 and 1, but got [%s].", fpp));
+                    String.format("The item [bloomFpp] must be between 0 and 1, but got [%s].", fpp));
         }
 
         return new BloomFilterConfig(String.join(",", normalizedBloomColumns), fpp);
