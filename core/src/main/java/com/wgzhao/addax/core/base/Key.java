@@ -37,6 +37,10 @@ public class Key
     public static final String VALUE = "value";
     // Compression alg will be read or write, default is NONE. string type
     public static final String COMPRESS = "compress";
+    // ORC bloom filter columns, list type
+    public static final String BLOOM_FILTER_COLUMNS = "bloomColumns";
+    // ORC bloom filter false positive probability, double type
+    public static final String BLOOM_FILTER_FPP = "bloomFpp";
     // data encoding，default is UTF-8. string type
     public static final String ENCODING = "encoding";
     // JDBC driver class name , in most cases, the program can guess automatically, without manual configuration. string type
