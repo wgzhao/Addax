@@ -67,7 +67,7 @@ jobs:
           sha256sum addax-${{ steps.version.outputs.version }}.tar.gz > addax-${{ steps.version.outputs.version }}.tar.gz.sha256sum.asc
 
       - name: Upload to GitHub
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         if: github.ref_type == 'tag'
         with:
           body: |
