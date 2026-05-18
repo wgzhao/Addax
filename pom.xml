@@ -88,7 +88,7 @@
         <javadbf.version>1.14.1</javadbf.version>
         <jest.version>6.3.1</jest.version>
         <junit.version>5.10.2</junit.version>
-        <joda.time.version>2.14.0</joda.time.version>
+        <joda.time.version>2.14.2</joda.time.version>
         <jackson.version>2.20.1</jackson.version>
         <jedis.version>3.7.0</jedis.version>
         <jsch.version>2.27.5</jsch.version>
