@@ -76,7 +76,7 @@
         <fluent.hc.version>4.5.14</fluent.hc.version>
         <hadoop.version>3.3.6</hadoop.version>
         <hbase2.version>2.2.5</hbase2.version>
-        <hive.version>3.1.3</hive.version>
+        <hive.version>4.2.0</hive.version>
         <httpclient.version>5.5</httpclient.version>
         <httpcore.version>5.3.6</httpcore.version>
         <influxdb.client.version>8.0.0</influxdb.client.version>
