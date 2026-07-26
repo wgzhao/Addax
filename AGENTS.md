@@ -102,11 +102,20 @@ sh addax.sh -job /path/to/job.json
 
 ### 3) Body 规则
 
-- 对 `feat`、`fix`、`refactor`、`perf`，建议必须写 body。
-- body 中至少说明三点：
-   - `why`: 为什么改
-   - `what`: 改了什么
-   - `impact`: 影响范围、兼容性、性能或行为变化
+- 对 `feat`、`fix`、`refactor`、`perf`，body **必须**写（CI 校验 `.github/scripts/lint-commit-msg.sh` 会检查）。
+- body 必须包含以下三行行首前缀，冒号后紧跟空格再接描述，描述须在同一行内（不能换行到下一行）：
+   - `why: ...` — 为什么改
+   - `what: ...` — 改了什么
+   - `impact: ...` — 影响范围、兼容性、性能或行为变化
+- 示例：
+
+  ```text
+  why: the existing code called column.asLong() which throws CONVERT_OVER_FLOW for values > Long.MAX_VALUE.
+
+  what: use setBigDecimal when column type is STRING to handle overflow values from UNSIGNED BIGINT.
+
+  impact: unsigned bigint values >= 2^63 no longer cause errors during transfer.
+  ```
 
 ### 4) Footer 规则
 
