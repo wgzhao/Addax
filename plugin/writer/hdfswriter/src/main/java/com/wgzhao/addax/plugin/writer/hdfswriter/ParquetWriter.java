@@ -218,7 +218,7 @@ public class ParquetWriter
             }
             case TIMESTAMP -> group.append(colName, tsToBinary(column.asTimestamp()));
             case DATE -> group.append(colName, (int) Math.round(column.asLong() * 1.0 / MILLIS_PER_DAY));
-            default -> group.append(colName, column.asString());
+            default -> group.append(colName, formatTimeWithNanos(column));
         }
     }
 
@@ -318,7 +318,7 @@ public class ParquetWriter
     {
         long millis = ts.getTime();
         int julianDays = (int) (millis / MILLIS_PER_DAY) + JULIAN_EPOCH_OFFSET_DAYS;
-        long nanosOfDay = (millis % MILLIS_PER_DAY) * NANOS_PER_MILLISECOND;
+        long nanosOfDay = (millis % MILLIS_PER_DAY) * NANOS_PER_MILLISECOND + (ts.getNanos() % (int) NANOS_PER_MILLISECOND);
 
         // Write INT96 timestamp
         byte[] timestampBuffer = new byte[12];

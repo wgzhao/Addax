@@ -24,6 +24,8 @@ import com.alibaba.fastjson2.JSONObject;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import com.wgzhao.addax.core.base.Key;
+import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.element.DateColumn;
 import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.util.Configuration;
 import org.apache.commons.lang3.StringUtils;
@@ -42,6 +44,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -352,5 +355,28 @@ public class HdfsHelper
         }
 
         return new BloomFilterConfig(String.join(",", normalizedBloomColumns), fpp);
+    }
+
+    /**
+     * Format a TIME column to string with full nanosecond precision.
+     * <p>
+     * When the column is a DateColumn with TIME subtype and has non-zero nanos,
+     * produces ISO-8601 format like {@code HH:mm:ss.SSSSSS} with trailing zeros trimmed.
+     * When nanos is zero, delegates to the default {@code column.asString()} ({@code HH:mm:ss}).
+     *
+     * @param column the input column to format
+     * @return formatted time string with full precision when applicable
+     */
+    protected static String formatTimeWithNanos(Column column)
+    {
+        if (column.getType() == Column.Type.DATE && ((DateColumn) column).getSubType() == DateColumn.DateType.TIME) {
+            long nanos = ((DateColumn) column).getNanos();
+            if (nanos > 0) {
+                long timeMs = (Long) column.getRawData();
+                long totalNanosOfDay = (timeMs % 86_400_000L) * 1_000_000L + (nanos % 1_000_000L);
+                return LocalTime.ofNanoOfDay(totalNanosOfDay).toString();
+            }
+        }
+        return column.asString();
     }
 }

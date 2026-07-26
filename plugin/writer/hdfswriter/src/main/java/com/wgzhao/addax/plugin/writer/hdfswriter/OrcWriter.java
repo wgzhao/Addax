@@ -271,7 +271,7 @@ public class OrcWriter
         }
         else if (colType == Column.Type.DATE) {
             if (((DateColumn) column).getSubType() == DateColumn.DateType.TIME) {
-                buffer = column.asString().getBytes(StandardCharsets.UTF_8);
+                buffer = formatTimeWithNanos(column).getBytes(StandardCharsets.UTF_8);
             }
             else {
                 buffer = DATE_FORMAT.get().format(column.asDate()).getBytes(StandardCharsets.UTF_8);
