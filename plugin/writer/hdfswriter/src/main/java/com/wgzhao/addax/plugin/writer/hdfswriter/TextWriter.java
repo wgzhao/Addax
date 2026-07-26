@@ -141,7 +141,7 @@ public class TextWriter
                             case BIGINT -> recordList.add(column.asLong());
                             case FLOAT -> recordList.add(Float.valueOf(rowData));
                             case DOUBLE -> recordList.add(column.asDouble());
-                            case STRING, VARCHAR, CHAR -> recordList.add(column.asString());
+                            case STRING, VARCHAR, CHAR -> recordList.add(formatTimeWithNanos(column));
                             case DECIMAL -> recordList.add(HiveDecimal.create(column.asBigDecimal()));
                             case BOOLEAN -> recordList.add(column.asBoolean());
                             case DATE -> recordList.add(org.apache.hadoop.hive.common.type.Date.valueOf(column.asString()));
