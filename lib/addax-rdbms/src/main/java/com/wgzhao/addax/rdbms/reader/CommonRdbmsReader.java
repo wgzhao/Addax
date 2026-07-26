@@ -48,6 +48,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -353,7 +354,21 @@ public class CommonRdbmsReader
                 case Types.SMALLINT:
                 case Types.TINYINT:
                 case Types.INTEGER:
+                    return new LongColumn(rs.getString(i));
                 case Types.BIGINT:
+                    if (!metaData.isSigned(i)) {
+                        // BIGINT UNSIGNED may exceed Long.MAX_VALUE (9223372036854775807);
+                        // store as StringColumn to preserve full precision
+                        String raw = rs.getString(i);
+                        if (raw != null) {
+                            BigInteger bi = new BigInteger(raw);
+                            if (bi.compareTo(BigInteger.valueOf(Long.MAX_VALUE)) > 0) {
+                                return new StringColumn(raw);
+                            }
+                            return new LongColumn(bi);
+                        }
+                        return new LongColumn((String) null);
+                    }
                     return new LongColumn(rs.getString(i));
                 case Types.NUMERIC:
                 case Types.DECIMAL:

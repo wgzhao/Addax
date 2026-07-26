@@ -697,14 +697,26 @@ public class CommonRdbmsWriter
                 case Types.TINYINT:
                 case Types.SMALLINT:
                 case Types.INTEGER:
-                case Types.BIGINT:
                     preparedStatement.setLong(columnIndex, column.asLong());
+                    break;
+
+                case Types.BIGINT:
+                    if (column.getType() == Column.Type.STRING) {
+                        // value from UNSIGNED BIGINT overflow; use BigDecimal to preserve precision
+                        preparedStatement.setBigDecimal(columnIndex, new BigDecimal(column.asString()));
+                    } else {
+                        preparedStatement.setLong(columnIndex, column.asLong());
+                    }
                     break;
 
                 case Types.NUMERIC:
                 case Types.DECIMAL:
                     if ((int) this.resultSetMetaData.get(columnIndex).get("scale") == 0) {
-                        preparedStatement.setLong(columnIndex, column.asLong());
+                        if (column.getType() == Column.Type.STRING) {
+                            preparedStatement.setBigDecimal(columnIndex, new BigDecimal(column.asString()));
+                        } else {
+                            preparedStatement.setLong(columnIndex, column.asLong());
+                        }
                     }
                     else {
                         preparedStatement.setBigDecimal(columnIndex, new BigDecimal(column.asString()));
