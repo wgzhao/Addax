@@ -24,6 +24,7 @@ package com.wgzhao.addax.rdbms.writer;
 import com.wgzhao.addax.core.base.Constant;
 import com.wgzhao.addax.core.base.Key;
 import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.element.DateColumn;
 import com.wgzhao.addax.core.element.Record;
 import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.plugin.RecordReceiver;
@@ -737,6 +738,19 @@ public class CommonRdbmsWriter
 
                     if (null != utilDate) {
                         sqlTime = new java.sql.Time(utilDate.getTime());
+                        // preserve nanosecond precision if the source DateColumn carries it
+                        if (column instanceof DateColumn) {
+                            long nanos = ((DateColumn) column).getNanos();
+                            if (nanos > 0) {
+                                try {
+                                    preparedStatement.setObject(columnIndex,
+                                            sqlTime.toLocalTime().withNano((int) nanos));
+                                    break;
+                                } catch (SQLException ignored) {
+                                    // driver doesn't support LocalTime; fall through to setTime
+                                }
+                            }
+                        }
                     }
                     preparedStatement.setTime(columnIndex, sqlTime);
                     break;

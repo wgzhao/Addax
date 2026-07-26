@@ -362,7 +362,18 @@ public class CommonRdbmsReader
                 case Types.DOUBLE:
                     return new DoubleColumn(rs.getString(i));
                 case Types.TIME:
-                    return new DateColumn(rs.getTime(i));
+                    java.sql.Time time = rs.getTime(i);
+                    int nanos = 0;
+                    int precision = metaData.getScale(i);
+                    try {
+                        java.time.LocalTime lt = rs.getObject(i, java.time.LocalTime.class);
+                        if (lt != null) {
+                            nanos = lt.getNano();
+                        }
+                    } catch (SQLException | AbstractMethodError e) {
+                        // JDBC driver doesn't support getObject(int, Class); fallback to millis-only
+                    }
+                    return new DateColumn(time, nanos, precision);
                 case Types.DATE:
                     return new DateColumn(rs.getDate(i));
                 case Types.TIMESTAMP:
