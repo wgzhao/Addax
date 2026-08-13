@@ -32,16 +32,16 @@ import com.wgzhao.addax.core.element.StringColumn;
  * Usage in job config:
  * "transformer": [
  *   {
- *     "name": "dx_null_to_empty_string"
+ *     "name": "dx_string_null_to_empty"
  *   }
  * ]
  */
-public class NullToEmptyStringTransformer
+public class StringNullToEmptyTransformer
         extends Transformer
 {
-    public NullToEmptyStringTransformer()
+    public StringNullToEmptyTransformer()
     {
-        setTransformerName("dx_null_to_empty_string");
+        setTransformerName("dx_string_null_to_empty");
     }
 
     @Override
