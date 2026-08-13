@@ -19,35 +19,31 @@
 
 package com.wgzhao.addax.core.transport.transformer;
 
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONArray;
-import com.alibaba.fastjson2.JSONObject;
 import com.wgzhao.addax.core.element.Record;
 import com.wgzhao.addax.core.element.StringColumn;
 
-import java.util.HashSet;
-import java.util.Set;
-
 /**
- * Transformer that converts null values to empty strings for string-type columns.
+ * Transformer that converts null string values to empty strings.
  *
- * Requires column type mapping from writer config to identify string columns.
+ * Operates on a single column specified by columnIndex.
+ * Only transforms if the column type parameter is "string".
  *
  * Usage in job config:
  * "transformer": [
  *   {
  *     "name": "dx_string_null_to_empty",
  *     "parameter": {
- *       "column": [
- *         {"name": "euc", "type": "string"},
- *         {"name": "eu1", "type": "string"},
- *         {"name": "age", "type": "long"}
- *       ]
+ *       "columnIndex": 0,
+ *       "paras": ["string"]
  *     }
  *   }
  * ]
  *
- * Only columns with type "string" will have null converted to "".
+ * For multiple columns, add multiple transformer entries:
+ * "transformer": [
+ *   {"name": "dx_string_null_to_empty", "parameter": {"columnIndex": 0, "paras": ["string"]}},
+ *   {"name": "dx_string_null_to_empty", "parameter": {"columnIndex": 1, "paras": ["string"]}}
+ * ]
  */
 public class StringNullToEmptyTransformer
         extends Transformer
@@ -64,68 +60,30 @@ public class StringNullToEmptyTransformer
             return null;
         }
 
-        // Parse column config from parameters
-        Set<Integer> stringColumnIndexes = parseStringColumnIndexes(paras);
-
-        if (stringColumnIndexes == null) {
-            // No column config provided, skip transformation
+        // paras[0] is columnIndex (set by framework)
+        // paras[1] should be the column type (e.g., "string")
+        if (paras == null || paras.length < 2) {
             return record;
         }
 
-        // Only transform string columns
-        for (int i = 0; i < record.getColumnNumber(); i++) {
-            if (stringColumnIndexes.contains(i)) {
-                if (record.getColumn(i) == null || record.getColumn(i).getRawData() == null) {
-                    record.setColumn(i, new StringColumn(""));
-                }
-            }
+        int columnIndex = (Integer) paras[0];
+        String columnType = (String) paras[1];
+
+        // Only transform string type columns
+        if (!"string".equalsIgnoreCase(columnType) && !"str".equalsIgnoreCase(columnType)) {
+            return record;
+        }
+
+        // Check bounds
+        if (columnIndex < 0 || columnIndex >= record.getColumnNumber()) {
+            return record;
+        }
+
+        // Convert null to empty string
+        if (record.getColumn(columnIndex) == null || record.getColumn(columnIndex).getRawData() == null) {
+            record.setColumn(columnIndex, new StringColumn(""));
         }
 
         return record;
-    }
-
-    @SuppressWarnings("unchecked")
-    private Set<Integer> parseStringColumnIndexes(Object... paras)
-    {
-        if (paras == null || paras.length == 0) {
-            return null;
-        }
-
-        try {
-            // paras[0] should be the parameter map from transformer config
-            if (paras[0] instanceof String) {
-                // If it's a JSON string, parse it
-                JSONObject param = JSON.parseObject((String) paras[0]);
-                return extractStringColumns(param);
-            }
-            else if (paras[0] instanceof JSONObject) {
-                return extractStringColumns((JSONObject) paras[0]);
-            }
-        }
-        catch (Exception e) {
-            // If parsing fails, return null
-        }
-
-        return null;
-    }
-
-    private Set<Integer> extractStringColumns(JSONObject param)
-    {
-        Set<Integer> stringIndexes = new HashSet<>();
-        JSONArray columns = param.getJSONArray("column");
-
-        if (columns == null) {
-            return null;
-        }
-
-        for (int i = 0; i < columns.size(); i++) {
-            JSONObject col = columns.getJSONObject(i);
-            String type = col.getString("type");
-            if ("string".equalsIgnoreCase(type) || "str".equalsIgnoreCase(type)) {
-                stringIndexes.add(i);
-            }
-        }
-
-        return stringIndexes;
     }
 }
