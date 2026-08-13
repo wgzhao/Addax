@@ -264,11 +264,11 @@ Failed record             :                   0
 
 ## Star History
 
-<a href="https://www.star-history.com/#wgzhao/Addax&Date">
+<a href="https://star-history.dera.page/#wgzhao/Addax&type=Date">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=wgzhao/Addax&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=wgzhao/Addax&type=Date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=wgzhao/Addax&type=Date" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://star-history.dera.page/svg?repos=wgzhao/Addax&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://star-history.dera.page/svg?repos=wgzhao/Addax&type=Date" />
+   <img alt="Star History Chart" src="https://star-history.dera.page/svg?repos=wgzhao/Addax&type=Date" />
  </picture>
 </a>
 
