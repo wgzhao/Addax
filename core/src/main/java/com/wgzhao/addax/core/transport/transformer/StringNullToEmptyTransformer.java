@@ -19,22 +19,35 @@
 
 package com.wgzhao.addax.core.transport.transformer;
 
-import com.wgzhao.addax.core.element.Column;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.wgzhao.addax.core.element.Record;
 import com.wgzhao.addax.core.element.StringColumn;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
- * Transformer that converts null string values to empty strings.
+ * Transformer that converts null values to empty strings for string-type columns.
  *
- * Only transforms columns that are already StringColumn type.
- * Other types (Long, Double, Bool, etc.) are left unchanged.
+ * Requires column type mapping from writer config to identify string columns.
  *
  * Usage in job config:
  * "transformer": [
  *   {
- *     "name": "dx_string_null_to_empty"
+ *     "name": "dx_string_null_to_empty",
+ *     "parameter": {
+ *       "column": [
+ *         {"name": "euc", "type": "string"},
+ *         {"name": "eu1", "type": "string"},
+ *         {"name": "age", "type": "long"}
+ *       ]
+ *     }
  *   }
  * ]
+ *
+ * Only columns with type "string" will have null converted to "".
  */
 public class StringNullToEmptyTransformer
         extends Transformer
@@ -51,14 +64,68 @@ public class StringNullToEmptyTransformer
             return null;
         }
 
+        // Parse column config from parameters
+        Set<Integer> stringColumnIndexes = parseStringColumnIndexes(paras);
+
+        if (stringColumnIndexes == null) {
+            // No column config provided, skip transformation
+            return record;
+        }
+
+        // Only transform string columns
         for (int i = 0; i < record.getColumnNumber(); i++) {
-            Column column = record.getColumn(i);
-            // 只处理 StringColumn 类型的 null 值
-            if (column instanceof StringColumn && column.getRawData() == null) {
-                record.setColumn(i, new StringColumn(""));
+            if (stringColumnIndexes.contains(i)) {
+                if (record.getColumn(i) == null || record.getColumn(i).getRawData() == null) {
+                    record.setColumn(i, new StringColumn(""));
+                }
             }
         }
 
         return record;
+    }
+
+    @SuppressWarnings("unchecked")
+    private Set<Integer> parseStringColumnIndexes(Object... paras)
+    {
+        if (paras == null || paras.length == 0) {
+            return null;
+        }
+
+        try {
+            // paras[0] should be the parameter map from transformer config
+            if (paras[0] instanceof String) {
+                // If it's a JSON string, parse it
+                JSONObject param = JSON.parseObject((String) paras[0]);
+                return extractStringColumns(param);
+            }
+            else if (paras[0] instanceof JSONObject) {
+                return extractStringColumns((JSONObject) paras[0]);
+            }
+        }
+        catch (Exception e) {
+            // If parsing fails, return null
+        }
+
+        return null;
+    }
+
+    private Set<Integer> extractStringColumns(JSONObject param)
+    {
+        Set<Integer> stringIndexes = new HashSet<>();
+        JSONArray columns = param.getJSONArray("column");
+
+        if (columns == null) {
+            return null;
+        }
+
+        for (int i = 0; i < columns.size(); i++) {
+            JSONObject col = columns.getJSONObject(i);
+            String type = col.getString("type");
+            if ("string".equalsIgnoreCase(type) || "str".equalsIgnoreCase(type)) {
+                stringIndexes.add(i);
+            }
+        }
+
+        return stringIndexes;
     }
 }
