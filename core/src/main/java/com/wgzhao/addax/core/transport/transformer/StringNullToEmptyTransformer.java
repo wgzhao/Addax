@@ -25,24 +25,14 @@ import com.wgzhao.addax.core.element.StringColumn;
 /**
  * Transformer that converts null string values to empty strings.
  *
- * Operates on a single column specified by columnIndex.
- * Only transforms if the column type parameter is "string".
+ * Processes ALL columns automatically - no need to specify columnIndex.
+ * Only transforms columns that are StringColumn type with null values.
  *
  * Usage in job config:
  * "transformer": [
  *   {
- *     "name": "dx_string_null_to_empty",
- *     "parameter": {
- *       "columnIndex": 0,
- *       "paras": ["string"]
- *     }
+ *     "name": "dx_string_null_to_empty"
  *   }
- * ]
- *
- * For multiple columns, add multiple transformer entries:
- * "transformer": [
- *   {"name": "dx_string_null_to_empty", "parameter": {"columnIndex": 0, "paras": ["string"]}},
- *   {"name": "dx_string_null_to_empty", "parameter": {"columnIndex": 1, "paras": ["string"]}}
  * ]
  */
 public class StringNullToEmptyTransformer
@@ -60,28 +50,18 @@ public class StringNullToEmptyTransformer
             return null;
         }
 
-        // paras[0] is columnIndex (set by framework)
-        // paras[1] should be the column type (e.g., "string")
-        if (paras == null || paras.length < 2) {
-            return record;
-        }
-
-        int columnIndex = (Integer) paras[0];
-        String columnType = (String) paras[1];
-
-        // Only transform string type columns
-        if (!"string".equalsIgnoreCase(columnType) && !"str".equalsIgnoreCase(columnType)) {
-            return record;
-        }
-
-        // Check bounds
-        if (columnIndex < 0 || columnIndex >= record.getColumnNumber()) {
-            return record;
-        }
-
-        // Convert null to empty string
-        if (record.getColumn(columnIndex) == null || record.getColumn(columnIndex).getRawData() == null) {
-            record.setColumn(columnIndex, new StringColumn(""));
+        // Process all columns
+        for (int i = 0; i < record.getColumnNumber(); i++) {
+            if (record.getColumn(i) == null || record.getColumn(i).getRawData() == null) {
+                // Only convert to empty string if it's a StringColumn
+                if (record.getColumn(i) instanceof StringColumn) {
+                    record.setColumn(i, new StringColumn(""));
+                }
+                // For null column (no type info), also convert to empty string
+                else if (record.getColumn(i) == null) {
+                    record.setColumn(i, new StringColumn(""));
+                }
+            }
         }
 
         return record;
