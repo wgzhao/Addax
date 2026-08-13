@@ -124,7 +124,7 @@ public class TransformerUtil
                     transformerExecutionParas.setExtraPackage(extraPackage);
                 }
             }
-            else if ("dx_string_null_to_empty".equals(functionName)) {
+            else if ("dx_null_to_default".equals(functionName)) {
                 // No special parameters needed - processes all columns automatically
             }
             else {

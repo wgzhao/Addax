@@ -209,7 +209,7 @@ public class TransformerRegistry
         registryTransformer(new FilterTransformer());
         registryTransformer(new GroovyTransformer());
         registryTransformer(new MapTransformer());
-        registryTransformer(new StringNullToEmptyTransformer());
+        registryTransformer(new NullToDefaultTransformer());
         registryTransformer(new PadTransformer());
         registryTransformer(new ReplaceTransformer());
         registryTransformer(new SubstrTransformer());
