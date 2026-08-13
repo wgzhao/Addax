@@ -199,8 +199,8 @@ public class MongoDBWriter
             this.batchSize = writerSliceConfig.getInt(BATCH_SIZE, DEFAULT_BATCH_SIZE);
 
             // support wildcard column config: if COLUMN is exactly "*", we operate in wildcardMode
-            List<String> columnConf = writerSliceConfig.getList(COLUMN, String.class);
-            if (columnConf.size() == 1 && "*".equals(columnConf.get(0))) {
+            List<Object> columnConf = writerSliceConfig.getList(COLUMN, Object.class);
+            if (columnConf.size() == 1 && "*".equals(columnConf.get(0).toString())) {
                 this.wildcardMode = true;
                 this.mongodbColumnMeta = null;
             }
