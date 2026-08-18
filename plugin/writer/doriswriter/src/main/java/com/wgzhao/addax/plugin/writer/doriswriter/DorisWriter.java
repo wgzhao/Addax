@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
 
 /**
  * doris data writer
@@ -147,9 +148,37 @@ public class DorisWriter
         }
 
         @Override
+        public void post()
+        {
+            try {
+                // flush remaining buffered records and wait for all in-flight
+                // async Stream Load batches to finish before the task is
+                // considered successful.  Doing this in destroy() (as the
+                // original implementation did) lets Addax report SUCCESS
+                // before partial async batches complete, which causes
+                // silent data loss.  This matches the behavior of
+                // DataX DorisWriter, DataX StarRocksWriter and
+                // Addax StarRocksWriter.
+                writerManager.close();
+            }
+            catch (Exception e) {
+                throw AddaxException.asAddaxException(EXECUTE_FAIL, e);
+            }
+        }
+
+        @Override
         public void destroy()
         {
-            writerManager.close();
+            // no-op: writerManager.close() is invoked from post() so that
+            // all async Stream Load batches are awaited before the task
+            // is marked successful.  close() is idempotent, so calling
+            // it again here is safe but unnecessary.
+        }
+
+        @Override
+        public boolean supportFailOver()
+        {
+            return false;
         }
     }
 }
