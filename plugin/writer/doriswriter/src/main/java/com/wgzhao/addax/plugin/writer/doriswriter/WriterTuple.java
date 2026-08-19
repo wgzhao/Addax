@@ -21,18 +21,26 @@
 package com.wgzhao.addax.plugin.writer.doriswriter;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 public class WriterTuple
 {
     private String label;
     private final Long bytes;
     private final List<byte[]> rows;
+    private final CountDownLatch latch;
 
     public WriterTuple(String label, Long bytes, List<byte[]> rows)
+    {
+        this(label, bytes, rows, null);
+    }
+
+    public WriterTuple(String label, Long bytes, List<byte[]> rows, CountDownLatch latch)
     {
         this.label = label;
         this.rows = rows;
         this.bytes = bytes;
+        this.latch = latch;
     }
 
     public String getLabel() {return label;}
@@ -42,4 +50,6 @@ public class WriterTuple
     public Long getBytes() {return bytes;}
 
     public List<byte[]> getRows() {return rows;}
+
+    public CountDownLatch getLatch() {return latch;}
 }

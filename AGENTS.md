@@ -89,7 +89,7 @@ sh addax.sh -job /path/to/job.json
 - `type` 必填，且只能是：`feat`、`fix`、`refactor`、`perf`、`docs`、`test`、`build`、`ci`、`chore`、`revert`。
 - `scope` 必填（本项目强制），用于标识模块或插件。
 - `subject` 使用祈使句现在时（如 add/fix/remove/refactor），首字母小写，不以句号结尾。
-- 标题总长度不超过 72 个字符。
+- 标题总长度不超过 100 个字符。
 - 单个 commit 只做一件事，禁止混入无关改动。
 
 ### 2) Scope 约束
