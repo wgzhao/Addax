@@ -90,19 +90,42 @@ public class TransformerUtil
             TransformerExecutionParas transformerExecutionParas = new TransformerExecutionParas();
 
             // the groovy function has only code
-            if (!"dx_groovy".equals(functionName) && !"dx_fackGroovy".equals(functionName)) {
-                Integer columnIndex = configuration.getInt(CoreConstant.TRANSFORMER_PARAMETER_COLUMN_INDEX);
-
-                if (columnIndex == null) {
+            if ("dx_groovy".equals(functionName) || "dx_fackGroovy".equals(functionName)) {
+                String code = configuration.getString(CoreConstant.TRANSFORMER_PARAMETER_CODE);
+                String codeFile = configuration.getString(CoreConstant.TRANSFORMER_PARAMETER_CODE_FILE);
+                if (StringUtils.isAllEmpty(code, codeFile)) {
                     throw AddaxException.asAddaxException(REQUIRED_VALUE,
-                            "columnIndex must be set by UDF: name=" + functionName);
+                            "groovy code or codeFile must be set by UDF: name=" + functionName);
                 }
+                // code and codeFile both setup, prefers to code , ignore codeFile
+                if (StringUtils.isNoneEmpty(code, codeFile)) {
+                    LOG.warn("Both setup code and codeFile, will pickup code, ignore the codeFile");
+                }
+                if (StringUtils.isNotEmpty(codeFile)) {
+                    // load groovy code from codeFile
+                    // the codeFile default relative path is the same of addax.home properties
+                    File file = new File(codeFile);
+                    if (!file.exists() || !file.isFile()) {
+                        throw AddaxException.asAddaxException(CONFIG_ERROR,
+                                "the codeFile [" + codeFile + "]does not exists or is unreadable!");
+                    }
+                    try {
+                        code = FileUtils.readFileToString(file, Charset.defaultCharset());
+                    }
+                    catch (IOException e) {
+                        throw AddaxException.asAddaxException(IO_ERROR,
+                                "read codeFile [" + codeFile + "] failure:", e);
+                    }
+                }
+                transformerExecutionParas.setCode(code);
 
-                transformerExecutionParas.setColumnIndex(columnIndex);
-                List<String> paras = configuration.getList(CoreConstant.TRANSFORMER_PARAMETER_PARAS, String.class);
-                if (paras != null && !paras.isEmpty()) {
-                    transformerExecutionParas.setParas(paras.toArray(new String[0]));
+                List<String> extraPackage = configuration.getList(CoreConstant.TRANSFORMER_PARAMETER_EXTRA_PACKAGE, String.class);
+                if (extraPackage != null && !extraPackage.isEmpty()) {
+                    transformerExecutionParas.setExtraPackage(extraPackage);
                 }
+            }
+            else if ("dx_null_to_default".equals(functionName)) {
+                // No special parameters needed - processes all columns automatically
             }
             else {
                 String code = configuration.getString(CoreConstant.TRANSFORMER_PARAMETER_CODE);
