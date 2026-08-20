@@ -17,7 +17,7 @@ jobs:
 
     steps:
       # Step 1: checkout code
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       # Step 2: get the current release version
@@ -63,7 +63,7 @@ jobs:
           maven-version: 3.8.8
 
       - name: Set up JDK
-        uses: actions/setup-java@v5.2.0
+        uses: actions/setup-java@v5.7.0
         with:
           java-version: '17'
           distribution: 'adopt'
@@ -113,13 +113,13 @@ jobs:
         uses: docker/setup-buildx-action@v4
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v4
+        uses: docker/login-action@v4.5.2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Login to Quay.io
-        uses: docker/login-action@v4
+        uses: docker/login-action@v4.5.2
         with:
           registry: quay.io
           username: ${{ secrets.QUAY_USERNAME }}

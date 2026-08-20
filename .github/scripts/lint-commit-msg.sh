@@ -29,8 +29,8 @@ if [[ -z "$header" ]]; then
   exit 1
 fi
 
-if (( ${#header} > 72 )); then
-  echo "commit header exceeds 72 chars (${#header}): $header" >&2
+if (( ${#header} > 100 )); then
+  echo "commit header exceeds 100 chars (${#header}): $header" >&2
   exit 1
 fi
 
@@ -45,7 +45,7 @@ allowed types: feat|fix|refactor|perf|docs|test|build|ci|chore|revert
 rules:
 - scope is mandatory and uses [a-z0-9-]
 - subject starts with lowercase and must not end with '.'
-- header length <= 72
+- header length <= 100
 EOF
   echo "actual: $header" >&2
   exit 1

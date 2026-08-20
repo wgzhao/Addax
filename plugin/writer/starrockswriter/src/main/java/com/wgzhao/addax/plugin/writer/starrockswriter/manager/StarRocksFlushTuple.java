@@ -20,6 +20,7 @@
 package com.wgzhao.addax.plugin.writer.starrockswriter.manager;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 public class StarRocksFlushTuple
 {
@@ -27,12 +28,19 @@ public class StarRocksFlushTuple
     private String label;
     private final Long bytes;
     private final List<byte[]> rows;
+    private final CountDownLatch latch;
 
     public StarRocksFlushTuple(String label, Long bytes, List<byte[]> rows)
+    {
+        this(label, bytes, rows, null);
+    }
+
+    public StarRocksFlushTuple(String label, Long bytes, List<byte[]> rows, CountDownLatch latch)
     {
         this.label = label;
         this.bytes = bytes;
         this.rows = rows;
+        this.latch = latch;
     }
 
     public String getLabel() {return label;}
@@ -42,4 +50,6 @@ public class StarRocksFlushTuple
     public Long getBytes() {return bytes;}
 
     public List<byte[]> getRows() {return rows;}
+
+    public CountDownLatch getLatch() {return latch;}
 }

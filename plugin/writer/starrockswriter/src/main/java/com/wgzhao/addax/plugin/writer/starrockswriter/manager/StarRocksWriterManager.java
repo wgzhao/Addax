@@ -30,6 +30,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ScheduledExecutorService;
@@ -177,10 +178,11 @@ public class StarRocksWriterManager
     private void waitAsyncFlushingDone()
             throws InterruptedException
     {
-        // wait previous flushing
-        for (int i = 0; i <= writerOptions.getFlushQueueLength(); i++) {
-            flushQueue.put(new StarRocksFlushTuple("", 0L, null));
-        }
+        // enqueue a barrier and block until it is consumed: due to FIFO ordering,
+        // all real batches enqueued before the barrier have been stream-loaded
+        CountDownLatch latch = new CountDownLatch(1);
+        flushQueue.put(new StarRocksFlushTuple("", 0L, null, latch));
+        latch.await();
         checkFlushException();
     }
 
@@ -189,6 +191,10 @@ public class StarRocksWriterManager
     {
         StarRocksFlushTuple flushData = flushQueue.take();
         if (Strings.isNullOrEmpty(flushData.getLabel())) {
+            // barrier reached, signal the waiting thread that all prior batches are done
+            if (flushData.getLatch() != null) {
+                flushData.getLatch().countDown();
+            }
             return;
         }
         stopScheduler();
