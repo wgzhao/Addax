@@ -1,5 +1,7 @@
 # 和阿里 DataX 的差异
 
+> DataX 官方仓库自 2023 年 9 月（`datax_v202309`）后不再发布新版本，Addax 是其持续维护的继承者。
+
 `Addax` fork [DataX](https://github.com/alibaba/datax) 后，除核心框架未作太多改动后，其他均做了大幅改动，并一直在进行优化迭代。其差别说明如下：
 
 ## 精简

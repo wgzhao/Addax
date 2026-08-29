@@ -6,7 +6,7 @@
     <b>A versatile open-source ETL tool</b>
 </p>
 <p align="center">
-Addax is an extensible ETL (Extract, Transform, Load) tool supporting over 20 SQL/NoSQL data sources, developed as a fork and evolution of Alibaba's <a href="https://github.com/alibaba/datax">DataX</a>. 
+Addax is an extensible ETL (Extract, Transform, Load) tool supporting over 20 SQL/NoSQL data sources, forked from Alibaba's <a href="https://github.com/alibaba/datax">DataX</a>, which has been frozen since 2023 — Addax is its actively maintained successor.
 It provides a growing ecosystem of plugins and offers easy-to-follow configuration for data integrations.
 </p>
 <p align="center">

@@ -98,6 +98,7 @@ jobs:
             # Addax  ${{ steps.version.outputs.version }} has released! 🎉
 
             We are pleased to announce version ${{ steps.version.outputs.version }}, which focuses on improving stability and performance by addressing several bugs and implementing minor code refinements.
+            This release continues Addax's role as the actively maintained successor to Alibaba's DataX (frozen since 2023).
             Below are the key updates in this release:
 
             ## 📜 Changes
