@@ -42,6 +42,14 @@
             <outputDirectory>lib</outputDirectory>
         </fileSet>
         <fileSet>
+            <directory>lib/addax-gen/target/addax-gen-${project.version}/lib/</directory>
+            <includes>
+                <include>*.*</include>
+            </includes>
+            <fileMode>0644</fileMode>
+            <outputDirectory>lib</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>lib/addax-rdbms/target/addax-rdbms-${project.version}/lib/</directory>
             <includes>
                 <include>*.*</include>

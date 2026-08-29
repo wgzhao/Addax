@@ -307,6 +307,33 @@ list_all_plugin_names() {
 
 if [ "$1" = "gen" ]; then
     shift 1
+    # connection-string based generation when any argument carries scheme://...,
+    # otherwise legacy template stitching
+    case "$*" in
+        *://*)
+            check_jdk_version
+            # add only the reader/writer plugin dirs of the two connection strings to the
+            # classpath (JDBC drivers live there, not in lib/). Adding every plugin would
+            # make DriverManager scan unrelated drivers (e.g. Ucanaccess) and fail.
+            GEN_CP="${CLASS_PATH}"
+            for arg in "$@"; do
+                case "$arg" in
+                    --to=*://*) conn=${arg#--to=} ;;
+                    *://*) conn=${arg} ;;
+                    *) continue ;;
+                esac
+                scheme=${conn%%://*}
+                # hdfs is a generation-only endpoint; no JDBC driver to load
+                [ "$scheme" = "hdfs" ] && continue
+                for plug in "reader/${scheme}reader" "writer/${scheme}writer"; do
+                    for j in "${ADDAX_HOME}/plugin/${plug}/"*.jar "${ADDAX_HOME}/plugin/${plug}/libs/"*.jar; do
+                        [ -f "$j" ] && GEN_CP="${GEN_CP}:${j}"
+                    done
+                done
+            done
+            exec java -server ${DEFAULT_JVM} -classpath "${GEN_CP}" ${DEFAULT_PROPERTY_CONF} com.wgzhao.addax.gen.AddaxGen "$@"
+            ;;
+    esac
     generate_json "$@"
     exit 0
 fi
