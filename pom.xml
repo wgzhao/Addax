@@ -147,6 +147,7 @@
     <modules>
         <!-- common modules -->
         <module>core</module>
+        <module>lib/addax-gen</module>
         <module>lib/addax-rdbms</module>
         <module>lib/addax-storage</module>
         <!-- reader -->
