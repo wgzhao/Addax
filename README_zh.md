@@ -14,6 +14,17 @@
 
 该项目原始代码来自阿里开源的 [DataX](https://github.com/alibaba/datax) ，在此基础上经过了大量的改进，并提供了更多的读写插件，详细情况可参考[与DataX的主要区别](difference.md)
 
+## 项目状态
+
+**Addax 处于积极的维护中。** 项目有意进入成熟的维护阶段：
+
+- **月度维护版发布。** 大约每月发布一个新版本（见 [Releases](https://github.com/wgzhao/Addax/releases)），即使没有新特性，也会包含依赖/CVE 更新和 bug 修复。
+- **及时的 issue 响应。** 已提交的 issue 通常在数天内得到回应和解决，而不是数月。
+- **稳定是刻意的定位。** 插件功能刻意保持稳定：我们修复 bug、更新依赖，而不是追逐特性变动。新的数据源插件在有真实社区需求时才会添加——如果你需要，请[提交 issue](https://github.com/wgzhao/Addax/issues/new)。
+- **欢迎贡献。** PR 持续被评审。参与方式见 [CONTRIBUTING.md](CONTRIBUTING.md)。
+
+维护者请参阅 [RELEASING.md](RELEASING.md) 了解发布流程。
+
 ## 支持的数据库一览表
 
 Addax 支持超过 20 种[关系型和非关系型数据库](support_data_sources.md)，通过简单的配置，还可以快速增加更多的数据源支持。

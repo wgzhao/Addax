@@ -42,6 +42,11 @@ expected from contributors and committers in at least equal proportion to their 
         * Wrap the body at 72 characters
         * Use the body to explain what and why vs. how
 
+## For Maintainers
+
+- The release process (cutting a version, publishing to GitHub Releases / Docker / Maven Central) is documented in [RELEASING.md](RELEASING.md).
+- Dependency updates from Dependabot follow the same review flow as any other PR, and are the primary content of maintenance releases.
+
 ## Conduct
 
 Please refer to our [Code of Conduct](https://github.com/wgzhao/Addax/blob/master/CODE_OF_CONDUCT.md).

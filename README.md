@@ -41,6 +41,19 @@ Detailed instructions on installation, configuration, and usage are available:
 
 ---
 
+## 💚 Project Status
+
+**Addax is actively maintained.** The project is in a mature maintenance phase by design:
+
+- **Monthly maintenance releases.** A new release ships roughly every month (see [Releases](https://github.com/wgzhao/Addax/releases)), bundling dependency/CVE updates and bug fixes — even when there are no new features to announce.
+- **Responsive issue triage.** Open issues are typically answered and resolved within days, not months.
+- **Stable by intent.** Plugin functionality is deliberately kept stable: we fix bugs and update dependencies rather than chasing feature churn. New data-source plugins are added when there is real community demand — if you need one, [open an issue](https://github.com/wgzhao/Addax/issues/new).
+- **Open to contribution.** PRs are reviewed continuously. See [CONTRIBUTING.md](CONTRIBUTING.md) for how to contribute.
+
+For maintainers, the release process is documented in [RELEASING.md](RELEASING.md).
+
+---
+
 ## 📦 Supported Data Sources
 
 Addax supports a wide range of database systems and file sources. Below is a selection of supported platforms:
