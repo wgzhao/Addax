@@ -12,7 +12,7 @@
    </a>
 </p>
 
-该项目原始代码来自阿里开源的 [DataX](https://github.com/alibaba/datax) ，在此基础上经过了大量的改进，并提供了更多的读写插件，详细情况可参考[与DataX的主要区别](difference.md)
+该项目原始代码来自阿里开源的 [DataX](https://github.com/alibaba/datax) （DataX 官方仓库自 2023 年后已停止更新），在此基础上经过了大量的改进，持续活跃维护，并提供了更多的读写插件，详细情况可参考[与DataX的主要区别](difference.md)
 
 ## 项目状态
 
