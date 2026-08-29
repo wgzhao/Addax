@@ -333,7 +333,7 @@ public class IcebergWriter
 
                 if ("parquet".equals(fileFormat)) {
                     try {
-                        dataWriter = Parquet.writeData(file).overwrite().forTable(table).createWriterFunc(GenericParquetWriter::buildWriter).build();
+                        dataWriter = Parquet.writeData(file).overwrite().forTable(table).createWriterFunc(GenericParquetWriter::create).build();
                     }
                     catch (IOException e) {
                         throw new RuntimeException(e);
