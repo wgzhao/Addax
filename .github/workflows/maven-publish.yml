@@ -140,5 +140,9 @@ jobs:
         run: |
           mvn -B -V -DskipTests -DautoPublish=true -DwaitUntil=PUBLISHED deploy
         env:
+          # setup-java v6 writes settings.xml with ${env.X} placeholders that are
+          # interpolated when maven runs here, so the vars must exist in this step
+          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
           # maven-gpg-plugin 3.2+ reads the signing passphrase from this env var by default
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASS_PHRASE }}
