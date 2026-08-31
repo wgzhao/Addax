@@ -101,6 +101,7 @@ public class MongoDBWriter
 
             String dbName = connConf.getNecessaryValue(DATABASE, REQUIRED_VALUE);
             String collection = connConf.getNecessaryValue(KeyConstant.MONGO_COLLECTION_NAME, REQUIRED_VALUE);
+            String authDb = connConf.getString("authDb", dbName);
             String username = connConf.getString(USERNAME);
             String password = connConf.getString(PASSWORD);
             if (password != null && password.startsWith(Constant.ENC_PASSWORD_PREFIX)) {
@@ -112,7 +113,7 @@ public class MongoDBWriter
                 mongoClient = MongoUtil.initMongoClient(address);
             }
             else {
-                mongoClient = MongoUtil.initCredentialMongoClient(address, username, password, dbName);
+                mongoClient = MongoUtil.initCredentialMongoClient(address, username, password, authDb);
             }
 
             String preSqls = connConf.getString(PRE_SQL);
@@ -190,9 +191,10 @@ public class MongoDBWriter
             }
             Configuration connConf = writerSliceConfig.getConfiguration(CONNECTION);
             this.database = connConf.getString(DATABASE);
+            String authDb = connConf.getString("authDb", this.database);
             List<Object> addressList = connConf.getList(KeyConstant.MONGO_ADDRESS, Object.class);
             this.mongoClient = StringUtils.isNotEmpty(userName) && StringUtils.isNotEmpty(password) ?
-                    MongoUtil.initCredentialMongoClient(addressList, userName, password, database) :
+                    MongoUtil.initCredentialMongoClient(addressList, userName, password, authDb) :
                     MongoUtil.initMongoClient(addressList);
 
             this.collection = connConf.getString(KeyConstant.MONGO_COLLECTION_NAME);
