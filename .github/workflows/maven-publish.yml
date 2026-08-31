@@ -146,5 +146,7 @@ jobs:
           # interpolated when maven runs here, so the vars must exist in this step
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-          # maven-gpg-plugin 3.2+ reads the signing passphrase from this env var by default
+          # the active gpg profile in the generated settings.xml redirects the
+          # passphrase env name to GPG_PASSPHRASE, so provide both spellings
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASS_PHRASE }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASS_PHRASE }}
