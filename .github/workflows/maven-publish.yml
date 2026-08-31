@@ -139,3 +139,6 @@ jobs:
       - name: Publish to Maven Central
         run: |
           mvn -B -V -DskipTests -DautoPublish=true -DwaitUntil=PUBLISHED deploy
+        env:
+          # maven-gpg-plugin 3.2+ reads the signing passphrase from this env var by default
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASS_PHRASE }}
