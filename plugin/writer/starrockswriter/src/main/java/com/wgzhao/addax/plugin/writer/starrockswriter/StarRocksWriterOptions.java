@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
+/** Star Rocks Writer Options. */
 public class StarRocksWriterOptions
         implements Serializable
 {
@@ -62,6 +63,7 @@ public class StarRocksWriterOptions
     private final List<String> userSetColumns;
     private boolean isWildcardColumn;
 
+    /** Starrockswriteroptions. */
     public StarRocksWriterOptions(Configuration options)
     {
         this.options = options;
@@ -71,42 +73,50 @@ public class StarRocksWriterOptions
         }
     }
 
+    /** Dopretreatment. */
     public void doPretreatment()
     {
         validateRequired();
         validateStreamLoadUrl();
     }
 
+    /** Returns the jdbcurl. */
     public String getJdbcUrl()
     {
         return options.getString(KEY_JDBC_URL);
     }
 
+    /** Returns the database. */
     public String getDatabase()
     {
         return options.getString(KEY_DATABASE);
     }
 
+    /** Returns the table. */
     public String getTable()
     {
         return options.getString(KEY_TABLE);
     }
 
+    /** Returns the username. */
     public String getUsername()
     {
         return options.getString(KEY_USERNAME);
     }
 
+    /** Returns the password. */
     public String getPassword()
     {
         return options.getString(KEY_PASSWORD);
     }
 
+    /** Returns the loadurllist. */
     public List<String> getLoadUrlList()
     {
         return options.getList(KEY_LOAD_URL, String.class);
     }
 
+    /** Returns the columns. */
     public List<String> getColumns()
     {
         if (isWildcardColumn) {
@@ -115,60 +125,71 @@ public class StarRocksWriterOptions
         return this.userSetColumns;
     }
 
+    /** Checks whether the wildcardcolumn condition holds. */
     public boolean isWildcardColumn()
     {
         return this.isWildcardColumn;
     }
 
+    /** Sets the infocchemacolumns. */
     public void setInfoCchemaColumns(List<String> cols)
     {
         this.infoCchemaColumns = cols;
     }
 
+    /** Returns the presqllist. */
     public List<String> getPreSqlList()
     {
         return options.getList(KEY_PRE_SQL, String.class);
     }
 
+    /** Returns the postsqllist. */
     public List<String> getPostSqlList()
     {
         return options.getList(KEY_POST_SQL, String.class);
     }
 
+    /** Returns the loadprops. */
     public Map<String, Object> getLoadProps()
     {
         return options.getMap(KEY_LOAD_PROPS);
     }
 
+    /** Returns the maxretries. */
     public int getMaxRetries()
     {
         return MAX_RETRIES;
     }
 
+    /** Returns the batchrows. */
     public int getBatchRows()
     {
         Integer rows = options.getInt(KEY_MAX_BATCH_ROWS);
         return null == rows ? BATCH_ROWS : rows;
     }
 
+    /** Returns the batchsize. */
     public long getBatchSize()
     {
         Long size = options.getLong(KEY_MAX_BATCH_SIZE);
         return null == size ? BATCH_BYTES : size;
     }
 
+    /** Returns the flushinterval. */
     public long getFlushInterval()
     {
         Long interval = options.getLong(KEY_FLUSH_INTERVAL);
         return null == interval ? FLUSH_INTERVAL : interval;
     }
 
+    /** Returns the flushqueuelength. */
     public int getFlushQueueLength()
     {
         Integer len = options.getInt(KEY_FLUSH_QUEUE_LENGTH);
         return null == len ? 1 : len;
     }
 
+    /** Returns the streamloadformat. */
     public StreamLoadFormat getStreamLoadFormat()
     {
         Map<String, Object> loadProps = getLoadProps();
@@ -206,6 +227,7 @@ public class StarRocksWriterOptions
         }
     }
 
+    /** Stream Load Format. */
     public enum StreamLoadFormat
     {
         CSV, JSON

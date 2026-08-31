@@ -51,12 +51,14 @@ import java.util.List;
 import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
 
+/** Text Writer. */
 public class TextWriter
         extends HdfsHelper
         implements IHDFSWriter
 {
     private final static Logger logger = LoggerFactory.getLogger(TextWriter.class.getName());
 
+    /** Textwriter. */
     public TextWriter(Configuration conf)
     {
         super();
@@ -104,6 +106,7 @@ public class TextWriter
         }
     }
 
+    /** Transportonerecord. */
     public static MutablePair<Text, Boolean> transportOneRecord(
             Record record, char fieldDelimiter, List<Configuration> columnsConfiguration, TaskPluginCollector taskPluginCollector)
     {
@@ -116,6 +119,7 @@ public class TextWriter
         return transportResult;
     }
 
+    /** Transportonerecord. */
     public static MutablePair<List<Object>, Boolean> transportOneRecord(
             Record record, List<Configuration> columnsConfiguration,
             TaskPluginCollector taskPluginCollector)

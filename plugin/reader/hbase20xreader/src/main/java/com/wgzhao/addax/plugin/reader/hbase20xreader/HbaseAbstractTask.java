@@ -45,6 +45,7 @@ import java.io.IOException;
 import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
 
+/** Hbase Abstract Task. */
 public abstract class HbaseAbstractTask
 {
     private final static Logger LOG = LoggerFactory.getLogger(HbaseAbstractTask.class);
@@ -61,6 +62,7 @@ public abstract class HbaseAbstractTask
     protected Scan scan;
     protected ResultScanner resultScanner;
 
+    /** Hbaseabstracttask. */
     public HbaseAbstractTask(Configuration configuration)
     {
 
@@ -73,12 +75,15 @@ public abstract class HbaseAbstractTask
         this.scanBatchSize = configuration.getInt(HBaseKey.SCAN_BATCH_SIZE, HBaseConstant.DEFAULT_SCAN_BATCH_SIZE);
     }
 
+    /** Fetchline. */
     public abstract boolean fetchLine(Record record)
             throws Exception;
 
     //不同模式设置不同,如多版本模式需要设置版本
+    /** Initscan. */
     public abstract void initScan(Scan scan);
 
+    /** Prepare. */
     public void prepare()
             throws Exception
     {
@@ -95,6 +100,7 @@ public abstract class HbaseAbstractTask
         this.resultScanner = this.htable.getScanner(this.scan);
     }
 
+    /** Close. */
     public void close()
     {
         Hbase20xHelper.closeResultScanner(this.resultScanner);
@@ -123,6 +129,7 @@ public abstract class HbaseAbstractTask
         return result;
     }
 
+    /** Convertbytestoassigntype. */
     public Column convertBytesToAssignType(ColumnType columnType, byte[] byteArray, String dateformat)
             throws Exception
     {
@@ -162,6 +169,7 @@ public abstract class HbaseAbstractTask
         return column;
     }
 
+    /** Convertvaluetoassigntype. */
     public Column convertValueToAssignType(ColumnType columnType, String constantValue, String dateformat)
             throws Exception
     {

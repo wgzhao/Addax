@@ -42,13 +42,17 @@ import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.core.spi.ErrorCode.LOGIN_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
+/** HBase20x SQLHelper. */
 public class HBase20xSQLHelper
 {
 
     // phoenix thin driver name
+    /** Phoenix jdbc thin driver. */
     public static final String PHOENIX_JDBC_THIN_DRIVER = "org.apache.phoenix.queryserver.client.Driver";
     // phoenix jdbc driver name
+    /** Phoenix jdbc thick driver. */
     public static final String PHOENIX_JDBC_THICK_DRIVER = "org.apache.phoenix.jdbc.PhoenixDriver";
+    /** Select catalog table string. */
     public static final String SELECT_CATALOG_TABLE_STRING = "SELECT COLUMN_NAME FROM SYSTEM.CATALOG WHERE TABLE_NAME='%s' AND COLUMN_NAME IS NOT NULL";
     private static final Logger LOG = LoggerFactory.getLogger(HBase20xSQLHelper.class);
 
@@ -96,6 +100,7 @@ public class HBase20xSQLHelper
         originalConfig.set(HBaseKey.QUERY_SERVER_ADDRESS, connStr);
     }
 
+    /** Returns the clientconnection. */
     public static Connection getClientConnection(String connStr, String driverName)
     {
         LOG.debug("Connecting to QueryServer [{}] ...", connStr);
@@ -112,6 +117,7 @@ public class HBase20xSQLHelper
         return conn;
     }
 
+    /** Returns the jdbcconnection. */
     public static Connection getJdbcConnection(Configuration conf)
     {
         String queryServerAddress = conf.getNecessaryValue(HBaseKey.QUERY_SERVER_ADDRESS, REQUIRED_VALUE);
@@ -122,6 +128,7 @@ public class HBase20xSQLHelper
         }
     }
 
+    /** Checktable. */
     public static void checkTable(Connection conn, String schema, String tableName, List<String> columnNames)
     {
         String selectSystemTable = getSelectSystemSQL(schema, tableName);
@@ -163,6 +170,7 @@ public class HBase20xSQLHelper
         return sql;
     }
 
+    /** Closejdbc. */
     public static void closeJdbc(Connection connection, Statement statement, ResultSet resultSet)
     {
         try {

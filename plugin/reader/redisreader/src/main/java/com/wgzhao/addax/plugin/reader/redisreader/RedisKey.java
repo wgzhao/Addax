@@ -20,15 +20,24 @@ package com.wgzhao.addax.plugin.reader.redisreader;
 
 import com.wgzhao.addax.core.base.Key;
 
+/** Redis Key configuration keys. */
 public class RedisKey
     extends Key
 {
+    /** Uri. */
     public static final String URI = "uri";
+    /** Mode. */
     public static final String MODE = "mode";
+    /** Auth. */
     public static final String AUTH = "auth";
+    /** Master name. */
     public static final String MASTER_NAME  = "masterName";
+    /** Include. */
     public static final String INCLUDE = "include";
+    /** Exclude. */
     public static final String EXCLUDE = "exclude";
+    /** Db. */
     public static final String DB = "db";
+    /** Key threshold length. */
     public static final String KEY_THRESHOLD_LENGTH = "keyThresholdLength";
 }

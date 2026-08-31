@@ -57,6 +57,7 @@ import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
+/** Stream Reader. */
 public class StreamReader
         extends Reader
 {
@@ -79,6 +80,7 @@ public class StreamReader
         }
     }
 
+    /** Job. */
     public static class Job
             extends Reader.Job
     {
@@ -379,6 +381,7 @@ public class StreamReader
         }
     }
 
+    /** Task. */
     public static class Task
             extends Reader.Task
     {

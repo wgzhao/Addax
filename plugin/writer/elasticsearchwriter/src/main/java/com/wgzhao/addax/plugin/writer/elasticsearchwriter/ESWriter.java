@@ -52,11 +52,13 @@ import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
 import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
+/** ESWriter. */
 public class ESWriter
         extends Writer
 {
     private static final String WRITE_COLUMNS = "write_columns";
 
+    /** Job. */
     public static class Job
             extends Writer.Job
     {
@@ -242,6 +244,7 @@ public class ESWriter
         }
     }
 
+    /** Task. */
     public static class Task
             extends Writer.Task
     {

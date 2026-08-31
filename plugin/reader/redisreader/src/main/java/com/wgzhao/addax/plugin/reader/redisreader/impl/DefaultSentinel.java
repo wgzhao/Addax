@@ -46,6 +46,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static redis.clients.jedis.Protocol.Command.UNSUBSCRIBE;
 
+/** Default Sentinel. */
 public class DefaultSentinel
         implements Sentinel
 {
@@ -61,6 +62,7 @@ public class DefaultSentinel
     protected final List<SentinelListener> listeners = new CopyOnWriteArrayList<>();
     protected final ScheduledExecutorService schedule = newSingleThreadScheduledExecutor();
 
+    /** Defaultsentinel. */
     public DefaultSentinel(List<HostAndPort> hosts, String masterName, Configuration configuration)
     {
         this.hosts = hosts;

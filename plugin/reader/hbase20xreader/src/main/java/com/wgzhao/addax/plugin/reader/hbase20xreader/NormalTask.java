@@ -31,11 +31,13 @@ import org.apache.hadoop.hbase.util.Bytes;
 import java.util.List;
 import java.util.Map;
 
+/** Normal Task. */
 public class NormalTask
         extends HbaseAbstractTask
 {
     private final List<HbaseColumnCell> hbaseColumnCells;
 
+    /** Normaltask. */
     public NormalTask(Configuration configuration)
     {
         super(configuration);

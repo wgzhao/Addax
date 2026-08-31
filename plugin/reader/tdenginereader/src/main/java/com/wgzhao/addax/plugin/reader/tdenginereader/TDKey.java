@@ -21,11 +21,15 @@ package com.wgzhao.addax.plugin.reader.tdenginereader;
 
 import com.wgzhao.addax.core.base.Key;
 
+/** TDKey configuration keys. */
 public class TDKey
         extends Key
 {
 
+    /** Begin datetime. */
     public static final String BEGIN_DATETIME = "beginDateTime";
+    /** End datetime. */
     public static final String END_DATETIME = "endDateTime";
+    /** Split interval. */
     public static final String SPLIT_INTERVAL = "splitInterval";
 }

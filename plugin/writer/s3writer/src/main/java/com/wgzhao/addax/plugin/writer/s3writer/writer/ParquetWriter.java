@@ -58,6 +58,7 @@ import java.util.Map;
 
 import static org.apache.parquet.schema.LogicalTypeAnnotation.decimalType;
 
+/** Parquet Writer. */
 public class ParquetWriter
         implements IFormatWriter
 {
@@ -76,103 +77,122 @@ public class ParquetWriter
 
     private org.apache.hadoop.conf.Configuration hadoopConf = null;
 
+    /** Parquetwriter. */
     public ParquetWriter()
     {
     }
 
+    /** Returns the fielddelimiter. */
     public char getFieldDelimiter()
     {
         return fieldDelimiter;
     }
 
+    /** Sets the fielddelimiter. */
     public ParquetWriter setFieldDelimiter(char fieldDelimiter)
     {
         this.fieldDelimiter = fieldDelimiter;
         return this;
     }
 
+    /** Returns the nullformat. */
     public String getNullFormat()
     {
         return nullFormat;
     }
 
+    /** Sets the nullformat. */
     public ParquetWriter setNullFormat(String nullFormat)
     {
         this.nullFormat = nullFormat;
         return this;
     }
 
+    /** Returns the sslenabled. */
     public String getSslEnabled()
     {
         return sslEnabled;
     }
 
+    /** Sets the sslenabled. */
     public ParquetWriter setSslEnabled(String sslEnabled)
     {
         this.sslEnabled = sslEnabled;
         return this;
     }
 
+    /** Returns the dateformat. */
     public String getDateFormat()
     {
         return dateFormat;
     }
 
+    /** Sets the dateformat. */
     public ParquetWriter setDateFormat(String dateFormat)
     {
         this.dateFormat = dateFormat;
         return this;
     }
 
+    /** Returns the encoding. */
     public String getEncoding()
     {
         return encoding;
     }
 
+    /** Sets the encoding. */
     public ParquetWriter setEncoding(String encoding)
     {
         this.encoding = encoding;
         return this;
     }
 
+    /** Returns the bucket. */
     public String getBucket()
     {
         return bucket;
     }
 
+    /** Sets the bucket. */
     public ParquetWriter setBucket(String bucket)
     {
         this.bucket = bucket;
         return this;
     }
 
+    /** Returns the object. */
     public String getObject()
     {
         return object;
     }
 
+    /** Sets the object. */
     public ParquetWriter setObject(String object)
     {
         this.object = object;
         return this;
     }
 
+    /** Returns the header. */
     public List<String> getHeader()
     {
         return header;
     }
 
+    /** Sets the header. */
     public ParquetWriter setHeader(List<String> header)
     {
         this.header = header;
         return this;
     }
 
+    /** Returns the s3client. */
     public S3Client getS3Client()
     {
         return s3Client;
     }
 
+    /** Sets the s3client. */
     public ParquetWriter setS3Client(S3Client s3Client)
     {
         this.s3Client = s3Client;
@@ -258,6 +278,7 @@ public class ParquetWriter
         }
     }
 
+    /** Buildrecord. */
     public Group buildRecord(
             Record record, List<Configuration> columns,
             TaskPluginCollector taskPluginCollector, SimpleGroupFactory simpleGroupFactory)

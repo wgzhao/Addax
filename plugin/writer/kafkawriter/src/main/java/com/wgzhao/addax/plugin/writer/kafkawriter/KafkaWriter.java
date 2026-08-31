@@ -49,9 +49,11 @@ import static com.wgzhao.addax.plugin.writer.kafkawriter.KafkaKey.BROKER_LIST;
 import static com.wgzhao.addax.plugin.writer.kafkawriter.KafkaKey.PROPERTIES;
 import static com.wgzhao.addax.plugin.writer.kafkawriter.KafkaKey.TOPIC;
 
+/** Kafka Writer. */
 public class KafkaWriter
         extends Writer
 {
+    /** Job. */
     public static class Job
             extends Writer.Job
     {
@@ -89,6 +91,7 @@ public class KafkaWriter
         }
     }
 
+    /** Task. */
     public static class Task
             extends Writer.Task
     {

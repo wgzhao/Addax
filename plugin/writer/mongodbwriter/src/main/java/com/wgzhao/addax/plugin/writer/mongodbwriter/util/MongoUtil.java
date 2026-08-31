@@ -32,9 +32,11 @@ import java.util.List;
 import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
+/** Mongo Util. */
 public class MongoUtil
 {
 
+    /** Initmongoclient. */
     public static MongoClient initMongoClient(List<Object> addressList)
     {
 
@@ -55,6 +57,7 @@ public class MongoUtil
         }
     }
 
+    /** Initcredentialmongoclient. */
     public static MongoClient initCredentialMongoClient(List<Object> addressList, String userName, String password, String database)
     {
 

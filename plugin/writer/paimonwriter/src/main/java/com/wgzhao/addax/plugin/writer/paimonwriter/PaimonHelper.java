@@ -31,9 +31,11 @@ import org.slf4j.LoggerFactory;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.LOGIN_ERROR;
 
+/** Paimon Helper. */
 public class PaimonHelper {
     private static final Logger LOG = LoggerFactory.getLogger(PaimonHelper.class);
 
+    /** Kerberosauthentication. */
     public static void kerberosAuthentication(org.apache.hadoop.conf.Configuration hadoopConf, String kerberosPrincipal, String kerberosKeytabFilePath) throws Exception {
         if (StringUtils.isNotBlank(kerberosPrincipal) && StringUtils.isNotBlank(kerberosKeytabFilePath)) {
             UserGroupInformation.setConfiguration(hadoopConf);
@@ -48,12 +50,14 @@ public class PaimonHelper {
         }
     }
 
+    /** Returns the options. */
     public static Options getOptions(Configuration conf){
         Options options = new Options();
         conf.getMap("paimonConfig").forEach((k, v) -> options.set(k, String.valueOf(v)));
         return options;
     }
 
+    /** Returns the catalogcontext. */
     public static CatalogContext getCatalogContext(Options options) {
         CatalogContext context = null;
         String warehouse=options.get("warehouse");

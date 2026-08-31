@@ -39,6 +39,7 @@ public abstract class AbstractTGContainerCommunicator
 {
     protected int taskGroupId;
 
+    /** Abstracttgcontainercommunicator. */
     public AbstractTGContainerCommunicator(Configuration configuration)
     {
         super(configuration);

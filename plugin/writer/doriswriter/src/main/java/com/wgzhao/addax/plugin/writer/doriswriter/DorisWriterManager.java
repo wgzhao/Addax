@@ -39,6 +39,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+/** Doris Writer Manager. */
 public class DorisWriterManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(DorisWriterManager.class);
@@ -54,6 +55,7 @@ public class DorisWriterManager {
     private ScheduledExecutorService scheduler;
     private ScheduledFuture<?> scheduledFuture;
 
+    /** Doriswritermanager. */
     public DorisWriterManager( DorisKey options) {
         this.options = options;
         this.visitor = new DorisStreamLoadObserver (options);
@@ -62,6 +64,7 @@ public class DorisWriterManager {
         this.startAsyncFlushing();
     }
 
+    /** Startscheduler. */
     public void startScheduler() {
         stopScheduler();
         BasicThreadFactory basicThreadFactory = BasicThreadFactory.builder().namingPattern("Doris-interval-flush").daemon(true).build();
@@ -84,6 +87,7 @@ public class DorisWriterManager {
         }, options.getFlushInterval(), TimeUnit.MILLISECONDS);
     }
 
+    /** Stopscheduler. */
     public void stopScheduler() {
         if (this.scheduledFuture != null) {
             scheduledFuture.cancel(false);
@@ -91,6 +95,7 @@ public class DorisWriterManager {
         }
     }
 
+    /** Writerecord. */
     public final synchronized void writeRecord(String record) {
         checkFlushException();
         try {
@@ -108,6 +113,7 @@ public class DorisWriterManager {
         }
     }
 
+    /** Flush. */
     public synchronized void flush(String label, boolean waitUtilDone) throws Exception {
         checkFlushException();
         if (batchCount == 0) {
@@ -126,6 +132,7 @@ public class DorisWriterManager {
         batchSize = 0;
     }
 
+    /** Close. */
     public synchronized void close() {
         if (!closed) {
             closed = true;
@@ -140,6 +147,7 @@ public class DorisWriterManager {
         checkFlushException();
     }
 
+    /** Createbatchlabel. */
     public String createBatchLabel() {
         return options.getLabelPrefix() + UUID.randomUUID();
     }

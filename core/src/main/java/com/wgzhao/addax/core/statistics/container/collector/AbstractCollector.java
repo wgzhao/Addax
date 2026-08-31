@@ -29,14 +29,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/** Abstract Collector. */
 public abstract class AbstractCollector
 {
     private final Map<Integer, Communication> taskCommunicationMap = new ConcurrentHashMap<>();
+    /** Returns the taskcommunicationmap. */
     public Map<Integer, Communication> getTaskCommunicationMap()
     {
         return taskCommunicationMap;
     }
 
+    /** Registertgcommunication. */
     public void registerTGCommunication(List<Configuration> taskGroupConfigurationList)
     {
         for (Configuration config : taskGroupConfigurationList) {
@@ -45,6 +48,7 @@ public abstract class AbstractCollector
         }
     }
 
+    /** Registertaskcommunication. */
     public void registerTaskCommunication(List<Configuration> taskConfigurationList)
     {
         for (Configuration taskConfig : taskConfigurationList) {
@@ -53,6 +57,7 @@ public abstract class AbstractCollector
         }
     }
 
+    /** Collectfromtask. */
     public Communication collectFromTask()
     {
         Communication communication = new Communication();
@@ -65,18 +70,22 @@ public abstract class AbstractCollector
         return communication;
     }
 
+    /** Collectfromtaskgroup. */
     public abstract Communication collectFromTaskGroup();
 
+    /** Returns the tgcommunicationmap. */
     public Map<Integer, Communication> getTGCommunicationMap()
     {
         return LocalTGCommunicationManager.getTaskGroupCommunicationMap();
     }
 
+    /** Returns the tgcommunication. */
     public Communication getTGCommunication(Integer taskGroupId)
     {
         return LocalTGCommunicationManager.getTaskGroupCommunication(taskGroupId);
     }
 
+    /** Returns the taskcommunication. */
     public Communication getTaskCommunication(Integer taskId)
     {
         return this.taskCommunicationMap.get(taskId);

@@ -37,6 +37,7 @@ import java.util.Map;
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
 
+/** Schema Manager. */
 public class SchemaManager
 {
     private static final Logger LOG = LoggerFactory.getLogger(SchemaManager.class);
@@ -49,6 +50,7 @@ public class SchemaManager
         this.conn = conn;
     }
 
+    /** Loaddatabaseprecision. */
     public TimestampPrecision loadDatabasePrecision()
             throws AddaxException
     {
@@ -93,6 +95,7 @@ public class SchemaManager
         return this.precision;
     }
 
+    /** Loadtablemeta. */
     public Map<String, TableMeta> loadTableMeta(List<String> tables)
             throws AddaxException
     {
@@ -129,6 +132,7 @@ public class SchemaManager
         return tableMetas;
     }
 
+    /** Loadcolumnmetas. */
     public Map<String, List<ColumnMeta>> loadColumnMetas(List<String> tables)
             throws AddaxException
     {

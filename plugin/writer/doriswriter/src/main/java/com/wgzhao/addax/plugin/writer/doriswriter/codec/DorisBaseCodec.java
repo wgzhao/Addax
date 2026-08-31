@@ -21,6 +21,7 @@ package com.wgzhao.addax.plugin.writer.doriswriter.codec;
 
 import com.wgzhao.addax.core.element.Column;
 
+/** Doris Base Codec. */
 public class DorisBaseCodec
 {
     protected String convertField(Column col)

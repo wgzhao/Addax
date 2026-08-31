@@ -25,6 +25,7 @@ import org.apache.commons.lang3.Validate;
 import org.apache.hadoop.hbase.util.Bytes;
 
 
+/** Hbase Column Cell. */
 public class HbaseColumnCell
         extends BaseObject
 {
@@ -71,41 +72,49 @@ public class HbaseColumnCell
         }
     }
 
+    /** Returns the columntype. */
     public ColumnType getColumnType()
     {
         return columnType;
     }
 
+    /** Returns the columnname. */
     public String getColumnName()
     {
         return columnName;
     }
 
+    /** Returns the columnfamily. */
     public byte[] getColumnFamily()
     {
         return columnFamily;
     }
 
+    /** Returns the qualifier. */
     public byte[] getQualifier()
     {
         return qualifier;
     }
 
+    /** Returns the dateformat. */
     public String getDateFormat()
     {
         return dateFormat;
     }
 
+    /** Returns the columnvalue. */
     public String getColumnValue()
     {
         return columnValue;
     }
 
+    /** Checks whether the constant condition holds. */
     public boolean isConstant()
     {
         return isConstant;
     }
 
+    /** Builder. */
     public static class Builder
     {
         private final ColumnType columnType;
@@ -114,29 +123,34 @@ public class HbaseColumnCell
 
         private String dateFormat;
 
+        /** Builder. */
         public Builder(ColumnType columnType)
         {
             this.columnType = columnType;
         }
 
+        /** Columnname. */
         public Builder columnName(String columnName)
         {
             this.columnName = columnName;
             return this;
         }
 
+        /** Columnvalue. */
         public Builder columnValue(String columnValue)
         {
             this.columnValue = columnValue;
             return this;
         }
 
+        /** Dateformat. */
         public Builder dateFormat(String dateFormat)
         {
             this.dateFormat = dateFormat;
             return this;
         }
 
+        /** Build. */
         public HbaseColumnCell build()
         {
             return new HbaseColumnCell(this);

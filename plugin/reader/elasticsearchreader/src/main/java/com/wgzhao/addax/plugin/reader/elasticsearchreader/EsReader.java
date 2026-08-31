@@ -70,6 +70,7 @@ public class EsReader
         extends Reader
 {
 
+    /** Job. */
     public static class Job
             extends Reader.Job
     {
@@ -135,6 +136,7 @@ public class EsReader
         }
     }
 
+    /** Task. */
     public static class Task
             extends Reader.Task
     {

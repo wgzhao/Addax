@@ -73,6 +73,7 @@ import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 public class JsonReader
         extends Reader
 {
+    /** Job. */
     public static class Job
             extends Reader.Job
     {
@@ -191,6 +192,7 @@ public class JsonReader
         }
     }
 
+    /** Task. */
     public static class Task
             extends Reader.Task
     {

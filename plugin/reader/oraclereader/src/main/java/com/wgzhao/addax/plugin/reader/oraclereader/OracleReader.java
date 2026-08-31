@@ -47,12 +47,14 @@ import static com.wgzhao.addax.core.base.Key.IS_TABLE_MODE;
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 
+/** Oracle Reader. */
 public class OracleReader
         extends Reader
 {
 
     private static final DataBaseType DATABASE_TYPE = DataBaseType.Oracle;
 
+    /** Job. */
     public static class Job
             extends Reader.Job
     {
@@ -119,6 +121,7 @@ public class OracleReader
         }
     }
 
+    /** Task. */
     public static class Task
             extends Reader.Task
     {

@@ -63,6 +63,7 @@ import static com.wgzhao.addax.core.spi.ErrorCode.LOGIN_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
 import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
+/** Hdfs Helper. */
 public class HdfsHelper
 {
     private static final Logger LOG = LoggerFactory.getLogger(HdfsHelper.class);
@@ -143,6 +144,7 @@ public class HdfsHelper
         }
     }
 
+    /** Hdfsdirlist. */
     public Path[] hdfsDirList(String dir)
     {
         Path path = new Path(dir);
@@ -162,6 +164,7 @@ public class HdfsHelper
         return files;
     }
 
+    /** Checks whether the pathexists condition holds. */
     public boolean isPathExists(String filePath)
     {
         Path path = new Path(filePath);
@@ -176,6 +179,7 @@ public class HdfsHelper
         return exist;
     }
 
+    /** Checks whether the pathdir condition holds. */
     public boolean isPathDir(String filePath)
     {
         Path path = new Path(filePath);
@@ -190,6 +194,7 @@ public class HdfsHelper
         return isDir;
     }
 
+    /** Deletefilesfromdir. */
     public void deleteFilesFromDir(Path dir, boolean skipTrash)
     {
         try {
@@ -221,6 +226,7 @@ public class HdfsHelper
         }
     }
 
+    /** Deletedir. */
     public void deleteDir(Path path)
     {
         LOG.info("Begin to delete temporary dir [{}] .", path);
@@ -236,6 +242,7 @@ public class HdfsHelper
         LOG.info("Finish deleting temporary dir [{}] .", path);
     }
 
+    /** Createpath. */
     public boolean createPath(String path)
     {
         try {
@@ -271,6 +278,7 @@ public class HdfsHelper
         LOG.info("Finish moving file(s).");
     }
 
+    /** Closefilesystem. */
     public void closeFileSystem()
     {
         try {
@@ -298,6 +306,7 @@ public class HdfsHelper
         return codecClass;
     }
 
+    /** Checks whether the pathwritable condition holds. */
     public boolean isPathWritable(String path) {
         try {
             Path p = new Path(path);
@@ -310,11 +319,13 @@ public class HdfsHelper
         }
     }
 
+    /** Validatebloomfilterconfiguration. */
     public void validateBloomFilterConfiguration(Configuration config, List<Configuration> columns)
     {
         resolveBloomFilterConfiguration(config, columns);
     }
 
+    /** Resolvebloomfilterconfiguration. */
     public BloomFilterConfig resolveBloomFilterConfiguration(Configuration config, List<Configuration> columns)
     {
         List<String> bloomFilterColumns = config.getList(Key.BLOOM_FILTER_COLUMNS, String.class);

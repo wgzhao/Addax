@@ -51,9 +51,11 @@ import static com.wgzhao.addax.core.base.Key.PRE_SHELL;
 import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
+/** Hdfs Writer. */
 public class HdfsWriter
         extends Writer
 {
+    /** Job. */
     public static class Job
             extends Writer.Job
     {
@@ -74,6 +76,7 @@ public class HdfsWriter
         private boolean skipTrash = false;
 
         // Use Set.of() for immutable set creation
+        /** Support format. */
         public static final Set<String> SUPPORT_FORMAT = Set.of("ORC", "PARQUET", "TEXT");
 
         // Create record for decimal configuration
@@ -447,6 +450,7 @@ public class HdfsWriter
         }
     }
 
+    /** Task. */
     public static class Task
             extends Writer.Task
     {

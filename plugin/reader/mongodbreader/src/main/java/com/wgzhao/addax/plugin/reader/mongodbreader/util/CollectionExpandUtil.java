@@ -26,12 +26,14 @@ import java.util.regex.Pattern;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 
+/** Collection Expand Util. */
 public final class CollectionExpandUtil
 {
     private static final Pattern PATTERN = Pattern.compile("(\\w+)\\[(\\d+)-(\\d+)](.*)");
 
     private CollectionExpandUtil() {}
 
+    /** Expandcollectionnames. */
     public static List<String> expandCollectionNames(String collectionExpr)
     {
         if (collectionExpr == null || collectionExpr.trim().isEmpty()) {

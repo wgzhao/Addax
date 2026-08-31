@@ -67,6 +67,7 @@ import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
+/** Http Reader. */
 public class HttpReader
         extends Reader
 {
@@ -87,6 +88,7 @@ public class HttpReader
     {
     }
 
+    /** Job. */
     public static class Job
             extends Reader.Job
     {
@@ -113,6 +115,7 @@ public class HttpReader
         }
     }
 
+    /** Task. */
     public static class Task
             extends Reader.Task
     {

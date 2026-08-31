@@ -48,6 +48,7 @@ import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
+/** HBase20x SQLWriter Task. */
 public class HBase20xSQLWriterTask
 {
     private static final Logger LOG = LoggerFactory.getLogger(HBase20xSQLWriterTask.class);
@@ -67,11 +68,13 @@ public class HBase20xSQLWriterTask
     private NullModeType nullModeType;
     private int batchSize;
 
+    /** Hbase20xsqlwritertask. */
     public HBase20xSQLWriterTask(Configuration configuration)
     {
         this.configuration = configuration;
     }
 
+    /** Startwriter. */
     public void startWriter(RecordReceiver lineReceiver, TaskPluginCollector taskPluginCollector)
     {
         this.taskPluginCollector = taskPluginCollector;

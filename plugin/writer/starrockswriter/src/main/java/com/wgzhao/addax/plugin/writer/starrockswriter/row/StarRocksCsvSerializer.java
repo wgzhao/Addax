@@ -21,6 +21,7 @@ package com.wgzhao.addax.plugin.writer.starrockswriter.row;
 
 import com.wgzhao.addax.core.element.Record;
 
+/** Star Rocks Csv Serializer. */
 public class StarRocksCsvSerializer
         extends StarRocksBaseSerializer
         implements StarRocksISerializer
@@ -30,6 +31,7 @@ public class StarRocksCsvSerializer
 
     private final String columnSeparator;
 
+    /** Starrockscsvserializer. */
     public StarRocksCsvSerializer(String sp)
     {
         this.columnSeparator = StarRocksDelimiterParser.parse(sp, "\t");

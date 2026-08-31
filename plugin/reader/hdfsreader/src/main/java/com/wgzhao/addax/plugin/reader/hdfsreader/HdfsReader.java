@@ -46,9 +46,11 @@ import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
+/** Hdfs Reader. */
 public class HdfsReader
         extends Reader
 {
+    /** Job. */
     public static class Job
             extends Reader.Job
     {
@@ -71,6 +73,7 @@ public class HdfsReader
             LOG.info("init() ok and end...");
         }
 
+        /** Validate. */
         public void validate()
         {
             readerOriginConfig.getNecessaryValue(Key.DEFAULT_FS, CONFIG_ERROR);
@@ -212,6 +215,7 @@ public class HdfsReader
         }
     }
 
+    /** Task. */
     public static class Task
             extends Reader.Task
     {

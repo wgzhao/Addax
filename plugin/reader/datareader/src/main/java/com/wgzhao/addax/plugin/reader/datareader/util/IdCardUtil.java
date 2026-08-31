@@ -30,6 +30,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 
+/** Id Card Util. */
 public class IdCardUtil
 {
     // http://www.stats.gov.cn/tjsj/tjbz/xzqhdm/201504/t20150415_712722.html
@@ -362,6 +363,7 @@ public class IdCardUtil
         return r[result % 11] + "";
     }
 
+    /** Nextidcard. */
     public static String nextIdCard()
     {
         StringBuilder sb = new StringBuilder();

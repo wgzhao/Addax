@@ -26,16 +26,26 @@ import org.apache.commons.lang3.Strings;
 import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
+/** Column Type. */
 public enum ColumnType
 {
+    /** BOOLEAN column type. */
     BOOLEAN("boolean"),
+    /** SHORT column type. */
     SHORT("short"),
+    /** INT column type. */
     INT("int"),
+    /** LONG column type. */
     LONG("long"),
+    /** FLOAT column type. */
     FLOAT("float"),
+    /** DOUBLE column type. */
     DOUBLE("double"),
+    /** DATE column type. */
     DATE("date"),
+    /** STRING column type. */
     STRING("string"),
+    /** BINARY_STRING column type. */
     BINARY_STRING("binarystring");
 
     private final String typeName;
@@ -45,6 +55,7 @@ public enum ColumnType
         this.typeName = typeName;
     }
 
+    /** Returns the bytypename. */
     public static ColumnType getByTypeName(String typeName)
     {
         if (StringUtils.isBlank(typeName)) {

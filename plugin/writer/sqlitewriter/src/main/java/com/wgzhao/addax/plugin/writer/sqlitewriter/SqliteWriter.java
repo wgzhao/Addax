@@ -36,11 +36,13 @@ import static com.wgzhao.addax.core.base.Constant.DEFAULT_DATE_FORMAT;
 import static com.wgzhao.addax.core.base.Key.PASSWORD;
 import static com.wgzhao.addax.core.base.Key.USERNAME;
 
+/** Sqlite Writer. */
 public class SqliteWriter
         extends Writer
 {
     private static final DataBaseType DATABASE_TYPE = DataBaseType.SQLite;
 
+    /** Job. */
     public static class Job
             extends Writer.Job
     {
@@ -91,6 +93,7 @@ public class SqliteWriter
         }
     }
 
+    /** Task. */
     public static class Task
             extends Writer.Task
     {

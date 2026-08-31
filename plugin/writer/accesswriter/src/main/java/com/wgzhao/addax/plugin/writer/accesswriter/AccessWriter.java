@@ -38,12 +38,14 @@ import java.util.List;
 import static com.wgzhao.addax.core.base.Key.CONNECTION;
 import static com.wgzhao.addax.core.base.Key.JDBC_URL;
 
+/** Access Writer. */
 public class AccessWriter
         extends Writer
 {
 
     private static final DataBaseType DATABASE_TYPE = DataBaseType.Access;
 
+    /** Job. */
     public static class Job
             extends Writer.Job
     {
@@ -128,6 +130,7 @@ public class AccessWriter
         }
     }
 
+    /** Task. */
     public static class Task
             extends Writer.Task
     {

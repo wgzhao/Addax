@@ -37,6 +37,7 @@ import java.util.Arrays;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
 
+/** File Type Utils. */
 public class FileTypeUtils
 {
     private static final Logger LOG = LoggerFactory.getLogger(FileTypeUtils.class);
@@ -171,6 +172,7 @@ public class FileTypeUtils
         return false;
     }
 
+    /** Checkhdfsfiletype. */
     public static boolean checkHdfsFileType(org.apache.hadoop.conf.Configuration hadoopConf, String filepath, String specifiedFileType)
     {
         var file = new Path(filepath);

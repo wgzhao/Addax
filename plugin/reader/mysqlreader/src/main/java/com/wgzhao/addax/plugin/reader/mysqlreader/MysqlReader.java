@@ -43,12 +43,14 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
 
+/** Mysql Reader. */
 public class MysqlReader
         extends Reader
 {
 
     private static final DataBaseType DATABASE_TYPE = DataBaseType.MySql;
 
+    /** Job. */
     public static class Job
             extends Reader.Job
     {
@@ -98,6 +100,7 @@ public class MysqlReader
         }
     }
 
+    /** Task. */
     public static class Task
             extends Reader.Task
     {

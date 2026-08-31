@@ -61,9 +61,11 @@ import static com.wgzhao.addax.core.spi.ErrorCode.PERMISSION_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
+/** Txt File Writer. */
 public class TxtFileWriter
         extends Writer
 {
+    /** Job. */
     public static class Job
             extends Writer.Job
     {
@@ -199,6 +201,7 @@ public class TxtFileWriter
         }
     }
 
+    /** Task. */
     public static class Task
             extends Writer.Task
     {

@@ -46,10 +46,12 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import static com.wgzhao.addax.core.base.Key.CONNECTION;
 
+/** Redis Writer. */
 public class RedisWriter
         extends Writer
 {
 
+    /** Task. */
     public static class Task
             extends Writer.Task
     {
@@ -271,6 +273,7 @@ public class RedisWriter
         }
     }
 
+    /** Job. */
     public static class Job
             extends Writer.Job
     {

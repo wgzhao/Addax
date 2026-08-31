@@ -48,6 +48,7 @@ import static com.moilioncircle.redis.replicator.util.Concurrents.terminateQuiet
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
+/** Sentinel Replicator. */
 public class SentinelReplicator
         implements Replicator, SentinelListener
 {
@@ -59,6 +60,7 @@ public class SentinelReplicator
     private final RedisSocketReplicator replicator;
     protected final ExecutorService executors = newSingleThreadExecutor();
 
+    /** Sentinelreplicator. */
     public SentinelReplicator(List<HostAndPort> hosts, String name, Configuration configuration)
     {
         Objects.requireNonNull(hosts);

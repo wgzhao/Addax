@@ -44,6 +44,7 @@ import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.PERMISSION_ERROR;
 
+/** Stream Writer. */
 public class StreamWriter
         extends Writer
 {
@@ -62,6 +63,7 @@ public class StreamWriter
         return "%s%s".formatted(path, fileName);
     }
 
+    /** Job. */
     public static class Job
             extends Writer.Job
     {
@@ -121,6 +123,7 @@ public class StreamWriter
         }
     }
 
+    /** Task. */
     public static class Task
             extends Writer.Task
     {

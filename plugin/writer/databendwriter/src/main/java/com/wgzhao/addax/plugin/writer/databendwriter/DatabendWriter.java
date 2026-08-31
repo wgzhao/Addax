@@ -32,9 +32,11 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
 
+/** Databend Writer. */
 public class DatabendWriter extends Writer {
     private static final DataBaseType DATABASE_TYPE = DataBaseType.Databend;
 
+    /** Job. */
     public static class Job
             extends Writer.Job {
         private Configuration originalConfig;
@@ -77,6 +79,7 @@ public class DatabendWriter extends Writer {
     }
 
 
+    /** Task. */
     public static class Task extends Writer.Task {
 
         private Configuration writerSliceConfig;

@@ -21,10 +21,14 @@ package com.wgzhao.addax.plugin.writer.kafkawriter;
 
 import com.wgzhao.addax.core.base.Key;
 
+/** Kafka Key configuration keys. */
 public class KafkaKey
         extends Key
 {
+    /** The Static. */
     public final static String BROKER_LIST = "brokerList";
+    /** The Static. */
     public final static String TOPIC = "topic";
+    /** The Static. */
     public final static String PROPERTIES = "properties";
 }

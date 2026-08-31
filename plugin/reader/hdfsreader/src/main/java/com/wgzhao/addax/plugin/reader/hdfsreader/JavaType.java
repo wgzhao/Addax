@@ -19,6 +19,7 @@
 
 package com.wgzhao.addax.plugin.reader.hdfsreader;
 
+/** Java Type. */
 public enum JavaType {
     TINYINT,
     SMALLINT,

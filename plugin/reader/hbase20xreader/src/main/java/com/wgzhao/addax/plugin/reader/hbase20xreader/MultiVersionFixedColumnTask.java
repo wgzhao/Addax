@@ -26,10 +26,12 @@ import org.apache.hadoop.hbase.util.Bytes;
 
 import java.util.Map;
 
+/** Multi Version Fixed Column Task. */
 public class MultiVersionFixedColumnTask
         extends MultiVersionTask
 {
 
+    /** Multiversionfixedcolumntask. */
     public MultiVersionFixedColumnTask(Configuration configuration)
     {
         super(configuration);

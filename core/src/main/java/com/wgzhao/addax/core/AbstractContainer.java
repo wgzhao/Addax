@@ -32,6 +32,7 @@ public abstract class AbstractContainer
 
     protected AbstractContainerCommunicator containerCommunicator;
 
+    /** Abstractcontainer. */
     public AbstractContainer(Configuration configuration)
     {
 
@@ -40,20 +41,24 @@ public abstract class AbstractContainer
         this.configuration = configuration;
     }
 
+    /** Returns the configuration. */
     public Configuration getConfiguration()
     {
         return configuration;
     }
 
+    /** Returns the containercommunicator. */
     public AbstractContainerCommunicator getContainerCommunicator()
     {
         return containerCommunicator;
     }
 
+    /** Sets the containercommunicator. */
     public void setContainerCommunicator(AbstractContainerCommunicator containerCommunicator)
     {
         this.containerCommunicator = containerCommunicator;
     }
 
+    /** Start. */
     public abstract void start();
 }

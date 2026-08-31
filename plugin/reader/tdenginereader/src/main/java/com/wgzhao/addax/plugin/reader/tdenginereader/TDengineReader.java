@@ -40,12 +40,14 @@ import static com.wgzhao.addax.core.base.Key.FETCH_SIZE;
 import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
+/** TDengine Reader. */
 public class TDengineReader
         extends Reader
 {
 
     private static final DataBaseType DATABASE_TYPE = DataBaseType.TDengine;
 
+    /** Job. */
     public static class Job
             extends Reader.Job
     {
@@ -153,6 +155,7 @@ public class TDengineReader
         }
     }
 
+    /** Task. */
     public static class Task
             extends Reader.Task
     {

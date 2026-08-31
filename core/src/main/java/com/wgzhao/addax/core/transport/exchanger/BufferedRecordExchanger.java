@@ -41,6 +41,7 @@ import static com.wgzhao.addax.core.util.container.CoreConstant.CORE_TRANSPORT_C
 import static com.wgzhao.addax.core.util.container.CoreConstant.CORE_TRANSPORT_EXCHANGER_BUFFER_SIZE;
 import static com.wgzhao.addax.core.util.container.CoreConstant.CORE_TRANSPORT_RECORD_CLASS;
 
+/** Buffered Record Exchanger. */
 public class BufferedRecordExchanger
         implements RecordSender, RecordReceiver
 {
@@ -58,6 +59,7 @@ public class BufferedRecordExchanger
     private volatile boolean shutdown = false;
 
     @SuppressWarnings("unchecked")
+    /** Bufferedrecordexchanger. */
     public BufferedRecordExchanger(Channel channel, TaskPluginCollector pluginCollector)
     {
         assert null != channel;

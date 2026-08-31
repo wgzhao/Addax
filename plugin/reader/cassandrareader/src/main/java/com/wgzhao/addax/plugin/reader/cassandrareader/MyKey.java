@@ -21,24 +21,38 @@ package com.wgzhao.addax.plugin.reader.cassandrareader;
 
 import com.wgzhao.addax.core.base.Key;
 
+/** My Key configuration keys. */
 public class MyKey
         extends Key
 {
 
+    /** The Static. */
     public final static String HOST = "host";
+    /** The Static. */
     public final static String PORT = "port";
+    /** The Static. */
     public final static String USE_SSL = "useSSL";
 
+    /** The Static. */
     public final static String KEYSPACE = "keyspace";
+    /** The Static. */
     public final static String TABLE = "table";
+    /** The Static. */
     public final static String COLUMN = "column";
+    /** The Static. */
     public final static String WHERE = "where";
+    /** The Static. */
     public final static String ALLOW_FILTERING = "allowFiltering";
+    /** The Static. */
     public final static String CONSISTENCY_LEVEL = "consistencyLevel";
+    /** The Static. */
     public final static String MIN_TOKEN = "minToken";
+    /** The Static. */
     public final static String MAX_TOKEN = "maxToken";
 
+    /** Column name. */
     public static final String COLUMN_NAME = "name";
 
+    /** Mykey. */
     public MyKey() {super();}
 }

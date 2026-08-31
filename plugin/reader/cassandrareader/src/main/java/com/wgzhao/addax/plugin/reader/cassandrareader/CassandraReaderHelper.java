@@ -65,6 +65,7 @@ import java.util.Set;
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 
 
+/** Cassandra Reader Helper. */
 public class CassandraReaderHelper
 {
     private static final Logger LOG = LoggerFactory.getLogger(CassandraReaderHelper.class);
@@ -442,6 +443,7 @@ public class CassandraReaderHelper
         return record;
     }
 
+    /** Splitjob. */
     public static List<Configuration> splitJob(int adviceNumber, Configuration jobConfig, Cluster cluster)
     {
         List<Configuration> splitConfigs = new ArrayList<Configuration>();
@@ -495,6 +497,7 @@ public class CassandraReaderHelper
         return splitConfigs;
     }
 
+    /** Returns the querystring. */
     public static String getQueryString(Configuration taskConfig, Cluster cluster)
     {
         List<String> columnMeta = taskConfig.getList(MyKey.COLUMN, String.class);
@@ -555,6 +558,7 @@ public class CassandraReaderHelper
         return select.toString();
     }
 
+    /** Checkconfig. */
     public static void checkConfig(Configuration jobConfig, Cluster cluster)
     {
         ensureStringExists(jobConfig, MyKey.HOST);

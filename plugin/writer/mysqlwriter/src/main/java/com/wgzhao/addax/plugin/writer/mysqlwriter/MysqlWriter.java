@@ -43,11 +43,13 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
 
+/** Mysql Writer. */
 public class MysqlWriter
         extends Writer
 {
     private static final DataBaseType DATABASE_TYPE = DataBaseType.MySql;
 
+    /** Job. */
     public static class Job
             extends Writer.Job
     {
@@ -93,6 +95,7 @@ public class MysqlWriter
         }
     }
 
+    /** Task. */
     public static class Task
             extends Writer.Task
     {

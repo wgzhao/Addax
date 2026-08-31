@@ -81,6 +81,7 @@ public class DFSUtil
         return !name.startsWith("_") && !name.startsWith(".");
     };
 
+    /** Dfsutil. */
     public DFSUtil(Configuration taskConfig)
     {
         hadoopConf = new org.apache.hadoop.conf.Configuration();
@@ -169,6 +170,7 @@ public class DFSUtil
         }
     }
 
+    /** Returns the hdfsallfiles. */
     public void getHDFSAllFiles(String hdfsPath)
     {
         try {
@@ -311,6 +313,7 @@ public class DFSUtil
         throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE, "The rc-file is not support longer");
     }
 
+    /** Orcfilestartread. */
     public void orcFileStartRead(String sourceOrcFilePath, RecordSender recordSender, TaskPluginCollector taskPluginCollector)
     {
         LOG.info("Being to read the orc-file [{}].", sourceOrcFilePath);
@@ -318,6 +321,7 @@ public class DFSUtil
         myOrcReader.reader(recordSender, taskPluginCollector);
     }
 
+    /** Parquetfilestartread. */
     public void parquetFileStartRead(String sourceParquetFilePath, RecordSender recordSender, TaskPluginCollector taskPluginCollector)
     {
         LOG.info("Begin to read the parquet-file [{}].", sourceParquetFilePath);

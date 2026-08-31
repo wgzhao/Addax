@@ -48,12 +48,14 @@ import static com.wgzhao.addax.core.base.Key.HAVE_KERBEROS;
 import static com.wgzhao.addax.core.base.Key.KERBEROS_KEYTAB_FILE_PATH;
 import static com.wgzhao.addax.core.base.Key.KERBEROS_PRINCIPAL;
 
+/** Hive Reader. */
 public class HiveReader
         extends Reader
 {
 
     private static final DataBaseType DATABASE_TYPE = DataBaseType.Hive;
 
+    /** Job. */
     public static class Job
             extends Reader.Job
     {
@@ -118,6 +120,7 @@ public class HiveReader
         }
     }
 
+    /** Task. */
     public static class Task
             extends Reader.Task
     {

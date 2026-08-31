@@ -49,6 +49,7 @@ import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
 import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
+/** Kudu Writer Task. */
 public class KuduWriterTask
         extends Writer
 {
@@ -59,8 +60,10 @@ public class KuduWriterTask
     private final Boolean isSkipFail;
     private final KuduTable table;
     private final KuduHelper kuduHelper;
+    /** The Session. */
     public KuduSession session;
 
+    /** Kuduwritertask. */
     public KuduWriterTask(Configuration configuration)
     {
 
@@ -78,6 +81,7 @@ public class KuduWriterTask
         session.setMutationBufferSpace((int) mutationBufferSpace);
     }
 
+    /** Startwriter. */
     public void startWriter(RecordReceiver lineReceiver, TaskPluginCollector taskPluginCollector)
     {
         LOG.info("Begin to write");
@@ -180,6 +184,7 @@ public class KuduWriterTask
         }
     }
 
+    /** Close. */
     public void close()
     {
         kuduHelper.closeClient();

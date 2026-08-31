@@ -24,6 +24,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Objects;
 
+/** Addax Exception. */
 public class AddaxException
         extends RuntimeException
 {
@@ -31,6 +32,7 @@ public class AddaxException
 
     private final transient ErrorCode errorCode;
 
+    /** Addaxexception. */
     public AddaxException(ErrorCode errorCode, String errorMessage)
     {
         super(errorMessage);
@@ -43,12 +45,14 @@ public class AddaxException
         this.errorCode = Objects.requireNonNull(errorCode, "ErrorCode cannot be null");
     }
 
+    /** Asaddaxexception. */
     public static AddaxException asAddaxException(ErrorCode errorCode, String message)
     {
         String errorMessage = StringUtils.isBlank(message) ? errorCode.getDescription() : message;
         return new AddaxException(errorCode, errorMessage);
     }
 
+    /** Asaddaxexception. */
     public static AddaxException asAddaxException(ErrorCode errorCode, String message, Throwable cause)
     {
         if (cause instanceof AddaxException) {
@@ -57,6 +61,7 @@ public class AddaxException
         return new AddaxException(errorCode, message, cause);
     }
 
+    /** Asaddaxexception. */
     public static AddaxException asAddaxException(ErrorCode errorCode, Throwable cause)
     {
         if (cause instanceof AddaxException) {
@@ -65,18 +70,21 @@ public class AddaxException
         return new AddaxException(errorCode, formatCauseMessage(cause), cause);
     }
 
+    /** Illegalconfigvalue. */
     public static AddaxException illegalConfigValue(String configName, Object configValue)
     {
         return new AddaxException(ErrorCode.ILLEGAL_VALUE,
                 String.format("The configuration value for '%s' is illegal or unsupported: '%s'", configName, configValue));
     }
 
+    /** Illegalconfigvalue. */
     public static AddaxException illegalConfigValue(String configName, Object configValue, String message)
     {
         return new AddaxException(ErrorCode.ILLEGAL_VALUE,
                 String.format("The configuration value for '%s' is illegal or unsupported: '%s': %s", configName, configValue, message));
     }
 
+    /** Missingconfig. */
     public static AddaxException missingConfig(String configName)
     {
         return new AddaxException(ErrorCode.REQUIRED_VALUE,
@@ -96,6 +104,7 @@ public class AddaxException
         return str.toString();
     }
 
+    /** Returns the errorcode. */
     public ErrorCode getErrorCode()
     {
         return this.errorCode;

@@ -54,10 +54,15 @@ public class SchemaProbe
      */
     public static class ColumnInfo
     {
+        /** The String. */
         public final String name;
+        /** The String. */
         public final String typeName;
+        /** The Int. */
         public final int precision;
+        /** The Int. */
         public final int scale;
+        /** The Boolean. */
         public final boolean primaryKey;
 
         ColumnInfo(String name, String typeName, int precision, int scale, boolean primaryKey)
@@ -83,6 +88,7 @@ public class SchemaProbe
         return java.sql.DriverManager.getConnection(jdbcUrl, username, password);
     }
 
+    /** Loaddriver. */
     public static void loadDriver(DataBaseType dataBaseType)
     {
         try {
@@ -100,6 +106,12 @@ public class SchemaProbe
      * the JDBC catalog, then as the schema, then in both positions, then as a
      * last resort all tables across schemas (system schemas excluded), because
      * drivers disagree on where the database name lives in the metadata model.
+ * @param dataBaseType the database type determining the JDBC driver
+ * @param jdbcUrl the JDBC URL to connect with
+ * @param username the database user name
+ * @param password the database password
+ * @param database the database name, tried as catalog and as schema
+     * @return the table names found in the database
      */
     public static List<String> listTables(DataBaseType dataBaseType, String jdbcUrl,
             String username, String password, String database)
@@ -127,6 +139,13 @@ public class SchemaProbe
 
     /**
      * Returns the primary key columns of a table, ordered by KEY_SEQ.
+ * @param dataBaseType the database type determining the JDBC driver
+ * @param jdbcUrl the JDBC URL to connect with
+ * @param username the database user name
+ * @param password the database password
+ * @param database the database name
+     * @param table the table to inspect
+     * @return the primary key column names in KEY_SEQ order
      */
     public static List<String> getPrimaryKeys(DataBaseType dataBaseType, String jdbcUrl,
             String username, String password, String database, String table)
@@ -144,6 +163,13 @@ public class SchemaProbe
 
     /**
      * Returns column metadata for a table, including primary key flags.
+ * @param dataBaseType the database type determining the JDBC driver
+ * @param jdbcUrl the JDBC URL to connect with
+ * @param username the database user name
+ * @param password the database password
+ * @param database the database name
+     * @param table the table to inspect
+     * @return column metadata of the table
      */
     public static List<ColumnInfo> getColumns(DataBaseType dataBaseType, String jdbcUrl,
             String username, String password, String database, String table)
@@ -161,6 +187,9 @@ public class SchemaProbe
 
     /**
      * Builds a map of column name to JDBC type name for quick name matching.
+     *
+     * @param columns the probed column metadata
+     * @return a lower-cased column name to JDBC type name map
      */
     public static Map<String, String> columnTypes(List<ColumnInfo> columns)
     {

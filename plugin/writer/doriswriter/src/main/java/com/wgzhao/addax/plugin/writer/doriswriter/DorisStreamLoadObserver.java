@@ -49,6 +49,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+/** Doris Stream Load Observer. */
 public class DorisStreamLoadObserver
 {
     private static final Logger LOG = LoggerFactory.getLogger(DorisStreamLoadObserver.class);
@@ -62,11 +63,13 @@ public class DorisStreamLoadObserver
     private static final String RESULT_LABEL_ABORTED = "ABORTED";
     private static final String RESULT_LABEL_UNKNOWN = "UNKNOWN";
 
+    /** Dorisstreamloadobserver. */
     public DorisStreamLoadObserver(DorisKey options)
     {
         this.options = options;
     }
 
+    /** Urldecode. */
     public String urlDecode(String outBuffer)
     {
         String data = outBuffer;
@@ -81,6 +84,7 @@ public class DorisStreamLoadObserver
         return data;
     }
 
+    /** Streamload. */
     public void streamLoad(WriterTuple data)
             throws Exception
     {

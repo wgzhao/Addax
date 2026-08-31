@@ -29,9 +29,11 @@ import com.wgzhao.addax.rdbms.util.DataBaseType;
 
 import java.util.List;
 
+/** Access Reader. */
 public class AccessReader extends Reader {
     private static final DataBaseType DATABASE_TYPE = DataBaseType.Access;
 
+    /** Job. */
     public static class Job extends Reader.Job {
 
         private Configuration configuration = null;
@@ -61,6 +63,7 @@ public class AccessReader extends Reader {
         }
     }
 
+    /** Task. */
     public static class Task extends Reader.Task {
 
         private Configuration configuration = null;

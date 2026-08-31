@@ -23,6 +23,7 @@ package com.wgzhao.addax.plugin.reader.datareader.util;
 
 import java.util.Random;
 
+/** Common Util. */
 public class CommonUtil
 {
     private static final Random RANDOM = new Random();
@@ -41,6 +42,7 @@ public class CommonUtil
         return randomDigitalString(length, 0, 10);
     }
 
+    /** Randomdigitalstring. */
     public static String randomDigitalString(int length, int origin, int bound)
     {
         if (length < 1 || bound < origin) {
@@ -51,27 +53,32 @@ public class CommonUtil
         return sb.toString();
     }
 
+    /** Randchoose. */
     public static String randChoose(String[] container)
     {
         return container[RANDOM.nextInt(container.length)];
     }
 
+    /** Randchoose. */
     public static int randChoose(int[] container)
     {
         return container[RANDOM.nextInt(container.length)];
     }
 
+    /** Randchoose. */
     public static long randChoose(long[] container)
     {
         return container[RANDOM.nextInt(container.length)];
     }
 
 
+    /** Randchoose. */
     public static double randChoose(double[] container)
     {
         return container[RANDOM.nextInt(container.length)];
     }
 
+    /** Randchoose. */
     public static String[] randChoose(String[][] container)
     {
         return container[RANDOM.nextInt(container.length)];

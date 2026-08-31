@@ -36,10 +36,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/** Multi Version Task. */
 public abstract class MultiVersionTask
         extends HbaseAbstractTask
 {
     private static final byte[] colonByte = ":".getBytes(StandardCharsets.UTF_8);
+    /** The List. */
     public static List<Map> column;
     private final int maxVersion;
     private final HashMap<String, HashMap<String, String>> familyQualifierMap;
@@ -107,6 +109,7 @@ public abstract class MultiVersionTask
         record.addColumn(convertBytesToAssignType(columnValueType, columnValue, columnValueFormat));
     }
 
+    /** Sets the maxversions. */
     public void setMaxVersions(Scan scan)
     {
         if (this.maxVersion == -1 || this.maxVersion == Integer.MAX_VALUE) {

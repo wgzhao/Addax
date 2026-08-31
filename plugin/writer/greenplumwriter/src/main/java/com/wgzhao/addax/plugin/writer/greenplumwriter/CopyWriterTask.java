@@ -46,22 +46,26 @@ import static com.wgzhao.addax.core.base.Constant.DEFAULT_BATCH_SIZE;
 import static com.wgzhao.addax.core.base.Key.BATCH_SIZE;
 import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
 
+/** Copy Writer Task. */
 public class CopyWriterTask
         extends CommonRdbmsWriter.Task
 {
     private static final Logger LOG = LoggerFactory.getLogger(CopyWriterTask.class);
     private Configuration writerSliceConfig = null;
 
+    /** Copywritertask. */
     public CopyWriterTask()
     {
         super(DataBaseType.PostgreSQL);
     }
 
+    /** Returns the jdbcurl. */
     public String getJdbcUrl()
     {
         return this.jdbcUrl;
     }
 
+    /** Createconnection. */
     public Connection createConnection()
     {
         String basicMsg = String.format("jdbcUrl:[%s]", this.jdbcUrl);
@@ -86,6 +90,7 @@ public class CopyWriterTask
         return StringUtils.join(columns, ",");
     }
 
+    /** Returns the copysql. */
     public String getCopySql(String tableName, List<String> columnList)
     {
 

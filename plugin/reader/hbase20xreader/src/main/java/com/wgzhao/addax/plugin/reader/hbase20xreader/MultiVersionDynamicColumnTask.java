@@ -26,11 +26,13 @@ import org.apache.hadoop.hbase.util.Bytes;
 
 import java.util.List;
 
+/** Multi Version Dynamic Column Task. */
 public class MultiVersionDynamicColumnTask
         extends MultiVersionTask
 {
     private final List<String> columnFamilies;
 
+    /** Multiversiondynamiccolumntask. */
     public MultiVersionDynamicColumnTask(Configuration configuration)
     {
         super(configuration);

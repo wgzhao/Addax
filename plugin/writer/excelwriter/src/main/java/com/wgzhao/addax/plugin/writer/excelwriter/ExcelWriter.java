@@ -62,11 +62,13 @@ import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
 import static com.wgzhao.addax.core.spi.ErrorCode.PERMISSION_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
+/** Excel Writer. */
 public class ExcelWriter
         extends Writer
 {
     private static final Logger log = LoggerFactory.getLogger(ExcelWriter.class);
 
+    /** Job. */
     public static class Job
             extends Writer.Job
     {
@@ -124,6 +126,7 @@ public class ExcelWriter
         }
     }
 
+    /** Task. */
     public static class Task
             extends Writer.Task
     {

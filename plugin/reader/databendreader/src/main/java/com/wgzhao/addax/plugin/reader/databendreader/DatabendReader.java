@@ -29,12 +29,14 @@ import com.wgzhao.addax.rdbms.util.DataBaseType;
 
 import java.util.List;
 
+/** Databend Reader. */
 public class DatabendReader
         extends Reader
 {
 
     private static final DataBaseType DATABASE_TYPE = DataBaseType.Databend;
 
+    /** Job. */
     public static class Job
             extends Reader.Job
     {
@@ -74,6 +76,7 @@ public class DatabendReader
         }
     }
 
+    /** Task. */
     public static class Task
             extends Reader.Task
     {

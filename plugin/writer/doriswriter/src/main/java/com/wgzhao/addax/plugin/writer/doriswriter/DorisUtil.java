@@ -43,6 +43,7 @@ public class DorisUtil
 
     private DorisUtil() {}
 
+    /** Renderpreorpostsqls. */
     public static List<String> renderPreOrPostSqls(List<String> preOrPostSqls, String tableName)
     {
         if (null == preOrPostSqls) {
@@ -57,6 +58,7 @@ public class DorisUtil
         return renderedSqls;
     }
 
+    /** Executesqls. */
     public static void executeSqls(Connection conn, List<String> sqls)
     {
         try {
@@ -70,6 +72,7 @@ public class DorisUtil
         }
     }
 
+    /** Precheckpreparesql. */
     public static void preCheckPrePareSQL(DorisKey options)
     {
         String table = options.getTable();
@@ -88,6 +91,7 @@ public class DorisUtil
         }
     }
 
+    /** Precheckpostsql. */
     public static void preCheckPostSQL(DorisKey options)
     {
         String table = options.getTable();

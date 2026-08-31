@@ -31,11 +31,13 @@ import java.util.List;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 
+/** Sybase Writer. */
 public class SybaseWriter
         extends Writer
 {
     private static final DataBaseType DATABASE_TYPE = DataBaseType.Sybase;
 
+    /** Job. */
     public static class Job
             extends Writer.Job
     {
@@ -83,6 +85,7 @@ public class SybaseWriter
         }
     }
 
+    /** Task. */
     public static class Task
             extends Writer.Task
     {

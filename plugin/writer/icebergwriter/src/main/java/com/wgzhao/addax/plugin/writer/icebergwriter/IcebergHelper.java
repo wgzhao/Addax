@@ -36,10 +36,12 @@ import static com.wgzhao.addax.core.base.Key.KERBEROS_KEYTAB_FILE_PATH;
 import static com.wgzhao.addax.core.base.Key.KERBEROS_PRINCIPAL;
 import static com.wgzhao.addax.core.spi.ErrorCode.LOGIN_ERROR;
 
+/** Iceberg Helper. */
 public class IcebergHelper
 {
     private static final Logger LOG = LoggerFactory.getLogger(IcebergHelper.class);
 
+    /** Kerberosauthentication. */
     public static void kerberosAuthentication(org.apache.hadoop.conf.Configuration hadoopConf, String kerberosPrincipal, String kerberosKeytabFilePath)
             throws Exception
     {
@@ -57,6 +59,7 @@ public class IcebergHelper
         }
     }
 
+    /** Returns the catalog. */
     public static Catalog getCatalog(Configuration conf)
             throws Exception
     {

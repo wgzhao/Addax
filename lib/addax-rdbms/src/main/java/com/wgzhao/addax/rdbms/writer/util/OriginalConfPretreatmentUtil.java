@@ -49,6 +49,7 @@ public final class OriginalConfPretreatmentUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger(OriginalConfPretreatmentUtil.class);
     // The database type used for processing configurations
+    /** The Databasetype. */
     public static DataBaseType dataBaseType;
     private static final String jdbcUrlPath = Key.CONNECTION + "." + Key.JDBC_URL;
 

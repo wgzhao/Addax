@@ -21,13 +21,19 @@ package com.wgzhao.addax.plugin.writer.greenplumwriter;
 
 import com.wgzhao.addax.core.base.Constant;
 
+/** GPConstant configuration keys. */
 public class GPConstant
         extends Constant
 {
+    /** Delimiter. */
     public static final char DELIMITER = '\u0001';
+    /** Quote char. */
     public static final char QUOTE_CHAR = '\u0002';
+    /** Newline. */
     public static final char NEWLINE = '\n';
+    /** Escape. */
     public static final char ESCAPE = '\\';
     // https://gpdb.docs.pivotal.io/5100/admin_guide/load/topics/g-copy-encoding.html
+    /** Max csv size. */
     public static final int MAX_CSV_SIZE = 4194304;
 }

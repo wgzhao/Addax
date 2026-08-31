@@ -60,6 +60,7 @@ import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
 import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
+/** Orc Writer. */
 public class OrcWriter
         extends HdfsHelper
         implements IHDFSWriter
@@ -75,6 +76,7 @@ public class OrcWriter
     // the type of the value in the map
     private SupportHiveDataType valueType;
 
+    /** Orcwriter. */
     public OrcWriter(Configuration conf)
     {
         super();

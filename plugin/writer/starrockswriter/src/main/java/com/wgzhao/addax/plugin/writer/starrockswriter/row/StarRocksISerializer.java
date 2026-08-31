@@ -23,6 +23,7 @@ import com.wgzhao.addax.core.element.Record;
 
 import java.io.Serializable;
 
+/** Star Rocks ISerializer. */
 public interface StarRocksISerializer
         extends Serializable
 {

@@ -66,9 +66,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+/** Iceberg Writer. */
 public class IcebergWriter
         extends Writer
 {
+    /** Job. */
     public static class Job
             extends Writer.Job
     {
@@ -133,6 +135,7 @@ public class IcebergWriter
         }
     }
 
+    /** Task. */
     public static class Task
             extends Writer.Task
     {

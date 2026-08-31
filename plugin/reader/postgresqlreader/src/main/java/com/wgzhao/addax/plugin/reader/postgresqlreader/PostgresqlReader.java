@@ -39,12 +39,14 @@ import static com.wgzhao.addax.core.base.Constant.DEFAULT_FETCH_SIZE;
 import static com.wgzhao.addax.core.base.Key.FETCH_SIZE;
 import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 
+/** Postgresql Reader. */
 public class PostgresqlReader
         extends Reader
 {
 
     private static final DataBaseType DATABASE_TYPE = DataBaseType.PostgreSQL;
 
+    /** Job. */
     public static class Job
             extends Reader.Job
     {
@@ -84,6 +86,7 @@ public class PostgresqlReader
         }
     }
 
+    /** Task. */
     public static class Task
             extends Reader.Task
     {

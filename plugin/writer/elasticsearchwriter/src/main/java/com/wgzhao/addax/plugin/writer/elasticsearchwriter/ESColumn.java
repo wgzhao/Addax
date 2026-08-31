@@ -35,51 +35,61 @@ public class ESColumn
 
     private Boolean array;
 
+    /** Sets the timezone. */
     public void setTimeZone(String timezone)
     {
         this.timezone = timezone;
     }
 
+    /** Returns the name. */
     public String getName()
     {
         return name;
     }
 
+    /** Sets the name. */
     public void setName(String name)
     {
         this.name = name;
     }
 
+    /** Returns the type. */
     public String getType()
     {
         return type;
     }
 
+    /** Sets the type. */
     public void setType(String type)
     {
         this.type = type;
     }
 
+    /** Returns the timezone. */
     public String getTimezone()
     {
         return timezone;
     }
 
+    /** Returns the format. */
     public String getFormat()
     {
         return format;
     }
 
+    /** Sets the format. */
     public void setFormat(String format)
     {
         this.format = format;
     }
 
+    /** Checks whether the array condition holds. */
     public Boolean isArray()
     {
         return array;
     }
 
+    /** Sets the array. */
     public void setArray(Boolean array)
     {
         this.array = array;

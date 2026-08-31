@@ -21,14 +21,21 @@ package com.wgzhao.addax.plugin.reader.ftpreader;
 
 import com.wgzhao.addax.core.base.Constant;
 
+/** Ftp Constant configuration keys. */
 public class FtpConstant extends Constant
 {
 
+    /** Ftpconstant. */
     public FtpConstant() {super();}
 
+    /** Default ftp port. */
     public static final int DEFAULT_FTP_PORT = 21;
+    /** Default sftp port. */
     public static final int DEFAULT_SFTP_PORT = 22;
+    /** Default timeout ms. */
     public static final int DEFAULT_TIMEOUT_MS = 60000;
+    /** Default max traversal level. */
     public static final int DEFAULT_MAX_TRAVERSAL_LEVEL = 100;
+    /** Default ftp connect pattern. */
     public static final String DEFAULT_FTP_CONNECT_PATTERN = "PASV";
 }

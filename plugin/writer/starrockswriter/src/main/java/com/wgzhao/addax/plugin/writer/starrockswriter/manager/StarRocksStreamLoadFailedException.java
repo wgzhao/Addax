@@ -22,6 +22,7 @@ package com.wgzhao.addax.plugin.writer.starrockswriter.manager;
 import java.io.IOException;
 import java.util.Map;
 
+/** Star Rocks Stream Load Failed Exception. */
 public class StarRocksStreamLoadFailedException
         extends IOException
 {
@@ -30,12 +31,14 @@ public class StarRocksStreamLoadFailedException
     private final Map<String, Object> response;
     private boolean reCreateLabel;
 
+    /** Starrocksstreamloadfailedexception. */
     public StarRocksStreamLoadFailedException(String message, Map<String, Object> response)
     {
         super(message);
         this.response = response;
     }
 
+    /** Starrocksstreamloadfailedexception. */
     public StarRocksStreamLoadFailedException(String message, Map<String, Object> response, boolean reCreateLabel)
     {
         super(message);
@@ -43,11 +46,13 @@ public class StarRocksStreamLoadFailedException
         this.reCreateLabel = reCreateLabel;
     }
 
+    /** Returns the failedresponse. */
     public Map<String, Object> getFailedResponse()
     {
         return response;
     }
 
+    /** Needrecreatelabel. */
     public boolean needReCreateLabel()
     {
         return reCreateLabel;

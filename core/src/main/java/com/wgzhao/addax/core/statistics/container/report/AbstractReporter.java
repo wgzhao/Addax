@@ -21,10 +21,13 @@ package com.wgzhao.addax.core.statistics.container.report;
 
 import com.wgzhao.addax.core.statistics.communication.Communication;
 
+/** Abstract Reporter. */
 public abstract class AbstractReporter
 {
 
+    /** Reportjobcommunication. */
     public abstract void reportJobCommunication(Communication communication);
 
+    /** Reporttgcommunication. */
     public abstract void reportTGCommunication(Integer taskGroupId, Communication communication);
 }

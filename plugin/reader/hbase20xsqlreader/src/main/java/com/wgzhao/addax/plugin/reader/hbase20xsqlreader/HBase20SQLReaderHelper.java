@@ -40,6 +40,7 @@ import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
 import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
+/** HBase20 SQLReader Helper. */
 public class HBase20SQLReaderHelper
 {
     private static final Logger LOG = LoggerFactory.getLogger(HBase20SQLReaderHelper.class);
@@ -50,6 +51,7 @@ public class HBase20SQLReaderHelper
     private List<String> columnNames;
     private String splitKey;
 
+    /** Hbase20sqlreaderhelper. */
     public HBase20SQLReaderHelper(Configuration configuration)
     {
         this.configuration = configuration;
@@ -93,6 +95,7 @@ public class HBase20SQLReaderHelper
         }
     }
 
+    /** Returns the connection. */
     public Connection getConnection(String queryServerAddress, String serialization)
     {
         String url = String.format(HBaseConstant.CONNECT_STRING_TEMPLATE, queryServerAddress, serialization);
@@ -171,6 +174,7 @@ public class HBase20SQLReaderHelper
         }
     }
 
+    /** Closejdbc. */
     public void closeJdbc(Connection connection, Statement statement, ResultSet resultSet)
     {
         try {
@@ -189,6 +193,7 @@ public class HBase20SQLReaderHelper
         }
     }
 
+    /** Dealwhere. */
     public void dealWhere()
     {
         String where = configuration.getString(HBaseKey.WHERE, null);

@@ -54,6 +54,7 @@ public enum ESFieldType
     FLATTENED,
     NESTED;
 
+    /** Returns the esfieldtype. */
     public static ESFieldType getESFieldType(String type)
     {
         if (type == null) {

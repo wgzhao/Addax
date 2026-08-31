@@ -19,6 +19,7 @@
 
 package com.wgzhao.addax.plugin.writer.s3writer.writer;
 
+/** Support Hive Data Type. */
 public enum SupportHiveDataType {
     TINYINT,
     SMALLINT,

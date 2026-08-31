@@ -53,12 +53,14 @@ import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
+/** Hbase20x Helper. */
 public class Hbase20xHelper
 {
 
     private static final Logger LOG = LoggerFactory.getLogger(Hbase20xHelper.class);
     private static org.apache.hadoop.hbase.client.Connection H_CONNECTION = null;
 
+    /** Returns the hbaseconnection. */
     public static org.apache.hadoop.hbase.client.Connection getHbaseConnection(String hbaseConfig)
     {
         if (H_CONNECTION != null && !H_CONNECTION.isClosed()) {
@@ -86,6 +88,7 @@ public class Hbase20xHelper
         return H_CONNECTION;
     }
 
+    /** Returns the table. */
     public static Table getTable(Configuration configuration)
     {
         String hbaseConfig = configuration.getString(HBaseKey.HBASE_CONFIG);
@@ -107,6 +110,7 @@ public class Hbase20xHelper
         return hTable;
     }
 
+    /** Returns the regionlocator. */
     public static RegionLocator getRegionLocator(Configuration configuration)
     {
         String hbaseConfig = configuration.getString(HBaseKey.HBASE_CONFIG);
@@ -128,6 +132,7 @@ public class Hbase20xHelper
         return regionLocator;
     }
 
+    /** Closeconnection. */
     public synchronized static void closeConnection(Connection hConnection)
     {
         try {
@@ -140,6 +145,7 @@ public class Hbase20xHelper
         }
     }
 
+    /** Closeadmin. */
     public static void closeAdmin(Admin admin)
     {
         try {
@@ -152,6 +158,7 @@ public class Hbase20xHelper
         }
     }
 
+    /** Closetable. */
     public static void closeTable(Table table)
     {
         try {
@@ -164,6 +171,7 @@ public class Hbase20xHelper
         }
     }
 
+    /** Closeresultscanner. */
     public static void closeResultScanner(ResultScanner resultScanner)
     {
         if (null != resultScanner) {
@@ -171,6 +179,7 @@ public class Hbase20xHelper
         }
     }
 
+    /** Closeregionlocator. */
     public static void closeRegionLocator(RegionLocator regionLocator)
     {
         try {
@@ -183,6 +192,7 @@ public class Hbase20xHelper
         }
     }
 
+    /** Checkhbasetable. */
     public static void checkHbaseTable(Admin admin, TableName hTableName)
             throws IOException
     {
@@ -197,6 +207,7 @@ public class Hbase20xHelper
         }
     }
 
+    /** Convertuserstartrowkey. */
     public static byte[] convertUserStartRowkey(Configuration configuration)
     {
         String startRowkey = configuration.getString(HBaseKey.START_ROW_KEY);
@@ -209,6 +220,7 @@ public class Hbase20xHelper
         }
     }
 
+    /** Convertuserendrowkey. */
     public static byte[] convertUserEndRowkey(Configuration configuration)
     {
         String endRowkey = configuration.getString(HBaseKey.END_ROW_KEY);
@@ -238,6 +250,7 @@ public class Hbase20xHelper
         return Bytes.toBytesBinary(startRowkey);
     }
 
+    /** Convertinnerendrowkey. */
     public static byte[] convertInnerEndRowkey(Configuration configuration)
     {
         String endRowkey = configuration.getString(HBaseKey.END_ROW_KEY);
@@ -258,11 +271,13 @@ public class Hbase20xHelper
         }
     }
 
+    /** Checks whether the rowkeycolumn condition holds. */
     public static boolean isRowkeyColumn(String columnName)
     {
         return HBaseConstant.ROWKEY_FLAG.equalsIgnoreCase(columnName);
     }
 
+    /** Parsecolumnofnormalmode. */
     public static List<HbaseColumnCell> parseColumnOfNormalMode(List<Map> column)
     {
         List<HbaseColumnCell> hbaseColumnCells = new ArrayList<>();
@@ -308,6 +323,7 @@ public class Hbase20xHelper
     }
 
     //将多竖表column变成<familyQualifier,<>>形式
+    /** Parsecolumnofmultiversionmode. */
     public static HashMap<String, HashMap<String, String>> parseColumnOfMultiversionMode(List<Map> column)
     {
 
@@ -340,6 +356,7 @@ public class Hbase20xHelper
         return familyQualifierMap;
     }
 
+    /** Split. */
     public static List<Configuration> split(Configuration configuration)
     {
         byte[] startRowkeyByte = Hbase20xHelper.convertUserStartRowkey(configuration);
@@ -459,6 +476,7 @@ public class Hbase20xHelper
         return Bytes.toStringBinary(tempStartRowkeyByte);
     }
 
+    /** Validateparameter. */
     public static void validateParameter(Configuration originalConfig)
     {
         originalConfig.getNecessaryValue(HBaseKey.HBASE_CONFIG, REQUIRED_VALUE);

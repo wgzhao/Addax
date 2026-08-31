@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/** Doris Json Codec. */
 public class DorisJsonCodec
         extends DorisBaseCodec
         implements DorisCodec
@@ -36,6 +37,7 @@ public class DorisJsonCodec
 
     private final List<String> fieldNames;
 
+    /** Dorisjsoncodec. */
     public DorisJsonCodec(List<String> fieldNames)
     {
         this.fieldNames = fieldNames;

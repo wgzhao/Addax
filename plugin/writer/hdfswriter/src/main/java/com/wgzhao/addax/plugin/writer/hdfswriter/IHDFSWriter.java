@@ -23,6 +23,7 @@ import com.wgzhao.addax.core.plugin.RecordReceiver;
 import com.wgzhao.addax.core.plugin.TaskPluginCollector;
 import com.wgzhao.addax.core.util.Configuration;
 
+/** IHDFSWriter. */
 public interface IHDFSWriter
 {
 

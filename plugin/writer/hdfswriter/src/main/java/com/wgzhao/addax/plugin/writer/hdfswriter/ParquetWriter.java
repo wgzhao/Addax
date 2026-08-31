@@ -62,6 +62,7 @@ import java.util.Map;
 
 import static org.apache.parquet.schema.LogicalTypeAnnotation.decimalType;
 
+/** Parquet Writer. */
 public class ParquetWriter
         extends HdfsHelper
         implements IHDFSWriter
@@ -75,6 +76,7 @@ public class ParquetWriter
     private static final int JULIAN_EPOCH_OFFSET_DAYS = 2440588;
     private static final long NANOS_PER_MILLISECOND = 1000000L;
 
+    /** Parquetwriter. */
     public ParquetWriter(Configuration conf)
     {
         super();
@@ -168,6 +170,7 @@ public class ParquetWriter
         }
     }
 
+    /** Buildrecord. */
     public Group buildRecord(
             Record record, List<Configuration> columns,
             TaskPluginCollector taskPluginCollector, SimpleGroupFactory simpleGroupFactory)

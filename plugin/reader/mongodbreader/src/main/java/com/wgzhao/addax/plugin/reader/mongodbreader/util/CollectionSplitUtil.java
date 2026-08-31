@@ -40,10 +40,12 @@ import static com.wgzhao.addax.core.base.Key.CONNECTION;
 import static com.wgzhao.addax.core.base.Key.DATABASE;
 import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 
+/** Collection Split Util. */
 public class CollectionSplitUtil
 {
     private CollectionSplitUtil() {}
 
+    /** Dosplit. */
     public static List<Configuration> doSplit(Configuration originalSliceConfig, int adviceNumber, MongoClient mongoClient)
     {
 

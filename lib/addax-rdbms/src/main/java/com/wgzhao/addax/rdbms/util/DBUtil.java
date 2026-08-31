@@ -415,6 +415,16 @@ public final class DBUtil
      * @return List of column names in the table
      * @throws AddaxException if connection or query fails
      */
+    /**
+     * Returns the column names of a table.
+     *
+     * @param dataBaseType the database type
+     * @param jdbcUrl the JDBC URL to connect with
+     * @param user the database user name
+     * @param pass the database password
+     * @param tableName the table to inspect
+     * @return the column names of the table
+     */
     public static List<String> getTableColumns(DataBaseType dataBaseType, String jdbcUrl, String user, String pass, String tableName)
     {
         try (Connection conn = getConnection(dataBaseType, jdbcUrl, user, pass)) {

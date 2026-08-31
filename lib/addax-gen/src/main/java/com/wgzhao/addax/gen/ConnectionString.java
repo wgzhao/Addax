@@ -114,6 +114,9 @@ public class ConnectionString
     /**
      * Parses a connection string. Passwords containing '@' or ':' are not
      * supported inline — use the --password-env option instead.
+     *
+     * @param input the raw connection string, e.g. mysql://user:pass@host:3306/db
+     * @return the parsed connection string
      */
     public static ConnectionString parse(String input)
     {

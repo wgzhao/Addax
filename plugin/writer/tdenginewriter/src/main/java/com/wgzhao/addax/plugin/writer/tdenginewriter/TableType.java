@@ -19,6 +19,7 @@
 
 package com.wgzhao.addax.plugin.writer.tdenginewriter;
 
+/** Table Type. */
 public enum TableType
 {
     SUP_TABLE, SUB_TABLE, NML_TABLE

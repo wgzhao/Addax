@@ -75,6 +75,7 @@ public class KuduReader
         extends Reader
 {
 
+    /** Job. */
     public static class Job
             extends Reader.Job
     {
@@ -193,6 +194,7 @@ public class KuduReader
         }
     }
 
+    /** Task. */
     public static class Task
             extends Reader.Task
     {

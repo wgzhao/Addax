@@ -57,6 +57,7 @@ import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
 import static com.wgzhao.addax.plugin.reader.hdfsreader.JavaType.ARRAY;
 import static com.wgzhao.addax.plugin.reader.hdfsreader.JavaType.MAP;
 
+/** My Orc Reader. */
 public class MyOrcReader
 {
     private static final Logger LOG = LoggerFactory.getLogger(MyOrcReader.class);
@@ -66,6 +67,7 @@ public class MyOrcReader
     private final List<ColumnEntry> columnEntries;
     private final Path path;
 
+    /** Myorcreader. */
     public MyOrcReader(org.apache.hadoop.conf.Configuration hadoopConf, Path path, String nullFormat, List<ColumnEntry> columns)
     {
         this.hadoopConf = hadoopConf;
@@ -74,6 +76,7 @@ public class MyOrcReader
         this.columnEntries = columns;
     }
 
+    /** Reader. */
     public void reader(RecordSender recordSender, TaskPluginCollector taskPluginCollector)
     {
         try (Reader reader = OrcFile.createReader(path, OrcFile.readerOptions(hadoopConf))) {

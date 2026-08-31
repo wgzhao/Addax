@@ -55,10 +55,12 @@ import static com.wgzhao.addax.core.base.Key.USERNAME;
 import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
+/** Mongo DBReader. */
 public class MongoDBReader
         extends Reader
 {
 
+    /** Job. */
     public static class Job
             extends Reader.Job
     {
@@ -114,6 +116,7 @@ public class MongoDBReader
         }
     }
 
+    /** Task. */
     public static class Task
             extends Reader.Task
     {

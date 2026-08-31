@@ -37,11 +37,13 @@ import static com.wgzhao.addax.core.base.Key.FETCH_SIZE;
 import static com.wgzhao.addax.core.base.Key.JDBC_DRIVER;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
+/** Rdbms Reader. */
 public class RdbmsReader
         extends Reader
 {
     private static final DataBaseType DATABASE_TYPE = DataBaseType.RDBMS_READER;
 
+    /** Job. */
     public static class Job
             extends Reader.Job
     {
@@ -98,6 +100,7 @@ public class RdbmsReader
         }
     }
 
+    /** Task. */
     public static class Task
             extends Reader.Task
     {

@@ -92,6 +92,7 @@ public class AddressUtil
     private static final String[] CITY_SUFFIXES = {"市", "县"};
     private static final String[] STREET_SUFFIXES = {"街", "路"};
 
+    /** Nextaddress. */
     public static String nextAddress()
     {
         return String.format("%s%s%s%s区%s%s%d号", CommonUtil.randChoose(PROVINCES),
@@ -104,6 +105,7 @@ public class AddressUtil
         );
     }
 
+    /** Nextcountry. */
     public static String nextCountry()
     {
         return CommonUtil.randChoose(COUNTRIES);

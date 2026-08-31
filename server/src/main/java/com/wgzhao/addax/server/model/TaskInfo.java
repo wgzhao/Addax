@@ -17,7 +17,9 @@
 
 package com.wgzhao.addax.server.model;
 
+/** Task Info. */
 public class TaskInfo {
+    /** Status. */
     public enum Status {
         RUNNING, SUCCESS, FAILED
     }
@@ -27,17 +29,25 @@ public class TaskInfo {
     private String result;
     private String error;
 
+    /** Taskinfo. */
     public TaskInfo(String taskId) {
         this.taskId = taskId;
         this.status = Status.RUNNING;
     }
 
     // getters and setters
+    /** Returns the taskid. */
     public String getTaskId() { return taskId; }
+    /** Returns the status. */
     public Status getStatus() { return status; }
+    /** Sets the status. */
     public void setStatus(Status status) { this.status = status; }
+    /** Returns the result. */
     public String getResult() { return result; }
+    /** Sets the result. */
     public void setResult(String result) { this.result = result; }
+    /** Returns the error. */
     public String getError() { return error; }
+    /** Sets the error. */
     public void setError(String error) { this.error = error; }
 }

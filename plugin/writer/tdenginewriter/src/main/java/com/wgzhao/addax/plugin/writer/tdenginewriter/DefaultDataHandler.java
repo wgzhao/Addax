@@ -49,6 +49,7 @@ import java.util.stream.Collectors;
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
 
+/** Default Data Handler. */
 public class DefaultDataHandler
         implements DataHandler
 {
@@ -68,16 +69,19 @@ public class DefaultDataHandler
     private Map<String, TableMeta> tableMetas;
     private SchemaManager schemaManager;
 
+    /** Sets the tablemetas. */
     public void setTableMetas(Map<String, TableMeta> tableMetas)
     {
         this.tableMetas = tableMetas;
     }
 
+    /** Sets the columnmetas. */
     public void setColumnMetas(Map<String, List<ColumnMeta>> columnMetas)
     {
         this.columnMetas = columnMetas;
     }
 
+    /** Sets the schemamanager. */
     public void setSchemaManager(SchemaManager schemaManager)
     {
         this.schemaManager = schemaManager;
@@ -95,6 +99,7 @@ public class DefaultDataHandler
         }
     }
 
+    /** Defaultdatahandler. */
     public DefaultDataHandler(Configuration configuration)
     {
         this.username = configuration.getString(Key.USERNAME, DEFAULT_USERNAME);

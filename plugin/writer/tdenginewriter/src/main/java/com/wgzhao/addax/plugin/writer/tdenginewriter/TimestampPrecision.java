@@ -19,6 +19,7 @@
 
 package com.wgzhao.addax.plugin.writer.tdenginewriter;
 
+/** Timestamp Precision. */
 public enum TimestampPrecision
 {
     MILLISEC, MICROSEC, NANOSEC

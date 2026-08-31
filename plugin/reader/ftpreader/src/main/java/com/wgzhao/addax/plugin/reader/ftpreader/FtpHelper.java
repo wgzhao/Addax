@@ -24,12 +24,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/** Ftp Helper. */
 public abstract class FtpHelper
 {
     protected final HashSet<String> sourceFiles = new HashSet<>();
 
+    /** Loginftpserver. */
     public abstract void loginFtpServer(String host, String username, String password, int port, String keyPath, String keyPass, int timeout, String connectMode);
 
+    /** Logoutftpserver. */
     public abstract void logoutFtpServer();
 
     /**

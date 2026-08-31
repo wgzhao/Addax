@@ -69,22 +69,31 @@ public abstract class Column
         this.byteSize = byteSize;
     }
 
+    /** Aslong. */
     public abstract Long asLong();
 
+    /** Asdouble. */
     public abstract Double asDouble();
 
+    /** Asstring. */
     public abstract String asString();
 
+    /** Asdate. */
     public abstract Date asDate();
 
+    /** Asbytes. */
     public abstract byte[] asBytes();
 
+    /** Asboolean. */
     public abstract Boolean asBoolean();
 
+    /** Asbigdecimal. */
     public abstract BigDecimal asBigDecimal();
 
+    /** Asbiginteger. */
     public abstract BigInteger asBigInteger();
 
+    /** Astimestamp. */
     public abstract Timestamp asTimestamp();
 
     @Override

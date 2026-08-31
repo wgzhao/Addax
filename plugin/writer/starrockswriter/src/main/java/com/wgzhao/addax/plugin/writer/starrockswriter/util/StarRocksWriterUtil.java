@@ -35,12 +35,14 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+/** Star Rocks Writer Util. */
 public final class StarRocksWriterUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger(StarRocksWriterUtil.class);
 
     private StarRocksWriterUtil() {}
 
+    /** Returns the starrockscolumns. */
     public static List<String> getStarRocksColumns(Connection conn, String databaseName, String tableName)
     {
         String currentSql = String.format("SELECT COLUMN_NAME FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = '%s' " +
@@ -63,6 +65,7 @@ public final class StarRocksWriterUtil
         }
     }
 
+    /** Renderpreorpostsqls. */
     public static List<String> renderPreOrPostSqls(List<String> preOrPostSqls, String tableName)
     {
         List<String> renderedSqls = new ArrayList<>();
@@ -77,6 +80,7 @@ public final class StarRocksWriterUtil
         return renderedSqls;
     }
 
+    /** Executesqls. */
     public static void executeSqls(Connection conn, List<String> sqls)
     {
         Statement stmt = null;
@@ -96,6 +100,7 @@ public final class StarRocksWriterUtil
         }
     }
 
+    /** Precheckpreparesql. */
     public static void preCheckPrePareSQL(StarRocksWriterOptions options)
     {
         String table = options.getTable();
@@ -114,6 +119,7 @@ public final class StarRocksWriterUtil
         }
     }
 
+    /** Precheckpostsql. */
     public static void preCheckPostSQL(StarRocksWriterOptions options)
     {
         String table = options.getTable();

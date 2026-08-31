@@ -23,9 +23,12 @@ import com.wgzhao.addax.core.exception.AddaxException;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
 
+/** Null Mode Type. */
 public enum NullModeType
 {
+    /** SKIP value. */
     SKIP("skip"),
+    /** EMPTY value. */
     EMPTY("empty");
 
     private final String mode;
@@ -35,6 +38,7 @@ public enum NullModeType
         this.mode = mode.toLowerCase();
     }
 
+    /** Returns the bytypename. */
     public static NullModeType getByTypeName(String modeName)
     {
         for (NullModeType modeType : values()) {

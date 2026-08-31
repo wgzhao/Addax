@@ -31,10 +31,12 @@ import com.wgzhao.addax.rdbms.util.DataBaseType;
 
 import java.util.List;
 
+/** Doris Reader. */
 public class DorisReader
         extends Reader
 {
 
+    /** Job. */
     public static class Job
             extends Reader.Job
     {
@@ -84,6 +86,7 @@ public class DorisReader
         }
     }
 
+    /** Task. */
     public static class Task
             extends Reader.Task
     {

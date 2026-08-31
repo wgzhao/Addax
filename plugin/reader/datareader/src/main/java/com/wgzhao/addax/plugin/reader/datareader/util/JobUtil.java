@@ -21,6 +21,7 @@
 
 package com.wgzhao.addax.plugin.reader.datareader.util;
 
+/** Job Util. */
 public class JobUtil
 {
     private static final String[] JOBS = {
@@ -127,6 +128,7 @@ public class JobUtil
             "驻唱/歌手", "舞蹈演员", "模特", "演员/群众演员", "娱乐领班", "娱乐服务员", "前台迎宾", "驯兽师/助理驯兽师", "志愿者/社会工作者", "其他",
     };
 
+    /** Nextjob. */
     public static String nextJob()
     {
         return CommonUtil.randChoose(JOBS);

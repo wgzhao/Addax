@@ -22,6 +22,7 @@ package com.wgzhao.addax.plugin.writer.ftpwriter.util;
 import java.io.OutputStream;
 import java.util.Set;
 
+/** IFtp Helper. */
 public interface IFtpHelper
 {
 

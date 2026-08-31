@@ -20,6 +20,7 @@ package com.wgzhao.addax.core.plugin;
 import com.wgzhao.addax.core.base.BaseObject;
 import com.wgzhao.addax.core.util.Configuration;
 
+/** Abstract Plugin. */
 public abstract class AbstractPlugin
         extends BaseObject
         implements Pluginable
@@ -95,23 +96,28 @@ public abstract class AbstractPlugin
         this.peerPluginName = peerPluginName;
     }
 
+    /** Precheck. */
     public void preCheck()
     {
     }
 
+    /** Prepare. */
     public void prepare()
     {
     }
 
+    /** Post. */
     public void post()
     {
     }
 
+    /** Prehandler. */
     public void preHandler(Configuration jobConfiguration)
     {
 
     }
 
+    /** Posthandler. */
     public void postHandler(Configuration jobConfiguration)
     {
 

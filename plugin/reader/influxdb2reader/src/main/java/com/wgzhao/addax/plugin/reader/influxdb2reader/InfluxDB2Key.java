@@ -21,13 +21,20 @@ package com.wgzhao.addax.plugin.reader.influxdb2reader;
 
 import com.wgzhao.addax.core.base.Key;
 
+/** Influx DB2 Key configuration keys. */
 public final class InfluxDB2Key
         extends Key
 {
+    /** Endpoint. */
     public static final String ENDPOINT = "endpoint";
+    /** Bucket. */
     public static final String BUCKET = "bucket";
+    /** Org. */
     public static final String ORG = "org";
+    /** Token. */
     public static final String TOKEN = "token";
+    /** Range. */
     public static final String RANGE = "range";
+    /** Limit. */
     public static final String LIMIT = "limit";
 }

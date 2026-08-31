@@ -25,10 +25,12 @@ import com.wgzhao.addax.core.util.Configuration;
 
 import java.util.List;
 
+/** HBase20x SQLReader. */
 public class HBase20xSQLReader
         extends Reader
 {
 
+    /** Job. */
     public static class Job
             extends Reader.Job
     {
@@ -56,6 +58,7 @@ public class HBase20xSQLReader
         }
     }
 
+    /** Task. */
     public static class Task
             extends Reader.Task
     {

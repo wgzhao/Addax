@@ -42,18 +42,23 @@ public class DefaultMemberAccess
         implements MemberAccess
 {
 
+    /** The Allowprivateaccess. */
     public boolean allowPrivateAccess;
+    /** The Allowprotectedaccess. */
     public boolean allowProtectedAccess;
+    /** The Allowpackageprotectedaccess. */
     public boolean allowPackageProtectedAccess;
 
     /*===================================================================
         Constructors
       ===================================================================*/
+    /** Defaultmemberaccess. */
     public DefaultMemberAccess(boolean allowAllAccess)
     {
         this(allowAllAccess, allowAllAccess, allowAllAccess);
     }
 
+    /** Defaultmemberaccess. */
     public DefaultMemberAccess(boolean allowPrivateAccess, boolean allowProtectedAccess, boolean allowPackageProtectedAccess)
     {
         super();
@@ -65,31 +70,37 @@ public class DefaultMemberAccess
     /*===================================================================
         Public methods
       ===================================================================*/
+    /** Returns the allowprivateaccess. */
     public boolean getAllowPrivateAccess()
     {
         return allowPrivateAccess;
     }
 
+    /** Sets the allowprivateaccess. */
     public void setAllowPrivateAccess(boolean value)
     {
         allowPrivateAccess = value;
     }
 
+    /** Returns the allowprotectedaccess. */
     public boolean getAllowProtectedAccess()
     {
         return allowProtectedAccess;
     }
 
+    /** Sets the allowprotectedaccess. */
     public void setAllowProtectedAccess(boolean value)
     {
         allowProtectedAccess = value;
     }
 
+    /** Returns the allowpackageprotectedaccess. */
     public boolean getAllowPackageProtectedAccess()
     {
         return allowPackageProtectedAccess;
     }
 
+    /** Sets the allowpackageprotectedaccess. */
     public void setAllowPackageProtectedAccess(boolean value)
     {
         allowPackageProtectedAccess = value;

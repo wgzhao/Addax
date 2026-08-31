@@ -36,12 +36,14 @@ import java.util.List;
 import static com.wgzhao.addax.core.base.Key.JDBC_DRIVER;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
+/** Rdbms Writer. */
 public class RdbmsWriter
         extends Writer
 {
     private static final Logger LOG = LoggerFactory.getLogger(RdbmsWriter.class);
     private static final DataBaseType DATABASE_TYPE = DataBaseType.RDBMS_WRITER;
 
+    /** Job. */
     public static class Job
             extends Writer.Job
     {
@@ -93,6 +95,7 @@ public class RdbmsWriter
         }
     }
 
+    /** Task. */
     public static class Task
             extends Writer.Task
     {

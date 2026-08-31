@@ -58,10 +58,12 @@ import static com.wgzhao.addax.core.base.Key.WRITE_MODE;
 import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
+/** Mongo DBWriter. */
 public class MongoDBWriter
         extends Writer
 {
 
+    /** Job. */
     public static class Job
             extends Writer.Job
     {
@@ -166,6 +168,7 @@ public class MongoDBWriter
         }
     }
 
+    /** Task. */
     public static class Task
             extends Writer.Task
     {

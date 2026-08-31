@@ -50,6 +50,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+/** Star Rocks Stream Load Visitor. */
 public class StarRocksStreamLoadVisitor
 {
 
@@ -66,11 +67,13 @@ public class StarRocksStreamLoadVisitor
     private final StarRocksWriterOptions writerOptions;
     private long pos;
 
+    /** Starrocksstreamloadvisitor. */
     public StarRocksStreamLoadVisitor(StarRocksWriterOptions writerOptions)
     {
         this.writerOptions = writerOptions;
     }
 
+    /** Dostreamload. */
     public void doStreamLoad(StarRocksFlushTuple flushData)
             throws IOException
     {

@@ -39,9 +39,11 @@ import java.util.*;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.*;
 
+/** S3 Writer. */
 public class S3Writer
         extends Writer
 {
+    /** Job. */
     public static class Job
             extends Writer.Job
     {
@@ -203,6 +205,7 @@ public class S3Writer
         }
     }
 
+    /** Task. */
     public static class Task
             extends Writer.Task
     {

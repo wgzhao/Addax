@@ -76,6 +76,7 @@ public class BankUtil
         return BANKS[RANDOM.nextInt(BANKS.length)];
     }
 
+    /** Nextdebitcard. */
     public static String nextDebitCard()
     {
         StringBuilder sb = new StringBuilder();
@@ -84,6 +85,7 @@ public class BankUtil
         return sb.toString();
     }
 
+    /** Nextcreditcard. */
     public static String nextCreditCard()
     {
         StringBuilder sb = new StringBuilder();

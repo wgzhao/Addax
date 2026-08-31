@@ -58,11 +58,13 @@ public class ESClient
 
     private JestClient jestClient;
 
+    /** Returns the client. */
     public JestClient getClient()
     {
         return jestClient;
     }
 
+    /** Createclient. */
     public void createClient(String endpoint,
             String user,
             String passwd,
@@ -92,6 +94,7 @@ public class ESClient
         jestClient = factory.getObject();
     }
 
+    /** Indicesexists. */
     public boolean indicesExists(String indexName)
             throws Exception
     {
@@ -114,6 +117,7 @@ public class ESClient
         return isIndicesExists;
     }
 
+    /** Deleteindex. */
     public boolean deleteIndex(String indexName)
             throws Exception
     {
@@ -128,6 +132,7 @@ public class ESClient
         return true;
     }
 
+    /** Createindex. */
     public boolean createIndex(String indexName, String typeName,
             Object mappings, String settings, boolean dynamic)
             throws Exception
@@ -191,6 +196,7 @@ public class ESClient
         return true;
     }
 
+    /** Execute. */
     public JestResult execute(Action<JestResult> clientRequest)
             throws Exception
     {
@@ -202,6 +208,7 @@ public class ESClient
         return rst;
     }
 
+    /** Returns the status. */
     public Integer getStatus(JestResult rst)
     {
         JsonObject jsonObject = rst.getJsonObject();
@@ -211,12 +218,14 @@ public class ESClient
         return 600;
     }
 
+    /** Checks whether the bulkresult condition holds. */
     public boolean isBulkResult(JestResult rst)
     {
         JsonObject jsonObject = rst.getJsonObject();
         return jsonObject.has("items");
     }
 
+    /** Alias. */
     public void alias(String indexName, String aliasName, boolean needClean)
             throws IOException
     {
@@ -248,6 +257,7 @@ public class ESClient
         }
     }
 
+    /** Bulkinsert. */
     public JestResult bulkInsert(Bulk.Builder bulk, int trySize)
             throws Exception
     {
@@ -262,6 +272,7 @@ public class ESClient
         return rst;
     }
 
+    /** Closejestclient. */
     public void closeJestClient()
     {
         if (jestClient != null) {

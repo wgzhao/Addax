@@ -202,6 +202,7 @@ public enum DataBaseType
         return jdbc;
     }
 
+    /** Quotecolumnname. */
     public String quoteColumnName(String columnName) {
         return quoteColumnName(columnName, false);
     }
@@ -260,6 +261,7 @@ public enum DataBaseType
         return null;
     }
 
+    /** Unquote. */
     public String unQuote(String field) {
         if (field == null || field.length() < 2) {
             return field;

@@ -32,20 +32,28 @@ public final class KuduKey
         extends Key
 {
 
+    /** Kudu master addresses. */
     public static final String KUDU_MASTER_ADDRESSES = "masterAddress";
 
+    /** Lower bound. */
     public static final String LOWER_BOUND = "lowerBound";
 
+    /** Upper bound. */
     public static final String UPPER_BOUND = "upperBound";
 
+    /** Split lower bound. */
     public static final String SPLIT_LOWER_BOUND = "splitLowerBound";
 
+    /** Split upper bound. */
     public static final String SPLIT_UPPER_BOUND = "splitUpperBound";
 
+    /** Socket read timeout. */
     public static final String SOCKET_READ_TIMEOUT = "readTimeout";
 
+    /** Scan request timeout. */
     public static final String SCAN_REQUEST_TIMEOUT = "scanTimeout";
 
+    /** The "=" key. */
     public static final Map<String, KuduPredicate.ComparisonOp> KUDU_OPERATORS = ImmutableMap.of(
             "=", KuduPredicate.ComparisonOp.EQUAL,
             ">", KuduPredicate.ComparisonOp.GREATER,

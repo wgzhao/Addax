@@ -34,11 +34,13 @@ import java.util.List;
 
 import static com.wgzhao.addax.core.base.Constant.DEFAULT_DATE_FORMAT;
 
+/** Click House Writer. */
 public class ClickHouseWriter
         extends Writer
 {
     private static final DataBaseType DATABASE_TYPE = DataBaseType.ClickHouse;
 
+    /** Job. */
     public static class Job
             extends Writer.Job
     {
@@ -78,6 +80,7 @@ public class ClickHouseWriter
         }
     }
 
+    /** Task. */
     public static class Task
             extends Writer.Task
     {

@@ -19,6 +19,7 @@
 
 package com.wgzhao.addax.plugin.writer.tdenginewriter;
 
+/** Table Meta. */
 public class TableMeta
 {
     TableType tableType;

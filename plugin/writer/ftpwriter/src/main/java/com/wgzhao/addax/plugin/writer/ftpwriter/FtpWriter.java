@@ -52,9 +52,11 @@ import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.LOGIN_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
+/** Ftp Writer. */
 public class FtpWriter
         extends Writer
 {
+    /** Job. */
     public static class Job
             extends Writer.Job
     {
@@ -231,6 +233,7 @@ public class FtpWriter
         }
     }
 
+    /** Task. */
     public static class Task
             extends Writer.Task
     {

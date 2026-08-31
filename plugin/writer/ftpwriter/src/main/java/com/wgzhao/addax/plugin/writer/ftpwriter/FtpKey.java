@@ -21,16 +21,24 @@ package com.wgzhao.addax.plugin.writer.ftpwriter;
 
 import com.wgzhao.addax.core.base.Key;
 
+/** Ftp Key configuration keys. */
 public final class FtpKey extends Key
 {
+    /** Protocol. */
     public static final String PROTOCOL = "protocol";
+    /** Host. */
     public static final String HOST = "host";
+    /** Port. */
     public static final String PORT = "port";
+    /** Timeout. */
     public static final String TIMEOUT = "timeout";
 
+    /** Use key. */
     public static final String USE_KEY = "useKey";
     // ssh private key
+    /** Key path. */
     public static final String KEY_PATH = "keyPath";
     // ssh private key passphrase
+    /** Key pass. */
     public static final String KEY_PASS = "keyPass";
 }

@@ -40,6 +40,7 @@ import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 public class Hbase20xReader
         extends Reader
 {
+    /** Job. */
     public static class Job
             extends Reader.Job
     {
@@ -65,6 +66,7 @@ public class Hbase20xReader
         }
     }
 
+    /** Task. */
     public static class Task
             extends Reader.Task
     {

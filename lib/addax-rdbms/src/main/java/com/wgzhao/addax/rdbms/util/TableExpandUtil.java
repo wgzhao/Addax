@@ -33,6 +33,7 @@ import java.util.regex.Pattern;
 public final class TableExpandUtil
 {
     // Groups: 1=schema, 2=table, 3=start, 4=end, 5=suffix
+    /** Pattern. */
     public static final Pattern PATTERN = Pattern.compile("(\\w+\\.)?(\\w+)\\[(\\d+)-(\\d+)\\](.*)");
 
     private TableExpandUtil()

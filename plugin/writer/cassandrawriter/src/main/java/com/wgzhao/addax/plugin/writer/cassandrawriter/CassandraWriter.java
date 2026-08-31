@@ -60,6 +60,7 @@ public class CassandraWriter
     private static final Logger LOG = LoggerFactory
             .getLogger(CassandraWriter.class);
 
+    /** Job. */
     public static class Job
             extends Writer.Job
     {
@@ -88,6 +89,7 @@ public class CassandraWriter
         }
     }
 
+    /** Task. */
     public static class Task
             extends Writer.Task
     {

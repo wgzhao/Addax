@@ -23,6 +23,7 @@ package com.wgzhao.addax.plugin.reader.datareader.util;
 
 import org.apache.commons.rng.simple.RandomSource;
 
+/** Person Util. */
 public class PersonUtil
 {
     private static final String[] FIRST_NAMES_MALE = {
@@ -57,6 +58,7 @@ public class PersonUtil
             "湛", "宾", "戎", "勾", "茅", "利", "于", "呼", "居", "揭", "干", "但", "尉", "冶", "斯", "元", "束", "檀", "衣", "信", "展", "阴", "昝", "智", "幸",
             "奉", "植", "衡", "富", "尧", "闭", "由"};
 
+    /** Nextname. */
     public static String nextName()
     {
         StringBuilder sb = new StringBuilder();

@@ -58,9 +58,11 @@ import static com.wgzhao.addax.plugin.reader.ftpreader.FtpKey.PROTOCOL;
 import static com.wgzhao.addax.plugin.reader.ftpreader.FtpKey.TIME_OUT;
 import static com.wgzhao.addax.plugin.reader.ftpreader.FtpKey.USE_KEY;
 
+/** Ftp Reader. */
 public class FtpReader
         extends Reader
 {
+    /** Job. */
     public static class Job
             extends Reader.Job
     {
@@ -210,6 +212,7 @@ public class FtpReader
         }
     }
 
+    /** Task. */
     public static class Task
             extends Reader.Task
     {

@@ -50,6 +50,7 @@ import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 public class DbfReader
         extends Reader
 {
+    /** Job. */
     public static class Job
             extends Reader.Job
     {
@@ -132,6 +133,7 @@ public class DbfReader
         }
     }
 
+    /** Task. */
     public static class Task
             extends Reader.Task
     {

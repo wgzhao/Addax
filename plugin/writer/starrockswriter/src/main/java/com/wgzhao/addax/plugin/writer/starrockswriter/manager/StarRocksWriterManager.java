@@ -37,6 +37,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+/** Star Rocks Writer Manager. */
 public class StarRocksWriterManager
 {
 
@@ -54,6 +55,7 @@ public class StarRocksWriterManager
     private ScheduledExecutorService scheduler;
     private ScheduledFuture<?> scheduledFuture;
 
+    /** Starrockswritermanager. */
     public StarRocksWriterManager(StarRocksWriterOptions writerOptions)
     {
         this.writerOptions = writerOptions;
@@ -63,6 +65,7 @@ public class StarRocksWriterManager
         this.startAsyncFlushing();
     }
 
+    /** Startscheduler. */
     public void startScheduler()
     {
         stopScheduler();
@@ -87,6 +90,7 @@ public class StarRocksWriterManager
         }, writerOptions.getFlushInterval(), TimeUnit.MILLISECONDS);
     }
 
+    /** Stopscheduler. */
     public void stopScheduler()
     {
         if (this.scheduledFuture != null) {
@@ -95,6 +99,7 @@ public class StarRocksWriterManager
         }
     }
 
+    /** Writerecord. */
     public final synchronized void writeRecord(String record)
             throws IOException
     {
@@ -115,6 +120,7 @@ public class StarRocksWriterManager
         }
     }
 
+    /** Flush. */
     public synchronized void flush(String label, boolean waitUtilDone)
             throws Exception
     {
@@ -135,6 +141,7 @@ public class StarRocksWriterManager
         batchSize = 0;
     }
 
+    /** Close. */
     public synchronized void close()
     {
         if (!closed) {
@@ -153,6 +160,7 @@ public class StarRocksWriterManager
         checkFlushException();
     }
 
+    /** Createbatchlabel. */
     public String createBatchLabel()
     {
         return UUID.randomUUID().toString();

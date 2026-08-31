@@ -43,19 +43,24 @@ import java.util.Iterator;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
 
+/** Excel Helper. */
 public class ExcelHelper
 {
+    /** The Header. */
     public boolean header;
+    /** The Skiprows. */
     public int skipRows;
     FileInputStream file;
     Workbook workbook;
     private FormulaEvaluator evaluator;
     private Iterator<Row> rowIterator;
 
+    /** Excelhelper. */
     public ExcelHelper(boolean header, int skipRows) {
         this.header = header;
         this.skipRows = skipRows;
     }
+    /** Open. */
     public void open(String filePath)
     {
         try {
@@ -86,6 +91,7 @@ public class ExcelHelper
         }
     }
 
+    /** Close. */
     public void close()
     {
         try {
@@ -97,6 +103,7 @@ public class ExcelHelper
         }
     }
 
+    /** Readline. */
     public Record readLine(Record record)
     {
         if (rowIterator.hasNext()) {

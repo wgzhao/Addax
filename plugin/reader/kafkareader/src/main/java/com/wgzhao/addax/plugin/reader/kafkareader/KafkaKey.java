@@ -21,12 +21,18 @@ package com.wgzhao.addax.plugin.reader.kafkareader;
 
 import com.wgzhao.addax.core.base.Key;
 
+/** Kafka Key configuration keys. */
 public class KafkaKey
         extends Key
 {
+    /** The Static. */
     public final static String BROKER_LIST = "brokerList";
+    /** The Static. */
     public final static String TOPIC = "topic";
+    /** The Static. */
     public final static String PROPERTIES = "properties";
+    /** The Static. */
     public final static String MISSING_KEY_VALUE = "missingKeyValue";
+    /** Max message number. */
     public static final String MAX_MESSAGE_NUMBER = "maxMessageNumber";
 }

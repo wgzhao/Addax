@@ -21,6 +21,7 @@ package com.wgzhao.addax.plugin.reader.redisreader.impl;
 import java.io.Closeable;
 import java.io.IOException;
 
+/** Sentinel. */
 public interface Sentinel
         extends Closeable
 {

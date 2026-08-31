@@ -23,9 +23,12 @@ import com.wgzhao.addax.core.exception.AddaxException;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
 
+/** Mode Type. */
 public enum ModeType
 {
+    /** NORMAL value. */
     NORMAL("normal"),
+    /** MULTI_VERSION_FIXED_COLUMN value. */
     MULTI_VERSION_FIXED_COLUMN("multiVersionFixedColumn");
 
     private final String mode;
@@ -35,6 +38,7 @@ public enum ModeType
         this.mode = mode.toLowerCase();
     }
 
+    /** Returns the bytypename. */
     public static ModeType getByTypeName(String modeName)
     {
         for (ModeType modeType : values()) {
@@ -45,6 +49,7 @@ public enum ModeType
         throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE, "The mode '" + modeName + "' is not supported");
     }
 
+    /** Returns the mode. */
     public String getMode()
     {
         return mode;

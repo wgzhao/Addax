@@ -23,6 +23,7 @@ package com.wgzhao.addax.plugin.reader.datareader.util;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
+/** Phone Util. */
 public class PhoneUtil
 {
     /**
@@ -36,6 +37,7 @@ public class PhoneUtil
             "159", "177", "182", "187", "188", "130", "131", "132", "145", "155", "156", "185", "186", "133", "153", "180", "181", "189", "190", "191", "193"};
 
 
+    /** Nextphonenumber. */
     public static String nextPhoneNumber()
     {
         return CommonUtil.randChoose(PHONE_NUMBER_PREFIXES) + RandomStringUtils.secure().nextNumeric(8);

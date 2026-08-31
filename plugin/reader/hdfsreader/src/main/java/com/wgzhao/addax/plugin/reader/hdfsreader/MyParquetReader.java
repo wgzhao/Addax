@@ -64,6 +64,7 @@ import java.util.concurrent.TimeUnit;
 import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
 
+/** My Parquet Reader. */
 public class MyParquetReader
 {
     private static final Logger LOG = LoggerFactory.getLogger(MyParquetReader.class);
@@ -78,6 +79,7 @@ public class MyParquetReader
     private final List<ColumnEntry> columnEntries;
     private final ParquetReader<Group> reader;
 
+    /** Myparquetreader. */
     public MyParquetReader(org.apache.hadoop.conf.Configuration hadoopConf, Path path, String nullFormat, List<ColumnEntry> columns)
     {
         hadoopConf.set("parquet.avro.readInt96AsFixed", "true");
@@ -113,6 +115,7 @@ public class MyParquetReader
         }
     }
 
+    /** Reader. */
     public void reader(RecordSender recordSender, TaskPluginCollector taskPluginCollector)
     {
         try {
@@ -281,6 +284,7 @@ public class MyParquetReader
         return getTimestampMills(bytes);
     }
 
+    /** Returns the timestampmills. */
     public static long getTimestampMills(byte[] bytes)
     {
         assert bytes.length == 12;

@@ -63,6 +63,7 @@ import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 public class DbfWriter
         extends Writer
 {
+    /** Job. */
     public static class Job
             extends Writer.Job
     {
@@ -292,6 +293,7 @@ public class DbfWriter
         }
     }
 
+    /** Task. */
     public static class Task
             extends Writer.Task
     {

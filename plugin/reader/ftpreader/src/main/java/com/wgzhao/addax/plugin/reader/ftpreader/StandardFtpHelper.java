@@ -38,6 +38,7 @@ import static com.wgzhao.addax.core.spi.ErrorCode.CONNECT_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
 import static org.apache.commons.net.ftp.FTP.BINARY_FILE_TYPE;
 
+/** Standard Ftp Helper. */
 public class StandardFtpHelper
         extends FtpHelper
 {

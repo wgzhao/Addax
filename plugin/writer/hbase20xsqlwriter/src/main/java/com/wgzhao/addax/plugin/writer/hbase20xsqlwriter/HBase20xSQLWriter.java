@@ -26,10 +26,12 @@ import com.wgzhao.addax.core.util.Configuration;
 import java.util.ArrayList;
 import java.util.List;
 
+/** HBase20x SQLWriter. */
 public class HBase20xSQLWriter
         extends Writer
 {
 
+    /** Job. */
     public static class Job
             extends Writer.Job
     {
@@ -60,6 +62,7 @@ public class HBase20xSQLWriter
         }
     }
 
+    /** Task. */
     public static class Task
             extends Writer.Task
     {

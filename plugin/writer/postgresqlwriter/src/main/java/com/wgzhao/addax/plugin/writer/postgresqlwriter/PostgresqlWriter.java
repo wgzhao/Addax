@@ -43,12 +43,14 @@ import java.util.Optional;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 
+/** Postgresql Writer. */
 public class PostgresqlWriter
         extends Writer
 {
     private static final DataBaseType DATABASE_TYPE = DataBaseType.PostgreSQL;
     private static final Logger log = LoggerFactory.getLogger(PostgresqlWriter.class);
 
+    /** Job. */
     public static class Job
             extends Writer.Job
     {
@@ -99,6 +101,7 @@ public class PostgresqlWriter
         }
     }
 
+    /** Task. */
     public static class Task
             extends Writer.Task
     {
@@ -228,6 +231,7 @@ public class PostgresqlWriter
             return columnTypeName.equals(GEOMETRY);
         }
 
+        /** Checks whether the array condition holds. */
         public boolean isArray(String columnTypeName)
         {
             if (Objects.isNull(columnTypeName)) {
@@ -236,6 +240,7 @@ public class PostgresqlWriter
             return columnTypeName.startsWith("_");
         }
 
+        /** Extractarraytype. */
         public Optional<String> extractArrayType(String columnTypeName)
         {
             if (isArray(columnTypeName)) {

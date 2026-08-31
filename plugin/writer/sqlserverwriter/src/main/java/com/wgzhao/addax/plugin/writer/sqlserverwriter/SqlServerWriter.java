@@ -31,11 +31,13 @@ import java.util.List;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 
+/** Sql Server Writer. */
 public class SqlServerWriter
         extends Writer
 {
     private static final DataBaseType DATABASE_TYPE = DataBaseType.SQLServer;
 
+    /** Job. */
     public static class Job
             extends Writer.Job
     {
@@ -84,6 +86,7 @@ public class SqlServerWriter
         }
     }
 
+    /** Task. */
     public static class Task
             extends Writer.Task
     {

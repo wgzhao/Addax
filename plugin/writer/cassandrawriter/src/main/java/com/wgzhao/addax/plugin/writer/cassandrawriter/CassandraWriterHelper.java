@@ -59,6 +59,7 @@ public class CassandraWriterHelper
 {
     static CodecRegistry registry = new CodecRegistry();
 
+    /** Parsefromstring. */
     public static Object parseFromString(String s, DataType sqlType)
             throws Exception
     {
@@ -154,6 +155,7 @@ public class CassandraWriterHelper
         } // end switch
     }
 
+    /** Parsefromjson. */
     public static Object parseFromJson(Object jsonObject, DataType type)
             throws Exception
     {
@@ -260,6 +262,7 @@ public class CassandraWriterHelper
         }
     }
 
+    /** Sets the upcolumn. */
     public static void setupColumn(BoundStatement ps, int pos, DataType sqlType, Column col)
             throws Exception
     {

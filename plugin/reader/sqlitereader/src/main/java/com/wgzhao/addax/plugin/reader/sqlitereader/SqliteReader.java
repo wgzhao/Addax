@@ -30,12 +30,14 @@ import java.util.List;
 
 import static com.wgzhao.addax.core.base.Constant.DEFAULT_FETCH_SIZE;
 
+/** Sqlite Reader. */
 public class SqliteReader
         extends Reader
 {
 
     private static final DataBaseType DATABASE_TYPE = DataBaseType.SQLite;
 
+    /** Job. */
     public static class Job
             extends Reader.Job
     {
@@ -75,6 +77,7 @@ public class SqliteReader
         }
     }
 
+    /** Task. */
     public static class Task
             extends Reader.Task
     {

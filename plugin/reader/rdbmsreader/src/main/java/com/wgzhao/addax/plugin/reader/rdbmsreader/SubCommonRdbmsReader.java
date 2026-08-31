@@ -23,22 +23,27 @@ import com.wgzhao.addax.rdbms.reader.CommonRdbmsReader;
 import com.wgzhao.addax.rdbms.util.DBUtil;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 
+/** Sub Common Rdbms Reader. */
 public class SubCommonRdbmsReader
         extends CommonRdbmsReader
 {
+    /** Job. */
     public static class Job
             extends CommonRdbmsReader.Job
     {
+        /** Job. */
         public Job(DataBaseType dataBaseType)
         {
             super(dataBaseType);
         }
     }
 
+    /** Task. */
     public static class Task
             extends CommonRdbmsReader.Task
     {
 
+        /** Task. */
         public Task(DataBaseType dataBaseType)
         {
             super(dataBaseType);

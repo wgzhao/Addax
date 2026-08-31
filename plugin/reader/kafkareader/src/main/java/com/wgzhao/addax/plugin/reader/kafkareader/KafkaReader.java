@@ -49,9 +49,11 @@ import java.util.Properties;
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
+/** Kafka Reader. */
 public class KafkaReader
         extends Reader
 {
+    /** Job. */
     public static class Job
             extends Reader.Job
     {
@@ -79,6 +81,7 @@ public class KafkaReader
         }
     }
 
+    /** Task. */
     public static class Task
             extends Reader.Task
     {

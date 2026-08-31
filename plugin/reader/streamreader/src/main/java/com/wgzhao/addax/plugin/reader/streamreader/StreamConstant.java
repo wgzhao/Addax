@@ -21,20 +21,29 @@ package com.wgzhao.addax.plugin.reader.streamreader;
 
 import com.wgzhao.addax.core.base.Constant;
 
+/** Stream Constant configuration keys. */
 public final class StreamConstant extends Constant
 {
 
+    /** Random. */
     public static final String RANDOM = "random";
 
     // 递增字段
+    /** Incr. */
     public static final String INCR = "incr";
 
 
+    /** Have mixup function. */
     public static final String HAVE_MIXUP_FUNCTION = "hasMixupFunction";
+    /** Mixup function pattern. */
     public static final String MIXUP_FUNCTION_PATTERN = "\\s*(.*)\\s*,\\s*(.*)\\s*";
+    /** Mixup function param1. */
     public static final String MIXUP_FUNCTION_PARAM1 = "mixupParam1";
+    /** Mixup function param2. */
     public static final String MIXUP_FUNCTION_PARAM2 = "mixupParam2";
+    /** Mixup function scale. */
     public static final String MIXUP_FUNCTION_SCALE = "scale";
+    /** Have incr function. */
     public static final String HAVE_INCR_FUNCTION = "hasIncrFunction";
 
     private StreamConstant() {}

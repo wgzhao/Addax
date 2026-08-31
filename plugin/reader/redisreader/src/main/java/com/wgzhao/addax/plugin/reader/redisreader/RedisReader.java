@@ -78,9 +78,11 @@ import static com.moilioncircle.redis.replicator.Constants.RDB_TYPE_ZSET_ZIPLIST
 import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
+/** Redis Reader. */
 public class RedisReader
         extends Reader
 {
+    /** Job. */
     public static class Job
             extends Reader.Job
     {
@@ -143,6 +145,7 @@ public class RedisReader
         }
     }
 
+    /** Task. */
     public static class Task
             extends Reader.Task
     {

@@ -20,8 +20,10 @@ package com.wgzhao.addax.plugin.reader.redisreader.util;
 
 import java.lang.reflect.Field;
 
+/** Reflections. */
 public class Reflections {
 
+    /** Sets the field. */
     public static void setField(Object obj, String name, Object value) {
         try {
             Field field = obj.getClass().getDeclaredField(name);

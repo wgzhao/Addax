@@ -25,6 +25,7 @@ public abstract class AbstractJobPlugin
 {
     private JobPluginCollector jobPluginCollector;
 
+    /** Returns the jobplugincollector. */
     public JobPluginCollector getJobPluginCollector()
     {
         return jobPluginCollector;

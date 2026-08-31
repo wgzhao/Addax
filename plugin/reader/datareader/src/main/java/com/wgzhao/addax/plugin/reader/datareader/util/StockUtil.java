@@ -23,6 +23,7 @@ package com.wgzhao.addax.plugin.reader.datareader.util;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
+/** Stock Util. */
 public class StockUtil
 {
 
@@ -33,11 +34,13 @@ public class StockUtil
             "30", "78"
     };
 
+    /** Nextstockcode. */
     public static String nextStockCode()
     {
         return CommonUtil.randChoose(CODE_PREFIXES) + RandomStringUtils.secure().nextNumeric(4);
     }
 
+    /** Nextstockaccount. */
     public static String nextStockAccount()
     {
         return RandomStringUtils.secure().nextNumeric(10);

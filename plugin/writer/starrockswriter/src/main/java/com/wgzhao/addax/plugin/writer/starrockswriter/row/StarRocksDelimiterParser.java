@@ -23,11 +23,13 @@ import com.google.common.base.Strings;
 
 import java.io.StringWriter;
 
+/** Star Rocks Delimiter Parser. */
 public class StarRocksDelimiterParser
 {
 
     private static final String HEX_STRING = "0123456789ABCDEF";
 
+    /** Parse. */
     public static String parse(String sp, String dSp)
             throws RuntimeException
     {

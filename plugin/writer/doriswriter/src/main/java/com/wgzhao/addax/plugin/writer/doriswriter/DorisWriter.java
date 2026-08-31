@@ -46,6 +46,7 @@ public class DorisWriter
         extends Writer
 {
 
+    /** Job. */
     public static class Job
             extends Writer.Job
     {
@@ -117,6 +118,7 @@ public class DorisWriter
         }
     }
 
+    /** Task. */
     public static class Task
             extends Writer.Task
     {

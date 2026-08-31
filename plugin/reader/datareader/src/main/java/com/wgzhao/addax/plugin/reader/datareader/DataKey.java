@@ -21,12 +21,17 @@ package com.wgzhao.addax.plugin.reader.datareader;
 
 import com.wgzhao.addax.core.base.Key;
 
+/** Data Key configuration keys. */
 public final class DataKey
         extends Key
 {
+    /** Mix function param1. */
     public static final String MIX_FUNCTION_PARAM1 = "mixParam1";
+    /** Mix function param2. */
     public static final String MIX_FUNCTION_PARAM2 = "mixParam2";
+    /** Mix function scale. */
     public static final String MIX_FUNCTION_SCALE = "scale";
+    /** Rule. */
     public static final String RULE = "rule";
 
     private DataKey() {}

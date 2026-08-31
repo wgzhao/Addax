@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/** Star Rocks Json Serializer. */
 public class StarRocksJsonSerializer
         extends StarRocksBaseSerializer
         implements StarRocksISerializer
@@ -35,6 +36,7 @@ public class StarRocksJsonSerializer
 
     private final List<String> fieldNames;
 
+    /** Starrocksjsonserializer. */
     public StarRocksJsonSerializer(List<String> fieldNames)
     {
         this.fieldNames = fieldNames;

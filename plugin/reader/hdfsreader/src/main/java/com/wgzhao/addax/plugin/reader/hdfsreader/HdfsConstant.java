@@ -31,14 +31,23 @@ public class HdfsConstant
         extends Constant
 {
 
+    /** Source files. */
     public static final String SOURCE_FILES = "sourceFiles";
+    /** Text. */
     public static final String TEXT = "TEXT";
+    /** Orc. */
     public static final String ORC = "ORC";
+    /** Csv. */
     public static final String CSV = "CSV";
+    /** Seq. */
     public static final String SEQ = "SEQ";
+    /** Rc. */
     public static final String RC = "RC";
+    /** Parquet. */
     public static final String PARQUET = "PARQUET";
+    /** Hdfs default key. */
     public static final String HDFS_DEFAULT_KEY = "fs.defaultFS";
+    /** Hadoop security authentication key. */
     public static final String HADOOP_SECURITY_AUTHENTICATION_KEY = "hadoop.security.authentication";
     protected static final List<String> SUPPORT_FILE_TYPE =
             Arrays.asList(HdfsConstant.CSV, HdfsConstant.ORC, HdfsConstant.RC, HdfsConstant.SEQ, HdfsConstant.TEXT, HdfsConstant.PARQUET);

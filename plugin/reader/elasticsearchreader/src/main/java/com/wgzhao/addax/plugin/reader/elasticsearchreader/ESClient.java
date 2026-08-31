@@ -60,11 +60,13 @@ public class ESClient
 
     private JestClient jestClient;
 
+    /** Returns the client. */
     public JestClient getClient()
     {
         return jestClient;
     }
 
+    /** Createclient. */
     public void createClient(String endpoint,
             String user,
             String passwd,
@@ -95,6 +97,7 @@ public class ESClient
         jestClient = factory.getObject();
     }
 
+    /** Indicesexists. */
     public boolean indicesExists(String indexName)
             throws Exception
     {
@@ -115,6 +118,7 @@ public class ESClient
         }
     }
 
+    /** Search. */
     public SearchResult search(String query,
             SearchType searchType,
             String index,
@@ -141,6 +145,7 @@ public class ESClient
         return jestClient.execute(searchBuilder.build());
     }
 
+    /** Scroll. */
     public JestResult scroll(String scrollId, String scroll)
             throws Exception
     {
@@ -148,6 +153,7 @@ public class ESClient
         return execute(builder.build());
     }
 
+    /** Clearscroll. */
     public void clearScroll(String scrollId)
     {
         ClearScroll.Builder builder = new ClearScroll.Builder().addScrollId(scrollId);
@@ -159,6 +165,7 @@ public class ESClient
         }
     }
 
+    /** Execute. */
     public JestResult execute(Action<JestResult> clientRequest)
             throws Exception
     {
@@ -176,6 +183,7 @@ public class ESClient
         return rst;
     }
 
+    /** Returns the status. */
     public Integer getStatus(JestResult rst)
     {
         JsonObject jsonObject = rst.getJsonObject();
@@ -185,12 +193,14 @@ public class ESClient
         return 600;
     }
 
+    /** Checks whether the bulkresult condition holds. */
     public boolean isBulkResult(JestResult rst)
     {
         JsonObject jsonObject = rst.getJsonObject();
         return jsonObject.has("items");
     }
 
+    /** Alias. */
     public boolean alias(String indexName, String aliasName, boolean needClean)
             throws IOException
     {
@@ -224,6 +234,7 @@ public class ESClient
         return true;
     }
 
+    /** Closejestclient. */
     public void closeJestClient()
     {
         if (jestClient != null) {

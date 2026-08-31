@@ -26,6 +26,7 @@ import org.apache.commons.rng.simple.RandomSource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+/** Geo Util. */
 public class GeoUtil
 {
     private static final String[][] LAND_COORDS = {
@@ -1001,22 +1002,26 @@ public class GeoUtil
                 .setScale(7, RoundingMode.HALF_UP);
     }
 
+    /** Latitude. */
     public static BigDecimal latitude()
     {
         // Latitude has a range of -90 to 90, so divide by two.
         return GeoUtil.coordinate().divide(new BigDecimal(2), RoundingMode.CEILING);
     }
 
+    /** Longitude. */
     public static BigDecimal longitude()
     {
         return GeoUtil.coordinate();
     }
 
+    /** Nextlatlng. */
     public static BigDecimal[] nextLatlng()
     {
         return new BigDecimal[] {GeoUtil.latitude(), GeoUtil.longitude()};
     }
 
+    /** Nextlatlngonland. */
     public static BigDecimal[] nextLatlngOnLand()
     {
         String[] res = CommonUtil.randChoose(LAND_COORDS);

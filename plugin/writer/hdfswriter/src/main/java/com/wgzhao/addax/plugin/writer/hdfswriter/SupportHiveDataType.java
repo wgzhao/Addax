@@ -19,6 +19,7 @@
 
 package com.wgzhao.addax.plugin.writer.hdfswriter;
 
+/** Support Hive Data Type. */
 public enum SupportHiveDataType
 {
     TINYINT,

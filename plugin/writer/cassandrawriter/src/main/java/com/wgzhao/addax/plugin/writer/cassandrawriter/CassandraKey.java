@@ -26,14 +26,22 @@ import com.wgzhao.addax.core.base.Key;
  */
 public final class CassandraKey extends Key
 {
+    /** The Static. */
     public final static String HOST = "host";
+    /** The Static. */
     public final static String PORT = "port";
+    /** The Static. */
     public final static String USE_SSL = "useSSL";
 
+    /** The Static. */
     public final static String KEYSPACE = "keyspace";
     public final static String WRITE_TIME = "writetime()";
+    /** The Static. */
     public final static String ASYNC_WRITE = "asyncWrite";
+    /** The Static. */
     public final static String CONSISTENCY_LEVEL = "consistencyLevel";
+    /** The Static. */
     public final static String CONNECTIONS_PER_HOST = "connectionsPerHost";
+    /** The Static. */
     public final static String MAX_PENDING_CONNECTION = "maxPendingPerConnection";
 }

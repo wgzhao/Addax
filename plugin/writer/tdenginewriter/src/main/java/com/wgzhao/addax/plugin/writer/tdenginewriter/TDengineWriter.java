@@ -33,11 +33,13 @@ import java.util.List;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
+/** TDengine Writer. */
 public class TDengineWriter
         extends Writer
 {
     private static final String PEER_PLUGIN_NAME = "peerPluginName";
 
+    /** Job. */
     public static class Job
             extends Writer.Job
     {
@@ -99,6 +101,7 @@ public class TDengineWriter
         }
     }
 
+    /** Task. */
     public static class Task
             extends Writer.Task
     {

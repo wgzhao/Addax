@@ -40,12 +40,14 @@ import static com.wgzhao.addax.core.base.Key.FETCH_SIZE;
 import static com.wgzhao.addax.core.base.Constant.DEFAULT_FETCH_SIZE;
 import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 
+/** Sql Server Reader. */
 public class SqlServerReader
         extends Reader
 {
 
     private static final DataBaseType DATABASE_TYPE = DataBaseType.SQLServer;
 
+    /** Job. */
     public static class Job
             extends Reader.Job
     {
@@ -87,6 +89,7 @@ public class SqlServerReader
         }
     }
 
+    /** Task. */
     public static class Task
             extends Reader.Task
     {

@@ -21,6 +21,7 @@ package com.wgzhao.addax.plugin.writer.starrockswriter.row;
 
 import com.wgzhao.addax.core.element.Column;
 
+/** Star Rocks Base Serializer. */
 public class StarRocksBaseSerializer
 {
 

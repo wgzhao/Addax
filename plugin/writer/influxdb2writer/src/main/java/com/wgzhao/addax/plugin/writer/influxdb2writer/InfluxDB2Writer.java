@@ -44,10 +44,12 @@ import static com.wgzhao.addax.core.base.Key.ENDPOINT;
 import static com.wgzhao.addax.core.base.Key.TABLE;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
+/** Influx DB2 Writer. */
 public class InfluxDB2Writer
         extends Writer
 {
 
+    /** Job. */
     public static class Job
             extends Writer.Job
     {
@@ -85,6 +87,7 @@ public class InfluxDB2Writer
         }
     }
 
+    /** Task. */
     public static class Task
             extends Writer.Task
     {

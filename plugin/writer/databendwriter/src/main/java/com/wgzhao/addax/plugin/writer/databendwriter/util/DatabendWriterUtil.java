@@ -29,14 +29,17 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.StringJoiner;
 
+/** Databend Writer Util. */
 public final class DatabendWriterUtil {
     private static final Logger LOG = LoggerFactory.getLogger(DatabendWriterUtil.class);
 
+    /** The Static. */
     public final static String ONCONFLICT_COLUMN = "onConflictColumn";
 
     private DatabendWriterUtil() {
     }
 
+    /** Dealwritemode. */
     public static void dealWriteMode(Configuration originalConfig) {
         List<String> columns = originalConfig.getList(Key.COLUMN, String.class);
         List<String> onConflictColumns = originalConfig.getList(ONCONFLICT_COLUMN, String.class);
@@ -75,6 +78,7 @@ public final class DatabendWriterUtil {
         }
     }
 
+    /** Onconflictdostring. */
     public static String onConFlictDoString(List<String> conflictColumns) {
         return " ON " +
                 "(" +

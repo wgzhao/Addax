@@ -45,6 +45,7 @@ import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.LOGIN_ERROR;
 
+/** Sftp Helper Impl. */
 public class SftpHelperImpl
         implements IFtpHelper
 {
@@ -166,6 +167,7 @@ public class SftpHelperImpl
         }
     }
 
+    /** Mkdirsinglehierarchy. */
     public void mkDirSingleHierarchy(String directoryPath)
             throws SftpException
     {

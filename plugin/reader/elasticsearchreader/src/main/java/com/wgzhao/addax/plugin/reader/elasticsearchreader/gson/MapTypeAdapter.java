@@ -41,6 +41,7 @@ import java.util.Map;
 public class MapTypeAdapter
         extends TypeAdapter<Object>
 {
+    /** Factory. */
     public static final TypeAdapterFactory FACTORY = new TypeAdapterFactory()
     {
         @SuppressWarnings("unchecked")

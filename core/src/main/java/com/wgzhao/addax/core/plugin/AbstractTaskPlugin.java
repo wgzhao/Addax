@@ -28,32 +28,38 @@ public abstract class AbstractTaskPlugin
     private int taskId;
     private TaskPluginCollector taskPluginCollector;
 
+    /** Returns the taskplugincollector. */
     public TaskPluginCollector getTaskPluginCollector()
     {
         return taskPluginCollector;
     }
 
+    /** Sets the taskplugincollector. */
     public void setTaskPluginCollector(
             TaskPluginCollector taskPluginCollector)
     {
         this.taskPluginCollector = taskPluginCollector;
     }
 
+    /** Returns the taskid. */
     public int getTaskId()
     {
         return taskId;
     }
 
+    /** Sets the taskid. */
     public void setTaskId(int taskId)
     {
         this.taskId = taskId;
     }
 
+    /** Returns the taskgroupid. */
     public int getTaskGroupId()
     {
         return taskGroupId;
     }
 
+    /** Sets the taskgroupid. */
     public void setTaskGroupId(int taskGroupId)
     {
         this.taskGroupId = taskGroupId;

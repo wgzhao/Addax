@@ -23,6 +23,7 @@ package com.wgzhao.addax.plugin.writer.doriswriter.codec;
 import com.wgzhao.addax.core.element.Record;
 import com.wgzhao.addax.plugin.writer.doriswriter.DelimiterParser;
 
+/** Doris Csv Codec. */
 public class DorisCsvCodec
         extends DorisBaseCodec
         implements DorisCodec
@@ -32,6 +33,7 @@ public class DorisCsvCodec
 
     private final String columnSeparator;
 
+    /** Doriscsvcodec. */
     public DorisCsvCodec(String sp)
     {
         this.columnSeparator = DelimiterParser.parse(sp, "\t");

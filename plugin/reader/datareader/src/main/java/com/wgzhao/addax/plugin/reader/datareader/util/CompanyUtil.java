@@ -21,6 +21,7 @@
 
 package com.wgzhao.addax.plugin.reader.datareader.util;
 
+/** Company Util. */
 public class CompanyUtil
 {
     private static final String[] COMPANY_PREFIXES = {
@@ -36,6 +37,7 @@ public class CompanyUtil
     private static final String[] COMPANY_SUFFIXES = {"有限公司", "股份有限公司", "集团有限公司", "责任有限公司", "中外合作有限公司", "普通合伙企业",
             "有限合伙企业", "集团"};
 
+    /** Nextcompany. */
     public static String nextCompany()
     {
         return CommonUtil.randChoose(COMPANY_PREFIXES)

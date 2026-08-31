@@ -29,6 +29,7 @@ import com.wgzhao.addax.core.statistics.container.report.AbstractReporter;
 import java.util.List;
 import java.util.Map;
 
+/** Abstract Container Communicator. */
 public abstract class AbstractContainerCommunicator
 {
     private final Configuration configuration;
@@ -37,44 +38,55 @@ public abstract class AbstractContainerCommunicator
     private AbstractReporter reporter;
     private long lastReportTime = System.currentTimeMillis();
 
+    /** Abstractcontainercommunicator. */
     public AbstractContainerCommunicator(Configuration configuration)
     {
         this.configuration = configuration;
     }
 
+    /** Returns the configuration. */
     public Configuration getConfiguration()
     {
         return this.configuration;
     }
 
+    /** Returns the collector. */
     public AbstractCollector getCollector()
     {
         return collector;
     }
 
+    /** Sets the collector. */
     public void setCollector(AbstractCollector collector)
     {
         this.collector = collector;
     }
 
+    /** Returns the reporter. */
     public AbstractReporter getReporter()
     {
         return reporter;
     }
 
+    /** Sets the reporter. */
     public void setReporter(AbstractReporter reporter)
     {
         this.reporter = reporter;
     }
 
+    /** Registercommunication. */
     public abstract void registerCommunication(List<Configuration> configurationList);
 
+    /** Collect. */
     public abstract Communication collect();
 
+    /** Report. */
     public abstract void report(Communication communication);
 
+    /** Collectstate. */
     public abstract State collectState();
 
+    /** Returns the communication. */
     public abstract Communication getCommunication(Integer id);
 
     /**
@@ -84,12 +96,14 @@ public abstract class AbstractContainerCommunicator
      */
     public abstract Map<Integer, Communication> getCommunicationMap();
 
+    /** Resetcommunication. */
     public void resetCommunication(Integer id)
     {
         Map<Integer, Communication> map = getCommunicationMap();
         map.put(id, new Communication());
     }
 
+    /** Reportvminfo. */
     public void reportVmInfo()
     {
         long now = System.currentTimeMillis();

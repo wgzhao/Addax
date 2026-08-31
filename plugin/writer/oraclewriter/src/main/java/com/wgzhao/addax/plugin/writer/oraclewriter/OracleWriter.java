@@ -37,11 +37,13 @@ import java.util.List;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 
+/** Oracle Writer. */
 public class OracleWriter
         extends Writer
 {
     private static final DataBaseType DATABASE_TYPE = DataBaseType.Oracle;
 
+    /** Job. */
     public static class Job
             extends Writer.Job
     {
@@ -97,6 +99,7 @@ public class OracleWriter
         }
     }
 
+    /** Task. */
     public static class Task
             extends Writer.Task
     {

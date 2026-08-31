@@ -34,9 +34,11 @@ import java.util.List;
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
+/** Kudu Writer. */
 public class KuduWriter
         extends Writer
 {
+    /** Job. */
     public static class Job
             extends Writer.Job
     {
@@ -131,6 +133,7 @@ public class KuduWriter
         }
     }
 
+    /** Task. */
     public static class Task
             extends Writer.Task
     {

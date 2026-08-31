@@ -42,11 +42,13 @@ public class MongoUtil
 
     private MongoUtil() {}
 
+    /** Initmongoclient. */
     public static MongoClient initMongoClient(List<Object> addressList)
     {
         return initCredentialMongoClient(addressList, "", "", null);
     }
 
+    /** Initcredentialmongoclient. */
     public static MongoClient initCredentialMongoClient(List<Object> addressList, String userName, String password, String database)
     {
 

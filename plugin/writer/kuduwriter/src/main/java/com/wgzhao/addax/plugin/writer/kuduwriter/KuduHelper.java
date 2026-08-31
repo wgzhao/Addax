@@ -41,12 +41,14 @@ import static com.wgzhao.addax.core.base.Key.KERBEROS_PRINCIPAL;
 import static com.wgzhao.addax.core.spi.ErrorCode.CONNECT_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
+/** Kudu Helper. */
 public class KuduHelper
 {
     private static final Logger LOG = LoggerFactory.getLogger(KuduHelper.class);
     private final KuduClient kuduClient;
     private KuduTable kuduTable;
 
+    /** Kuduhelper. */
     public KuduHelper(String masterAddress, long timeout, Configuration config)
     {
         try {
@@ -74,6 +76,7 @@ public class KuduHelper
         }
     }
 
+    /** Returns the kudutable. */
     public KuduTable getKuduTable(String tableName)
     {
         if (tableName == null) {
@@ -90,6 +93,7 @@ public class KuduHelper
         }
     }
 
+    /** Checks whether the tableexists condition holds. */
     public boolean isTableExists(String tableName)
     {
         if (tableName == null) {
@@ -103,6 +107,7 @@ public class KuduHelper
         }
     }
 
+    /** Closeclient. */
     public void closeClient()
     {
         try {
@@ -115,6 +120,7 @@ public class KuduHelper
         }
     }
 
+    /** Returns the schema. */
     public Schema getSchema(String tableName)
     {
         if (kuduTable != null) {
@@ -126,6 +132,7 @@ public class KuduHelper
         }
     }
 
+    /** Returns the allcolumns. */
     public List<String> getAllColumns(String tableName)
     {
         List<String> columns = new ArrayList<>();
@@ -136,6 +143,7 @@ public class KuduHelper
         return columns;
     }
 
+    /** Returns the session. */
     public KuduSession getSession()
     {
         return kuduClient.newSession();

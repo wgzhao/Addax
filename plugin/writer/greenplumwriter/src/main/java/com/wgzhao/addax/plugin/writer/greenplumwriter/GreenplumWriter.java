@@ -27,11 +27,13 @@ import com.wgzhao.addax.rdbms.writer.CommonRdbmsWriter;
 
 import java.util.List;
 
+/** Greenplum Writer. */
 public class GreenplumWriter
         extends Writer
 {
     private static final DataBaseType DATABASE_TYPE = DataBaseType.PostgreSQL;
 
+    /** Job. */
     public static class Job
             extends Writer.Job
     {
@@ -78,6 +80,7 @@ public class GreenplumWriter
         }
     }
 
+    /** Task. */
     public static class Task
             extends Writer.Task
     {

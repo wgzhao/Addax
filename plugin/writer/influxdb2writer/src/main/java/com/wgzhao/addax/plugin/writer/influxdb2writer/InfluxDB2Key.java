@@ -21,12 +21,18 @@ package com.wgzhao.addax.plugin.writer.influxdb2writer;
 
 import com.wgzhao.addax.core.base.Key;
 
+/** Influx DB2 Key configuration keys. */
 public final class InfluxDB2Key
         extends Key
 {
+    /** Bucket. */
     public static final String BUCKET = "bucket";
+    /** Org. */
     public static final String ORG = "org";
+    /** Token. */
     public static final String TOKEN = "token";
+    /** Tag. */
     public static final String TAG = "tag";
+    /** Interval. */
     public static final String INTERVAL = "interval";
 }

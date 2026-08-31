@@ -46,9 +46,11 @@ import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
+/** S3 Reader. */
 public class S3Reader
         extends Reader
 {
+    /** Job. */
     public static class Job
             extends Reader.Job
     {
@@ -214,6 +216,7 @@ public class S3Reader
         }
     }
 
+    /** Task. */
     public static class Task
             extends Reader.Task
     {

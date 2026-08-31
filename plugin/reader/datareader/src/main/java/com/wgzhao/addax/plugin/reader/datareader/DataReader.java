@@ -72,6 +72,7 @@ import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 import static com.wgzhao.addax.plugin.reader.datareader.DataKey.RULE;
 
+/** Data Reader. */
 public class DataReader
         extends Reader
 {
@@ -93,6 +94,7 @@ public class DataReader
         }
     }
 
+    /** Job. */
     public static class Job
             extends Reader.Job
     {
@@ -369,6 +371,7 @@ public class DataReader
         }
     }
 
+    /** Task. */
     public static class Task
             extends Reader.Task
     {

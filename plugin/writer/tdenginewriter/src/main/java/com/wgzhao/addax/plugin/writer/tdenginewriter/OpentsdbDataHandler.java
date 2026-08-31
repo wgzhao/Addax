@@ -40,6 +40,7 @@ import java.sql.SQLException;
 import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
 import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
+/** Opentsdb Data Handler. */
 public class OpentsdbDataHandler
         implements DataHandler
 {
@@ -51,6 +52,7 @@ public class OpentsdbDataHandler
     private final String password;
     int batchSize;
 
+    /** Opentsdbdatahandler. */
     public OpentsdbDataHandler(Configuration config)
     {
         // opentsdb json protocol use JNI and schemaless API to write

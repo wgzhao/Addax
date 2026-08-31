@@ -24,6 +24,7 @@ import com.wgzhao.addax.core.element.Record;
 
 import java.io.Serializable;
 
+/** Doris Codec. */
 public interface DorisCodec
         extends Serializable
 {

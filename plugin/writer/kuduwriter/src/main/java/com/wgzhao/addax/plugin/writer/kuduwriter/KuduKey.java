@@ -21,11 +21,16 @@ package com.wgzhao.addax.plugin.writer.kuduwriter;
 
 import com.wgzhao.addax.core.base.Key;
 
+/** Kudu Key configuration keys. */
 public class KuduKey extends Key
 {
+    /** The Static. */
     public final static String KUDU_MASTER_ADDRESSES = "masterAddress";
+    /** The Static. */
     public final static String KUDU_TIMEOUT = "timeout";
 
+    /** Mutation buffer space. */
     public static final String MUTATION_BUFFER_SPACE = "bufferSize";
+    /** Skip fail. */
     public static final String SKIP_FAIL = "skipFail";
 }

@@ -28,11 +28,13 @@ import com.wgzhao.addax.rdbms.writer.CommonRdbmsWriter;
 
 import java.util.List;
 
+/** HANAWriter. */
 public class HANAWriter
         extends Writer
 {
     private static final DataBaseType DATABASE_TYPE = DataBaseType.HANA;
 
+    /** Job. */
     public static class Job
             extends Writer.Job
     {
@@ -78,6 +80,7 @@ public class HANAWriter
         }
     }
 
+    /** Task. */
     public static class Task
             extends Writer.Task
     {

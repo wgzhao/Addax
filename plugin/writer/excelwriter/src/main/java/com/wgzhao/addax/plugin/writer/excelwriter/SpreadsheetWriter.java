@@ -74,6 +74,7 @@ public class SpreadsheetWriter
         _out.write("</row>\n");
     }
 
+    /** Createcell. */
     public void createCell(int columnIndex, String value, int styleIndex)
             throws IOException
     {
@@ -88,12 +89,14 @@ public class SpreadsheetWriter
         _out.write("</c>");
     }
 
+    /** Createcell. */
     public void createCell(int columnIndex, String value)
             throws IOException
     {
         createCell(columnIndex, value, -1);
     }
 
+    /** Createcell. */
     public void createCell(int columnIndex, double value, int styleIndex)
             throws IOException
     {
@@ -107,12 +110,14 @@ public class SpreadsheetWriter
         _out.write("</c>");
     }
 
+    /** Createcell. */
     public void createCell(int columnIndex, double value)
             throws IOException
     {
         createCell(columnIndex, value, -1);
     }
 
+    /** Createcell. */
     public void createCell(int columnIndex, Calendar value, int styleIndex)
             throws IOException
     {

@@ -36,17 +36,20 @@ import java.util.concurrent.TimeUnit;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
+/** Abstract Scheduler. */
 public abstract class AbstractScheduler
 {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractScheduler.class);
 
     private final AbstractContainerCommunicator containerCommunicator;
 
+    /** Abstractscheduler. */
     public AbstractScheduler(AbstractContainerCommunicator containerCommunicator)
     {
         this.containerCommunicator = containerCommunicator;
     }
 
+    /** Schedule. */
     public void schedule(List<Configuration> configurations)
     {
         Validate.notNull(configurations, "The scheduler configuration cannot be empty");

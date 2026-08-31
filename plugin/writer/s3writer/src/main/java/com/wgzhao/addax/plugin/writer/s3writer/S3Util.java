@@ -30,8 +30,10 @@ import java.net.URI;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 
+/** S3 Util. */
 public class S3Util
 {
+    /** Inits3client. */
     public static S3Client initS3Client(Configuration conf) {
         String regionStr = conf.getString(S3Key.REGION);
         Region region = Region.of(regionStr);
@@ -43,6 +45,7 @@ public class S3Util
 
     }
 
+    /** Inits3client. */
     public static S3Client initS3Client(String endpoint, Region region, String accessId, String accessKey, String pathStyleAccessEnabled) {
         if (null == region) {
             region = Region.of("ap-northeast-1");

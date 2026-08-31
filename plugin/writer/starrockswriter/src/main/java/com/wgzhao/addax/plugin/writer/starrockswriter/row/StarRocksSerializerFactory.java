@@ -23,11 +23,13 @@ import com.wgzhao.addax.plugin.writer.starrockswriter.StarRocksWriterOptions;
 
 import java.util.Map;
 
+/** Star Rocks Serializer Factory. */
 public class StarRocksSerializerFactory
 {
 
     private StarRocksSerializerFactory() {}
 
+    /** Createserializer. */
     public static StarRocksISerializer createSerializer(StarRocksWriterOptions writerOptions)
     {
         if (StarRocksWriterOptions.StreamLoadFormat.CSV.equals(writerOptions.getStreamLoadFormat())) {

@@ -21,29 +21,41 @@ package com.wgzhao.addax.plugin.writer.s3writer;
 
 import com.wgzhao.addax.core.base.Key;
 
+/** S3 Key configuration keys. */
 public class S3Key extends Key
 {
+    /** Region. */
     public static final String REGION = "region";
 
+    /** Endpoint. */
     public static final String ENDPOINT = "endpoint";
 
+    /** Access id. */
     public static final String ACCESS_ID = "accessId";
 
+    /** Access key. */
     public static final String ACCESS_KEY = "accessKey";
 
+    /** Bucket. */
     public static final String BUCKET = "bucket";
 
+    /** Object. */
     public static final String OBJECT = "object";
 
     // unit: MB
+    /** Max file size. */
     public static final String MAX_FILE_SIZE = "maxFileSize";
 
+    /** Default suffix. */
     public static final String DEFAULT_SUFFIX = "defaultSuffix";
 
+    /** Path style access enabled. */
     public static final String PATH_STYLE_ACCESS_ENABLED = "pathStyleAccessEnabled";
 
+    /** File type. */
     public static final String FILE_TYPE = "fileType";
 
+    /** Ssl enabled. */
     public static final String SSL_ENABLED = "sslEnabled";
 
 

@@ -34,11 +34,13 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+/** Cassandra Reader. */
 public class CassandraReader
         extends Reader
 {
     private static final Logger LOG = LoggerFactory.getLogger(CassandraReader.class);
 
+    /** Job. */
     public static class Job
             extends Reader.Job
     {
@@ -85,6 +87,7 @@ public class CassandraReader
         }
     }
 
+    /** Task. */
     public static class Task
             extends Reader.Task
     {

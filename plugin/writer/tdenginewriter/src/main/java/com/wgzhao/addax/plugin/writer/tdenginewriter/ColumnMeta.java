@@ -19,6 +19,7 @@
 
 package com.wgzhao.addax.plugin.writer.tdenginewriter;
 
+/** Column Meta. */
 public class ColumnMeta
 {
     String field;

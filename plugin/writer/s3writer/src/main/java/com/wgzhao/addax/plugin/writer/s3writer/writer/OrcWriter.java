@@ -61,6 +61,7 @@ import java.util.StringJoiner;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.*;
 
+/** Orc Writer. */
 public class OrcWriter
         implements IFormatWriter
 {
@@ -79,103 +80,122 @@ public class OrcWriter
 
     private org.apache.hadoop.conf.Configuration hadoopConf = null;
 
+    /** Orcwriter. */
     public OrcWriter()
     {
     }
 
+    /** Returns the fielddelimiter. */
     public char getFieldDelimiter()
     {
         return fieldDelimiter;
     }
 
+    /** Sets the fielddelimiter. */
     public OrcWriter setFieldDelimiter(char fieldDelimiter)
     {
         this.fieldDelimiter = fieldDelimiter;
         return this;
     }
 
+    /** Returns the nullformat. */
     public String getNullFormat()
     {
         return nullFormat;
     }
 
+    /** Sets the nullformat. */
     public OrcWriter setNullFormat(String nullFormat)
     {
         this.nullFormat = nullFormat;
         return this;
     }
 
+    /** Returns the sslenabled. */
     public String getSslEnabled()
     {
         return sslEnabled;
     }
 
+    /** Sets the sslenabled. */
     public OrcWriter setSslEnabled(String sslEnabled)
     {
         this.sslEnabled = sslEnabled;
         return this;
     }
 
+    /** Returns the dateformat. */
     public String getDateFormat()
     {
         return dateFormat;
     }
 
+    /** Sets the dateformat. */
     public OrcWriter setDateFormat(String dateFormat)
     {
         this.dateFormat = dateFormat;
         return this;
     }
 
+    /** Returns the encoding. */
     public String getEncoding()
     {
         return encoding;
     }
 
+    /** Sets the encoding. */
     public OrcWriter setEncoding(String encoding)
     {
         this.encoding = encoding;
         return this;
     }
 
+    /** Returns the bucket. */
     public String getBucket()
     {
         return bucket;
     }
 
+    /** Sets the bucket. */
     public OrcWriter setBucket(String bucket)
     {
         this.bucket = bucket;
         return this;
     }
 
+    /** Returns the object. */
     public String getObject()
     {
         return object;
     }
 
+    /** Sets the object. */
     public OrcWriter setObject(String object)
     {
         this.object = object;
         return this;
     }
 
+    /** Returns the header. */
     public List<String> getHeader()
     {
         return header;
     }
 
+    /** Sets the header. */
     public OrcWriter setHeader(List<String> header)
     {
         this.header = header;
         return this;
     }
 
+    /** Returns the s3client. */
     public S3Client getS3Client()
     {
         return s3Client;
     }
 
+    /** Sets the s3client. */
     public OrcWriter setS3Client(S3Client s3Client)
     {
         this.s3Client = s3Client;

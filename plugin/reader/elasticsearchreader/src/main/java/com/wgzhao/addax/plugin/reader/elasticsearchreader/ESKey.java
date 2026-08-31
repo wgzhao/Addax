@@ -30,73 +30,88 @@ import java.util.Map;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 
+/** ESKey configuration keys. */
 public final class ESKey
 {
+    /** Search key. */
     public static final String SEARCH_KEY = "search";
 
     private ESKey() {}
 
+    /** Returns the searchtype. */
     public static SearchType getSearchType(Configuration conf)
     {
         String searchType = conf.getString("searchType", SearchType.DFS_QUERY_THEN_FETCH.toString());
         return SearchType.valueOf(searchType.toUpperCase());
     }
 
+    /** Returns the endpoint. */
     public static String getEndpoint(Configuration conf)
     {
         return conf.getNecessaryValue("endpoint", CONFIG_ERROR);
     }
 
+    /** Returns the accessid. */
     public static String getAccessID(Configuration conf)
     {
         return conf.getString("accessId", "");
     }
 
+    /** Returns the accesskey. */
     public static String getAccessKey(Configuration conf)
     {
         return conf.getString("accessKey", "");
     }
 
+    /** Returns the batchsize. */
     public static int getBatchSize(Configuration conf)
     {
         return conf.getInt("batchSize", 1000);
     }
 
+    /** Returns the trysize. */
     public static int getTrySize(Configuration conf)
     {
         return conf.getInt("trySize", 30);
     }
 
+    /** Returns the timeout. */
     public static int getTimeout(Configuration conf)
     {
         return conf.getInt("timeout", 60) * 1000;
     }
 
+    /** Checks whether the cleanup condition holds. */
     public static boolean isCleanup(Configuration conf)
     {
         return conf.getBool("cleanup", false);
     }
 
+    /** Checks whether the discovery condition holds. */
     public static boolean isDiscovery(Configuration conf)
     {
         return conf.getBool("discovery", false);
     }
 
+    /** Checks whether the compression condition holds. */
     public static boolean isCompression(Configuration conf)
     {
         return conf.getBool("compression", true);
     }
 
+    /** Checks whether the multithread condition holds. */
     public static boolean isMultiThread(Configuration conf)
     {
         return conf.getBool("multiThread", true);
     }
 
+    /** Returns the indexname. */
     public static String getIndexName(Configuration conf)
     {
         return conf.getNecessaryValue("index",  CONFIG_ERROR);
     }
 
+    /** Returns the typename. */
     public static String getTypeName(Configuration conf)
     {
         String indexType = conf.getString("indexType");
@@ -106,11 +121,13 @@ public final class ESKey
         return indexType;
     }
 
+    /** Returns the headers. */
     public static Map<String, Object> getHeaders(Configuration conf)
     {
         return conf.getMap("headers", new HashMap<>());
     }
 
+    /** Returns the query. */
     public static String getQuery(Configuration conf)
     {
         if (conf == null) {
@@ -130,16 +147,19 @@ public final class ESKey
         return new Gson().toJson(searchObj);
     }
 
+    /** Returns the scroll. */
     public static String getScroll(Configuration conf)
     {
         return conf.getString("scroll");
     }
 
+    /** Returns the column. */
     public static List<String> getColumn(Configuration conf)
     {
         return conf.getList("column", String.class);
     }
 
+    /** Returns the filter. */
     public static String getFilter(Configuration conf)
     {
         return conf.getString("filter", null);

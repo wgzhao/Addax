@@ -40,12 +40,14 @@ import java.util.List;
 
 import static com.wgzhao.addax.core.base.Constant.DEFAULT_FETCH_SIZE;
 
+/** Click House Reader. */
 public class ClickHouseReader
         extends Reader
 {
 
     private static final DataBaseType DATABASE_TYPE = DataBaseType.ClickHouse;
 
+    /** Job. */
     public static class Job
             extends Reader.Job
     {
@@ -88,6 +90,7 @@ public class ClickHouseReader
         }
     }
 
+    /** Task. */
     public static class Task
             extends Reader.Task
     {

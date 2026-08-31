@@ -40,6 +40,7 @@ import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.CONNECT_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
+/** Sftp Helper. */
 public class SftpHelper
         extends FtpHelper
 {

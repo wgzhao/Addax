@@ -45,6 +45,7 @@ public abstract class AbstractTaskPluginCollector
 
     private final PluginType pluginType;
 
+    /** Abstracttaskplugincollector. */
     public AbstractTaskPluginCollector(Configuration conf, Communication communication, PluginType type)
     {
         this.configuration = conf;
@@ -52,16 +53,19 @@ public abstract class AbstractTaskPluginCollector
         this.pluginType = type;
     }
 
+    /** Returns the communication. */
     public Communication getCommunication()
     {
         return communication;
     }
 
+    /** Returns the configuration. */
     public Configuration getConfiguration()
     {
         return configuration;
     }
 
+    /** Returns the plugintype. */
     public PluginType getPluginType()
     {
         return pluginType;

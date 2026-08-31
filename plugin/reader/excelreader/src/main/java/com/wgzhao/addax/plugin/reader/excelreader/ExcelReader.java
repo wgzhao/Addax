@@ -37,9 +37,11 @@ import java.util.List;
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
+/** Excel Reader. */
 public class ExcelReader
         extends Reader
 {
+    /** Job. */
     public static class Job
             extends Reader.Job
     {
@@ -100,6 +102,7 @@ public class ExcelReader
         }
     }
 
+    /** Task. */
     public static class Task
             extends Reader.Task
     {

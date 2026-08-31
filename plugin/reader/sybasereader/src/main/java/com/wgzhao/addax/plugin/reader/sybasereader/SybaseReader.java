@@ -38,12 +38,14 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
 
+/** Sybase Reader. */
 public class SybaseReader
         extends Reader
 {
 
     private static final DataBaseType DATABASE_TYPE = DataBaseType.Sybase;
 
+    /** Job. */
     public static class Job
             extends Reader.Job
     {
@@ -92,6 +94,7 @@ public class SybaseReader
         }
     }
 
+    /** Task. */
     public static class Task
             extends Reader.Task
     {

@@ -22,6 +22,7 @@ package com.wgzhao.addax.plugin.writer.doriswriter;
 import java.io.IOException;
 import java.util.Map;
 
+/** Doris Writer Exception. */
 public class DorisWriterException
         extends IOException
 {
@@ -29,6 +30,7 @@ public class DorisWriterException
     private final Map<String, Object> response;
     private final boolean reCreateLabel;
 
+    /** Doriswriterexception. */
     public DorisWriterException(String message, Map<String, Object> response, boolean reCreateLabel)
     {
         super(message);
@@ -36,6 +38,7 @@ public class DorisWriterException
         this.reCreateLabel = reCreateLabel;
     }
 
+    /** Needrecreatelabel. */
     public boolean needReCreateLabel()
     {
         return reCreateLabel;

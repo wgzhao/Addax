@@ -22,13 +22,16 @@ package com.wgzhao.addax.plugin.writer.doriswriter.codec;
 
 import com.wgzhao.addax.plugin.writer.doriswriter.DorisKey;
 
+/** Doris Codec Factory. */
 public class DorisCodecFactory
 {
+    /** Doriscodecfactory. */
     public DorisCodecFactory()
     {
 
     }
 
+    /** Createcodec. */
     public static DorisCodec createCodec(DorisKey writerOptions)
     {
         if (DorisKey.StreamLoadFormat.CSV.equals(writerOptions.getStreamLoadFormat())) {

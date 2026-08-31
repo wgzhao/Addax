@@ -21,6 +21,7 @@
 
 package com.wgzhao.addax.plugin.reader.datareader;
 
+/** Rule. */
 public enum Rule
 {
     ADDRESS,

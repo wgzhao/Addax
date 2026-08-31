@@ -32,11 +32,13 @@ public class BoolColumn
         extends Column
 {
 
+    /** Boolcolumn. */
     public BoolColumn(Boolean bool)
     {
         super(bool, Column.Type.BOOL, 1);
     }
 
+    /** Boolcolumn. */
     public BoolColumn(final String data)
     {
         this(true);
@@ -51,6 +53,7 @@ public class BoolColumn
         }
     }
 
+    /** Boolcolumn. */
     public BoolColumn()
     {
         super(null, Column.Type.BOOL, 1);

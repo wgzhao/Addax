@@ -51,9 +51,11 @@ import java.util.Map;
 import static com.wgzhao.addax.core.base.Key.KERBEROS_KEYTAB_FILE_PATH;
 import static com.wgzhao.addax.core.base.Key.KERBEROS_PRINCIPAL;
 
+/** Paimon Writer. */
 public class PaimonWriter
         extends Writer
 {
+    /** Job. */
     public static class Job
             extends Writer.Job
     {
@@ -136,6 +138,7 @@ public class PaimonWriter
         }
     }
 
+    /** Task. */
     public static class Task
             extends Writer.Task
     {

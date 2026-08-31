@@ -48,10 +48,12 @@ import static com.wgzhao.addax.core.base.Key.QUERY_SQL;
 import static com.wgzhao.addax.core.base.Key.TABLE;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
+/** Influx DB2 Reader. */
 public class InfluxDB2Reader
         extends Reader
 {
 
+    /** Job. */
     public static class Job
             extends Reader.Job
     {
@@ -86,6 +88,7 @@ public class InfluxDB2Reader
             this.originalConfig = dealColumns();
         }
 
+        /** Dealcolumns. */
         public Configuration dealColumns()
         {
             Configuration conf = this.originalConfig;
@@ -225,6 +228,7 @@ public class InfluxDB2Reader
         }
     }
 
+    /** Task. */
     public static class Task
             extends Reader.Task
     {

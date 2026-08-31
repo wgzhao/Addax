@@ -50,6 +50,7 @@ import java.sql.Types;
 import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
 import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
 
+/** HBase20x SQLReader Task. */
 public class HBase20xSQLReaderTask
 {
     private static final Logger LOG = LoggerFactory.getLogger(HBase20xSQLReaderTask.class);
@@ -58,6 +59,7 @@ public class HBase20xSQLReaderTask
     private int taskGroupId;
     private int taskId;
 
+    /** Hbase20xsqlreadertask. */
     public HBase20xSQLReaderTask(Configuration config, int taskGroupId, int taskId)
     {
         this.readerConfig = config;
@@ -65,6 +67,7 @@ public class HBase20xSQLReaderTask
         this.taskId = taskId;
     }
 
+    /** Readrecord. */
     public void readRecord(RecordSender recordSender)
     {
         String querySql = readerConfig.getString(HBaseConstant.QUERY_SQL_PER_SPLIT);

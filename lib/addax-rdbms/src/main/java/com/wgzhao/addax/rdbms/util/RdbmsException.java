@@ -51,6 +51,7 @@ public class RdbmsException
      * Creates an AddaxException for database connection errors.
      *
      * @param e The underlying exception that caused the connection failure
+     * @param jdbcUrl the JDBC URL that failed to connect
      * @return AddaxException with CONNECTION_ERROR code
      */
     public static AddaxException asConnException(Exception e, String jdbcUrl)

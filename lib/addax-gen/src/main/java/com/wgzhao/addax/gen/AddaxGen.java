@@ -107,6 +107,7 @@ public class AddaxGen
     private final List<String> hadoopConfigs = new ArrayList<>();
     private String hdfsSitePath;
 
+    /** Main entry point. */
     public static void main(String[] args)
     {
         int code = new AddaxGen().run(args);

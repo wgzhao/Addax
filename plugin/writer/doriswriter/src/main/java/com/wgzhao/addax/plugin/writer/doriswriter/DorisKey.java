@@ -39,6 +39,7 @@ import static com.wgzhao.addax.core.base.Constant.DEFAULT_BATCH_SIZE;
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
+/** Doris Key configuration keys. */
 public class DorisKey
         extends Key
 {
@@ -48,6 +49,7 @@ public class DorisKey
 
     private static final String LOAD_PROPS_FORMAT = "format";
 
+    /** Stream Load Format configuration keys. */
     public enum StreamLoadFormat
     {
         CSV, JSON
@@ -71,6 +73,7 @@ public class DorisKey
     private final String jdbcUrl;
     private final String table;
 
+    /** Doriskey. */
     public DorisKey(Configuration options)
     {
         this.options = options;
@@ -95,6 +98,7 @@ public class DorisKey
         }
     }
 
+    /** Returns the doristablecolumns. */
     public List<String> getDorisTableColumns()
     {
         String currentSql = "SELECT COLUMN_NAME FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = '" +
@@ -118,91 +122,109 @@ public class DorisKey
         }
     }
 
+    /** Dopretreatment. */
     public void doPretreatment()
     {
         validateStreamLoadUrl();
     }
 
+    /** Returns the jdbcurl. */
     public String getJdbcUrl()
     {
         return this.jdbcUrl;
     }
 
+    /** Returns the database. */
     public String getDatabase()
     {
         return this.database;
     }
 
+    /** Returns the table. */
     public String getTable()
     {
         return this.table;
     }
 
+    /** Returns the username. */
     public String getUsername()
     {
         return options.getString(USERNAME);
     }
 
+    /** Returns the password. */
     public String getPassword()
     {
         return options.getString(PASSWORD);
     }
 
+    /** Returns the labelprefix. */
     public String getLabelPrefix()
     {
         return DEFAULT_LABEL_PREFIX;
     }
 
+    /** Returns the loadurllist. */
     public List<String> getLoadUrlList()
     {
         return options.getList(LOAD_URL, String.class);
     }
 
+    /** Returns the columns. */
     public List<String> getColumns()
     {
         return this.infoSchemaColumns;
     }
 
+    /** Returns the presqllist. */
     public List<String> getPreSqlList()
     {
         return options.getList(PRE_SQL, String.class);
     }
 
+    /** Returns the postsqllist. */
     public List<String> getPostSqlList()
     {
         return options.getList(POST_SQL, String.class);
     }
 
+    /** Returns the maxretries. */
     public int getMaxRetries()
     {
         return MAX_RETRIES;
     }
 
+    /** Returns the batchsize. */
     public long getBatchSize()
     {
         return options.getLong(BATCH_SIZE, DEFAULT_BATCH_SIZE);
     }
 
+    /** Returns the flushinterval. */
     public long getFlushInterval()
     {
         return options.getLong(FLUSH_INTERVAL, DEFAULT_FLUSH_INTERVAL);
     }
 
+    /** Returns the flushqueuelength. */
     public int getFlushQueueLength()
     {
         return options.getInt(FLUSH_QUEUE_LENGTH, 1);
     }
 
+    /** Returns the streamloadformat. */
     public StreamLoadFormat getStreamLoadFormat()
     {
         return streamLoadFormat;
     }
 
+    /** Checks whether the jsonformat condition holds. */
     public boolean isJsonFormat()
     {
         return StreamLoadFormat.JSON.equals(streamLoadFormat);
     }
 
+    /** Checks whether the csvformat condition holds. */
     public boolean isCsvFormat()
     {
         return StreamLoadFormat.CSV.equals(streamLoadFormat);
@@ -219,16 +241,19 @@ public class DorisKey
         }
     }
 
+    /** Returns the linedelimiter. */
     public String getLineDelimiter()
     {
         return loadProps.getString(LINE_SEPARATOR, "\n");
     }
 
+    /** Returns the columnseparator. */
     public String getColumnSeparator()
     {
         return loadProps.getString(COLUMN_SEPARATOR, "\t");
     }
 
+    /** Loadprops2map. */
     public Map<String, String> loadProps2Map()
     {
         Map<String, String> result = new HashMap<>();

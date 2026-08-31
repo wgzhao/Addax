@@ -46,6 +46,7 @@ import java.util.StringJoiner;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
 
+/** Text Writer. */
 public class TextWriter
         implements IFormatWriter
 {
@@ -60,103 +61,122 @@ public class TextWriter
     private List<String> header;
     private S3Client s3Client;
 
+    /** Textwriter. */
     public TextWriter()
     {
     }
 
+    /** Returns the fielddelimiter. */
     public char getFieldDelimiter()
     {
         return fieldDelimiter;
     }
 
+    /** Sets the fielddelimiter. */
     public TextWriter setFieldDelimiter(char fieldDelimiter)
     {
         this.fieldDelimiter = fieldDelimiter;
         return this;
     }
 
+    /** Returns the nullformat. */
     public String getNullFormat()
     {
         return nullFormat;
     }
 
+    /** Sets the nullformat. */
     public TextWriter setNullFormat(String nullFormat)
     {
         this.nullFormat = nullFormat;
         return this;
     }
 
+    /** Returns the dateformat. */
     public String getDateFormat()
     {
         return dateFormat;
     }
 
+    /** Sets the dateformat. */
     public TextWriter setDateFormat(String dateFormat)
     {
         this.dateFormat = dateFormat;
         return this;
     }
 
+    /** Returns the encoding. */
     public String getEncoding()
     {
         return encoding;
     }
 
+    /** Sets the encoding. */
     public TextWriter setEncoding(String encoding)
     {
         this.encoding = encoding;
         return this;
     }
 
+    /** Returns the bucket. */
     public String getBucket()
     {
         return bucket;
     }
 
+    /** Sets the bucket. */
     public TextWriter setBucket(String bucket)
     {
         this.bucket = bucket;
         return this;
     }
 
+    /** Returns the object. */
     public String getObject()
     {
         return object;
     }
 
+    /** Sets the object. */
     public TextWriter setObject(String object)
     {
         this.object = object;
         return this;
     }
 
+    /** Returns the maxfilesize. */
     public int getMaxFileSize()
     {
         return maxFileSize;
     }
 
+    /** Sets the maxfilesize. */
     public TextWriter setMaxFileSize(int maxFileSize)
     {
         this.maxFileSize = maxFileSize;
         return this;
     }
 
+    /** Returns the header. */
     public List<String> getHeader()
     {
         return header;
     }
 
+    /** Sets the header. */
     public TextWriter setHeader(List<String> header)
     {
         this.header = header;
         return this;
     }
 
+    /** Returns the s3client. */
     public S3Client getS3Client()
     {
         return s3Client;
     }
 
+    /** Sets the s3client. */
     public TextWriter setS3Client(S3Client s3Client)
     {
         this.s3Client = s3Client;

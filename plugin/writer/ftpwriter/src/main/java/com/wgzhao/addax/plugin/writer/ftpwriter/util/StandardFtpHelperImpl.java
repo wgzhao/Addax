@@ -43,6 +43,7 @@ import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.LOGIN_ERROR;
 import static org.apache.commons.net.ftp.FTP.BINARY_FILE_TYPE;
 
+/** Standard Ftp Helper Impl. */
 public class StandardFtpHelperImpl
         implements IFtpHelper
 {
@@ -145,6 +146,7 @@ public class StandardFtpHelperImpl
         }
     }
 
+    /** Mkdirsinglehierarchy. */
     public boolean mkDirSingleHierarchy(String directoryPath)
             throws IOException
     {

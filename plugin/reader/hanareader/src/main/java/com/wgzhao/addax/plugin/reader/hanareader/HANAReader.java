@@ -31,12 +31,14 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+/** HANAReader. */
 public class HANAReader
         extends Reader
 {
 
     private static final DataBaseType DATABASE_TYPE = DataBaseType.HANA;
 
+    /** Job. */
     public static class Job
             extends Reader.Job
     {
@@ -83,6 +85,7 @@ public class HANAReader
         }
     }
 
+    /** Task. */
     public static class Task
             extends Reader.Task
     {
