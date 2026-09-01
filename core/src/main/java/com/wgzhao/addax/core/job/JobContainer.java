@@ -57,6 +57,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.Map;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
@@ -503,8 +504,8 @@ public class JobContainer
 
     private void logStatistics()
     {
-        long totalCosts = (this.endTimeStamp - this.startTimeStamp) / 1000;
-        long transferCosts = (this.endTransferTimeStamp - this.startTransferTimeStamp) / 1000;
+        long totalCosts = TimeUnit.MILLISECONDS.toSeconds(this.endTimeStamp - this.startTimeStamp);
+        long transferCosts = TimeUnit.MILLISECONDS.toSeconds(this.endTransferTimeStamp - this.startTransferTimeStamp);
         if (0L == transferCosts) {
             transferCosts = 1L;
         }
