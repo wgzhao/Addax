@@ -30,6 +30,9 @@ import com.wgzhao.addax.core.element.LongColumn;
 import com.wgzhao.addax.core.element.Record;
 import com.wgzhao.addax.core.element.StringColumn;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * Transformer that converts null values to type-appropriate defaults.
  *
@@ -54,6 +57,9 @@ import com.wgzhao.addax.core.element.StringColumn;
 public class NullToDefaultTransformer
         extends Transformer
 {
+    // the column config JSON is fixed per job; parse it once per distinct parameter string
+    private final Map<String, String[]> columnTypesCache = new ConcurrentHashMap<>();
+
     public NullToDefaultTransformer()
     {
         setTransformerName("dx_null_to_default");
@@ -105,21 +111,28 @@ public class NullToDefaultTransformer
                 return null;
             }
 
-            JSONObject param = JSON.parseObject(paramJson);
-            JSONArray columns = param.getJSONArray("column");
-            if (columns == null || columns.isEmpty()) {
-                return null;
-            }
-
-            String[] types = new String[columns.size()];
-            for (int i = 0; i < columns.size(); i++) {
-                JSONObject col = columns.getJSONObject(i);
-                types[i] = col.getString("type");
-            }
-            return types;
+            // the config is immutable per job, so parsing it once per distinct
+            // parameter string avoids a JSON.parseObject on every record
+            return columnTypesCache.computeIfAbsent(paramJson, this::parseColumnTypesFromJson);
         } catch (Exception e) {
             return null;
         }
+    }
+
+    private String[] parseColumnTypesFromJson(String paramJson)
+    {
+        JSONObject param = JSON.parseObject(paramJson);
+        JSONArray columns = param.getJSONArray("column");
+        if (columns == null || columns.isEmpty()) {
+            return null;
+        }
+
+        String[] types = new String[columns.size()];
+        for (int i = 0; i < columns.size(); i++) {
+            JSONObject col = columns.getJSONObject(i);
+            types[i] = col.getString("type");
+        }
+        return types;
     }
 
     private Column createDefaultColumn(String type)
