@@ -429,7 +429,7 @@ public class TaskGroupContainer
             TaskPluginCollector pluginCollector;
 
             switch (pluginType) {
-                case READER:
+                case READER -> {
                     newRunner = LoadUtil.loadPluginRunner(pluginType, this.taskConfig.getString(CoreConstant.JOB_READER_NAME));
                     newRunner.setJobConf(this.taskConfig.getConfiguration(CoreConstant.JOB_READER_PARAMETER));
 
@@ -447,8 +447,8 @@ public class TaskGroupContainer
 
                     // set the taskPlugin's collector to handle dirty data and job/task communication
                     newRunner.setTaskPluginCollector(pluginCollector);
-                    break;
-                case WRITER:
+                }
+                case WRITER -> {
                     newRunner = LoadUtil.loadPluginRunner(pluginType, this.taskConfig.getString(CoreConstant.JOB_WRITER_NAME));
                     newRunner.setJobConf(this.taskConfig.getConfiguration(CoreConstant.JOB_WRITER_PARAMETER));
 
@@ -457,9 +457,8 @@ public class TaskGroupContainer
 
                     // set the taskPlugin's collector to handle dirty data and job/task communication
                     newRunner.setTaskPluginCollector(pluginCollector);
-                    break;
-                default:
-                    throw AddaxException.asAddaxException(CONFIG_ERROR, "Cant generateRunner for:" + pluginType);
+                }
+                default -> throw AddaxException.asAddaxException(CONFIG_ERROR, "Cant generateRunner for:" + pluginType);
             }
 
             newRunner.setTaskGroupId(taskGroupId);

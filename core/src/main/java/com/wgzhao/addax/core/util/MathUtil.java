@@ -531,6 +531,6 @@ public class MathUtil
      */
     private static boolean isBlank(String str)
     {
-        return null == str || str.trim().isEmpty();
+        return str == null || str.isBlank();
     }
 }

@@ -94,11 +94,9 @@ public class PerfRecord
         if (this == o) {
             return true;
         }
-        if (!(o instanceof PerfRecord)) {
+        if (!(o instanceof PerfRecord dst)) {
             return false;
         }
-
-        PerfRecord dst = (PerfRecord) o;
 
         if (this.getInstId() != dst.getInstId()) {
             return false;

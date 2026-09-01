@@ -75,7 +75,7 @@ public class GroovyTransformer
         GroovyClassLoader loader = new GroovyClassLoader(GroovyTransformer.class.getClassLoader());
         String groovyRule = getGroovyRule(code, extraPackage);
 
-        Class groovyClass;
+        Class<?> groovyClass;
         try {
             groovyClass = loader.parseClass(groovyRule);
         }
@@ -86,12 +86,12 @@ public class GroovyTransformer
 
         try {
             Object t = groovyClass.getConstructor().newInstance();
-            if (!(t instanceof Transformer)) {
+            if (!(t instanceof Transformer transformer)) {
                 throw AddaxException.asAddaxException(
                         RUNTIME_ERROR,
                         "Addax bug! ");
             }
-            this.groovyTransformer = (Transformer) t;
+            this.groovyTransformer = transformer;
         }
         catch (Throwable ex) {
             throw AddaxException.asAddaxException(
