@@ -109,13 +109,15 @@ public class GroovyTransformer
                 }
             }
         }
-        sb.append("import static com.wgzhao.addax.core.transport.transformer.GroovyTransformerStaticUtil.*;");
-        sb.append("import com.wgzhao.addax.core.element.*;");
-        sb.append("import com.wgzhao.addax.core.exception.AddaxException;");
-        sb.append("import com.wgzhao.addax.core.transport.transformer.Transformer;");
-        sb.append("import java.util.*;");
-        sb.append("public class RULE extends Transformer").append("{");
-        sb.append("public Record evaluate(Record record, Object... paras) {");
+        sb.append("""
+                import static com.wgzhao.addax.core.transport.transformer.GroovyTransformerStaticUtil.*;
+                import com.wgzhao.addax.core.element.*;
+                import com.wgzhao.addax.core.exception.AddaxException;
+                import com.wgzhao.addax.core.transport.transformer.Transformer;
+                import java.util.*;
+                public class RULE extends Transformer {
+                public Record evaluate(Record record, Object... paras) {
+                """);
         sb.append(expression);
         sb.append("}}");
 

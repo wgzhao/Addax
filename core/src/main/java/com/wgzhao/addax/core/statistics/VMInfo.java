@@ -98,13 +98,18 @@ public class VMInfo
 
     public String toString()
     {
-        return "The machine info  => \n\n"
-                + "\tosInfo: \t" + osInfo + "\n"
-                + "\tjvmInfo:\t" + jvmInfo + "\n"
-                + "\tcpu num:\t" + totalProcessorCount + "\n\n"
-                + startPhyOSStatus.toString() + "\n"
-                + processGCStatus + "\n"
-                + processMemoryStatus + "\n";
+        return """
+                The machine info  =>
+
+                \tosInfo: \t%s
+                \tjvmInfo:\t%s
+                \tcpu num:\t%d
+
+                %s
+                %s
+                %s
+                """.formatted(osInfo, jvmInfo, totalProcessorCount,
+                startPhyOSStatus.toString(), processGCStatus, processMemoryStatus);
     }
 
     public String totalString()
