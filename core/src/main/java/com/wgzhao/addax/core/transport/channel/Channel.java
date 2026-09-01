@@ -47,7 +47,12 @@ public abstract class Channel
 
     private static final Logger LOG = LoggerFactory.getLogger(Channel.class);
     private static Boolean isFirstPrint = true;
-    private final Communication lastCommunication = new Communication();
+    // last flow-control snapshot as primitives to avoid per-interval counter allocations
+    private long lastTimestamp;
+    private long lastReadBytes;
+    private long lastReadFailedBytes;
+    private long lastReadRecords;
+    private long lastReadFailedRecords;
     protected int taskGroupId;
     protected int capacity;
     protected int byteCapacity;
@@ -114,7 +119,11 @@ public abstract class Channel
     public void setCommunication(final Communication communication)
     {
         this.currentCommunication = communication;
-        this.lastCommunication.reset();
+        this.lastTimestamp = System.currentTimeMillis();
+        this.lastReadBytes = 0;
+        this.lastReadFailedBytes = 0;
+        this.lastReadRecords = 0;
+        this.lastReadFailedRecords = 0;
         this.waitCountersRegistered = false;
     }
 
@@ -196,15 +205,14 @@ public abstract class Channel
             return;
         }
 
-        long lastTimestamp = lastCommunication.getTimestamp();
         long nowTimestamp = System.currentTimeMillis();
-        long interval = nowTimestamp - lastTimestamp;
+        long interval = nowTimestamp - this.lastTimestamp;
         if (interval - this.flowControlInterval >= 0) {
             long byteLimitSleepTime = 0;
             long recordLimitSleepTime = 0;
             if (isChannelByteSpeedLimit) {
                 long currentByteSpeed = (CommunicationTool.getTotalReadBytes(currentCommunication) -
-                        CommunicationTool.getTotalReadBytes(lastCommunication)) * 1000 / interval;
+                        (this.lastReadBytes + this.lastReadFailedBytes)) * 1000 / interval;
                 if (currentByteSpeed > this.byteSpeed) {
                     byteLimitSleepTime = currentByteSpeed * interval / this.byteSpeed - interval;
                 }
@@ -212,7 +220,7 @@ public abstract class Channel
 
             if (isChannelRecordSpeedLimit) {
                 long currentRecordSpeed = (CommunicationTool.getTotalReadRecords(currentCommunication) -
-                        CommunicationTool.getTotalReadRecords(lastCommunication)) * 1000 / interval;
+                        (this.lastReadRecords + this.lastReadFailedRecords)) * 1000 / interval;
                 if (currentRecordSpeed > this.recordSpeed) {
                     recordLimitSleepTime = currentRecordSpeed * interval / this.recordSpeed - interval;
                 }
@@ -228,15 +236,12 @@ public abstract class Channel
                 }
             }
 
-            lastCommunication.setLongCounter(CommunicationTool.READ_SUCCEED_BYTES,
-                    currentCommunication.getLongCounter(CommunicationTool.READ_SUCCEED_BYTES));
-            lastCommunication.setLongCounter(CommunicationTool.READ_FAILED_BYTES,
-                    currentCommunication.getLongCounter(CommunicationTool.READ_FAILED_BYTES));
-            lastCommunication.setLongCounter(CommunicationTool.READ_SUCCEED_RECORDS,
-                    currentCommunication.getLongCounter(CommunicationTool.READ_SUCCEED_RECORDS));
-            lastCommunication.setLongCounter(CommunicationTool.READ_FAILED_RECORDS,
-                    currentCommunication.getLongCounter(CommunicationTool.READ_FAILED_RECORDS));
-            lastCommunication.setTimestamp(nowTimestamp);
+            // keep the snapshot in primitives instead of a per-interval Communication
+            this.lastReadBytes = currentCommunication.getLongCounter(CommunicationTool.READ_SUCCEED_BYTES);
+            this.lastReadFailedBytes = currentCommunication.getLongCounter(CommunicationTool.READ_FAILED_BYTES);
+            this.lastReadRecords = currentCommunication.getLongCounter(CommunicationTool.READ_SUCCEED_RECORDS);
+            this.lastReadFailedRecords = currentCommunication.getLongCounter(CommunicationTool.READ_FAILED_RECORDS);
+            this.lastTimestamp = nowTimestamp;
         }
     }
 
