@@ -25,6 +25,7 @@ import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.StringUtils;
 
 import java.security.SecureRandom;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -86,7 +87,7 @@ public final class JobAssignUtil
             Collections.shuffle(contentConfig, new SecureRandom());
         }
 
-        LinkedHashMap<String, List<Integer>> resourceMarkAndTaskIdMap = parseAndGetResourceMarkAndTaskIdMap(contentConfig);
+        LinkedHashMap<String, ArrayDeque<Integer>> resourceMarkAndTaskIdMap = parseAndGetResourceMarkAndTaskIdMap(contentConfig);
         List<Configuration> taskGroupConfig = doAssign(resourceMarkAndTaskIdMap, configuration, taskGroupNumber);
 
         // adjust channel number per task group
@@ -125,22 +126,22 @@ public final class JobAssignUtil
      * @param contentConfig configuration
      * @return map of resource mark and taskId
      */
-    private static LinkedHashMap<String, List<Integer>> parseAndGetResourceMarkAndTaskIdMap(List<Configuration> contentConfig)
+    private static LinkedHashMap<String, ArrayDeque<Integer>> parseAndGetResourceMarkAndTaskIdMap(List<Configuration> contentConfig)
     {
         // key: resourceMark, value: taskId
-        LinkedHashMap<String, List<Integer>> readerResourceMarkAndTaskIdMap = new LinkedHashMap<>();
-        LinkedHashMap<String, List<Integer>> writerResourceMarkAndTaskIdMap = new LinkedHashMap<>();
+        LinkedHashMap<String, ArrayDeque<Integer>> readerResourceMarkAndTaskIdMap = new LinkedHashMap<>();
+        LinkedHashMap<String, ArrayDeque<Integer>> writerResourceMarkAndTaskIdMap = new LinkedHashMap<>();
 
         for (Configuration aTaskConfig : contentConfig) {
             int taskId = aTaskConfig.getInt(CoreConstant.TASK_ID);
             // Add readerResourceMark to readerResourceMarkAndTaskIdMap
             String readerResourceMark = aTaskConfig.getString(JOB_READER_PARAMETER + "." + LOAD_BALANCE_RESOURCE_MARK);
-            readerResourceMarkAndTaskIdMap.computeIfAbsent(readerResourceMark, k -> new ArrayList<>());
+            readerResourceMarkAndTaskIdMap.computeIfAbsent(readerResourceMark, k -> new ArrayDeque<>());
             readerResourceMarkAndTaskIdMap.get(readerResourceMark).add(taskId);
 
             // Add writerResourceMark to writerResourceMarkAndTaskIdMap
             String writerResourceMark = aTaskConfig.getString(JOB_WRITER_PARAMETER + "." + LOAD_BALANCE_RESOURCE_MARK);
-            writerResourceMarkAndTaskIdMap.computeIfAbsent(writerResourceMark, k -> new ArrayList<>());
+            writerResourceMarkAndTaskIdMap.computeIfAbsent(writerResourceMark, k -> new ArrayDeque<>());
             writerResourceMarkAndTaskIdMap.get(writerResourceMark).add(taskId);
         }
 
@@ -174,7 +175,7 @@ public final class JobAssignUtil
      * @param taskGroupNumber the number of group
      * @return list of configuration
      */
-    private static List<Configuration> doAssign(LinkedHashMap<String, List<Integer>> resourceMarkAndTaskIdMap, Configuration jobConfiguration, int taskGroupNumber)
+    private static List<Configuration> doAssign(LinkedHashMap<String, ArrayDeque<Integer>> resourceMarkAndTaskIdMap, Configuration jobConfiguration, int taskGroupNumber)
     {
         List<Configuration> contentConfig = jobConfiguration.getListConfiguration(JOB_CONTENT);
 
@@ -191,7 +192,7 @@ public final class JobAssignUtil
         int mapValueMaxLength = -1;
 
         List<String> resourceMarks = new ArrayList<>();
-        for (Map.Entry<String, List<Integer>> entry : resourceMarkAndTaskIdMap.entrySet()) {
+        for (Map.Entry<String, ArrayDeque<Integer>> entry : resourceMarkAndTaskIdMap.entrySet()) {
             resourceMarks.add(entry.getKey());
             if (entry.getValue().size() > mapValueMaxLength) {
                 mapValueMaxLength = entry.getValue().size();
@@ -202,11 +203,10 @@ public final class JobAssignUtil
         for (int i = 0; i < mapValueMaxLength; i++) {
             for (String resourceMark : resourceMarks) {
                 if (!resourceMarkAndTaskIdMap.get(resourceMark).isEmpty()) {
-                    int taskId = resourceMarkAndTaskIdMap.get(resourceMark).get(0);
+                    // pollFirst is O(1) while ArrayList.remove(0) is O(n), quadratic for many splits
+                    int taskId = resourceMarkAndTaskIdMap.get(resourceMark).pollFirst();
                     taskGroupConfigList.get(taskGroupIndex % taskGroupNumber).add(contentConfig.get(taskId));
                     taskGroupIndex++;
-
-                    resourceMarkAndTaskIdMap.get(resourceMark).remove(0);
                 }
             }
         }

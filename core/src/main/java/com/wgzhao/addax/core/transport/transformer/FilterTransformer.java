@@ -31,6 +31,9 @@ import com.wgzhao.addax.core.exception.AddaxException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
@@ -42,6 +45,9 @@ import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 public class FilterTransformer
         extends Transformer
 {
+    // regexes used by dx_filter like/not like are compiled once per distinct value
+    private final Map<String, Pattern> patternCache = new ConcurrentHashMap<>();
+
     public FilterTransformer()
     {
         setTransformerName("dx_filter");
@@ -375,7 +381,8 @@ public class FilterTransformer
     private Record doLike(Record record, String value, Column column)
     {
         String originalValue = column.asString();
-        if (originalValue != null && originalValue.matches(value)) {
+        // String.matches compiles the regex on every call; compile once per distinct value
+        if (originalValue != null && patternCache.computeIfAbsent(value, Pattern::compile).matcher(originalValue).matches()) {
             return null;
         }
         else {
@@ -386,7 +393,7 @@ public class FilterTransformer
     private Record doNotLike(Record record, String value, Column column)
     {
         String originalValue = column.asString();
-        if (originalValue != null && originalValue.matches(value)) {
+        if (originalValue != null && patternCache.computeIfAbsent(value, Pattern::compile).matcher(originalValue).matches()) {
             return record;
         }
         else {

@@ -32,7 +32,9 @@ import com.wgzhao.addax.core.transport.record.TerminateRecord;
 import com.wgzhao.addax.core.transport.transformer.TransformerExecution;
 import org.apache.commons.lang3.StringUtils;
 
+import java.lang.reflect.Constructor;
 import java.util.List;
+import java.util.function.Supplier;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.SHUT_DOWN_TASK;
@@ -43,28 +45,41 @@ public class RecordExchanger
         implements RecordSender, RecordReceiver
 {
 
-    private static Class<? extends Record> RECORD_CLASS;
     private final Channel channel;
+    private final Supplier<Record> recordFactory;
     private volatile boolean shutdown = false;
 
-    @SuppressWarnings("unchecked")
     public RecordExchanger(int taskGroupId, int taskId, Channel channel, Communication communication,
             List<TransformerExecution> transformerExecs, TaskPluginCollector pluginCollector)
     {
         super(taskGroupId, taskId, communication, transformerExecs, pluginCollector);
         assert channel != null;
         this.channel = channel;
-        Configuration configuration = channel.getConfiguration();
+        this.recordFactory = createRecordFactory(channel.getConfiguration());
+    }
+
+    /**
+     * Resolve the record class once and cache its no-arg constructor so the
+     * per-record creation path does no reflection lookups.
+     */
+    private static Supplier<Record> createRecordFactory(Configuration configuration)
+    {
         try {
             String cls = configuration.getString(CORE_TRANSPORT_RECORD_CLASS, null);
-            if (!StringUtils.isBlank(cls)) {
-                RECORD_CLASS = (Class<? extends Record>) Class.forName(cls);
-            }
-            else {
-                RecordExchanger.RECORD_CLASS = DefaultRecord.class;
-            }
+            @SuppressWarnings("unchecked")
+            Class<? extends Record> recordClass = StringUtils.isBlank(cls)
+                    ? DefaultRecord.class : (Class<? extends Record>) Class.forName(cls);
+            Constructor<? extends Record> constructor = recordClass.getConstructor();
+            return () -> {
+                try {
+                    return constructor.newInstance();
+                }
+                catch (ReflectiveOperationException e) {
+                    throw AddaxException.asAddaxException(CONFIG_ERROR, e);
+                }
+            };
         }
-        catch (ClassNotFoundException e) {
+        catch (Exception e) {
             throw AddaxException.asAddaxException(CONFIG_ERROR, e);
         }
     }
@@ -82,12 +97,7 @@ public class RecordExchanger
     @Override
     public Record createRecord()
     {
-        try {
-            return RECORD_CLASS.getConstructor().newInstance();
-        }
-        catch (Exception e) {
-            throw AddaxException.asAddaxException(CONFIG_ERROR, e);
-        }
+        return recordFactory.get();
     }
 
     @Override
