@@ -100,8 +100,15 @@ public abstract class AbstractScheduler
             }
 
             // Enforce error limits ASAP to fail-fast
-            errorLimit.checkRecordLimit(nowJobContainerCommunication);
-            errorLimit.checkPercentageLimit(nowJobContainerCommunication);
+            try {
+                errorLimit.checkRecordLimit(nowJobContainerCommunication);
+                errorLimit.checkPercentageLimit(nowJobContainerCommunication);
+            }
+            catch (Exception e) {
+                // shut down the task-group executor before propagating the breach,
+                // otherwise its non-daemon threads keep running in embedded use
+                dealFailedStat(this.containerCommunicator, e);
+            }
 
             State state = nowJobContainerCommunication.getState();
             if (state == State.SUCCEEDED) {
@@ -122,10 +129,10 @@ public abstract class AbstractScheduler
                 TimeUnit.MILLISECONDS.sleep(jobSleepIntervalInMillSec);
             }
             catch (InterruptedException e) {
-                // Restore interrupt status and exit as failed
+                // Restore interrupt status and exit as failed, shutting down task groups
                 Thread.currentThread().interrupt();
                 LOG.error("The scheduler thread was interrupted.", e);
-                throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
+                dealFailedStat(this.containerCommunicator, e);
             }
         }
     }

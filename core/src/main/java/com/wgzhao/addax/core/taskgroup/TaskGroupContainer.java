@@ -147,6 +147,7 @@ public class TaskGroupContainer
         long lastReportTimeStamp = 0;
         Communication lastTaskGroupContainerCommunication = new Communication();
 
+        try {
         while (true) {
             boolean failedOrKilled = false;
             Map<Integer, Communication> communicationMap = containerCommunicator.getCommunicationMap();
@@ -220,10 +221,12 @@ public class TaskGroupContainer
                             reportTaskGroupCommunication(lastTaskGroupContainerCommunication, taskCountInThisTaskGroup);
                             throw AddaxException.asAddaxException(ErrorCode.WAIT_TIME_EXCEED, "The task fail over wait timed out.");
                         }
-                        else {
-                            lastExecutor.shutdown();
-                            continue;
-                        }
+                        // block deterministically until the previous attempt's threads are dead
+                        // before retrying, bounded by the remaining fail-over budget; a plugin
+                        // that ignores interrupts would otherwise keep writing concurrently
+                        // with the new attempt (duplicate writes)
+                        lastExecutor.shutdownAndWait(Math.min(sleepIntervalInMillSec, taskMaxWaitInMs - (now - failedTime)));
+                        continue;
                     }
                     else {
                         LOG.debug("TaskGroup[{}] TaskId[{}] AttemptCount[{}] has already shutdown",
@@ -281,6 +284,35 @@ public class TaskGroupContainer
 
         // final report for all taskGroup
         reportTaskGroupCommunication(lastTaskGroupContainerCommunication, taskCountInThisTaskGroup);
+        }
+        catch (Throwable e) {
+            // an exception escaping the loop before the first report would leave the
+            // task-group communication RUNNING forever and hang the whole job; mark it
+            // FAILED so the scheduler sees it within one collect cycle
+            shutdownAll(runTasks, taskFailedExecutorMap);
+            Communication comm = this.containerCommunicator.collect();
+            if (comm.getThrowable() == null) {
+                comm.setThrowable(e);
+            }
+            comm.setState(State.FAILED);
+            this.containerCommunicator.report(comm);
+            throw e instanceof AddaxException
+                    ? (AddaxException) e
+                    : AddaxException.asAddaxException(RUNTIME_ERROR, e);
+        }
+    }
+
+    /**
+     * Interrupt every running and failed task executor in the group.
+     */
+    private void shutdownAll(List<TaskExecutor> runTasks, Map<Integer, TaskExecutor> taskFailedExecutorMap)
+    {
+        for (TaskExecutor taskExecutor : runTasks) {
+            taskExecutor.shutdown();
+        }
+        for (TaskExecutor taskExecutor : taskFailedExecutorMap.values()) {
+            taskExecutor.shutdown();
+        }
     }
 
     /**
@@ -507,6 +539,25 @@ public class TaskGroupContainer
             }
             if (readerThread.isAlive()) {
                 readerThread.interrupt();
+            }
+        }
+
+        /**
+         * Shut down the attempt and wait up to {@code timeoutMs} for both threads to die.
+         */
+        private void shutdownAndWait(long timeoutMs)
+        {
+            this.shutdown();
+            try {
+                if (writerThread.isAlive()) {
+                    writerThread.join(timeoutMs);
+                }
+                if (readerThread.isAlive()) {
+                    readerThread.join(timeoutMs);
+                }
+            }
+            catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
         }
 
