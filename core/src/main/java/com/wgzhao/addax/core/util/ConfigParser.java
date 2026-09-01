@@ -110,12 +110,22 @@ public final class ConfigParser
      *
      * @param configuration {@link Configuration}
      */
+    /**
+     * Bridge the raw Map element type inferred from {@code Map.class} to a
+     * parameterized map list.
+     */
+    @SuppressWarnings("unchecked")
+    private static List<Map<String, Object>> castList(List<Map> list)
+    {
+        return (List<Map<String, Object>>) (List<?>) list;
+    }
+
     private static void upgradeJobConfig(Configuration configuration)
     {
         configuration.getNecessaryValue(JOB_CONTENT);
         if (configuration.getString(JOB_CONTENT).startsWith("[")) {
             // get the first element
-            List<Map> contentList = configuration.getList(JOB_CONTENT, Map.class);
+            List<Map<String, Object>> contentList = castList(configuration.getList(JOB_CONTENT, Map.class));
             if (contentList != null && !contentList.isEmpty()) {
                 configuration.set("job.content", contentList.get(0));
             }
@@ -123,7 +133,7 @@ public final class ConfigParser
         Configuration reader = configuration.getConfiguration(JOB_CONTENT_READER_PARAMETER);
         if (reader != null) {
             if (reader.getString(CONNECTION, "").startsWith("[")) {
-                List<Map> connectionList = configuration.getList(JOB_CONTENT_READER_PARAMETER_CONNECTION, Map.class);
+                List<Map<String, Object>> connectionList = castList(configuration.getList(JOB_CONTENT_READER_PARAMETER_CONNECTION, Map.class));
                 if (connectionList != null && !connectionList.isEmpty()) {
                     reader.set(CONNECTION, connectionList.get(0));
                 }
@@ -137,7 +147,7 @@ public final class ConfigParser
         Configuration writer = configuration.getConfiguration(JOB_CONTENT_WRITER_PARAMETER);
         if (writer != null) {
             if (writer.getString(CONNECTION, "").startsWith("[")) {
-                List<Map> connectionList = configuration.getList(JOB_CONTENT_WRITER_PARAMETER + ".connection", Map.class);
+                List<Map<String, Object>> connectionList = castList(configuration.getList(JOB_CONTENT_WRITER_PARAMETER + ".connection", Map.class));
                 if (connectionList != null && !connectionList.isEmpty()) {
                     writer.set(CONNECTION, connectionList.get(0));
                 }
@@ -256,7 +266,7 @@ public final class ConfigParser
 
     private static void validateJob(Configuration conf)
     {
-        final Map content = conf.getMap(JOB_CONTENT);
+        final Map<String, Object> content = conf.getMap(JOB_CONTENT);
         String[] validPaths = new String[] {JOB_CONTENT_READER, JOB_CONTENT_WRITER, JOB_CONTENT_READER_NAME,
                 JOB_CONTENT_READER_PARAMETER, JOB_CONTENT_WRITER_NAME, JOB_CONTENT_WRITER_PARAMETER};
 
