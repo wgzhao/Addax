@@ -29,9 +29,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.core.util.container.CoreConstant.STORAGE_TRANSFORMER_HOME;
@@ -40,7 +40,8 @@ public class TransformerRegistry
 {
 
     private static final Logger LOG = LoggerFactory.getLogger(TransformerRegistry.class);
-    private static final Map<String, TransformerInfo> registeredTransformer = new HashMap<>();
+    // written from task-group threads via buildTransformerInfo, read by the exchangers
+    private static final Map<String, TransformerInfo> registeredTransformer = new ConcurrentHashMap<>();
 
     public static void loadTransformerFromLocalStorage()
     {
@@ -96,7 +97,9 @@ public class TransformerRegistry
                     each, funName, transformerPath, transformerConfiguration.beautify());
         }
 
-        try (JarLoader jarLoader = new JarLoader(new String[] {transformerPath})) {
+        JarLoader jarLoader = new JarLoader(new String[] {transformerPath});
+        boolean registered = false;
+        try {
             Class<?> transformerClass = jarLoader.loadClass(className);
             Object transformer = transformerClass.getConstructor().newInstance();
             if (ComplexTransformer.class.isAssignableFrom(transformer.getClass())) {
@@ -110,10 +113,23 @@ public class TransformerRegistry
             else {
                 LOG.error("Load Transformer class[{}] error, path = {}", className, transformerPath);
             }
+            registered = true;
         }
         catch (Exception e) {
             //error, skip function
             LOG.error("Skip transformer({}),load Transformer class error, path = {} ", each, transformerPath, e);
+        }
+        finally {
+            // keep the loader open for the registry lifetime so classes lazily
+            // loaded during evaluation still resolve; close it only on failure
+            if (!registered) {
+                try {
+                    jarLoader.close();
+                }
+                catch (Exception ignored) {
+                    // closing a failed loader is best-effort
+                }
+            }
         }
     }
 

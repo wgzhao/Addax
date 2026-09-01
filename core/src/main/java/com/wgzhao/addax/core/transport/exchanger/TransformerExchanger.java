@@ -73,55 +73,65 @@ public abstract class TransformerExchanger
         long diffExhaustedTime = 0;
         String errorMsg = null;
         boolean failed = false;
-        for (TransformerExecution transformerInfoExec : transformerExecs) {
-            long startTs = System.nanoTime();
+        boolean loaderSwapped = false;
+        ClassLoader currentLoader = null;
+        try {
+            for (TransformerExecution transformerInfoExec : transformerExecs) {
+                long startTs = System.nanoTime();
 
-            if (transformerInfoExec.getClassLoader() != null) {
-                classLoaderSwapper.setCurrentThreadClassLoader(transformerInfoExec.getClassLoader());
-            }
-
-            /*
-             * Deferred validation of transformer parameters; throw directly if invalid rather than marking dirty.
-             * No need to validate parameters inside plugins except for plugin-specific ones like parameter count.
-             */
-            if (!transformerInfoExec.isChecked()) {
-
-                if (transformerInfoExec.getColumnIndex() != null
-                        && transformerInfoExec.getColumnIndex() >= record.getColumnNumber()) {
-                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                            String.format("columnIndex[%s] out of bound[%s]. name=%s",
-                                    transformerInfoExec.getColumnIndex(), record.getColumnNumber(),
-                                    transformerInfoExec.getTransformerName()));
+                // swap the thread context classloader only when it actually changes;
+                // native transformers (null loader) never trigger a swap
+                ClassLoader execLoader = transformerInfoExec.getClassLoader();
+                if (execLoader != null && execLoader != currentLoader) {
+                    classLoaderSwapper.setCurrentThreadClassLoader(execLoader);
+                    currentLoader = execLoader;
+                    loaderSwapped = true;
                 }
-                transformerInfoExec.setIsChecked(true);
-            }
 
-            try {
-                result = transformerInfoExec
-                        .getTransformer()
-                        .evaluate(result, transformerInfoExec.getContext(),
-                                transformerInfoExec.getFinalParas());
-            }
-            catch (Exception e) {
-                errorMsg = String.format("The transformer(%s) has encountered an exception(%s)",
-                        transformerInfoExec.getTransformerName(),
-                        e.getMessage());
-                failed = true;
-                break;
-            }
-            finally {
-                if (transformerInfoExec.getClassLoader() != null) {
-                    classLoaderSwapper.restoreCurrentThreadClassLoader();
+                /*
+                 * Deferred validation of transformer parameters; throw directly if invalid rather than marking dirty.
+                 * No need to validate parameters inside plugins except for plugin-specific ones like parameter count.
+                 */
+                if (!transformerInfoExec.isChecked()) {
+
+                    if (transformerInfoExec.getColumnIndex() != null
+                            && transformerInfoExec.getColumnIndex() >= record.getColumnNumber()) {
+                        throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                                String.format("columnIndex[%s] out of bound[%s]. name=%s",
+                                        transformerInfoExec.getColumnIndex(), record.getColumnNumber(),
+                                        transformerInfoExec.getTransformerName()));
+                    }
+                    transformerInfoExec.setIsChecked(true);
                 }
-            }
 
-            if (result == null) {
-                totalFilterRecords++;
-                break;
-            }
+                try {
+                    result = transformerInfoExec
+                            .getTransformer()
+                            .evaluate(result, transformerInfoExec.getContext(),
+                                    transformerInfoExec.getFinalParas());
+                }
+                catch (Exception e) {
+                    errorMsg = String.format("The transformer(%s) has encountered an exception(%s)",
+                            transformerInfoExec.getTransformerName(),
+                            e.getMessage());
+                    failed = true;
+                    break;
+                }
 
-            long diff = System.nanoTime() - startTs;
-            diffExhaustedTime += diff;
+                if (result == null) {
+                    totalFilterRecords++;
+                    break;
+                }
+
+                long diff = System.nanoTime() - startTs;
+                diffExhaustedTime += diff;
+            }
+        }
+        finally {
+            // restore exactly once per call if any swap happened
+            if (loaderSwapped) {
+                classLoaderSwapper.restoreCurrentThreadClassLoader();
+            }
         }
 
         totalExhaustedTime += diffExhaustedTime;

@@ -125,9 +125,11 @@ public abstract class AbstractRunner
      */
     public void markFail(final Throwable throwable)
     {
-        mark(State.FAILED);
+        // publish timestamp/throwable before the FAILED state so the task-group loop
+        // that observes isFinished() is guaranteed to see them (no lost retry interval)
         this.runnerCommunication.setTimestamp(System.currentTimeMillis());
         this.runnerCommunication.setThrowable(throwable);
+        mark(State.FAILED);
     }
 
     /**

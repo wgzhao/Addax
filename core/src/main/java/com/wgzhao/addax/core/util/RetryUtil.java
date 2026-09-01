@@ -148,13 +148,9 @@ public final class RetryUtil
                 catch (Exception e) {
                     saveException = e;
                     if (null != retryExceptionClass && !retryExceptionClass.isEmpty()) {
-                        boolean needRetry = false;
-                        for (Class<?> eachExceptionClass : retryExceptionClass) {
-                            if (eachExceptionClass == e.getClass()) {
-                                needRetry = true;
-                                break;
-                            }
-                        }
+                        // isAssignableFrom so subclasses of a listed exception also trigger a retry
+                        boolean needRetry = retryExceptionClass.stream()
+                                .anyMatch(eachExceptionClass -> eachExceptionClass.isAssignableFrom(e.getClass()));
                         if (!needRetry) {
                             throw saveException;
                         }
@@ -177,8 +173,10 @@ public final class RetryUtil
                         try {
                             Thread.sleep(timeToSleep);
                         }
-                        catch (InterruptedException ignored) {
-                            // ignore interrupted exception
+                        catch (InterruptedException ie) {
+                            // restore the interrupt and abort retrying instead of sleeping on
+                            Thread.currentThread().interrupt();
+                            throw saveException;
                         }
 
                         long realTimeSleep = System.currentTimeMillis() - startTime;

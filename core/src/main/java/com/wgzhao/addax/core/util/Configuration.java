@@ -100,8 +100,9 @@ public class Configuration
 
     public static Configuration from(File file)
     {
-        try {
-            return Configuration.from(IOUtils.toString(new FileInputStream(file), StandardCharsets.UTF_8));
+        // try-with-resources so the stream is always closed (IOUtils.toString does not close it)
+        try (InputStream is = new FileInputStream(file)) {
+            return Configuration.from(IOUtils.toString(is, StandardCharsets.UTF_8));
         }
         catch (FileNotFoundException e) {
             throw AddaxException.asAddaxException(ErrorCode.CONFIG_ERROR, String.format("No such file: %s", file.getAbsolutePath()));
@@ -207,8 +208,28 @@ public class Configuration
         try {
             return this.findObject(path);
         }
-        catch (Exception e) {
+        catch (MissingConfigException e) {
+            // absent key or out-of-range index: treat as missing
             return null;
+        }
+        catch (IllegalArgumentException e) {
+            // malformed path or wrong intermediate type: fail loudly instead of
+            // silently applying defaults for typos
+            throw AddaxException.asAddaxException(ErrorCode.CONFIG_ERROR,
+                    String.format("Invalid configuration path [%s], reason: %s", path, e.getMessage()));
+        }
+    }
+
+    /**
+     * Signals a missing key or out-of-range index during path navigation,
+     * as opposed to a malformed path.
+     */
+    private static class MissingConfigException
+            extends RuntimeException
+    {
+        MissingConfigException(String message)
+        {
+            super(message);
         }
     }
 
@@ -916,7 +937,7 @@ public class Configuration
 
         Object result = ((Map<String, Object>) target).get(index);
         if (null == result) {
-            throw new IllegalArgumentException("The value of item '" + index + "'is null.");
+            throw new MissingConfigException("The value of item '" + index + "'is null.");
         }
 
         return result;
@@ -934,7 +955,13 @@ public class Configuration
             throw new IllegalArgumentException(String.format("The list subscript must be a numeric type, but the actual type is [%s].", index));
         }
 
-        return ((List<Object>) target).get(Integer.parseInt(index));
+        int i = Integer.parseInt(index);
+        List<Object> list = (List<Object>) target;
+        if (i >= list.size()) {
+            throw new MissingConfigException(String.format("The list index [%d] is out of range, the list size is [%d].", i, list.size()));
+        }
+
+        return list.get(i);
     }
 
     private List<Object> expand(List<Object> list, int size)
