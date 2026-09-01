@@ -86,7 +86,10 @@ public abstract class AbstractScheduler
              */
             Communication nowJobContainerCommunication = this.containerCommunicator.collect();
             nowJobContainerCommunication.setTimestamp(System.currentTimeMillis());
-            LOG.debug(nowJobContainerCommunication.toString());
+            // toString walks every counter via reflection; build it only when debug is on
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(nowJobContainerCommunication.toString());
+            }
 
             long now = System.currentTimeMillis();
             if (now - lastReportTimeStamp > jobReportIntervalInMillSec) {

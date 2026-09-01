@@ -38,6 +38,8 @@ public abstract class AbstractTGContainerCommunicator
         extends AbstractContainerCommunicator
 {
     protected int taskGroupId;
+    // reused scratch instance: collectState runs on the task-group loop thread only
+    private final Communication stateScratch = new Communication();
 
     /** Abstracttgcontainercommunicator. */
     public AbstractTGContainerCommunicator(Configuration configuration)
@@ -62,14 +64,15 @@ public abstract class AbstractTGContainerCommunicator
     @Override
     public final State collectState()
     {
-        Communication communication = new Communication();
-        communication.setState(State.SUCCEEDED);
+        // reuse the scratch instance instead of allocating one per 100ms loop iteration
+        stateScratch.reset();
+        stateScratch.setState(State.SUCCEEDED);
 
         for (Communication taskCommunication : super.getCollector().getTaskCommunicationMap().values()) {
-            communication.mergeStateFrom(taskCommunication);
+            stateScratch.mergeStateFrom(taskCommunication);
         }
 
-        return communication.getState();
+        return stateScratch.getState();
     }
 
     @Override
