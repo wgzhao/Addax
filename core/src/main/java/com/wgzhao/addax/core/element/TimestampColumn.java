@@ -79,10 +79,9 @@ public class TimestampColumn
     @Override
     public Double asDouble()
     {
-       if (null == this.getRawData()) {
-           return null;
-       }
-       return (Double) this.getRawData();
+        // the raw data is a Timestamp, never a Double; converting to epoch millis
+        // would silently change the value's meaning, so fail with a clear error
+        throw AddaxException.asAddaxException(ErrorCode.CONVERT_NOT_SUPPORT, "Timestamp type cannot be converted to Double.");
     }
 
     @Override

@@ -38,7 +38,8 @@ public class StrUtil
 
     private static final long TB_IN_BYTES = 1024 * GB_IN_BYTES;
 
-    private static final DecimalFormat df = new DecimalFormat("0.00");
+    // DecimalFormat is not thread-safe; stringify is reachable from task threads
+    private static final ThreadLocal<DecimalFormat> DF = ThreadLocal.withInitial(() -> new DecimalFormat("0.00"));
 
     private static final Pattern VARIABLE_PATTERN = Pattern.compile("(\\$)\\{?(\\w+)\\}?");
 
@@ -51,16 +52,16 @@ public class StrUtil
     public static String stringify(long byteNumber)
     {
         if (byteNumber / TB_IN_BYTES > 0) {
-            return df.format((double) byteNumber / (double) TB_IN_BYTES) + "TB";
+            return DF.get().format((double) byteNumber / (double) TB_IN_BYTES) + "TB";
         }
         else if (byteNumber / GB_IN_BYTES > 0) {
-            return df.format((double) byteNumber / (double) GB_IN_BYTES) + "GB";
+            return DF.get().format((double) byteNumber / (double) GB_IN_BYTES) + "GB";
         }
         else if (byteNumber / MB_IN_BYTES > 0) {
-            return df.format((double) byteNumber / (double) MB_IN_BYTES) + "MB";
+            return DF.get().format((double) byteNumber / (double) MB_IN_BYTES) + "MB";
         }
         else if (byteNumber / KB_IN_BYTES > 0) {
-            return df.format((double) byteNumber / (double) KB_IN_BYTES) + "KB";
+            return DF.get().format((double) byteNumber / (double) KB_IN_BYTES) + "KB";
         }
         else {
             return byteNumber + "B";

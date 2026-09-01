@@ -116,7 +116,9 @@ public class VMInfo
     {
 
         try {
-            long curUptime = runtimeMXBean.getUptime();
+            // RuntimeMXBean.getUptime() returns millis while ThreadMXBean CPU times
+            // are nanos; convert to nanos so the ratio yields a correct percentage
+            long curUptime = runtimeMXBean.getUptime() * 1_000_000L;
             // Get CPU time by summing all thread CPU times
             long curProcessTime = getTotalThreadCpuTime();
 
@@ -142,8 +144,11 @@ public class VMInfo
                     processGCStatus.gcStatusMap.put(garbage.getName(), gcStatus);
                 }
 
+                // seed the builder with the previous snapshot so the delta is
+                // computed against the last round instead of zero
                 GCStatus.Builder builder = new GCStatus.Builder()
                         .name(gcStatus.name)
+                        .previous(gcStatus)
                         .setCurTotalGcCount(garbage.getCollectionCount())
                         .setCurTotalGcTime(garbage.getCollectionTime());
 
@@ -324,6 +329,23 @@ public class VMInfo
                 this.maxDeltaGCTime = Math.max(maxDeltaGCTime, curDeltaGCTime);
                 this.minDeltaGCTime = (minDeltaGCTime == -1) ?
                         curDeltaGCTime : Math.min(minDeltaGCTime, curDeltaGCTime);
+                return this;
+            }
+
+            /**
+             * Seed the builder with a previous snapshot so deltas and max/min
+             * values carry over across rounds.
+             */
+            public Builder previous(GCStatus previous)
+            {
+                if (previous != null) {
+                    this.totalGCCount = previous.totalGCCount();
+                    this.totalGCTime = previous.totalGCTime();
+                    this.maxDeltaGCCount = previous.maxDeltaGCCount();
+                    this.minDeltaGCCount = previous.minDeltaGCCount();
+                    this.maxDeltaGCTime = previous.maxDeltaGCTime();
+                    this.minDeltaGCTime = previous.minDeltaGCTime();
+                }
                 return this;
             }
 

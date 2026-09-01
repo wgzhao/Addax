@@ -151,9 +151,10 @@ public final class ConfigParser
 
         Configuration coreConfig = Configuration.from(new File(CONF_PATH));
         // apply the environment variables
-        coreConfig.getMap("entry.environment").forEach((k, v) -> {
-            System.setProperty(k, v.toString());
-        });
+        Map<String, Object> environment = coreConfig.getMap("entry.environment");
+        if (environment != null) {
+            environment.forEach((k, v) -> System.setProperty(k, v.toString()));
+        }
         return coreConfig;
     }
 
