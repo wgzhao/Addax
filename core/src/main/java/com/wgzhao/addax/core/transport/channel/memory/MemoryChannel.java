@@ -86,11 +86,15 @@ public class MemoryChannel
         try {
             long startTime = System.nanoTime();
             this.queue.put(r);
-            waitReaderTime.addAndGet(System.nanoTime() - startTime);
+            // blocked waiting for the writer to drain the queue
+            waitWriterTime.addAndGet(System.nanoTime() - startTime);
             memoryBytes.addAndGet(r.getMemorySize());
         }
         catch (InterruptedException ex) {
+            // propagate so the record is not counted as delivered; a silently
+            // swallowed interrupt would leave the reader flag set and lose data
             Thread.currentThread().interrupt();
+            throw new IllegalStateException(ex);
         }
     }
 
@@ -105,7 +109,8 @@ public class MemoryChannel
                 notInsufficient.await(200L, TimeUnit.MILLISECONDS);
             }
             this.queue.addAll(rs);
-            waitReaderTime.addAndGet(System.nanoTime() - startTime);
+            // blocked waiting for the writer to drain the queue
+            waitWriterTime.addAndGet(System.nanoTime() - startTime);
             memoryBytes.addAndGet(bytes);
             notEmpty.signalAll();
         }
@@ -113,7 +118,10 @@ public class MemoryChannel
             throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
         }
         finally {
-            lock.unlock();
+            // lockInterruptibly may throw before the lock is acquired
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
         }
     }
 
@@ -123,6 +131,7 @@ public class MemoryChannel
         try {
             long startTime = System.nanoTime();
             Record r = this.queue.take();
+            // blocked waiting for the reader to fill the queue
             waitReaderTime.addAndGet(System.nanoTime() - startTime);
             memoryBytes.addAndGet(-r.getMemorySize());
             return r;
@@ -144,6 +153,7 @@ public class MemoryChannel
             while (this.queue.drainTo(rs, bufferSize) <= 0) {
                 notEmpty.await(200L, TimeUnit.MILLISECONDS);
             }
+            // blocked waiting for the reader to fill the queue
             waitReaderTime.addAndGet(System.nanoTime() - startTime);
             int bytes = getRecordBytes(rs);
             memoryBytes.addAndGet(-bytes);
@@ -153,7 +163,10 @@ public class MemoryChannel
             throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
         }
         finally {
-            lock.unlock();
+            // lockInterruptibly may throw before the lock is acquired
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
         }
     }
 

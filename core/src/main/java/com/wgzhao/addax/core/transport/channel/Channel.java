@@ -59,6 +59,7 @@ public abstract class Channel
     protected volatile AtomicLong waitReaderTime = new AtomicLong(0);
     protected volatile AtomicLong waitWriterTime = new AtomicLong(0);
     private Communication currentCommunication;
+    private boolean waitCountersRegistered = false;
 
     public Channel(Configuration configuration)
     {
@@ -114,6 +115,7 @@ public abstract class Channel
     {
         this.currentCommunication = communication;
         this.lastCommunication.reset();
+        this.waitCountersRegistered = false;
     }
 
     public void push(Record r)
@@ -179,8 +181,14 @@ public abstract class Channel
         currentCommunication.increaseCounter(CommunicationTool.READ_SUCCEED_RECORDS, recordSize);
         currentCommunication.increaseCounter(CommunicationTool.READ_SUCCEED_BYTES, byteSize);
 
-        currentCommunication.setLongCounter(CommunicationTool.WAIT_READER_TIME, waitReaderTime.get());
-        currentCommunication.setLongCounter(CommunicationTool.WAIT_WRITER_TIME, waitWriterTime.get());
+        // register the live wait-time accumulators once per communication instead of
+        // copying their values on every batch; waitReaderTime is written only by the
+        // pull side and waitWriterTime only by the push side, so live reads are safe
+        if (!waitCountersRegistered) {
+            currentCommunication.putLongCounter(CommunicationTool.WAIT_READER_TIME, waitReaderTime);
+            currentCommunication.putLongCounter(CommunicationTool.WAIT_WRITER_TIME, waitWriterTime);
+            waitCountersRegistered = true;
+        }
 
         boolean isChannelByteSpeedLimit = (this.byteSpeed > 0);
         boolean isChannelRecordSpeedLimit = (this.recordSpeed > 0);
