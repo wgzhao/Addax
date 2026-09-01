@@ -55,8 +55,8 @@ public class AddaxException
     /** Asaddaxexception. */
     public static AddaxException asAddaxException(ErrorCode errorCode, String message, Throwable cause)
     {
-        if (cause instanceof AddaxException) {
-            return (AddaxException) cause;
+        if (cause instanceof AddaxException addaxException) {
+            return addaxException;
         }
         return new AddaxException(errorCode, message, cause);
     }
@@ -64,8 +64,8 @@ public class AddaxException
     /** Asaddaxexception. */
     public static AddaxException asAddaxException(ErrorCode errorCode, Throwable cause)
     {
-        if (cause instanceof AddaxException) {
-            return (AddaxException) cause;
+        if (cause instanceof AddaxException addaxException) {
+            return addaxException;
         }
         return new AddaxException(errorCode, formatCauseMessage(cause), cause);
     }

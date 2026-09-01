@@ -54,7 +54,6 @@ public class MapTransformer
         int columnIndex;
         String code;
         String value;
-        String newValue;
         Column column;
         int scale = 2; //默认精度
 
@@ -85,28 +84,15 @@ public class MapTransformer
         }
 
         try {
-            switch (code) {
-                case "+":
-                    newValue = add(column.asString(), value);
-                    break;
-                case "-":
-                    newValue = subtract(column.asString(), value);
-                    break;
-                case "*":
-                    newValue = multiply(column.asString(), value);
-                    break;
-                case "/":
-                    newValue = divide(column.asString(), value, scale);
-                    break;
-                case "%":
-                    newValue = mod(column.asString(), value);
-                    break;
-                case "^":
-                    newValue = pow(column.asString(), value);
-                    break;
-                default:
-                    throw new RuntimeException("dx_map can't support code:" + code);
-            }
+            String newValue = switch (code) {
+                case "+" -> add(column.asString(), value);
+                case "-" -> subtract(column.asString(), value);
+                case "*" -> multiply(column.asString(), value);
+                case "/" -> divide(column.asString(), value, scale);
+                case "%" -> mod(column.asString(), value);
+                case "^" -> pow(column.asString(), value);
+                default -> throw new RuntimeException("dx_map can't support code:" + code);
+            };
             record.setColumn(columnIndex, new StringColumn(newValue));
             return record;
         }

@@ -100,11 +100,13 @@ public class NullToDefaultTransformer
 
         try {
             // paras[0] should be the parameter JSON string
-            String paramJson = null;
-            if (paras[0] instanceof String) {
-                paramJson = (String) paras[0];
-            } else if (paras[0] instanceof JSONObject) {
-                paramJson = ((JSONObject) paras[0]).toJSONString();
+            String paramJson;
+            if (paras[0] instanceof String s) {
+                paramJson = s;
+            } else if (paras[0] instanceof JSONObject jsonObject) {
+                paramJson = jsonObject.toJSONString();
+            } else {
+                paramJson = null;
             }
 
             if (paramJson == null) {
@@ -141,55 +143,22 @@ public class NullToDefaultTransformer
             return new StringColumn("");
         }
 
-        switch (type.toLowerCase()) {
-            case "string":
-            case "char":
-            case "varchar":
-            case "text":
-                return new StringColumn("");
+        return switch (type.toLowerCase()) {
+            case "string", "char", "varchar", "text" -> new StringColumn("");
 
-            case "int":
-            case "integer":
-            case "tinyint":
-            case "smallint":
-            case "mediumint":
-            case "bigint":
-            case "long":
-                return new LongColumn(0L);
+            case "int", "integer", "tinyint", "smallint", "mediumint", "bigint", "long" -> new LongColumn(0L);
 
-            case "float":
-            case "double":
-            case "decimal":
-            case "numeric":
-            case "real":
-                return new DoubleColumn(0.0);
+            case "float", "double", "decimal", "numeric", "real" -> new DoubleColumn(0.0);
 
-            case "bool":
-            case "boolean":
-                return new BoolColumn(false);
+            case "bool", "boolean" -> new BoolColumn(false);
 
-            case "date":
-            case "datetime":
-            case "timestamp":
-            case "time":
-                return new StringColumn("");
+            case "date", "datetime", "timestamp", "time" -> new StringColumn("");
 
-            case "bytes":
-            case "binary":
-            case "varbinary":
-            case "blob":
-                return new BytesColumn(new byte[0]);
+            case "bytes", "binary", "varbinary", "blob" -> new BytesColumn(new byte[0]);
 
-            case "array":
-            case "json":
-            case "jsonb":
-            case "object":
-            case "objectid":
-            case "java_object":
-                return new StringColumn("");
+            case "array", "json", "jsonb", "object", "objectid", "java_object" -> new StringColumn("");
 
-            default:
-                return new StringColumn("");
-        }
+            default -> new StringColumn("");
+        };
     }
 }

@@ -25,7 +25,6 @@ import org.apache.commons.lang3.time.FastDateFormat;
 
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -87,7 +86,7 @@ class StringCast
         StringCast.datetimeFormat = configuration.getString("common.column.datetimeFormat",  "yyyy-MM-dd HH:mm:ss");
         StringCast.dateFormat = configuration.getString("common.column.dateFormat", "yyyy-MM-dd");
         StringCast.timeFormat = configuration.getString("common.column.timeFormat", "HH:mm:ss");
-        StringCast.extraFormats = configuration.getList("common.column.extraFormats", Collections.emptyList(), String.class);
+        StringCast.extraFormats = configuration.getList("common.column.extraFormats", List.of(), String.class);
         StringCast.timeZone = configuration.getString("common.column.timeZone", "GMT+8");
         StringCast.encoding = configuration.getString("common.column.encoding", "UTF-8");
 
@@ -173,21 +172,17 @@ class DateCast
             return null;
         }
 
-        switch (column.getSubType()) {
-            case DATE:
-                return DateFormatUtils.format(column.asDate(), DateCast.dateFormat,
-                        DateCast.timeZoner);
-            case TIME:
-                return DateFormatUtils.format(column.asDate(), DateCast.timeFormat,
-                        DateCast.timeZoner);
-            case DATETIME:
-                return DateFormatUtils.format(column.asDate(),
-                        DateCast.datetimeFormat, DateCast.timeZoner);
-            default:
-                throw AddaxException
-                        .asAddaxException(ErrorCode.CONVERT_NOT_SUPPORT,
-                                "An unsupported type occurred for the date type. Currently, only DATE/TIME/DATETIME are supported.");
-        }
+        return switch (column.getSubType()) {
+            case DATE -> DateFormatUtils.format(column.asDate(), DateCast.dateFormat,
+                    DateCast.timeZoner);
+            case TIME -> DateFormatUtils.format(column.asDate(), DateCast.timeFormat,
+                    DateCast.timeZoner);
+            case DATETIME -> DateFormatUtils.format(column.asDate(),
+                    DateCast.datetimeFormat, DateCast.timeZoner);
+            default -> throw AddaxException
+                    .asAddaxException(ErrorCode.CONVERT_NOT_SUPPORT,
+                            "An unsupported type occurred for the date type. Currently, only DATE/TIME/DATETIME are supported.");
+        };
     }
 }
 

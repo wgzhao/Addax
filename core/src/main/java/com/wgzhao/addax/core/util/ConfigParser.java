@@ -23,14 +23,14 @@ import com.wgzhao.addax.core.exception.AddaxException;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
@@ -110,12 +110,22 @@ public final class ConfigParser
      *
      * @param configuration {@link Configuration}
      */
+    /**
+     * Bridge the raw Map element type inferred from {@code Map.class} to a
+     * parameterized map list.
+     */
+    @SuppressWarnings("unchecked")
+    private static List<Map<String, Object>> castList(List<Map> list)
+    {
+        return (List<Map<String, Object>>) (List<?>) list;
+    }
+
     private static void upgradeJobConfig(Configuration configuration)
     {
         configuration.getNecessaryValue(JOB_CONTENT);
         if (configuration.getString(JOB_CONTENT).startsWith("[")) {
             // get the first element
-            List<Map> contentList = configuration.getList(JOB_CONTENT, Map.class);
+            List<Map<String, Object>> contentList = castList(configuration.getList(JOB_CONTENT, Map.class));
             if (contentList != null && !contentList.isEmpty()) {
                 configuration.set("job.content", contentList.get(0));
             }
@@ -123,7 +133,7 @@ public final class ConfigParser
         Configuration reader = configuration.getConfiguration(JOB_CONTENT_READER_PARAMETER);
         if (reader != null) {
             if (reader.getString(CONNECTION, "").startsWith("[")) {
-                List<Map> connectionList = configuration.getList(JOB_CONTENT_READER_PARAMETER_CONNECTION, Map.class);
+                List<Map<String, Object>> connectionList = castList(configuration.getList(JOB_CONTENT_READER_PARAMETER_CONNECTION, Map.class));
                 if (connectionList != null && !connectionList.isEmpty()) {
                     reader.set(CONNECTION, connectionList.get(0));
                 }
@@ -137,7 +147,7 @@ public final class ConfigParser
         Configuration writer = configuration.getConfiguration(JOB_CONTENT_WRITER_PARAMETER);
         if (writer != null) {
             if (writer.getString(CONNECTION, "").startsWith("[")) {
-                List<Map> connectionList = configuration.getList(JOB_CONTENT_WRITER_PARAMETER + ".connection", Map.class);
+                List<Map<String, Object>> connectionList = castList(configuration.getList(JOB_CONTENT_WRITER_PARAMETER + ".connection", Map.class));
                 if (connectionList != null && !connectionList.isEmpty()) {
                     writer.set(CONNECTION, connectionList.get(0));
                 }
@@ -183,11 +193,15 @@ public final class ConfigParser
             if (yamlObject == null) {
                 throw AddaxException.asAddaxException(CONFIG_ERROR, "The configure file is empty.");
             }
-            if (yamlObject instanceof Map) {
-                return Configuration.from((Map<String, Object>) yamlObject);
+            if (yamlObject instanceof Map<?, ?> map) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> typedMap = (Map<String, Object>) map;
+                return Configuration.from(typedMap);
             }
-            if (yamlObject instanceof List) {
-                return Configuration.from((List<Object>) yamlObject);
+            if (yamlObject instanceof List<?> list) {
+                @SuppressWarnings("unchecked")
+                List<Object> typedList = (List<Object>) list;
+                return Configuration.from(typedList);
             }
             throw AddaxException.asAddaxException(CONFIG_ERROR,
                     "The configuration is incorrect. The configuration you provided is not in valid YAML format: top-level node must be a map or list.");
@@ -203,7 +217,7 @@ public final class ConfigParser
         String jobContent;
 
         try {
-            jobContent = FileUtils.readFileToString(new File(jobResource), StandardCharsets.UTF_8);
+            jobContent = Files.readString(Path.of(jobResource));
         }
         catch (IOException e) {
             throw AddaxException.asAddaxException(CONFIG_ERROR, "Failed to obtain job configuration:" + jobResource, e);
@@ -257,7 +271,7 @@ public final class ConfigParser
 
     private static void validateJob(Configuration conf)
     {
-        final Map content = conf.getMap(JOB_CONTENT);
+        final Map<String, Object> content = conf.getMap(JOB_CONTENT);
         String[] validPaths = new String[] {JOB_CONTENT_READER, JOB_CONTENT_WRITER, JOB_CONTENT_READER_NAME,
                 JOB_CONTENT_READER_PARAMETER, JOB_CONTENT_WRITER_NAME, JOB_CONTENT_WRITER_PARAMETER};
 

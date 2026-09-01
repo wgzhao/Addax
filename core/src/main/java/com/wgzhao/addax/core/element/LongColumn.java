@@ -136,10 +136,8 @@ public class LongColumn
     @Override
     public Timestamp asTimestamp()
     {
-        if (this.getRawData() instanceof BigInteger) {
-            BigInteger b = (BigInteger) this.getRawData();
-            long l = b.longValue();
-            return new Timestamp(l);
+        if (this.getRawData() instanceof BigInteger b) {
+            return new Timestamp(b.longValue());
         }
         else {
             return new Timestamp((Long) this.getRawData());

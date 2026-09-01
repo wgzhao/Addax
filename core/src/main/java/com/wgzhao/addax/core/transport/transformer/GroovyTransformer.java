@@ -75,7 +75,7 @@ public class GroovyTransformer
         GroovyClassLoader loader = new GroovyClassLoader(GroovyTransformer.class.getClassLoader());
         String groovyRule = getGroovyRule(code, extraPackage);
 
-        Class groovyClass;
+        Class<?> groovyClass;
         try {
             groovyClass = loader.parseClass(groovyRule);
         }
@@ -86,12 +86,12 @@ public class GroovyTransformer
 
         try {
             Object t = groovyClass.getConstructor().newInstance();
-            if (!(t instanceof Transformer)) {
+            if (!(t instanceof Transformer transformer)) {
                 throw AddaxException.asAddaxException(
                         RUNTIME_ERROR,
                         "Addax bug! ");
             }
-            this.groovyTransformer = (Transformer) t;
+            this.groovyTransformer = transformer;
         }
         catch (Throwable ex) {
             throw AddaxException.asAddaxException(
@@ -109,13 +109,15 @@ public class GroovyTransformer
                 }
             }
         }
-        sb.append("import static com.wgzhao.addax.core.transport.transformer.GroovyTransformerStaticUtil.*;");
-        sb.append("import com.wgzhao.addax.core.element.*;");
-        sb.append("import com.wgzhao.addax.core.exception.AddaxException;");
-        sb.append("import com.wgzhao.addax.core.transport.transformer.Transformer;");
-        sb.append("import java.util.*;");
-        sb.append("public class RULE extends Transformer").append("{");
-        sb.append("public Record evaluate(Record record, Object... paras) {");
+        sb.append("""
+                import static com.wgzhao.addax.core.transport.transformer.GroovyTransformerStaticUtil.*;
+                import com.wgzhao.addax.core.element.*;
+                import com.wgzhao.addax.core.exception.AddaxException;
+                import com.wgzhao.addax.core.transport.transformer.Transformer;
+                import java.util.*;
+                public class RULE extends Transformer {
+                public Record evaluate(Record record, Object... paras) {
+                """);
         sb.append(expression);
         sb.append("}}");
 

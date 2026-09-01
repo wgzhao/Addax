@@ -82,27 +82,17 @@ public class FilterTransformer
         Column column = record.getColumn(columnIndex);
 
         try {
-            switch (code) {
-                case "like":
-                    return doLike(record, value, column);
-                case "not like":
-                    return doNotLike(record, value, column);
-                case ">":
-                    return doGreat(record, value, column, false);
-                case "<":
-                    return doLess(record, value, column, false);
-                case "=":
-                case "==":
-                    return doEqual(record, value, column);
-                case "!=":
-                    return doNotEqual(record, value, column);
-                case ">=":
-                    return doGreat(record, value, column, true);
-                case "<=":
-                    return doLess(record, value, column, true);
-                default:
-                    throw new RuntimeException("dx_filter code:" + code + " is unsupported");
-            }
+            return switch (code) {
+                case "like" -> doLike(record, value, column);
+                case "not like" -> doNotLike(record, value, column);
+                case ">" -> doGreat(record, value, column, false);
+                case "<" -> doLess(record, value, column, false);
+                case "=", "==" -> doEqual(record, value, column);
+                case "!=" -> doNotEqual(record, value, column);
+                case ">=" -> doGreat(record, value, column, true);
+                case "<=" -> doLess(record, value, column, true);
+                default -> throw new RuntimeException("dx_filter code:" + code + " is unsupported");
+            };
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(

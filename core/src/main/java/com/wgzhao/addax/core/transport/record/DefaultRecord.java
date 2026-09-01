@@ -26,6 +26,7 @@ import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.util.ClassSize;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -158,8 +159,6 @@ public class DefaultRecord
         }
 
         int needToExpand = totalSize - columns.size();
-        while (needToExpand-- > 0) {
-            this.columns.add(null);
-        }
+        this.columns.addAll(Collections.nCopies(needToExpand, null));
     }
 }

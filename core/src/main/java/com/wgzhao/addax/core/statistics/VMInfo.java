@@ -98,13 +98,18 @@ public class VMInfo
 
     public String toString()
     {
-        return "The machine info  => \n\n"
-                + "\tosInfo: \t" + osInfo + "\n"
-                + "\tjvmInfo:\t" + jvmInfo + "\n"
-                + "\tcpu num:\t" + totalProcessorCount + "\n\n"
-                + startPhyOSStatus.toString() + "\n"
-                + processGCStatus + "\n"
-                + processMemoryStatus + "\n";
+        return """
+                The machine info  =>
+
+                \tosInfo: \t%s
+                \tjvmInfo:\t%s
+                \tcpu num:\t%d
+
+                %s
+                %s
+                %s
+                """.formatted(osInfo, jvmInfo, totalProcessorCount,
+                startPhyOSStatus.toString(), processGCStatus, processMemoryStatus);
     }
 
     public String totalString()
@@ -136,13 +141,8 @@ public class VMInfo
 
             // Update GC statistics
             for (GarbageCollectorMXBean garbage : garbageCollectorMXBeanList) {
-                GCStatus gcStatus = processGCStatus.gcStatusMap.get(garbage.getName());
-                if (gcStatus == null) {
-                    gcStatus = new GCStatus.Builder()
-                            .name(garbage.getName())
-                            .build();
-                    processGCStatus.gcStatusMap.put(garbage.getName(), gcStatus);
-                }
+                GCStatus gcStatus = processGCStatus.gcStatusMap.computeIfAbsent(garbage.getName(),
+                        name -> new GCStatus.Builder().name(name).build());
 
                 // seed the builder with the previous snapshot so the delta is
                 // computed against the last round instead of zero
@@ -188,15 +188,8 @@ public class VMInfo
     {
         if (memoryPoolMXBeanList != null && !memoryPoolMXBeanList.isEmpty()) {
             memoryPoolMXBeanList.forEach(pool -> {
-                var memoryStatus = processMemoryStatus.memoryStatusMap.get(pool.getName());
-                if (memoryStatus == null) {
-                    memoryStatus = MemoryStatus.create(
-                            pool.getName(),
-                            pool.getUsage().getInit(),
-                            pool.getUsage().getMax()
-                    );
-                    processMemoryStatus.memoryStatusMap.put(pool.getName(), memoryStatus);
-                }
+                MemoryStatus memoryStatus = processMemoryStatus.memoryStatusMap.computeIfAbsent(pool.getName(),
+                        name -> MemoryStatus.create(name, pool.getUsage().getInit(), pool.getUsage().getMax()));
 
                 processMemoryStatus.memoryStatusMap.put(
                         pool.getName(),
