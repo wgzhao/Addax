@@ -33,9 +33,11 @@ import com.wgzhao.addax.core.transport.transformer.TransformerExecution;
 import com.wgzhao.addax.core.util.container.CoreConstant;
 import org.apache.commons.lang3.Validate;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 
@@ -44,16 +46,15 @@ public class BufferedRecordTransformerExchanger
         implements RecordSender, RecordReceiver
 {
 
-    private static Class<? extends Record> RECORD_CLASS;
     protected final int byteCapacity;
     private final Channel channel;
     private final List<Record> buffer;
     private final AtomicInteger memoryBytes = new AtomicInteger(0);
+    private final Supplier<Record> recordFactory;
     private int bufferSize;
     private int bufferIndex = 0;
     private volatile boolean shutdown = false;
 
-    @SuppressWarnings("unchecked")
     public BufferedRecordTransformerExchanger(int taskGroupId, int taskId,
             Channel channel, Communication communication,
             TaskPluginCollector pluginCollector,
@@ -73,22 +74,36 @@ public class BufferedRecordTransformerExchanger
         this.byteCapacity = configuration.getInt(
                 CoreConstant.CORE_TRANSPORT_CHANNEL_CAPACITY_BYTE, 8 * 1024 * 1024);
 
-        try {
-            BufferedRecordTransformerExchanger.RECORD_CLASS = ((Class<? extends Record>) Class
-                    .forName(configuration.getString(
-                            CoreConstant.CORE_TRANSPORT_RECORD_CLASS,
-                            "com.wgzhao.addax.core.transport.record.DefaultRecord")));
-        }
-        catch (Exception e) {
-            throw AddaxException.asAddaxException(CONFIG_ERROR, e);
-        }
+        this.recordFactory = createRecordFactory(configuration);
     }
 
     @Override
     public Record createRecord()
     {
+        return recordFactory.get();
+    }
+
+    /**
+     * Resolve the record class once and cache its no-arg constructor so the
+     * per-record creation path does no reflection lookups.
+     */
+    private static Supplier<Record> createRecordFactory(Configuration configuration)
+    {
         try {
-            return BufferedRecordTransformerExchanger.RECORD_CLASS.getConstructor().newInstance();
+            @SuppressWarnings("unchecked")
+            Class<? extends Record> recordClass = (Class<? extends Record>) Class
+                    .forName(configuration.getString(
+                            CoreConstant.CORE_TRANSPORT_RECORD_CLASS,
+                            "com.wgzhao.addax.core.transport.record.DefaultRecord"));
+            Constructor<? extends Record> constructor = recordClass.getConstructor();
+            return () -> {
+                try {
+                    return constructor.newInstance();
+                }
+                catch (ReflectiveOperationException e) {
+                    throw AddaxException.asAddaxException(CONFIG_ERROR, e);
+                }
+            };
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(CONFIG_ERROR, e);
@@ -186,6 +201,7 @@ public class BufferedRecordTransformerExchanger
     {
         this.channel.pullAll(this.buffer);
         this.bufferIndex = 0;
-        this.bufferSize = this.buffer.size();
+        // do not overwrite bufferSize: it is the configured flush threshold for
+        // the sender side, not the size of the last drained batch
     }
 }
