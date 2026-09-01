@@ -708,27 +708,26 @@ public class Configuration
 
     void getKeysRecursive(Object current, String path, Set<String> collect)
     {
-        boolean isRegularElement = !(current instanceof Map || current instanceof List);
-        if (isRegularElement) {
+        if (!(current instanceof Map || current instanceof List)) {
             collect.add(path);
             return;
         }
 
-        boolean isMap = current instanceof Map;
-        if (isMap) {
-            Map<String, Object> mapping = ((Map<String, Object>) current);
-            mapping.keySet().forEach(key -> {
+        if (current instanceof Map<?, ?> mapping) {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> map = (Map<String, Object>) mapping;
+            map.keySet().forEach(key -> {
                 if (StringUtils.isBlank(path)) {
-                    getKeysRecursive(mapping.get(key), key.trim(), collect);
+                    getKeysRecursive(map.get(key), key.trim(), collect);
                 }
                 else {
-                    getKeysRecursive(mapping.get(key), path + "." + key.trim(), collect);
+                    getKeysRecursive(map.get(key), path + "." + key.trim(), collect);
                 }
             });
             return;
         }
 
-        List<Object> lists = (List<Object>) current;
+        List<?> lists = (List<?>) current;
         for (int i = 0; i < lists.size(); i++) {
             getKeysRecursive(lists.get(i), path + String.format("[%d]", i), collect);
         }
@@ -753,22 +752,24 @@ public class Configuration
 
     private Object extractConfiguration(Object object)
     {
-        if (object instanceof Configuration) {
-            return extractFromConfiguration(object);
+        if (object instanceof Configuration configuration) {
+            return extractFromConfiguration(configuration);
         }
 
-        if (object instanceof List) {
+        if (object instanceof List<?> list) {
             List<Object> result = new ArrayList<>();
-            for (Object each : (List<Object>) object) {
+            for (Object each : list) {
                 result.add(extractFromConfiguration(each));
             }
             return result;
         }
 
-        if (object instanceof Map) {
+        if (object instanceof Map<?, ?> map) {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> typed = (Map<String, Object>) map;
             Map<String, Object> result = new HashMap<>();
-            for (String key : ((Map<String, Object>) object).keySet()) {
-                result.put(key, extractFromConfiguration(((Map<String, Object>) object).get(key)));
+            for (String key : typed.keySet()) {
+                result.put(key, extractFromConfiguration(typed.get(key)));
             }
             return result;
         }
@@ -778,8 +779,8 @@ public class Configuration
 
     private Object extractFromConfiguration(Object object)
     {
-        if (object instanceof Configuration) {
-            return ((Configuration) object).getInternal();
+        if (object instanceof Configuration configuration) {
+            return configuration.getInternal();
         }
 
         return object;
@@ -834,15 +835,16 @@ public class Configuration
             Map<String, Object> mapping;
 
             // the current is not a map, so we replace it with a map and return the new map object
-            boolean isCurrentMap = current instanceof Map;
-            if (!isCurrentMap) {
+            if (!(current instanceof Map)) {
                 mapping = new HashMap<>();
                 mapping.put(path, buildObject(paths.subList(index + 1, paths.size()), value));
                 return mapping;
             }
 
             // the current is a map, but the key does not exist, so we need to insert the object and return the map
-            mapping = ((Map<String, Object>) current);
+            @SuppressWarnings("unchecked")
+            Map<String, Object> currentMap = (Map<String, Object>) current;
+            mapping = currentMap;
             boolean hasSameKey = mapping.containsKey(path);
             if (!hasSameKey) {
                 mapping.put(path, buildObject(paths.subList(index + 1, paths.size()), value));
@@ -861,8 +863,7 @@ public class Configuration
             int listIndexer = getIndex(path);
 
             // 当前是list，直接新建并返回即可
-            boolean isCurrentList = current instanceof List;
-            if (!isCurrentList) {
+            if (!(current instanceof List)) {
                 lists = expand(new ArrayList<>(), listIndexer + 1);
                 lists.set(listIndexer, buildObject(paths.subList(index + 1, paths.size()), value));
                 return lists;
@@ -973,7 +974,7 @@ public class Configuration
 
     private List<String> split2List(String path)
     {
-        return Arrays.asList(StringUtils.split(split(path), "."));
+        return List.of(StringUtils.split(split(path), "."));
     }
 
     private void checkPath(String path)

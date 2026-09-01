@@ -25,14 +25,13 @@ import com.wgzhao.addax.core.transport.transformer.TransformerExecutionParas;
 import com.wgzhao.addax.core.transport.transformer.TransformerInfo;
 import com.wgzhao.addax.core.transport.transformer.TransformerRegistry;
 import com.wgzhao.addax.core.util.container.CoreConstant;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -110,7 +109,7 @@ public class TransformerUtil
                                 "the codeFile [" + codeFile + "]does not exists or is unreadable!");
                     }
                     try {
-                        code = FileUtils.readFileToString(file, Charset.defaultCharset());
+                        code = Files.readString(file.toPath());
                     }
                     catch (IOException e) {
                         throw AddaxException.asAddaxException(IO_ERROR,
@@ -147,7 +146,7 @@ public class TransformerUtil
                                 "the codeFile [" + codeFile + "]does not exists or is unreadable!");
                     }
                     try {
-                        code = FileUtils.readFileToString(file, Charset.defaultCharset());
+                        code = Files.readString(file.toPath());
                     }
                     catch (IOException e) {
                         throw AddaxException.asAddaxException(IO_ERROR,

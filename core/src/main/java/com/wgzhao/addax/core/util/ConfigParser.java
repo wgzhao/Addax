@@ -23,14 +23,14 @@ import com.wgzhao.addax.core.exception.AddaxException;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
@@ -192,11 +192,15 @@ public final class ConfigParser
             if (yamlObject == null) {
                 throw AddaxException.asAddaxException(CONFIG_ERROR, "The configure file is empty.");
             }
-            if (yamlObject instanceof Map) {
-                return Configuration.from((Map<String, Object>) yamlObject);
+            if (yamlObject instanceof Map<?, ?> map) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> typedMap = (Map<String, Object>) map;
+                return Configuration.from(typedMap);
             }
-            if (yamlObject instanceof List) {
-                return Configuration.from((List<Object>) yamlObject);
+            if (yamlObject instanceof List<?> list) {
+                @SuppressWarnings("unchecked")
+                List<Object> typedList = (List<Object>) list;
+                return Configuration.from(typedList);
             }
             throw AddaxException.asAddaxException(CONFIG_ERROR,
                     "The configuration is incorrect. The configuration you provided is not in valid YAML format: top-level node must be a map or list.");
@@ -212,7 +216,7 @@ public final class ConfigParser
         String jobContent;
 
         try {
-            jobContent = FileUtils.readFileToString(new File(jobResource), StandardCharsets.UTF_8);
+            jobContent = Files.readString(Path.of(jobResource));
         }
         catch (IOException e) {
             throw AddaxException.asAddaxException(CONFIG_ERROR, "Failed to obtain job configuration:" + jobResource, e);
