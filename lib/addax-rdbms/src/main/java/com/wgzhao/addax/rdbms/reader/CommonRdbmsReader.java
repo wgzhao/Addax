@@ -188,6 +188,11 @@ public class CommonRdbmsReader
         // per-column metadata of the ResultSet currently being read; all values are
         // row-invariant and are materialized once per ResultSet instead of per row
         private ResultSetMetaData cachedMetaData;
+
+        // TIME(6) sub-second read state: once the driver fails to return LocalTime,
+        // stop probing it on later rows and warn about the lost precision once
+        private boolean localTimeProbeFailed;
+        private boolean localTimeFallbackWarned;
         private int[] cachedColTypes;
         private boolean[] cachedSigned;
         private int[] cachedScales;
@@ -390,12 +395,13 @@ public class CommonRdbmsReader
                 case Types.REAL:
                 case Types.DOUBLE:
                     return new DoubleColumn(rs.getString(i));
-                case Types.TIME:
+                case Types.TIME: {
                     java.sql.Time time = rs.getTime(i);
                     int nanos = 0;
-                    // ask the driver for the sub-second component only when the column
-                    // actually declares fractional digits, avoiding a second fetch per row
-                    if (cachedScales[i] > 0) {
+                    // some drivers (MySQL Connector/J) report scale 0 for TIME(6) columns, so the
+                    // fractional digits cannot be detected from metadata; probe LocalTime per cell
+                    // and stop probing only after the driver proved it cannot return one
+                    if (!localTimeProbeFailed) {
                         try {
                             java.time.LocalTime lt = rs.getObject(i, java.time.LocalTime.class);
                             if (lt != null) {
@@ -403,11 +409,18 @@ public class CommonRdbmsReader
                             }
                         }
                         catch (SQLException | AbstractMethodError | RuntimeException e) {
-                            // driver cannot return LocalTime for this column; millis-only value
-                            LOG.debug("Failed to read LocalTime of column {}: {}", i, e.getMessage());
+                            // driver cannot return LocalTime for TIME columns; keep the millisecond
+                            // value from now on and report the lost precision once per task
+                            localTimeProbeFailed = true;
+                            if (!localTimeFallbackWarned) {
+                                localTimeFallbackWarned = true;
+                                LOG.warn("The JDBC driver cannot return java.time.LocalTime for TIME columns; "
+                                        + "sub-second digits will be lost: {}", e.getMessage());
+                            }
                         }
                     }
                     return new DateColumn(time, nanos, cachedScales[i]);
+                }
                 case Types.DATE:
                     return new DateColumn(rs.getDate(i));
                 case Types.TIMESTAMP:
