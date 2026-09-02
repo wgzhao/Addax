@@ -168,12 +168,11 @@ public class CommonRdbmsReader
     {
         private static final Logger LOG = LoggerFactory.getLogger(Task.class);
         private static final int SQL_LOG_MAX_LENGTH = 256;
-        private static final Calendar CALENDAR_INSTANCE = Calendar.getInstance();
-
-        /**
-         * Empty byte array constant used for string encoding operations when source bytes are null
-         */
-        protected final byte[] EMPTY_CHAR_ARRAY = new byte[0];
+        // Calendar is not thread-safe while reader tasks run in parallel, so each
+        // thread converts timestamps with its own instance of the default timezone
+        private static final ThreadLocal<Calendar> CALENDAR_INSTANCE = ThreadLocal.withInitial(Calendar::getInstance);
+        // compared against every BIGINT UNSIGNED cell, so it must not be re-allocated per row
+        private static final BigInteger BIGINT_LONG_MAX = BigInteger.valueOf(Long.MAX_VALUE);
 
         private final DataBaseType dataBaseType;
         private final int taskGroupId;
@@ -185,6 +184,16 @@ public class CommonRdbmsReader
         private String mandatoryEncoding;
 
         private String basicMsg;
+
+        // per-column metadata of the ResultSet currently being read; all values are
+        // row-invariant and are materialized once per ResultSet instead of per row
+        private ResultSetMetaData cachedMetaData;
+        private int[] cachedColTypes;
+        private boolean[] cachedSigned;
+        private int[] cachedScales;
+        private int[] cachedPrecisions;
+        private String[] cachedTypeNames;
+        private String[] cachedColumnNames;
 
         /**
          * Creates a new Task instance for the specified database type.
@@ -329,25 +338,25 @@ public class CommonRdbmsReader
         protected Column createColumn(ResultSet rs, ResultSetMetaData metaData, int i)
                 throws SQLException, UnsupportedEncodingException
         {
-            int colType = metaData.getColumnType(i);
-            String colTypeName = metaData.getColumnTypeName(i);
+            if (cachedMetaData != metaData) {
+                cacheColumnMetaData(metaData);
+            }
+            int colType = cachedColTypes[i];
             switch (colType) {
                 case Types.CHAR:
                 case Types.NCHAR:
                 case Types.VARCHAR:
                 case Types.LONGVARCHAR:
                 case Types.NVARCHAR:
-                case Types.LONGNVARCHAR: {
-                    byte[] rawBytes = rs.getBytes(i);
-                    String rawData;
+                case Types.LONGNVARCHAR:
                     if (StringUtils.isBlank(mandatoryEncoding)) {
-                        rawData = rs.getString(i);
+                        // read the string directly when no explicit encoding is required,
+                        // avoiding a redundant getBytes round trip
+                        return new StringColumn(rs.getString(i));
                     }
-                    else {
-                        rawData = new String((rawBytes == null ? EMPTY_CHAR_ARRAY : rawBytes), mandatoryEncoding);
-                    }
-                    return new StringColumn(rawData);
-                }
+                    byte[] rawBytes = rs.getBytes(i);
+                    // a SQL NULL stays NULL instead of being decoded into an empty string
+                    return new StringColumn(rawBytes == null ? null : new String(rawBytes, mandatoryEncoding));
                 case Types.CLOB:
                 case Types.NCLOB:
                     return new StringColumn(rs.getString(i));
@@ -356,13 +365,13 @@ public class CommonRdbmsReader
                 case Types.INTEGER:
                     return new LongColumn(rs.getString(i));
                 case Types.BIGINT:
-                    if (!metaData.isSigned(i)) {
+                    if (!cachedSigned[i]) {
                         // BIGINT UNSIGNED may exceed Long.MAX_VALUE (9223372036854775807);
                         // store as StringColumn to preserve full precision
                         String raw = rs.getString(i);
                         if (raw != null) {
                             BigInteger bi = new BigInteger(raw);
-                            if (bi.compareTo(BigInteger.valueOf(Long.MAX_VALUE)) > 0) {
+                            if (bi.compareTo(BIGINT_LONG_MAX) > 0) {
                                 return new StringColumn(raw);
                             }
                             return new LongColumn(bi);
@@ -379,49 +388,101 @@ public class CommonRdbmsReader
                 case Types.TIME:
                     java.sql.Time time = rs.getTime(i);
                     int nanos = 0;
-                    int precision = metaData.getScale(i);
-                    try {
-                        java.time.LocalTime lt = rs.getObject(i, java.time.LocalTime.class);
-                        if (lt != null) {
-                            nanos = lt.getNano();
+                    // ask the driver for the sub-second component only when the column
+                    // actually declares fractional digits, avoiding a second fetch per row
+                    if (cachedScales[i] > 0) {
+                        try {
+                            java.time.LocalTime lt = rs.getObject(i, java.time.LocalTime.class);
+                            if (lt != null) {
+                                nanos = lt.getNano();
+                            }
                         }
-                    } catch (SQLException | AbstractMethodError e) {
-                        // JDBC driver doesn't support getObject(int, Class); fallback to millis-only
+                        catch (SQLException | AbstractMethodError | RuntimeException e) {
+                            // driver cannot return LocalTime for this column; millis-only value
+                            LOG.debug("Failed to read LocalTime of column {}: {}", i, e.getMessage());
+                        }
                     }
-                    return new DateColumn(time, nanos, precision);
+                    return new DateColumn(time, nanos, cachedScales[i]);
                 case Types.DATE:
                     return new DateColumn(rs.getDate(i));
                 case Types.TIMESTAMP:
-                    return new TimestampColumn(rs.getTimestamp(i, CALENDAR_INSTANCE));
+                    return new TimestampColumn(rs.getTimestamp(i, CALENDAR_INSTANCE.get()));
                 case Types.BINARY:
                 case Types.VARBINARY:
                 case Types.BLOB:
                 case Types.LONGVARBINARY:
                     return new BytesColumn(rs.getBytes(i));
                 case Types.BOOLEAN:
-                    return new BoolColumn(rs.getBoolean(i));
+                    return newBoolColumn(rs, i);
                 case Types.BIT:
                     // bit(1) -> Types.BIT  use BooleanColumn
                     // bit(>1) -> Types.VARBINARY use BytesColumn
-                    if (metaData.getPrecision(i) == 1) {
-                        return new BoolColumn(rs.getBoolean(i));
+                    if (cachedPrecisions[i] == 1) {
+                        return newBoolColumn(rs, i);
                     }
-                    else {
-                        return new BytesColumn(rs.getBytes(i));
-                    }
+                    return new BytesColumn(rs.getBytes(i));
 
                 case Types.ARRAY:
                     return new StringColumn(Objects.isNull(rs.getObject(i)) ? null : rs.getArray(i).toString());
-                case Types.SQLXML:
-                    return new StringColumn(rs.getSQLXML(i).getString());
+                case Types.SQLXML: {
+                    var xml = rs.getSQLXML(i);
+                    // getString on a NULL SQLXML throws, so keep the SQL NULL as a null column
+                    return new StringColumn(xml == null ? null : xml.getString());
+                }
                 default:
-                    LOG.debug("Unknown data type: {} (typeName: {}) at field name: {}, using getObject().", colType, colTypeName, metaData.getColumnName(i));
+                    LOG.debug("Unknown data type: {} (typeName: {}) at field name: {}, using getObject().",
+                            colType, cachedTypeNames[i], cachedColumnNames[i]);
                     String stringData = null;
                     if (rs.getObject(i) != null) {
                         stringData = rs.getObject(i).toString();
                     }
                     return new StringColumn(stringData);
             }
+        }
+
+        /**
+         * getBoolean cannot distinguish a SQL NULL from false, so the wasNull flag decides
+         * between a null and a boolean column.
+         */
+        private Column newBoolColumn(ResultSet rs, int i)
+                throws SQLException
+        {
+            boolean boolValue = rs.getBoolean(i);
+            if (rs.wasNull()) {
+                return new BoolColumn((Boolean) null);
+            }
+            return new BoolColumn(boolValue);
+        }
+
+        /**
+         * Materializes the row-invariant column metadata of a ResultSet once, so that the
+         * per-row conversion loop never polls ResultSetMetaData for every cell.
+         */
+        private void cacheColumnMetaData(ResultSetMetaData metaData)
+                throws SQLException
+        {
+            int columnCount = metaData.getColumnCount();
+            int[] colTypes = new int[columnCount + 1];
+            boolean[] signed = new boolean[columnCount + 1];
+            int[] scales = new int[columnCount + 1];
+            int[] precisions = new int[columnCount + 1];
+            String[] typeNames = new String[columnCount + 1];
+            String[] columnNames = new String[columnCount + 1];
+            for (int i = 1; i <= columnCount; i++) {
+                colTypes[i] = metaData.getColumnType(i);
+                signed[i] = metaData.isSigned(i);
+                scales[i] = metaData.getScale(i);
+                precisions[i] = metaData.getPrecision(i);
+                typeNames[i] = metaData.getColumnTypeName(i);
+                columnNames[i] = metaData.getColumnName(i);
+            }
+            this.cachedMetaData = metaData;
+            this.cachedColTypes = colTypes;
+            this.cachedSigned = signed;
+            this.cachedScales = scales;
+            this.cachedPrecisions = precisions;
+            this.cachedTypeNames = typeNames;
+            this.cachedColumnNames = columnNames;
         }
 
         /**
