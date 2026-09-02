@@ -342,8 +342,8 @@ public class SingleTableSplitUtil
         String middleSqlTemplate = isString ? "%s >= '%s' AND %s < '%s'" : "%s >= %s AND %s < %s";
         String lastSqlTemplate = isString ? "%s >= '%s' AND %s <= '%s'" : "%s >= %s AND %s <= %s";
 
-        Object min = minMaxPackage.getMin();
-        Object max = minMaxPackage.getMax();
+        Object min = isString ? escapeSqlLiteral(String.valueOf(minMaxPackage.getMin())) : minMaxPackage.getMin();
+        Object max = isString ? escapeSqlLiteral(String.valueOf(minMaxPackage.getMax())) : minMaxPackage.getMax();
         if (rangeValues.isEmpty()) {
             rangeSql.add(String.format(singleSqlTemplate, pkName, min, pkName, max));
             return rangeSql;
@@ -351,7 +351,9 @@ public class SingleTableSplitUtil
 
         var allPoints = new ArrayList<>(rangeValues.size() + 1);
         allPoints.add(min);
-        allPoints.addAll(rangeValues);
+        // split points of string keys are already generated from a safe character set,
+        // but escape them too in case a future generator emits raw key data
+        rangeValues.forEach(v -> allPoints.add(isString ? escapeSqlLiteral(String.valueOf(v)) : v));
 
         for (int i = 0; i < allPoints.size() - 1; i++) {
             rangeSql.add(String.format(middleSqlTemplate, pkName, allPoints.get(i), pkName, allPoints.get(i + 1)));
@@ -360,6 +362,15 @@ public class SingleTableSplitUtil
         rangeSql.add(String.format(lastSqlTemplate, pkName, allPoints.get(allPoints.size() - 1), pkName, max));
 
         return rangeSql;
+    }
+
+    /**
+     * Doubles embedded single quotes so the value can be embedded in a SQL string literal.
+     * min/max of a string split key come straight from table data and may contain quotes.
+     */
+    private static String escapeSqlLiteral(String value)
+    {
+        return value.replace("'", "''");
     }
 
     private static boolean isLongType(int type)
