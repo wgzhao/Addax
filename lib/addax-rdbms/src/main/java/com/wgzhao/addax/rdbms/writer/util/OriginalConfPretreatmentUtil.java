@@ -48,9 +48,6 @@ import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 public final class OriginalConfPretreatmentUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger(OriginalConfPretreatmentUtil.class);
-    // The database type used for processing configurations
-    /** The Databasetype. */
-    public static DataBaseType dataBaseType;
     private static final String jdbcUrlPath = Key.CONNECTION + "." + Key.JDBC_URL;
 
     private OriginalConfPretreatmentUtil()
@@ -78,8 +75,8 @@ public final class OriginalConfPretreatmentUtil
         }
 
         doCheckBatchSize(originalConfig);
-        simplifyConf(originalConfig);
-        dealColumnConf(originalConfig);
+        simplifyConf(originalConfig, dataBaseType);
+        dealColumnConf(originalConfig, dataBaseType);
         dealWriteMode(originalConfig, dataBaseType);
     }
 
@@ -104,8 +101,9 @@ public final class OriginalConfPretreatmentUtil
      * Processes JDBC URL, driver settings, and table expansion.
      *
      * @param originalConfig The configuration to simplify
+     * @param dataBaseType the database type, passed in instead of being shared statically
      */
-    public static void simplifyConf(Configuration originalConfig)
+    public static void simplifyConf(Configuration originalConfig, DataBaseType dataBaseType)
     {
         Configuration connConf = originalConfig.getConfiguration(Key.CONNECTION);
 
@@ -144,8 +142,9 @@ public final class OriginalConfPretreatmentUtil
      * Handles column expansion, validation against table schema, and duplicate checking.
      *
      * @param originalConfig The configuration containing column settings
+     * @param dataBaseType the database type for column quoting
      */
-    public static void dealColumnConf(Configuration originalConfig)
+    public static void dealColumnConf(Configuration originalConfig, DataBaseType dataBaseType)
     {
         String jdbcUrl = originalConfig.getString(jdbcUrlPath);
         String username = originalConfig.getString(Key.USERNAME);
