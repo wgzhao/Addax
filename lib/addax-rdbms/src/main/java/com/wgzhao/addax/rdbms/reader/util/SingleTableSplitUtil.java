@@ -184,31 +184,18 @@ public class SingleTableSplitUtil
             while (DBUtil.asyncResultSetNext(rs)) {
                 minMaxPackage.setMin(rs.getObject(1));
                 minMaxPackage.setMax(rs.getObject(2));
+                // count of NULL split keys gathered from the same scan
+                Object nullCount = rs.getObject(3);
+                if (nullCount != null && ((Number) nullCount).longValue() > 0) {
+                    LOG.info("the split key has null value.");
+                    configuration.set("pkExistsNull", true);
+                }
             }
-
-            checkForNullValues(configuration, conn, splitPK, table, where);
 
             return minMaxPackage;
         }
         catch (AddaxException e) {
             throw e;
-        }
-        catch (Exception e) {
-            throw AddaxException.asAddaxException(CONFIG_ERROR, "Failed to split the table.", e);
-        }
-    }
-
-    private static void checkForNullValues(Configuration configuration, Connection conn, String splitPK, String table, String where)
-    {
-        String nullCheckSql = StringUtils.isBlank(where)
-                ? "SELECT count(*) FROM " + table + " WHERE " + splitPK + " IS NULL"
-                : "SELECT count(*) FROM " + table + " WHERE " + where + " AND " + splitPK + " IS NULL";
-
-        try (ResultSet rs = DBUtil.query(conn, nullCheckSql, 1)) {
-            if (rs.next() && rs.getInt(1) > 0) {
-                LOG.info("the split key has null value.");
-                configuration.set("pkExistsNull", true);
-            }
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(CONFIG_ERROR, "Failed to split the table.", e);
@@ -386,7 +373,9 @@ public class SingleTableSplitUtil
     }
 
     /**
-     * Generates SQL query to get the minimum and maximum values of the primary key column.
+     * Generates SQL query to get the minimum and maximum values of the primary key column
+     * plus the count of NULL split keys in a single table scan.
+     * MIN/MAX ignore NULL values by themselves, so no IS NOT NULL predicate is needed.
      *
      * @param splitPK The primary key column name (should be properly quoted)
      * @param table The table name to query
@@ -395,10 +384,12 @@ public class SingleTableSplitUtil
      */
     public static String genPKSql(String splitPK, String table, String where)
     {
-        String pkRangeSQL = String.format("SELECT MIN(%s), MAX(%s) FROM %s", splitPK, splitPK, table);
+        String pkRangeSQL = String.format(
+                "SELECT MIN(%s), MAX(%s), SUM(CASE WHEN %s IS NULL THEN 1 ELSE 0 END) FROM %s",
+                splitPK, splitPK, splitPK, table);
 
         if (StringUtils.isNotBlank(where)) {
-            return String.format("%s WHERE (%s AND %s IS NOT NULL)", pkRangeSQL, where, splitPK);
+            return String.format("%s WHERE (%s)", pkRangeSQL, where);
         }
 
         return pkRangeSQL;
