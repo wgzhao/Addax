@@ -327,9 +327,6 @@ public class CommonRdbmsWriter
         /** Write mode (INSERT, REPLACE, UPDATE, etc.) */
         protected String writeMode;
 
-        /** Whether to treat empty strings as NULL values */
-        protected boolean emptyAsNull;
-
         /** logs the sub-second truncation fallback only once per task */
         private boolean subsecondFallbackWarned;
 
@@ -379,7 +376,6 @@ public class CommonRdbmsWriter
             this.batchByteSize = writerSliceConfig.getInt(Key.BATCH_BYTE_SIZE, Constant.DEFAULT_BATCH_BYTE_SIZE);
 
             writeMode = writerSliceConfig.getString(Key.WRITE_MODE, "INSERT");
-            emptyAsNull = writerSliceConfig.getBool(Key.EMPTY_AS_NULL, true);
             insertOrReplaceTemplate = writerSliceConfig.getString(Constant.INSERT_OR_REPLACE_TEMPLATE_MARK);
             this.writeRecordSql = String.format(insertOrReplaceTemplate, this.table);
 
