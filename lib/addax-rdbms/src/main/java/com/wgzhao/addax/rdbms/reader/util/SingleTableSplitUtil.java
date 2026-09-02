@@ -93,7 +93,7 @@ public class SingleTableSplitUtil
             return pluginParams;
         }
 
-        var rangeList = genPkRangeSQLForGeneric(dataBaseType, splitPkName, table, where, configuration, adviceNum);
+        var rangeList = genPkRangeSQLForGeneric(dataBaseType, splitPkName, configuration, adviceNum);
 
         if (rangeList.isEmpty()) {
             //mean the split key only has null value
@@ -217,13 +217,11 @@ public class SingleTableSplitUtil
      *
      * @param dataBaseType The database type for generating appropriate queries
      * @param splitPK The primary key column name to use for splitting
-     * @param table The table name to split
-     * @param where Optional WHERE clause to filter data
      * @param configuration Configuration containing connection details
      * @param adviceNum The number of splits to create
      * @return List of WHERE clause conditions for each split, or empty list if splitting not possible
      */
-    public static List<String> genPkRangeSQLForGeneric(DataBaseType dataBaseType, String splitPK, String table, String where, Configuration configuration, int adviceNum)
+    public static List<String> genPkRangeSQLForGeneric(DataBaseType dataBaseType, String splitPK, Configuration configuration, int adviceNum)
     {
         if (adviceNum == 1) {
             return new ArrayList<>();
@@ -242,7 +240,13 @@ public class SingleTableSplitUtil
             return genAllTypePkRangeWhereClause(splitPK, pkMinAndMaxValue, rangeValue);
         }
 
-        String splitSql = genSplitPointSql(splitPK, table, where, adviceNum, dataBaseType, pkMinAndMaxValue);
+        // string split keys: equidistant midpoints keep the slices balanced without a
+        // sampling query (the former ORDER BY RAND() path was unreachable for this type)
+        List<Object> splitPoints = calculateStringSplitPoints(
+                pkMinAndMaxValue.getMin().toString(),
+                pkMinAndMaxValue.getMax().toString(),
+                adviceNum - 1);
+        String splitSql = buildStringSplitPointQuery(splitPK, dataBaseType, splitPoints);
         String jdbcURL = configuration.getString(Key.JDBC_URL);
         String username = configuration.getString(Key.USERNAME);
         String password = configuration.getString(Key.PASSWORD);
@@ -266,66 +270,6 @@ public class SingleTableSplitUtil
 
         LOG.debug(JSON.toJSONString(rangeValue));
         return genAllTypePkRangeWhereClause(splitPK, pkMinAndMaxValue, rangeValue);
-    }
-
-    /**
-     * Generate SQL that get the split points, whose points is the boundary of the split
-     * we can use math algorithm to get the split points, but it causes the data skew when the
-     * split key is not uniform distributed. So we use the random algorithm to get the split points
-     *
-     * @param splitPK the split key
-     * @param table the table name
-     * @param whereSql the where clause
-     * @param adviceNum the number of splits
-     * @param dataBaseType the database type
-     * @param minMaxPack {@link MinMaxPackage}
-     * @return the SQL string that gets the split points
-     */
-    private static String genSplitPointSql(String splitPK, String table, String whereSql, int adviceNum, DataBaseType dataBaseType, MinMaxPackage minMaxPack)
-    {
-        if (minMaxPack.getType() == MinMaxPackage.PkType.STRING) {
-            // For string type, we'll calculate the split points directly instead of using ORDER BY RAND()
-            List<Object> splitPoints = calculateStringSplitPoints(
-                    minMaxPack.getMin().toString(),
-                    minMaxPack.getMax().toString(),
-                    adviceNum - 1);
-
-            // Store the calculated split points in configuration for use later
-            return buildStringSplitPointQuery(splitPK, dataBaseType, splitPoints);
-        }
-
-        if (StringUtils.isBlank(whereSql)) {
-            whereSql = " WHERE 1=1 ";
-        }
-        else {
-            whereSql = "WHERE (" + whereSql + ") AND " + splitPK + " > " + minMaxPack.getMin() + " AND " + splitPK + "<" + minMaxPack.getMax();
-        }
-
-        return switch (dataBaseType) {
-            case Oracle -> String.format("""
-                            select %1$s from (
-                                select %1$s from %2$s %3$s order by DBMS_RANDOM.VALUE
-                            ) where rownum < %4$d order by %1$s""",
-                    splitPK, table, whereSql, adviceNum);
-
-            case SQLServer, Sybase -> String.format("""
-                            select %1$s from (
-                                select top %4$d %1$s from %2$s %3$s order by newid()
-                            ) t order by %1$s""",
-                    splitPK, table, whereSql, adviceNum - 1);
-
-            case PostgreSQL, SQLite -> String.format("""
-                            select %1$s from (
-                                select %1$s from %2$s %3$s order by random() limit %4$d
-                            ) t order by %1$s""",
-                    splitPK, table, whereSql, adviceNum - 1);
-
-            default -> String.format("""
-                            select %1$s from (
-                                select %1$s from %2$s %3$s order by rand() limit %4$d
-                            ) t order by %1$s""",
-                    splitPK, table, whereSql, adviceNum - 1);
-        };
     }
 
     /**

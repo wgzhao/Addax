@@ -100,6 +100,9 @@ public enum DataBaseType
 
     private static final Pattern jdbcUrlPattern = Pattern.compile("jdbc:[\\w-]+:(?:thin:url=|//|thin:@|)([\\w\\d.,]+).*");
 
+    /** Digit-only column names are never quoted */
+    private static final Pattern DIGIT_ONLY = Pattern.compile("\\d+");
+
     private String driverClassName;
     private final String typeName;
 
@@ -202,49 +205,53 @@ public enum DataBaseType
         return jdbc;
     }
 
-    /** Quotecolumnname. */
+    /**
+     * Quotes a column name only when needed (reserved word, digit-only, etc.).
+     *
+     * @param columnName the column name to quote; null returns null
+     * @return the quoted or original column name
+     */
     public String quoteColumnName(String columnName) {
         return quoteColumnName(columnName, false);
     }
 
     /**
      * Quotes column names according to database-specific conventions.
-     * Handles reserved words, special characters, and null values appropriately.
+     * When forceQuote is false, only reserved words, digit-only names and
+     * already-quoted names are touched, so ordinary identifiers stay as-is.
      *
-     * @param columnName The column name to quote
-     * @return Properly quoted column name or original if no quoting needed
+     * @param columnName the column name to quote; null returns null
+     * @param forceQuote quote unconditionally
+     * @return the properly quoted column name, or the original if no quoting is needed
      */
     public String quoteColumnName(String columnName, boolean forceQuote)
     {
+        if (columnName == null || columnName.length() < 2) {
+            return columnName;
+        }
         if (forceQuote) {
             String quoted = quoteColumn(columnName);
             return quoted != null ? quoted : columnName;
         }
+        // If the column already has quote characters or is a wildcard, return directly
         String quoteChar = "'`\"";
-        // If the column is not a reserved word, it's a constant value
-        if (!SQL_RESERVED_WORDS.contains(columnName.toUpperCase())) {
-            return columnName;
-        }
-        // If the column already has quote characters, return directly
-        if (quoteChar.contains(String.valueOf(columnName.charAt(0)))) {
-            return columnName;
-        }
-        if ("*".equals(columnName)) {
-            return columnName;
-        }
-        // If the column consists of only numbers, return directly
-        if (columnName.matches("\\d+")) {
+        if (quoteChar.contains(String.valueOf(columnName.charAt(0))) || "*".equals(columnName)) {
             return columnName;
         }
         // If the column is null string, means use null as column value
         if ("null".equalsIgnoreCase(columnName)) {
             return columnName;
         }
-        String columnName1 = quoteColumn(columnName);
-        if (columnName1 != null) {
-            return columnName1;
+        // If the column consists of only numbers, return directly
+        if (DIGIT_ONLY.matcher(columnName).matches()) {
+            return columnName;
         }
-        return columnName;
+        // If the column is not a reserved word, no quoting is needed
+        if (!SQL_RESERVED_WORDS.contains(columnName.toUpperCase())) {
+            return columnName;
+        }
+        String columnName1 = quoteColumn(columnName);
+        return columnName1 != null ? columnName1 : columnName;
     }
 
     private String quoteColumn(String columnName)
@@ -261,7 +268,12 @@ public enum DataBaseType
         return null;
     }
 
-    /** Unquote. */
+    /**
+     * Removes the surrounding quotes of a quoted identifier, if any.
+     *
+     * @param field the identifier to unquote
+     * @return the identifier without its surrounding quote characters
+     */
     public String unQuote(String field) {
         if (field == null || field.length() < 2) {
             return field;

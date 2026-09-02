@@ -405,17 +405,6 @@ public final class DBUtil
     }
 
     /**
-     * Retrieves all column names for a specified table.
-     *
-     * @param dataBaseType Database type
-     * @param jdbcUrl JDBC URL for connection
-     * @param user Database username
-     * @param pass Database password
-     * @param tableName Name of the table to query
-     * @return List of column names in the table
-     * @throws AddaxException if connection or query fails
-     */
-    /**
      * Returns the column names of a table.
      *
      * @param dataBaseType the database type
