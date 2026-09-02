@@ -79,7 +79,6 @@ public class CommonRdbmsWriter
         public Job(DataBaseType dataBaseType)
         {
             this.dataBaseType = dataBaseType;
-            OriginalConfPretreatmentUtil.dataBaseType = this.dataBaseType;
         }
 
         /**
@@ -281,10 +280,10 @@ public class CommonRdbmsWriter
         private static final BigDecimal BIGINT_UNSIGNED_MAX = new BigDecimal("18446744073709551615");
 
         /** Basic message template for logging context information */
-        protected static String basicMessage;
+        protected String basicMessage;
 
         /** Template for INSERT/REPLACE SQL statements */
-        protected static String insertOrReplaceTemplate;
+        protected String insertOrReplaceTemplate;
 
         /** Database type for this task */
         protected DataBaseType dataBaseType;
