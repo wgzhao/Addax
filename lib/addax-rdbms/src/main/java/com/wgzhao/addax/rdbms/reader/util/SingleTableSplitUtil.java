@@ -104,10 +104,16 @@ public class SingleTableSplitUtil
         }
 
         StringJoiner allQuerySql = new StringJoiner("\n");
+        // wrap the user where clause in parentheses so that a top-level OR inside it cannot
+        // swallow the appended range predicates (AND binds tighter than OR in SQL)
+        String queryPrefix = hasWhere
+                ? String.format(Constant.QUERY_SQL_TEMPLATE, column, table, "(" + where + ")")
+                : buildQuerySql(column, table, null);
+        String rangeSeparator = hasWhere ? " AND " : " WHERE ";
 
         for (String range : rangeList) {
             var tempConfig = configuration.clone();
-            var tempQuerySql = buildQuerySql(column, table, where) + (hasWhere ? " AND " : " WHERE ") + range;
+            var tempQuerySql = queryPrefix + rangeSeparator + range;
 
             allQuerySql.add(tempQuerySql);
             tempConfig.set(Key.QUERY_SQL, tempQuerySql);
@@ -116,9 +122,7 @@ public class SingleTableSplitUtil
 
         if (configuration.getBool("pkExistsNull", false)) {
             var tempConfig = configuration.clone();
-            var tempQuerySql = buildQuerySql(column, table, where)
-                    + (hasWhere ? " AND " : " WHERE ")
-                    + splitPkName + " IS NULL";
+            var tempQuerySql = queryPrefix + rangeSeparator + splitPkName + " IS NULL";
             allQuerySql.add(tempQuerySql);
             tempConfig.set(Key.QUERY_SQL, tempQuerySql);
             pluginParams.add(tempConfig);
@@ -180,31 +184,18 @@ public class SingleTableSplitUtil
             while (DBUtil.asyncResultSetNext(rs)) {
                 minMaxPackage.setMin(rs.getObject(1));
                 minMaxPackage.setMax(rs.getObject(2));
+                // count of NULL split keys gathered from the same scan
+                Object nullCount = rs.getObject(3);
+                if (nullCount != null && ((Number) nullCount).longValue() > 0) {
+                    LOG.info("the split key has null value.");
+                    configuration.set("pkExistsNull", true);
+                }
             }
-
-            checkForNullValues(configuration, conn, splitPK, table, where);
 
             return minMaxPackage;
         }
         catch (AddaxException e) {
             throw e;
-        }
-        catch (Exception e) {
-            throw AddaxException.asAddaxException(CONFIG_ERROR, "Failed to split the table.", e);
-        }
-    }
-
-    private static void checkForNullValues(Configuration configuration, Connection conn, String splitPK, String table, String where)
-    {
-        String nullCheckSql = StringUtils.isBlank(where)
-                ? "SELECT count(*) FROM " + table + " WHERE " + splitPK + " IS NULL"
-                : "SELECT count(*) FROM " + table + " WHERE " + where + " AND " + splitPK + " IS NULL";
-
-        try (ResultSet rs = DBUtil.query(conn, nullCheckSql, 1)) {
-            if (rs.next() && rs.getInt(1) > 0) {
-                LOG.info("the split key has null value.");
-                configuration.set("pkExistsNull", true);
-            }
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(CONFIG_ERROR, "Failed to split the table.", e);
@@ -295,8 +286,8 @@ public class SingleTableSplitUtil
         String middleSqlTemplate = isString ? "%s >= '%s' AND %s < '%s'" : "%s >= %s AND %s < %s";
         String lastSqlTemplate = isString ? "%s >= '%s' AND %s <= '%s'" : "%s >= %s AND %s <= %s";
 
-        Object min = minMaxPackage.getMin();
-        Object max = minMaxPackage.getMax();
+        Object min = isString ? escapeSqlLiteral(String.valueOf(minMaxPackage.getMin())) : minMaxPackage.getMin();
+        Object max = isString ? escapeSqlLiteral(String.valueOf(minMaxPackage.getMax())) : minMaxPackage.getMax();
         if (rangeValues.isEmpty()) {
             rangeSql.add(String.format(singleSqlTemplate, pkName, min, pkName, max));
             return rangeSql;
@@ -304,7 +295,9 @@ public class SingleTableSplitUtil
 
         var allPoints = new ArrayList<>(rangeValues.size() + 1);
         allPoints.add(min);
-        allPoints.addAll(rangeValues);
+        // split points of string keys are already generated from a safe character set,
+        // but escape them too in case a future generator emits raw key data
+        rangeValues.forEach(v -> allPoints.add(isString ? escapeSqlLiteral(String.valueOf(v)) : v));
 
         for (int i = 0; i < allPoints.size() - 1; i++) {
             rangeSql.add(String.format(middleSqlTemplate, pkName, allPoints.get(i), pkName, allPoints.get(i + 1)));
@@ -313,6 +306,15 @@ public class SingleTableSplitUtil
         rangeSql.add(String.format(lastSqlTemplate, pkName, allPoints.get(allPoints.size() - 1), pkName, max));
 
         return rangeSql;
+    }
+
+    /**
+     * Doubles embedded single quotes so the value can be embedded in a SQL string literal.
+     * min/max of a string split key come straight from table data and may contain quotes.
+     */
+    private static String escapeSqlLiteral(String value)
+    {
+        return value.replace("'", "''");
     }
 
     private static boolean isLongType(int type)
@@ -326,7 +328,9 @@ public class SingleTableSplitUtil
     }
 
     /**
-     * Generates SQL query to get the minimum and maximum values of the primary key column.
+     * Generates SQL query to get the minimum and maximum values of the primary key column
+     * plus the count of NULL split keys in a single table scan.
+     * MIN/MAX ignore NULL values by themselves, so no IS NOT NULL predicate is needed.
      *
      * @param splitPK The primary key column name (should be properly quoted)
      * @param table The table name to query
@@ -335,10 +339,12 @@ public class SingleTableSplitUtil
      */
     public static String genPKSql(String splitPK, String table, String where)
     {
-        String pkRangeSQL = String.format("SELECT MIN(%s), MAX(%s) FROM %s", splitPK, splitPK, table);
+        String pkRangeSQL = String.format(
+                "SELECT MIN(%s), MAX(%s), SUM(CASE WHEN %s IS NULL THEN 1 ELSE 0 END) FROM %s",
+                splitPK, splitPK, splitPK, table);
 
         if (StringUtils.isNotBlank(where)) {
-            return String.format("%s WHERE (%s AND %s IS NOT NULL)", pkRangeSQL, where, splitPK);
+            return String.format("%s WHERE (%s)", pkRangeSQL, where);
         }
 
         return pkRangeSQL;
@@ -392,9 +398,12 @@ public class SingleTableSplitUtil
                 return min; // They're equal, can't create a midpoint
             }
 
-            // Return a value with length between min and max
+            // min is a prefix of max: pad min with a printable filler up to a length strictly
+            // between the two, so the result stays inside (min, max). A filler below max's next
+            // character keeps the value below max; any filler keeps it above min (longer).
             int targetLength = (int) (minChars.length + fraction * (maxChars.length - minChars.length));
-            return new String(minChars, 0, targetLength);
+            char padChar = maxChars[minChars.length] > '0' ? '0' : (char) Math.max(' ', maxChars[minChars.length] - 1);
+            return min + String.valueOf(padChar).repeat(targetLength - minChars.length);
         }
 
         // Create a result array based on minChars

@@ -95,7 +95,8 @@ public class GetPrimaryKeyUtil
             }
         }
         catch (SQLException e) {
-            LOG.debug(e.getMessage());
+            // a broken probe query must not fail silently: report why no split key was found
+            LOG.warn("Failed to detect the split key of table {}: {}", table, e.getMessage());
             return null;
         }
 
@@ -206,7 +207,7 @@ public class GetPrimaryKeyUtil
                         """.formatted(schemaExpr, tableName);
             }
             case ClickHouse -> {
-                var schemaExpr = schema == null ? "SELECT currentDatabase()) " : "'" + schema + "'";
+                var schemaExpr = schema == null ? "(SELECT currentDatabase()) " : "'" + schema + "'";
                 yield """
                         SELECT name as column_name, type as column_type, 'PRI' as key_type
                         FROM system.columns
@@ -260,8 +261,8 @@ public class GetPrimaryKeyUtil
                         JOIN systypes t ON c.usertype = t.usertype
                     WHERE
                         o.name = '%s'
-                        AND (i.status & 2 = 2 OR i.status & 2048 = 2048) ")
-                        AND (SELECT COUNT(*) FROM sysindexkeys k WHERE k.id = i.id AND k.indid = i.indid) = 1 ")
+                        AND (i.status & 2 = 2 OR i.status & 2048 = 2048)
+                        AND (SELECT COUNT(*) FROM sysindexkeys k WHERE k.id = i.id AND k.indid = i.indid) = 1
                         AND o.uid = USER_ID('%s')
                     ORDER BY
                         CASE WHEN i.status & 2048 = 2048 THEN 0 ELSE 1 END,  t.name
