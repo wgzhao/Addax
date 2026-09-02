@@ -472,8 +472,8 @@ public final class DBUtil
         try (var statement = conn.createStatement()) {
             // Build query SQL based on database type
             String queryColumnSql;
-            if (DataBaseType.TDengine.getDriverClassName().equals(conn.getMetaData().getDriverName())) {
-                // TDengine does not support "1=2" clause
+            if (isTdengineConnection(conn)) {
+                // TDengine does not support the "1=2" clause
                 queryColumnSql = "SELECT " + column + " FROM " + tableName + " LIMIT 0";
             }
             else {
@@ -662,6 +662,24 @@ public final class DBUtil
     {
         SQLStatementParser statementParser = SQLParserUtils.createSQLStatementParser(sql, dataBaseType.getTypeName());
         statementParser.parseStatementList();
+    }
+
+    /**
+     * Whether the given connection is served by a TDengine driver.
+     * getDriverName() reports a display name such as "TSDB JDBC Driver", not the class
+     * name, so detection also covers the class names of the native and RESTful taos
+     * drivers and the connection implementation class.
+     */
+    private static boolean isTdengineConnection(Connection conn)
+            throws SQLException
+    {
+        String driverName = conn.getMetaData().getDriverName();
+        String driverNameLower = driverName == null ? "" : driverName.toLowerCase();
+        return "com.taosdata.jdbc.TSDBDriver".equals(driverName)
+                || "com.taosdata.jdbc.rs.RestfulDriver".equals(driverName)
+                || driverNameLower.contains("taos")
+                || driverNameLower.contains("tdengine")
+                || conn.getClass().getName().startsWith("com.taosdata");
     }
 
     /**
