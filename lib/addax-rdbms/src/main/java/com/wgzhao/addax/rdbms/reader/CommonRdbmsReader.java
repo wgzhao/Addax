@@ -313,6 +313,11 @@ public class CommonRdbmsReader
                 int columnNumber, TaskPluginCollector taskPluginCollector)
         {
             Record record = buildRecord(recordSender, rs, metaData, columnNumber, taskPluginCollector);
+            if (record == null) {
+                // the row already failed conversion and was reported via collectDirtyRecord,
+                // so it must not be forwarded (sendToWriter rejects null records)
+                return;
+            }
             recordSender.sendToWriter(record);
         }
 
