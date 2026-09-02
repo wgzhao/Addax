@@ -45,12 +45,9 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
@@ -330,6 +327,18 @@ public class CommonRdbmsWriter
         protected List<Map<String, Object>> resultSetMetaData;
 
         /**
+         * whether each configured column belongs to the merge key (Oracle/SQLServer update mode).
+         * Computed once per task so batch inserts never re-parse the write mode or re-match keys.
+         */
+        private boolean[] mergeKeyPositions;
+
+        /**
+         * column indexes that reorder a record to the merge template parameter order:
+         * key columns first, then non-key columns, then all columns again
+         */
+        private int[] mergeRecordOrder;
+
+        /**
          * Constructs a new Task instance for the specified database type.
          *
          * @param dataBaseType The database type this task will operate on
@@ -404,19 +413,24 @@ public class CommonRdbmsWriter
             if ((this.dataBaseType == DataBaseType.Oracle || this.dataBaseType == DataBaseType.SQLServer)
                     && !"insert".equalsIgnoreCase(this.writeMode)) {
                 LOG.info("write {} using {} mode", this.dataBaseType, this.writeMode);
+                String[] keyColumns = WriterUtil.getStrings(this.writeMode);
                 List<String> columnsOne = new ArrayList<>();
                 List<String> columnsTwo = new ArrayList<>();
-                String merge = this.writeMode;
-                String[] sArray = WriterUtil.getStrings(merge);
-                for (String s : this.columns) {
-                    if (Arrays.asList(sArray).contains(s)) {
-                        columnsOne.add(s);
+                this.mergeKeyPositions = new boolean[this.columns.size()];
+                for (int k = 0; k < this.columns.size(); k++) {
+                    String column = this.columns.get(k);
+                    if (WriterUtil.isKeyColumn(keyColumns, column)) {
+                        columnsOne.add(column);
+                        this.mergeKeyPositions[k] = true;
+                    }
+                    else {
+                        columnsTwo.add(column);
                     }
                 }
-                for (String s : this.columns) {
-                    if (!Arrays.asList(sArray).contains(s)) {
-                        columnsTwo.add(s);
-                    }
+                if (columnsOne.isEmpty()) {
+                    throw AddaxException.asAddaxException(CONFIG_ERROR,
+                            "None of the configured columns matches the update key columns declared in writeMode ["
+                                    + this.writeMode + "], configured columns: " + StringUtils.join(this.columns, ","));
                 }
                 int i = 0;
                 for (String column : columnsOne) {
@@ -425,6 +439,22 @@ public class CommonRdbmsWriter
                 for (String column : columnsTwo) {
                     mergeColumns.add(i++, column);
                 }
+                // the merge template binds key columns, then non-key columns, then all columns again
+                List<Integer> order = new ArrayList<>(this.columns.size() * 2);
+                for (int k = 0; k < this.columns.size(); k++) {
+                    if (this.mergeKeyPositions[k]) {
+                        order.add(k);
+                    }
+                }
+                for (int k = 0; k < this.columns.size(); k++) {
+                    if (!this.mergeKeyPositions[k]) {
+                        order.add(k);
+                    }
+                }
+                for (int k = 0; k < this.columns.size(); k++) {
+                    order.add(k);
+                }
+                this.mergeRecordOrder = order.stream().mapToInt(Integer::intValue).toArray();
             }
             mergeColumns.addAll(this.columns);
 
@@ -546,33 +576,11 @@ public class CommonRdbmsWriter
                     connection.setAutoCommit(false);
                 }
                 preparedStatement = connection.prepareStatement(writeRecordSql);
-                if ((this.dataBaseType == DataBaseType.Oracle || this.dataBaseType == DataBaseType.SQLServer)
-                        && !"insert".equalsIgnoreCase(writeMode)) {
-                    String[] sArray = WriterUtil.getStrings(this.writeMode);
-                    Set<String> mergeKeySet = new HashSet<>(java.util.Arrays.asList(sArray));
+                if (mergeRecordOrder != null) {
+                    // Oracle/SQLServer update: reorder each record to the merge parameter order
+                    // computed once in startWriteWithConnection
                     for (Record record : buffer) {
-                        List<Column> recordOne = new ArrayList<>(this.columns.size() * 2);
-                        // key columns first
-                        for (int j = 0; j < this.columns.size(); j++) {
-                            String col = columns.get(j);
-                            if (mergeKeySet.contains(col)) {
-                                recordOne.add(record.getColumn(j));
-                            }
-                        }
-                        // non-key columns next
-                        for (int j = 0; j < this.columns.size(); j++) {
-                            String col = columns.get(j);
-                            if (!mergeKeySet.contains(col)) {
-                                recordOne.add(record.getColumn(j));
-                            }
-                        }
-                        // all columns again for update placeholders
-                        for (int j = 0; j < this.columns.size(); j++) {
-                            recordOne.add(record.getColumn(j));
-                        }
-                        for (int j = 0; j < recordOne.size(); j++) {
-                            record.setColumn(j, recordOne.get(j));
-                        }
+                        reorderRecord(record, mergeRecordOrder);
                         preparedStatement = fillPreparedStatement(preparedStatement, record);
                         preparedStatement.addBatch();
                     }
@@ -601,6 +609,22 @@ public class CommonRdbmsWriter
             }
             finally {
                 DBUtil.closeDBResources(preparedStatement, null);
+            }
+        }
+
+        /**
+         * Reorders the columns of a record in place according to the given index order.
+         * The original columns are read into a temporary list first, because setColumn
+         * overwrites positions that later indexes may still reference.
+         */
+        private static void reorderRecord(Record record, int[] order)
+        {
+            List<Column> reordered = new ArrayList<>(order.length);
+            for (int pos : order) {
+                reordered.add(record.getColumn(pos));
+            }
+            for (int j = 0; j < reordered.size(); j++) {
+                record.setColumn(j, reordered.get(j));
             }
         }
 

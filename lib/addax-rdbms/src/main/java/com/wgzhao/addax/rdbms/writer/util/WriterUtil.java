@@ -280,7 +280,7 @@ public final class WriterUtil
         for (int i = 0; i < columnHolders.size(); i++) {
             String columnHolder = columnHolders.get(i);
             // If this is a key column used for matching records
-            if (Arrays.stream(keyColumns).anyMatch(s -> s.equalsIgnoreCase(columnHolder))) {
+            if (isKeyColumn(keyColumns, columnHolder)) {
                 if (!isFirstKeyColumn) {
                     mergeSql.append(", ");
                     joinCondition.append(" AND ");
@@ -304,7 +304,7 @@ public final class WriterUtil
         boolean isFirstUpdateColumn = true;
         for (int i = 0; i < columnHolders.size(); i++) {
             String columnHolder = columnHolders.get(i);
-            if (Arrays.stream(keyColumns).noneMatch(s -> s.equalsIgnoreCase(columnHolder))) {
+            if (!isKeyColumn(keyColumns, columnHolder)) {
                 if (!isFirstUpdateColumn) {
                     updateClause.append(", ");
                 }
@@ -335,6 +335,42 @@ public final class WriterUtil
         merge = merge.replace(")", "");
         merge = merge.replace(" ", "");
         return merge.split(",");
+    }
+
+    /**
+     * Whether the column takes part in the merge/update key matching.
+     * Column names expanded from a "*" wildcard come back quoted ("ID", [ID]) and keys may
+     * differ in case, so both sides are compared unquoted and case-insensitively.
+     *
+     * @param keyColumns the key columns parsed from the write mode
+     * @param columnName the column to test
+     * @return true when the column matches one of the keys
+     */
+    public static boolean isKeyColumn(String[] keyColumns, String columnName)
+    {
+        if (columnName == null) {
+            return false;
+        }
+        String normalized = unquoteColumnName(columnName);
+        for (String key : keyColumns) {
+            if (unquoteColumnName(key).equalsIgnoreCase(normalized)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static String unquoteColumnName(String name)
+    {
+        String trimmed = name.trim();
+        if (trimmed.length() >= 2) {
+            char first = trimmed.charAt(0);
+            char last = trimmed.charAt(trimmed.length() - 1);
+            if ((first == '`' && last == '`') || (first == '"' && last == '"') || (first == '[' && last == ']')) {
+                return trimmed.substring(1, trimmed.length() - 1);
+            }
+        }
+        return trimmed;
     }
 
     /**
