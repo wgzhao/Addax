@@ -104,10 +104,16 @@ public class SingleTableSplitUtil
         }
 
         StringJoiner allQuerySql = new StringJoiner("\n");
+        // wrap the user where clause in parentheses so that a top-level OR inside it cannot
+        // swallow the appended range predicates (AND binds tighter than OR in SQL)
+        String queryPrefix = hasWhere
+                ? String.format(Constant.QUERY_SQL_TEMPLATE, column, table, "(" + where + ")")
+                : buildQuerySql(column, table, null);
+        String rangeSeparator = hasWhere ? " AND " : " WHERE ";
 
         for (String range : rangeList) {
             var tempConfig = configuration.clone();
-            var tempQuerySql = buildQuerySql(column, table, where) + (hasWhere ? " AND " : " WHERE ") + range;
+            var tempQuerySql = queryPrefix + rangeSeparator + range;
 
             allQuerySql.add(tempQuerySql);
             tempConfig.set(Key.QUERY_SQL, tempQuerySql);
@@ -116,9 +122,7 @@ public class SingleTableSplitUtil
 
         if (configuration.getBool("pkExistsNull", false)) {
             var tempConfig = configuration.clone();
-            var tempQuerySql = buildQuerySql(column, table, where)
-                    + (hasWhere ? " AND " : " WHERE ")
-                    + splitPkName + " IS NULL";
+            var tempQuerySql = queryPrefix + rangeSeparator + splitPkName + " IS NULL";
             allQuerySql.add(tempQuerySql);
             tempConfig.set(Key.QUERY_SQL, tempQuerySql);
             pluginParams.add(tempConfig);
