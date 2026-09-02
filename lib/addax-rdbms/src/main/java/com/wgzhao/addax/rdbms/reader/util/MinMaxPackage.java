@@ -17,6 +17,7 @@
 
 package com.wgzhao.addax.rdbms.reader.util;
 
+import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -170,12 +171,19 @@ public class MinMaxPackage
         }
         List<Object> result = new java.util.ArrayList<>();
         if (isLong()) {
-            long min = Long.parseLong(this.min.toString());
-            long max = Long.parseLong(this.max.toString());
-            long step = (max - min) / splitNum;
+            // MIN/MAX of an UNSIGNED BIGINT may exceed Long.MAX_VALUE and the span of two
+            // sparse extremes can overflow a long, so compute the split points in BigInteger
+            BigInteger min = new BigInteger(this.min.toString());
+            BigInteger max = new BigInteger(this.max.toString());
+            BigInteger step = max.subtract(min).divide(BigInteger.valueOf(splitNum));
+            if (step.signum() == 0) {
+                // the span is smaller than the requested number of slices; one whole-range
+                // slice is safer than degenerate empty slices (mirrors the FLOAT branch)
+                return result;
+            }
             // exclude min and max
             for (long i = 1; i < splitNum; i++) {
-                result.add(min + i * step);
+                result.add(min.add(step.multiply(BigInteger.valueOf(i))));
             }
             return result;
         }

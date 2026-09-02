@@ -448,9 +448,12 @@ public class SingleTableSplitUtil
                 return min; // They're equal, can't create a midpoint
             }
 
-            // Return a value with length between min and max
+            // min is a prefix of max: pad min with a printable filler up to a length strictly
+            // between the two, so the result stays inside (min, max). A filler below max's next
+            // character keeps the value below max; any filler keeps it above min (longer).
             int targetLength = (int) (minChars.length + fraction * (maxChars.length - minChars.length));
-            return new String(minChars, 0, targetLength);
+            char padChar = maxChars[minChars.length] > '0' ? '0' : (char) Math.max(' ', maxChars[minChars.length] - 1);
+            return min + String.valueOf(padChar).repeat(targetLength - minChars.length);
         }
 
         // Create a result array based on minChars
