@@ -275,6 +275,11 @@ public class CommonRdbmsWriter
         /** Constant for SQL parameter placeholder */
         private static final String VALUE_HOLDER = "?";
 
+        /** Bounds of the BIGINT column types used for the client-side range check */
+        private static final BigDecimal BIGINT_SIGNED_MIN = BigDecimal.valueOf(Long.MIN_VALUE);
+        private static final BigDecimal BIGINT_SIGNED_MAX = BigDecimal.valueOf(Long.MAX_VALUE);
+        private static final BigDecimal BIGINT_UNSIGNED_MAX = new BigDecimal("18446744073709551615");
+
         /** Basic message template for logging context information */
         protected static String basicMessage;
 
@@ -702,9 +707,22 @@ public class CommonRdbmsWriter
 
                 case Types.BIGINT:
                     if (column.getType() == Column.Type.STRING) {
-                        // value from UNSIGNED BIGINT overflow; use BigDecimal to preserve precision
-                        preparedStatement.setBigDecimal(columnIndex, new BigDecimal(column.asString()));
-                    } else {
+                        // string cells may carry UNSIGNED BIGINT values beyond Long.MAX_VALUE;
+                        // validate client-side so an out-of-range value fails loudly as a dirty
+                        // record instead of being clamped or rounded silently by the server
+                        BigDecimal decimalValue = new BigDecimal(column.asString());
+                        String typeName = String.valueOf(this.resultSetMetaData.get(columnIndex).get("typeName"));
+                        BigDecimal lower = typeName.toUpperCase().contains("UNSIGNED") ? BigDecimal.ZERO : BIGINT_SIGNED_MIN;
+                        BigDecimal upper = typeName.toUpperCase().contains("UNSIGNED") ? BIGINT_UNSIGNED_MAX : BIGINT_SIGNED_MAX;
+                        if (decimalValue.stripTrailingZeros().scale() > 0
+                                || decimalValue.compareTo(lower) < 0
+                                || decimalValue.compareTo(upper) > 0) {
+                            throw new SQLException("Value [" + column.asString() + "] of column " + columnIndex
+                                    + " is out of range for a " + typeName + " target column");
+                        }
+                        preparedStatement.setBigDecimal(columnIndex, decimalValue);
+                    }
+                    else {
                         preparedStatement.setLong(columnIndex, column.asLong());
                     }
                     break;
