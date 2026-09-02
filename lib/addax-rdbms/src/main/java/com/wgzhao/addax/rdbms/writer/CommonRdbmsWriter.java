@@ -326,6 +326,9 @@ public class CommonRdbmsWriter
         /** Whether to treat empty strings as NULL values */
         protected boolean emptyAsNull;
 
+        /** logs the sub-second truncation fallback only once per task */
+        private boolean subsecondFallbackWarned;
+
         /** Metadata information about target table columns */
         protected List<Map<String, Object>> resultSetMetaData;
 
@@ -751,15 +754,19 @@ public class CommonRdbmsWriter
                     if (null != utilDate) {
                         sqlTime = new java.sql.Time(utilDate.getTime());
                         // preserve nanosecond precision if the source DateColumn carries it
-                        if (column instanceof DateColumn) {
-                            long nanos = ((DateColumn) column).getNanos();
-                            if (nanos > 0) {
-                                try {
-                                    preparedStatement.setObject(columnIndex,
-                                            sqlTime.toLocalTime().withNano((int) nanos));
-                                    break;
-                                } catch (SQLException ignored) {
-                                    // driver doesn't support LocalTime; fall through to setTime
+                        if (column instanceof DateColumn dateColumn && dateColumn.getNanos() > 0) {
+                            try {
+                                preparedStatement.setObject(columnIndex,
+                                        sqlTime.toLocalTime().withNano((int) dateColumn.getNanos()));
+                                break;
+                            }
+                            catch (SQLException | AbstractMethodError e) {
+                                // the driver cannot bind LocalTime; the setTime fallback below
+                                // truncates sub-second digits, so report that loss once per task
+                                if (!subsecondFallbackWarned) {
+                                    subsecondFallbackWarned = true;
+                                    LOG.warn("The JDBC driver cannot bind java.time.LocalTime; "
+                                            + "sub-second digits of TIME values will be truncated: {}", e.getMessage());
                                 }
                             }
                         }
@@ -768,7 +775,16 @@ public class CommonRdbmsWriter
                     break;
 
                 case Types.TIMESTAMP:
-                    preparedStatement.setTimestamp(columnIndex, column.asTimestamp());
+                    java.sql.Timestamp timestamp = column.asTimestamp();
+                    if (timestamp != null && column instanceof DateColumn dateColumn && dateColumn.getNanos() > 0) {
+                        // a DateColumn produced from a TIME(n) value carries sub-second precision
+                        // that the millisecond-based asTimestamp() would drop; rebuild it from the
+                        // whole seconds plus the carried nanos
+                        long secondBoundary = timestamp.getTime() - Math.floorMod(timestamp.getTime(), 1000);
+                        timestamp = new java.sql.Timestamp(secondBoundary);
+                        timestamp.setNanos((int) dateColumn.getNanos());
+                    }
+                    preparedStatement.setTimestamp(columnIndex, timestamp);
                     break;
 
                 case Types.BINARY:
