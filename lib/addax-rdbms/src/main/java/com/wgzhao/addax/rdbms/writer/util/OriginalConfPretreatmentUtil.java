@@ -48,9 +48,6 @@ import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 public final class OriginalConfPretreatmentUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger(OriginalConfPretreatmentUtil.class);
-    // The database type used for processing configurations
-    /** The Databasetype. */
-    public static DataBaseType dataBaseType;
     private static final String jdbcUrlPath = Key.CONNECTION + "." + Key.JDBC_URL;
 
     private OriginalConfPretreatmentUtil()
@@ -78,8 +75,8 @@ public final class OriginalConfPretreatmentUtil
         }
 
         doCheckBatchSize(originalConfig);
-        simplifyConf(originalConfig);
-        dealColumnConf(originalConfig);
+        simplifyConf(originalConfig, dataBaseType);
+        dealColumnConf(originalConfig, dataBaseType);
         dealWriteMode(originalConfig, dataBaseType);
     }
 
@@ -104,8 +101,9 @@ public final class OriginalConfPretreatmentUtil
      * Processes JDBC URL, driver settings, and table expansion.
      *
      * @param originalConfig The configuration to simplify
+     * @param dataBaseType the database type, passed in instead of being shared statically
      */
-    public static void simplifyConf(Configuration originalConfig)
+    public static void simplifyConf(Configuration originalConfig, DataBaseType dataBaseType)
     {
         Configuration connConf = originalConfig.getConfiguration(Key.CONNECTION);
 
@@ -144,8 +142,9 @@ public final class OriginalConfPretreatmentUtil
      * Handles column expansion, validation against table schema, and duplicate checking.
      *
      * @param originalConfig The configuration containing column settings
+     * @param dataBaseType the database type for column quoting
      */
-    public static void dealColumnConf(Configuration originalConfig)
+    public static void dealColumnConf(Configuration originalConfig, DataBaseType dataBaseType)
     {
         String jdbcUrl = originalConfig.getString(jdbcUrlPath);
         String username = originalConfig.getString(Key.USERNAME);
@@ -157,35 +156,34 @@ public final class OriginalConfPretreatmentUtil
             throw AddaxException.illegalConfigValue(Key.COLUMN, userConfiguredColumns);
         }
         else {
-            List<String> allColumns;
             Connection connection = DBUtil.getConnectionWithoutRetry(dataBaseType, jdbcUrl, username, password);
+            try {
+                List<String> allColumns = DBUtil.getTableColumnsByConn(connection, oneTable, dataBaseType);
 
-            allColumns = DBUtil.getTableColumnsByConn(connection, oneTable, dataBaseType);
+                LOG.info("The table [{}] has columns [{}].", oneTable, StringUtils.join(allColumns, ","));
 
-            LOG.info("The table [{}] has columns [{}].", oneTable, StringUtils.join(allColumns, ","));
+                if (1 == userConfiguredColumns.size() && "*".equals(userConfiguredColumns.get(0))) {
+                    LOG.warn("There are some risks in the column configuration. Because you did not configure the columns " +
+                            "to read the database table, changes in the number and types of fields in your table may affect " +
+                            "the correctness of the task or even cause errors.");
 
-            if (1 == userConfiguredColumns.size() && "*".equals(userConfiguredColumns.get(0))) {
-                LOG.warn("There are some risks in the column configuration. Because you did not configure the columns " +
-                        "to read the database table, changes in the number and types of fields in your table may affect " +
-                        "the correctness of the task or even cause errors.");
-
-                originalConfig.set(Key.COLUMN, allColumns);
-            }
-            else if (userConfiguredColumns.size() > allColumns.size()) {
-                throw AddaxException.asAddaxException(CONFIG_ERROR,
-                        "The number of columns your configured " + userConfiguredColumns.size()
-                                + "are greater than the number of table columns " + allColumns.size());
-            }
-            else {
-                // Ensure the column is not duplicated
-                ListUtil.makeSureNoValueDuplicate(userConfiguredColumns, false);
-                try {
+                    originalConfig.set(Key.COLUMN, allColumns);
+                }
+                else if (userConfiguredColumns.size() > allColumns.size()) {
+                    throw AddaxException.asAddaxException(CONFIG_ERROR,
+                            "The number of columns your configured " + userConfiguredColumns.size()
+                                    + "are greater than the number of table columns " + allColumns.size());
+                }
+                else {
+                    // Ensure the column is not duplicated
+                    ListUtil.makeSureNoValueDuplicate(userConfiguredColumns, false);
                     // Check whether the user's configured columns exist in the table
                     DBUtil.getColumnMetaData(connection, oneTable, StringUtils.join(userConfiguredColumns, ","));
                 }
-                finally {
-                    DBUtil.closeDBResources(null, null, connection);
-                }
+            }
+            finally {
+                // every path above acquires the connection, so return it to the pool exactly once
+                DBUtil.closeDBResources(null, null, connection);
             }
         }
     }

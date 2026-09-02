@@ -76,7 +76,6 @@ public class CommonRdbmsWriter
         public Job(DataBaseType dataBaseType)
         {
             this.dataBaseType = dataBaseType;
-            OriginalConfPretreatmentUtil.dataBaseType = this.dataBaseType;
         }
 
         /**
@@ -272,11 +271,16 @@ public class CommonRdbmsWriter
         /** Constant for SQL parameter placeholder */
         private static final String VALUE_HOLDER = "?";
 
+        /** Bounds of the BIGINT column types used for the client-side range check */
+        private static final BigDecimal BIGINT_SIGNED_MIN = BigDecimal.valueOf(Long.MIN_VALUE);
+        private static final BigDecimal BIGINT_SIGNED_MAX = BigDecimal.valueOf(Long.MAX_VALUE);
+        private static final BigDecimal BIGINT_UNSIGNED_MAX = new BigDecimal("18446744073709551615");
+
         /** Basic message template for logging context information */
-        protected static String basicMessage;
+        protected String basicMessage;
 
         /** Template for INSERT/REPLACE SQL statements */
-        protected static String insertOrReplaceTemplate;
+        protected String insertOrReplaceTemplate;
 
         /** Database type for this task */
         protected DataBaseType dataBaseType;
@@ -320,11 +324,22 @@ public class CommonRdbmsWriter
         /** Write mode (INSERT, REPLACE, UPDATE, etc.) */
         protected String writeMode;
 
-        /** Whether to treat empty strings as NULL values */
-        protected boolean emptyAsNull;
+        /** logs the sub-second truncation fallback only once per task */
+        private boolean subsecondFallbackWarned;
 
         /** Metadata information about target table columns */
         protected List<Map<String, Object>> resultSetMetaData;
+
+        // per-column binding metadata extracted once from resultSetMetaData (one-based indexes)
+        // so the per-record bind loop stops boxing and re-looking-up maps for every cell
+        private int[] bindingSqlTypes;
+        private int[] bindingScales;
+        private int[] bindingPrecisions;
+        private String[] bindingTypeNames;
+        private String[] bindingColumnNames;
+
+        /** Prepared statement reused across batches; recreated only after a failed batch */
+        private PreparedStatement batchStatement;
 
         /**
          * whether each configured column belongs to the merge key (Oracle/SQLServer update mode).
@@ -370,7 +385,6 @@ public class CommonRdbmsWriter
             this.batchByteSize = writerSliceConfig.getInt(Key.BATCH_BYTE_SIZE, Constant.DEFAULT_BATCH_BYTE_SIZE);
 
             writeMode = writerSliceConfig.getString(Key.WRITE_MODE, "INSERT");
-            emptyAsNull = writerSliceConfig.getBool(Key.EMPTY_AS_NULL, true);
             insertOrReplaceTemplate = writerSliceConfig.getString(Constant.INSERT_OR_REPLACE_TEMPLATE_MARK);
             this.writeRecordSql = String.format(insertOrReplaceTemplate, this.table);
 
@@ -459,6 +473,7 @@ public class CommonRdbmsWriter
             mergeColumns.addAll(this.columns);
 
             this.resultSetMetaData = DBUtil.getColumnMetaData(connection, this.table, StringUtils.join(mergeColumns, ","));
+            ensureBindingArrays();
 
             // combine the insert statement
             calcWriteRecordSql();
@@ -495,6 +510,9 @@ public class CommonRdbmsWriter
             }
             finally {
                 writeBuffer.clear();
+                // release the reused statement before returning the connection to the pool
+                DBUtil.closeDBResources(null, batchStatement, null);
+                batchStatement = null;
                 DBUtil.closeDBResources(null, null, connection);
             }
         }
@@ -575,10 +593,16 @@ public class CommonRdbmsWriter
                 if (supportCommit) {
                     connection.setAutoCommit(false);
                 }
-                preparedStatement = connection.prepareStatement(writeRecordSql);
+                // prepare the SQL once per task and reuse it across batches;
+                // the statement is dropped again only after a failed batch
+                if (batchStatement == null) {
+                    batchStatement = connection.prepareStatement(writeRecordSql);
+                }
+                preparedStatement = batchStatement;
                 if (mergeRecordOrder != null) {
                     // Oracle/SQLServer update: reorder each record to the merge parameter order
                     // computed once in startWriteWithConnection
+
                     for (Record record : buffer) {
                         reorderRecord(record, mergeRecordOrder);
                         preparedStatement = fillPreparedStatement(preparedStatement, record);
@@ -592,12 +616,17 @@ public class CommonRdbmsWriter
                     }
                 }
                 preparedStatement.executeBatch();
+                // free the batch buffer so the same statement serves the next batch
+                preparedStatement.clearBatch();
                 if (supportCommit) {
                     connection.commit();
                 }
             }
             catch (SQLException e) {
                 LOG.warn("Rolling back the write, try to write one line at a time. because: {}", e.getMessage());
+                // the failed statement may hold a partial batch; close it so the next batch re-prepares
+                DBUtil.closeDBResources(null, batchStatement, null);
+                batchStatement = null;
                 if (supportCommit) {
                     connection.rollback();
                 }
@@ -606,9 +635,6 @@ public class CommonRdbmsWriter
             catch (Exception e) {
                 throw AddaxException.asAddaxException(
                         EXECUTE_FAIL, e);
-            }
-            finally {
-                DBUtil.closeDBResources(preparedStatement, null);
             }
         }
 
@@ -676,11 +702,36 @@ public class CommonRdbmsWriter
                 throws SQLException
         {
             LOG.debug("Record info: {}", record);
+            ensureBindingArrays();
             for (int i = 1, len = record.getColumnNumber(); i <= len; i++) {
-                int columnSqlType = (int) this.resultSetMetaData.get(i).get("type");
-                preparedStatement = fillPreparedStatementColumnType(preparedStatement, i, columnSqlType, record.getColumn(i - 1));
+                preparedStatement = fillPreparedStatementColumnType(preparedStatement, i, bindingSqlTypes[i], record.getColumn(i - 1));
             }
             return preparedStatement;
+        }
+
+        /**
+         * Extracts the row-invariant binding metadata (sql type, scale, precision and names)
+         * from resultSetMetaData once per task instead of per record per cell.
+         */
+        private void ensureBindingArrays()
+        {
+            if (bindingSqlTypes != null || resultSetMetaData == null) {
+                return;
+            }
+            int size = resultSetMetaData.size();
+            bindingSqlTypes = new int[size];
+            bindingScales = new int[size];
+            bindingPrecisions = new int[size];
+            bindingTypeNames = new String[size];
+            bindingColumnNames = new String[size];
+            for (int i = 1; i < size; i++) {
+                Map<String, Object> map = resultSetMetaData.get(i);
+                bindingSqlTypes[i] = (int) map.get("type");
+                bindingScales[i] = (int) map.get("scale");
+                bindingPrecisions[i] = (int) map.get("precision");
+                bindingTypeNames[i] = String.valueOf(map.get("typeName"));
+                bindingColumnNames[i] = String.valueOf(map.get("name"));
+            }
         }
 
         /**
@@ -726,16 +777,29 @@ public class CommonRdbmsWriter
 
                 case Types.BIGINT:
                     if (column.getType() == Column.Type.STRING) {
-                        // value from UNSIGNED BIGINT overflow; use BigDecimal to preserve precision
-                        preparedStatement.setBigDecimal(columnIndex, new BigDecimal(column.asString()));
-                    } else {
+                        // string cells may carry UNSIGNED BIGINT values beyond Long.MAX_VALUE;
+                        // validate client-side so an out-of-range value fails loudly as a dirty
+                        // record instead of being clamped or rounded silently by the server
+                        BigDecimal decimalValue = new BigDecimal(column.asString());
+                        String typeName = String.valueOf(this.resultSetMetaData.get(columnIndex).get("typeName"));
+                        BigDecimal lower = typeName.toUpperCase().contains("UNSIGNED") ? BigDecimal.ZERO : BIGINT_SIGNED_MIN;
+                        BigDecimal upper = typeName.toUpperCase().contains("UNSIGNED") ? BIGINT_UNSIGNED_MAX : BIGINT_SIGNED_MAX;
+                        if (decimalValue.stripTrailingZeros().scale() > 0
+                                || decimalValue.compareTo(lower) < 0
+                                || decimalValue.compareTo(upper) > 0) {
+                            throw new SQLException("Value [" + column.asString() + "] of column " + columnIndex
+                                    + " is out of range for a " + typeName + " target column");
+                        }
+                        preparedStatement.setBigDecimal(columnIndex, decimalValue);
+                    }
+                    else {
                         preparedStatement.setLong(columnIndex, column.asLong());
                     }
                     break;
 
                 case Types.NUMERIC:
                 case Types.DECIMAL:
-                    if ((int) this.resultSetMetaData.get(columnIndex).get("scale") == 0) {
+                    if (bindingScales[columnIndex] == 0) {
                         if (column.getType() == Column.Type.STRING) {
                             preparedStatement.setBigDecimal(columnIndex, new BigDecimal(column.asString()));
                         } else {
@@ -775,15 +839,19 @@ public class CommonRdbmsWriter
                     if (null != utilDate) {
                         sqlTime = new java.sql.Time(utilDate.getTime());
                         // preserve nanosecond precision if the source DateColumn carries it
-                        if (column instanceof DateColumn) {
-                            long nanos = ((DateColumn) column).getNanos();
-                            if (nanos > 0) {
-                                try {
-                                    preparedStatement.setObject(columnIndex,
-                                            sqlTime.toLocalTime().withNano((int) nanos));
-                                    break;
-                                } catch (SQLException ignored) {
-                                    // driver doesn't support LocalTime; fall through to setTime
+                        if (column instanceof DateColumn dateColumn && dateColumn.getNanos() > 0) {
+                            try {
+                                preparedStatement.setObject(columnIndex,
+                                        sqlTime.toLocalTime().withNano((int) dateColumn.getNanos()));
+                                break;
+                            }
+                            catch (SQLException | AbstractMethodError e) {
+                                // the driver cannot bind LocalTime; the setTime fallback below
+                                // truncates sub-second digits, so report that loss once per task
+                                if (!subsecondFallbackWarned) {
+                                    subsecondFallbackWarned = true;
+                                    LOG.warn("The JDBC driver cannot bind java.time.LocalTime; "
+                                            + "sub-second digits of TIME values will be truncated: {}", e.getMessage());
                                 }
                             }
                         }
@@ -792,7 +860,16 @@ public class CommonRdbmsWriter
                     break;
 
                 case Types.TIMESTAMP:
-                    preparedStatement.setTimestamp(columnIndex, column.asTimestamp());
+                    java.sql.Timestamp timestamp = column.asTimestamp();
+                    if (timestamp != null && column instanceof DateColumn dateColumn && dateColumn.getNanos() > 0) {
+                        // a DateColumn produced from a TIME(n) value carries sub-second precision
+                        // that the millisecond-based asTimestamp() would drop; rebuild it from the
+                        // whole seconds plus the carried nanos
+                        long secondBoundary = timestamp.getTime() - Math.floorMod(timestamp.getTime(), 1000);
+                        timestamp = new java.sql.Timestamp(secondBoundary);
+                        timestamp.setNanos((int) dateColumn.getNanos());
+                    }
+                    preparedStatement.setTimestamp(columnIndex, timestamp);
                     break;
 
                 case Types.BINARY:
@@ -806,7 +883,7 @@ public class CommonRdbmsWriter
                 // warn: bit(>1) -> Types.VARBINARY using setBytes
                 case Types.BIT:
                     // bit(1) -> setBoolean; bit(>1) -> treat as VARBINARY and use setBytes
-                    if ((int) this.resultSetMetaData.get(columnIndex).get("precision") == 1) {
+                    if (bindingPrecisions[columnIndex] == 1) {
                         preparedStatement.setBoolean(columnIndex, column.asBoolean());
                     }
                     else {
@@ -819,12 +896,11 @@ public class CommonRdbmsWriter
                     break;
 
                 default:
-                    Map<String, Object> map = this.resultSetMetaData.get(columnIndex);
                     throw AddaxException.asAddaxException(
                             NOT_SUPPORT_TYPE,
-                            "Not support the type: field name: " + map.get("name")
-                                    + "The SQL type: " + map.get("type")
-                                    + "The Java type: " + map.get("typeName"));
+                            "Not support the type: field name: " + bindingColumnNames[columnIndex]
+                                    + "The SQL type: " + bindingSqlTypes[columnIndex]
+                                    + "The Java type: " + bindingTypeNames[columnIndex]);
             }
             return preparedStatement;
         }

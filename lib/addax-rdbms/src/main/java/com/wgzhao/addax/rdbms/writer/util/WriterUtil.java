@@ -197,9 +197,6 @@ public final class WriterUtil
             }
         }
         else {
-            if (mode.startsWith("update")) {
-                writeMode = "replace";
-            }
             writeDataSqlTemplate = writeMode + " INTO %s ( " + columns + ") VALUES ( " + placeHolders + " )";
         }
 

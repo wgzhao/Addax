@@ -33,14 +33,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.sql.DriverManager;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.sql.Statement;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -58,7 +56,12 @@ import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 public final class DBUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger(DBUtil.class);
-    private static final int DEFAULT_SOCKET_TIMEOUT_SEC = 20_000;
+    // default statement/login timeout in seconds; 3600 was the historical documented default
+    private static final int DEFAULT_QUERY_TIMEOUT_SEC = 3600;
+    // how long a pool borrow may wait for a free connection before failing (milliseconds)
+    private static final long POOL_BORROW_TIMEOUT_MS = 30_000L;
+    // how long a borrowed connection may take to validate itself (seconds)
+    private static final int VALIDATION_TIMEOUT_SEC = 30;
 
     private static final Map<String, BasicDataSource> DS_CACHE = new java.util.concurrent.ConcurrentHashMap<>();
     private static volatile boolean shutdownHookRegistered = false;
@@ -213,9 +216,11 @@ public final class DBUtil
     }
 
     /**
-     * Get direct JDBC connection with default socket timeout.
+     * Get a pooled JDBC connection with the default timeout.
      * <p>
-     * If connecting failed, try to connect for MAX_TRY_TIMES times
+     * The datasource is cached per driver/URL/user/password; the pool is created on first use
+     * and its connections are closed when the JVM shuts down. Borrows are bounded by the pool's
+     * maxWaitMillis so an exhausted pool fails fast instead of hanging forever.
      * </p>
      *
      * @param dataBaseType Database type
@@ -225,33 +230,30 @@ public final class DBUtil
      * @return Connection instance
      * @throws RdbmsException if connection fails
      */
-    public static synchronized Connection getConnection(DataBaseType dataBaseType, String jdbcUrl, String username, String password)
+    public static Connection getConnection(DataBaseType dataBaseType, String jdbcUrl, String username, String password)
     {
-        return getConnection(dataBaseType, jdbcUrl, username, password, DEFAULT_SOCKET_TIMEOUT_SEC);
+        return getConnection(dataBaseType, jdbcUrl, username, password, DEFAULT_QUERY_TIMEOUT_SEC);
     }
 
     /**
-     * Get direct JDBC connection with specified socket timeout.
+     * Get a pooled JDBC connection with the specified query timeout.
      *
      * @param dataBaseType Database type
      * @param jdbcUrl JDBC URL for connection
      * @param username Username for login
      * @param password Password to use when connecting to server
-     * @param socketTimeout Socket timeout in seconds
+     * @param timeoutSeconds Statement/login timeout in seconds
      * @return Connection instance
      * @throws RdbmsException if connection fails
      */
-    public static synchronized Connection getConnection(DataBaseType dataBaseType, String jdbcUrl, String username, String password, int socketTimeout)
+    public static Connection getConnection(DataBaseType dataBaseType, String jdbcUrl, String username, String password, int timeoutSeconds)
     {
         try {
             if (jdbcUrl == null) {
                 throw new IllegalArgumentException("jdbcUrl must not be null");
             }
             // Use shared cached datasource
-            BasicDataSource ds = getOrCreateDataSource(dataBaseType, jdbcUrl, username, password, socketTimeout);
-            try {
-                DriverManager.setLoginTimeout(socketTimeout);
-            } catch (Exception ignore) {}
+            BasicDataSource ds = getOrCreateDataSource(dataBaseType, jdbcUrl, username, password, timeoutSeconds);
             return ds.getConnection();
         }
         catch (Exception e) {
@@ -260,9 +262,9 @@ public final class DBUtil
     }
 
     /**
-     * Get direct JDBC connection without retry mechanism.
+     * Get a pooled JDBC connection with the default timeout.
      * <p>
-     * If connecting failed, fail immediately without retries
+     * Kept for compatibility; identical to {@link #getConnection(DataBaseType, String, String, String)}.
      * </p>
      *
      * @param dataBaseType The database type
@@ -274,23 +276,23 @@ public final class DBUtil
      */
     public static Connection getConnectionWithoutRetry(DataBaseType dataBaseType, String jdbcUrl, String username, String password)
     {
-        return getConnectionWithoutRetry(dataBaseType, jdbcUrl, username, password, DEFAULT_SOCKET_TIMEOUT_SEC);
+        return getConnectionWithoutRetry(dataBaseType, jdbcUrl, username, password, DEFAULT_QUERY_TIMEOUT_SEC);
     }
 
     /**
-     * Get connection without retry mechanism with specified socket timeout.
+     * Get a pooled JDBC connection with the specified query timeout.
      *
      * @param dataBaseType The database type
      * @param jdbcUrl JDBC URL for connection
      * @param username Username for login
      * @param password Password to use when connecting to server
-     * @param socketTimeout Socket timeout in seconds
+     * @param timeoutSeconds Statement/login timeout in seconds
      * @return Connection instance
      * @throws RdbmsException if connection fails
      */
-    public static Connection getConnectionWithoutRetry(DataBaseType dataBaseType, String jdbcUrl, String username, String password, int socketTimeout)
+    public static Connection getConnectionWithoutRetry(DataBaseType dataBaseType, String jdbcUrl, String username, String password, int timeoutSeconds)
     {
-        return DBUtil.getConnection(dataBaseType, jdbcUrl, username, password, socketTimeout);
+        return DBUtil.getConnection(dataBaseType, jdbcUrl, username, password, timeoutSeconds);
     }
 
     /**
@@ -305,8 +307,7 @@ public final class DBUtil
     public static ResultSet query(Connection conn, String sql, int fetchSize)
             throws SQLException
     {
-        // Default 3600s query Timeout
-        return query(conn, sql, fetchSize, DEFAULT_SOCKET_TIMEOUT_SEC);
+        return query(conn, sql, fetchSize, DEFAULT_QUERY_TIMEOUT_SEC);
     }
 
     /**
@@ -405,17 +406,6 @@ public final class DBUtil
     }
 
     /**
-     * Retrieves all column names for a specified table.
-     *
-     * @param dataBaseType Database type
-     * @param jdbcUrl JDBC URL for connection
-     * @param user Database username
-     * @param pass Database password
-     * @param tableName Name of the table to query
-     * @return List of column names in the table
-     * @throws AddaxException if connection or query fails
-     */
-    /**
      * Returns the column names of a table.
      *
      * @param dataBaseType the database type
@@ -471,8 +461,8 @@ public final class DBUtil
         try (var statement = conn.createStatement()) {
             // Build query SQL based on database type
             String queryColumnSql;
-            if (DataBaseType.TDengine.getDriverClassName().equals(conn.getMetaData().getDriverName())) {
-                // TDengine does not support "1=2" clause
+            if (isTdengineConnection(conn)) {
+                // TDengine does not support the "1=2" clause
                 queryColumnSql = "SELECT " + column + " FROM " + tableName + " LIMIT 0";
             }
             else {
@@ -539,7 +529,7 @@ public final class DBUtil
         // Callers are expected to close the ResultSet and the Statement (or use closeDBResources)
         // to avoid closing the Statement before the ResultSet is consumed.
         Statement stmt = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY); //NOSONAR
-        stmt.setQueryTimeout(DEFAULT_SOCKET_TIMEOUT_SEC);
+        stmt.setQueryTimeout(DEFAULT_QUERY_TIMEOUT_SEC);
         boolean hasResultSet = stmt.execute(sql);
         if (hasResultSet) {
             return stmt.getResultSet();
@@ -664,6 +654,24 @@ public final class DBUtil
     }
 
     /**
+     * Whether the given connection is served by a TDengine driver.
+     * getDriverName() reports a display name such as "TSDB JDBC Driver", not the class
+     * name, so detection also covers the class names of the native and RESTful taos
+     * drivers and the connection implementation class.
+     */
+    private static boolean isTdengineConnection(Connection conn)
+            throws SQLException
+    {
+        String driverName = conn.getMetaData().getDriverName();
+        String driverNameLower = driverName == null ? "" : driverName.toLowerCase();
+        return "com.taosdata.jdbc.TSDBDriver".equals(driverName)
+                || "com.taosdata.jdbc.rs.RestfulDriver".equals(driverName)
+                || driverNameLower.contains("taos")
+                || driverNameLower.contains("tdengine")
+                || conn.getClass().getName().startsWith("com.taosdata");
+    }
+
+    /**
      * Asynchronously advances ResultSet to next row with default timeout.
      * This method is designed for metadata queries, not for data reading.
      *
@@ -719,11 +727,13 @@ public final class DBUtil
         }
     }
 
-    private static String dsKey(String driver, String url, String user) {
-        return driver + "|" + url + "|" + (user == null ? "" : user);
+    private static String dsKey(String driver, String url, String user, String password) {
+        // the password is part of the key so that a rotated credential no longer
+        // silently borrows a connection authenticated with the old one
+        return driver + "|" + url + "|" + (user == null ? "" : user) + "|" + (password == null ? "" : password);
     }
 
-    private static BasicDataSource getOrCreateDataSource(DataBaseType dataBaseType, String jdbcUrl, String username, String password, int socketTimeout) {
+    private static BasicDataSource getOrCreateDataSource(DataBaseType dataBaseType, String jdbcUrl, String username, String password, int timeoutSeconds) {
         String driverClassName;
         String effectiveUrl = jdbcUrl;
         if (effectiveUrl != null && effectiveUrl.contains("inceptor2")) {
@@ -735,39 +745,54 @@ public final class DBUtil
         } else {
             driverClassName = dataBaseType.getDriverClassName();
         }
-        String key = dsKey(driverClassName, effectiveUrl, username);
+        String key = dsKey(driverClassName, effectiveUrl, username, password);
+        // the cache lookup stays lock-free; only pool creation is serialized
         BasicDataSource ds = DS_CACHE.get(key);
-        if (ds != null) {
-            return ds;
-        }
-        ds = new BasicDataSource();
-        ds.setDriverClassName(driverClassName);
-        ds.setUrl(effectiveUrl);
-        ds.setUsername(username);
-        ds.setPassword(password);
-        // Pool config (tuned conservatively)
-        ds.setMinIdle(2);
-        ds.setMaxTotal(8);
-        ds.setMaxOpenPreparedStatements(200);
-        ds.setValidationQueryTimeout(Duration.ofSeconds(socketTimeout));
-        // Vendor-specific properties
-        if (dataBaseType == DataBaseType.Oracle) {
-            ds.addConnectionProperty("oracle.jdbc.ReadTimeout", String.valueOf(socketTimeout * 1000L));
-        }
-        // Register shutdown hook once
-        if (!shutdownHookRegistered) {
-            synchronized (DBUtil.class) {
-                if (!shutdownHookRegistered) {
-                    Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                        DS_CACHE.values().forEach(d -> {
-                            try { d.close(); } catch (Exception ignore) {}
-                        });
-                    }, "addax-ds-shutdown"));
-                    shutdownHookRegistered = true;
+        if (ds == null) {
+            synchronized (DS_CACHE) {
+                ds = DS_CACHE.get(key);
+                if (ds == null) {
+                    ds = buildDataSource(dataBaseType, driverClassName, effectiveUrl, username, password, timeoutSeconds);
+                    DS_CACHE.put(key, ds);
+                    registerShutdownHookOnce();
                 }
             }
         }
-        BasicDataSource prev = DS_CACHE.putIfAbsent(key, ds);
-        return prev != null ? prev : ds;
+        return ds;
+    }
+
+    private static BasicDataSource buildDataSource(DataBaseType dataBaseType, String driverClassName, String url, String username, String password, int timeoutSeconds) {
+        BasicDataSource ds = new BasicDataSource();
+        ds.setDriverClassName(driverClassName);
+        ds.setUrl(url);
+        ds.setUsername(username);
+        ds.setPassword(password);
+        // Pool config: reader/writer tasks hold a connection for their whole lifetime, so the
+        // pool must admit at least the common channel counts; a bounded borrow wait makes an
+        // exhausted pool fail fast with a clear error instead of hanging the job forever
+        ds.setMinIdle(2);
+        ds.setMaxTotal(32);
+        ds.setMaxWaitMillis(POOL_BORROW_TIMEOUT_MS);
+        ds.setMaxOpenPreparedStatements(200);
+        // validate borrowed connections so a database restart does not hand out dead sockets
+        ds.setTestOnBorrow(true);
+        ds.setValidationQueryTimeout(VALIDATION_TIMEOUT_SEC);
+        // Vendor-specific properties
+        if (dataBaseType == DataBaseType.Oracle) {
+            // oracle.jdbc.ReadTimeout is expressed in milliseconds
+            ds.addConnectionProperty("oracle.jdbc.ReadTimeout", String.valueOf(timeoutSeconds * 1000L));
+        }
+        return ds;
+    }
+
+    private static void registerShutdownHookOnce() {
+        if (!shutdownHookRegistered) {
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                DS_CACHE.values().forEach(d -> {
+                    try { d.close(); } catch (Exception ignore) {}
+                });
+            }, "addax-ds-shutdown"));
+            shutdownHookRegistered = true;
+        }
     }
 }
