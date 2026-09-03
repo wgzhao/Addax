@@ -62,6 +62,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
@@ -172,7 +173,15 @@ public final class StorageReaderUtil
             return new BufferedReader(new InputStreamReader(inputStream, encoding), bufferSize);
         }
 
-        return switch (compress.toLowerCase()) {
+        // Normalize to the spellings commons-compress accepts, mirroring StorageWriterUtil.createWriter,
+        // so a compress value written by the writer side (gzip/bz2) also reads back on this side
+        String normalizedCompress = switch (compress.toLowerCase(Locale.ROOT)) {
+            case "gzip" -> "gz";
+            case "bz2" -> "bzip2";
+            default -> compress.toLowerCase(Locale.ROOT);
+        };
+
+        return switch (normalizedCompress) {
             case COMPRESS_ZIP -> {
                 ZipCycleInputStream zipCycleInputStream = new ZipCycleInputStream(inputStream);
                 yield new BufferedReader(new InputStreamReader(zipCycleInputStream, encoding), bufferSize);
@@ -184,7 +193,7 @@ public final class StorageReaderUtil
             default -> {
                 // Apache Commons Compress supports most compression algorithms
                 CompressorInputStream input = new CompressorStreamFactory().createCompressorInputStream(
-                        compress.toUpperCase(), inputStream, true);
+                        normalizedCompress, inputStream, true);
                 yield new BufferedReader(new InputStreamReader(input, encoding), bufferSize);
             }
         };

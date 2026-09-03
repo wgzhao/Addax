@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -172,7 +173,8 @@ public final class FileHelper
         if (StringUtils.isBlank(compress) || "none".equalsIgnoreCase(compress)) {
             return "";
         }
-        String suffix = COMPRESS_TYPE_SUFFIX_MAP.getOrDefault(compress.toUpperCase(), "." + compress.toLowerCase());
+        String suffix = COMPRESS_TYPE_SUFFIX_MAP.getOrDefault(compress.toUpperCase(Locale.ROOT),
+                "." + compress.toLowerCase(Locale.ROOT));
         LOG.debug("Compression type '{}' maps to suffix '{}'", compress, suffix);
         return suffix;
     }
