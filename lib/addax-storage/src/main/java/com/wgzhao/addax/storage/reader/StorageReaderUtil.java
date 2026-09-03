@@ -122,11 +122,8 @@ public final class StorageReaderUtil
             LOG.warn("The encoding: [{}] is illegal, uses [{}] by default", encoding, Constant.DEFAULT_ENCODING);
         }
 
-        List<Configuration> column = readerSliceConfig.getListConfiguration(Key.COLUMN);
-        // Handle ["*"] -> [], null
-        if (column != null && column.size() == 1 && "\"*\"".equals(column.get(0).toString())) {
-            readerSliceConfig.set(Key.COLUMN, null);
-        }
+        // Handle ["*"] (or ['*'] in YAML jobs) -> all columns as strings
+        normalizeWildcardColumn(readerSliceConfig);
 
         int bufferSize = readerSliceConfig.getInt(Key.BUFFER_SIZE, Constant.DEFAULT_BUFFER_SIZE);
 
@@ -474,6 +471,27 @@ public final class StorageReaderUtil
     }
 
     /**
+     * Normalize the ["*"] marker (all columns as strings) into a null column configuration.
+     * JSON serialization always quotes with double quotes, but YAML jobs may carry single quotes,
+     * so both spellings are matched here. Single-sourcing this keeps the two call sites consistent.
+     *
+     * @param configuration configuration holding the column list
+     * @return true if the wildcard marker was found and cleared
+     */
+    private static boolean normalizeWildcardColumn(Configuration configuration)
+    {
+        List<Configuration> columns = configuration.getListConfiguration(Key.COLUMN);
+        if (columns != null && columns.size() == 1) {
+            String columnInStr = columns.get(0).toString();
+            if ("\"*\"".equals(columnInStr) || "'*'".equals(columnInStr)) {
+                configuration.set(Key.COLUMN, null);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Validate reader configuration parameters including encoding, compression, and field delimiter.
      *
      * @param readerConfiguration the configuration to validate
@@ -543,13 +561,9 @@ public final class StorageReaderUtil
             throw AddaxException.missingConfig(Key.COLUMN);
         }
 
-        // Handle ["*"]
-        if (columns.size() == 1) {
-            String columnsInStr = columns.get(0).toString();
-            if ("\"*\"".equals(columnsInStr) || "'*'".equals(columnsInStr)) {
-                readerConfiguration.set(Key.COLUMN, null);
-                return;
-            }
+        // Handle ["*"] -> all columns as strings; nothing left to validate
+        if (normalizeWildcardColumn(readerConfiguration)) {
+            return;
         }
 
         for (Configuration eachColumnConf : columns) {

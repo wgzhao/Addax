@@ -18,10 +18,12 @@
 
 package com.wgzhao.addax.storage.util;
 
+import com.wgzhao.addax.core.compress.ExpandLzopInputStream;
 import com.wgzhao.addax.core.compress.ZipCycleInputStream;
 import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.spi.ErrorCode;
 import org.apache.commons.compress.compressors.CompressorException;
+import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -30,7 +32,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -98,42 +99,6 @@ public final class FileHelper
     }
 
     /**
-     * Detect the compression type of the specified file.
-     *
-     * @param fileName the file name to analyze
-     * @return the compression type if present, otherwise "none"
-     * @throws IOException if there's an error reading the file
-     */
-    public static String getFileCompressType(String fileName)
-            throws IOException
-    {
-        if (StringUtils.isBlank(fileName)) {
-            LOG.warn("Empty or null file name provided for compression detection");
-            return "none";
-        }
-
-        LOG.debug("Detecting compression type for file: {}", fileName);
-
-        Path filePath = Paths.get(fileName);
-        if (!Files.exists(filePath)) {
-            throw new FileNotFoundException("File not found: " + fileName);
-        }
-
-        if (!Files.isReadable(filePath)) {
-            throw new IOException("File is not readable: " + fileName);
-        }
-
-        try (InputStream inputStream = Files.newInputStream(filePath);
-             BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream)) {
-            return getFileCompressType(bufferedInputStream);
-        }
-        catch (IOException e) {
-            LOG.error("Failed to detect compression type for file: {}", fileName, e);
-            throw e;
-        }
-    }
-
-    /**
      * Detect compression type from an input stream.
      * The input stream must support mark/reset operations.
      *
@@ -141,7 +106,7 @@ public final class FileHelper
      * @return the compression type if present, otherwise "none"
      * @throws IllegalArgumentException if the input stream doesn't support mark
      */
-    public static String getFileCompressType(InputStream inputStream)
+    private static String getFileCompressType(InputStream inputStream)
     {
         if (inputStream == null) {
             throw new IllegalArgumentException("Input stream cannot be null");
@@ -180,7 +145,7 @@ public final class FileHelper
     }
 
     /**
-     * Read a compressed file and return a buffered reader.
+     * Read a (possibly compressed) file and return a buffered reader over its decoded content.
      *
      * @param fileName the file to read
      * @param encoding character encoding to use (if null, uses UTF-8)
@@ -201,26 +166,49 @@ public final class FileHelper
         LOG.debug("Reading compressed file: {} with encoding: {}, buffer size: {}",
                 fileName, actualEncoding, actualBufferSize);
 
+        Path path = Paths.get(fileName);
         try {
-            String compressType = getFileCompressType(fileName);
-            LOG.debug("Detected compression type: {} for file: {}", compressType, fileName);
-            Path path = Paths.get(fileName);
+            // Single open: magic detection and decoding share one buffered stream
+            BufferedInputStream bufferedInput = new BufferedInputStream(Files.newInputStream(path));
+            try {
+                // CompressorStreamFactory detects gz/bzip2/xz/... from magic bytes but has no zip/lzo
+                // provider, so fall back to the file suffix for those two addax-native formats
+                String compressType = getFileCompressType(bufferedInput);
+                if ("none".equals(compressType)) {
+                    String lowerCaseName = fileName.toLowerCase(Locale.ROOT);
+                    if (lowerCaseName.endsWith(".zip")) {
+                        compressType = "zip";
+                    }
+                    else if (lowerCaseName.endsWith(".lzo") || lowerCaseName.endsWith(".lzop")) {
+                        compressType = "lzo";
+                    }
+                }
+                LOG.debug("Detected compression type: {} for file: {}", compressType, fileName);
 
-            return switch (compressType) {
-                case "none" -> Files.newBufferedReader(path, Charset.forName(actualEncoding));
-                case "zip" -> {
-                    InputStream inputStream = Files.newInputStream(path);
-                    ZipCycleInputStream zis = new ZipCycleInputStream(inputStream);
-                    yield new BufferedReader(new InputStreamReader(zis, actualEncoding), actualBufferSize);
-                }
-                default -> {
-                    InputStream inputStream = Files.newInputStream(path);
-                    BufferedInputStream bis = new BufferedInputStream(inputStream);
-                    InputStream compressedInput = new CompressorStreamFactory()
-                            .createCompressorInputStream(compressType, bis, true);
-                    yield new BufferedReader(new InputStreamReader(compressedInput, actualEncoding), actualBufferSize);
-                }
-            };
+                return switch (compressType) {
+                    case "none" -> new BufferedReader(
+                            new InputStreamReader(bufferedInput, Charset.forName(actualEncoding)), actualBufferSize);
+                    case "zip" -> {
+                        ZipCycleInputStream zis = new ZipCycleInputStream(bufferedInput);
+                        yield new BufferedReader(new InputStreamReader(zis, actualEncoding), actualBufferSize);
+                    }
+                    case "lzo" -> {
+                        ExpandLzopInputStream expandLzopInputStream = new ExpandLzopInputStream(bufferedInput);
+                        yield new BufferedReader(
+                                new InputStreamReader(expandLzopInputStream, actualEncoding), actualBufferSize);
+                    }
+                    default -> {
+                        CompressorInputStream input = new CompressorStreamFactory()
+                                .createCompressorInputStream(compressType, bufferedInput, true);
+                        yield new BufferedReader(new InputStreamReader(input, actualEncoding), actualBufferSize);
+                    }
+                };
+            }
+            catch (IOException | CompressorException e) {
+                // the returned reader chain owns bufferedInput only after a successful wrap
+                bufferedInput.close();
+                throw e;
+            }
         }
         catch (IOException | CompressorException e) {
             throw AddaxException.asAddaxException(
