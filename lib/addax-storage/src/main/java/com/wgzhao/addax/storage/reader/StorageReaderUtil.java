@@ -285,9 +285,28 @@ public final class StorageReaderUtil
         // Note: default value is ',', fieldDelimiter could be \n(lineDelimiter) for no fieldDelimiter
         Character fieldDelimiter = configuration.getChar(Key.FIELD_DELIMITER, Constant.DEFAULT_FIELD_DELIMITER);
 
-        String[] sourceLine = StringUtils.split(line, fieldDelimiter);
+        String[] sourceLine = splitPreservingEmptyFields(line, fieldDelimiter);
 
         transportOneRecord(recordSender, column, sourceLine, nullFormat, taskPluginCollector);
+    }
+
+    /**
+     * Split a single line by a delimiter character, keeping every token including empty
+     * and trailing-empty ones. StringUtils.split collapses empty tokens, which shifts
+     * column indexes; the commons-csv parsing used by {@link #doReadFromStream} keeps them,
+     * so the per-line path must behave the same way.
+     */
+    private static String[] splitPreservingEmptyFields(String line, char delimiter)
+    {
+        List<String> fields = new ArrayList<>();
+        int start = 0;
+        int index;
+        while ((index = line.indexOf(delimiter, start)) != -1) {
+            fields.add(line.substring(start, index));
+            start = index + 1;
+        }
+        fields.add(line.substring(start));
+        return fields.toArray(new String[0]);
     }
 
     /**
