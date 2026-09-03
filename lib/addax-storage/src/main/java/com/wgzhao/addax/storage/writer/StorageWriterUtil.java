@@ -528,6 +528,8 @@ public final class StorageWriterUtil
 
         Record record;
         while ((record = lineReceiver.getFromReader()) != null) {
+            validateRecordColumns(record, columns);
+
             appendRecordValues(record, sb);
 
             if (!extendedInsert) {
