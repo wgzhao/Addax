@@ -35,7 +35,7 @@ if (( ${#header} > 100 )); then
 fi
 
 allowed_types='feat|fix|refactor|perf|docs|test|build|ci|chore|revert'
-pattern="^(${allowed_types})\\(([a-z0-9][a-z0-9-]*)\\)(!)?: ([a-z][^.]*)$"
+pattern="^(${allowed_types})\\(([a-z0-9][a-z0-9-]*)\\)(!)?: (.+)$"
 
 if [[ ! "$header" =~ $pattern ]]; then
   cat >&2 <<'EOF'
@@ -44,7 +44,7 @@ expected: <type>(<scope>)!: <subject>
 allowed types: feat|fix|refactor|perf|docs|test|build|ci|chore|revert
 rules:
 - scope is mandatory and uses [a-z0-9-]
-- subject starts with lowercase and must not end with '.'
+- subject is free text: dots and mixed case are allowed
 - header length <= 100
 EOF
   echo "actual: $header" >&2
