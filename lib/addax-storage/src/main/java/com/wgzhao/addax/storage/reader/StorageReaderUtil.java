@@ -299,7 +299,9 @@ public final class StorageReaderUtil
             // No column configuration - treat all as strings
             for (String columnValue : sourceLine) {
                 // Note: not equalsIgnoreCase, it's all ok if nullFormat is null
-                Column columnGenerated = columnValue.equals(nullFormat)
+                // commons-csv yields null for a field matching nullFormat, so check null first,
+                // mirroring the guard the typed branch has in createTypedColumn
+                Column columnGenerated = (columnValue == null || columnValue.equals(nullFormat))
                     ? new StringColumn(null)
                     : new StringColumn(columnValue);
                 record.addColumn(columnGenerated);
