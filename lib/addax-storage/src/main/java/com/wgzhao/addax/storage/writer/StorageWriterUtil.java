@@ -55,6 +55,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 
@@ -361,11 +362,12 @@ public final class StorageWriterUtil
             return new BufferedWriter(new OutputStreamWriter(outputStream, encoding));
         }
 
-        // Normalize compress name for compatibility
-        String normalizedCompress = switch (compress.toLowerCase()) {
+        // Normalize compress name for compatibility; Locale.ROOT keeps locale-sensitive JVMs
+        // (e.g. tr_TR) from mangling ASCII names such as "ZIP" -> "zıp"
+        String normalizedCompress = switch (compress.toLowerCase(Locale.ROOT)) {
             case "gzip" -> "gz";
             case "bz2" -> "bzip2";
-            default -> compress.toLowerCase();
+            default -> compress.toLowerCase(Locale.ROOT);
         };
 
         if ("zip".equals(normalizedCompress)) {
