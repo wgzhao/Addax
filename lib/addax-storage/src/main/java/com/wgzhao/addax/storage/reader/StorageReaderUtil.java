@@ -324,8 +324,8 @@ public final class StorageReaderUtil
             taskPluginCollector.collectDirtyRecord(record, iae.getMessage());
         }
         catch (Exception e) {
-            if (e instanceof AddaxException) {
-                throw (AddaxException) e;
+            if (e instanceof AddaxException addaxException) {
+                throw addaxException;
             }
             // Each record which transfer failed should be regarded as dirty
             taskPluginCollector.collectDirtyRecord(record, e.getMessage());
