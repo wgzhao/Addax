@@ -41,9 +41,10 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -375,12 +376,16 @@ public final class FileHelper
      *
      * @return generated string for file naming (never null)
      */
+    // Shared formatter: SimpleDateFormat is mutable and unsafe to share across the concurrent
+    // writer tasks that generate file names; java.time formatters are immutable and thread-safe
+    private static final DateTimeFormatter FILE_TIME_FORMATTER =
+            DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss_SSS").withZone(ZoneId.systemDefault());
+
     public static String generateFileMiddleName()
     {
         String randomChars = "0123456789abcdefghmnpqrstuvwxyz";
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS");
         // Generate format like: 20211203_143329_237_6587fddb
-        return dateFormat.format(new Date()) + "_" +
+        return FILE_TIME_FORMATTER.format(Instant.now()) + "_" +
                RandomStringUtils.insecure().next(8, randomChars);
     }
 }
