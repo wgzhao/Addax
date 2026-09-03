@@ -608,17 +608,17 @@ public final class StorageWriterUtil
         for (int i = 0; i < record.getColumnNumber(); i++) {
             Column column = record.getColumn(i);
 
+            // A null column (or null raw data) must become SQL NULL, never the quoted literal 'null'
+            if (column == null || column.getRawData() == null) {
+                sb.append("NULL");
+            }
             // Numeric and boolean columns don't need quotes
-            if (column instanceof LongColumn || column instanceof BoolColumn) {
+            else if (column instanceof LongColumn || column instanceof BoolColumn) {
                 sb.append(column.asString());
             }
             else {
                 // Escape single quotes in string values
-                String value = column.asString();
-                if (value != null) {
-                    value = value.replace("'", "''");
-                }
-                sb.append("'").append(value).append("'");
+                sb.append("'").append(column.asString().replace("'", "''")).append("'");
             }
 
             if (i < record.getColumnNumber() - 1) {
