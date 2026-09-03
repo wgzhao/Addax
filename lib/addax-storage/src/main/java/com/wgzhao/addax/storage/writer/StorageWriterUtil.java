@@ -530,27 +530,34 @@ public final class StorageWriterUtil
         while ((record = lineReceiver.getFromReader()) != null) {
             appendRecordValues(record, sb);
 
-            if (extendedInsert) {
-                currentBatchSize++;
-                if (currentBatchSize >= batchSize) {
-                    writeAndResetBuffer(writer, sb, sqlHeader);
-                    currentBatchSize = 0;
-                }
-                else {
-                    sb.append("), (");
-                }
-            }
-            else {
+            if (!extendedInsert) {
+                // one INSERT statement per record
                 sb.append(");\n");
                 writer.write(sb.toString());
                 sb.setLength(0);
                 sb.append(sqlHeader).append(" VALUES (");
+                continue;
+            }
+
+            currentBatchSize++;
+            if (currentBatchSize < batchSize) {
+                // join the next record to the current statement
+                sb.append("), (");
+            }
+            else {
+                // batch is full: the buffer ends with the bare row values (no separator yet),
+                // so close the statement explicitly instead of stripping a trailing separator
+                sb.append(");\n");
+                writer.write(sb.toString());
+                sb.setLength(0);
+                sb.append(sqlHeader).append(" VALUES (");
+                currentBatchSize = 0;
             }
         }
 
-        // Write remaining records
+        // A partial trailing batch ends with the "), (" separator appended above: strip it and close
         if (currentBatchSize > 0) {
-            sb.delete(sb.length() - 3, sb.length()).append(";\n");
+            sb.delete(sb.length() - 4, sb.length()).append(");\n");
             writer.write(sb.toString());
         }
     }
@@ -618,20 +625,4 @@ public final class StorageWriterUtil
         }
     }
 
-    /**
-     * Write buffer content and reset for next batch.
-     *
-     * @param writer the writer to write to
-     * @param sb the StringBuilder to write and reset
-     * @param sqlHeader SQL header for next batch
-     * @throws IOException if writing fails
-     */
-    private static void writeAndResetBuffer(BufferedWriter writer, StringBuilder sb, String sqlHeader)
-            throws IOException
-    {
-        sb.delete(sb.length() - 3, sb.length()).append(";\n");
-        writer.write(sb.toString());
-        sb.setLength(0);
-        sb.append(sqlHeader).append(" VALUES (");
-    }
 }
