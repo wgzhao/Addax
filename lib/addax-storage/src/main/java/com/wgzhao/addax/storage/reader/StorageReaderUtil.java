@@ -46,7 +46,6 @@ import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.io.Charsets;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -208,7 +207,7 @@ public final class StorageReaderUtil
      * @param recordSender sender for processed records
      * @param taskPluginCollector collector for error handling
      */
-    public static void doReadFromStream(BufferedReader reader, String fileName,
+    private static void doReadFromStream(BufferedReader reader, String fileName,
             Configuration readerSliceConfig, RecordSender recordSender,
             TaskPluginCollector taskPluginCollector)
     {
@@ -355,8 +354,8 @@ public final class StorageReaderUtil
             taskPluginCollector.collectDirtyRecord(record, iae.getMessage());
         }
         catch (Exception e) {
-            if (e instanceof AddaxException) {
-                throw (AddaxException) e;
+            if (e instanceof AddaxException addaxException) {
+                throw addaxException;
             }
             // Each record which transfer failed should be regarded as dirty
             taskPluginCollector.collectDirtyRecord(record, e.getMessage());
@@ -492,7 +491,7 @@ public final class StorageReaderUtil
      * @param readerConfiguration configuration to validate
      * @throws AddaxException if encoding is not supported
      */
-    public static void validateEncoding(Configuration readerConfiguration)
+    private static void validateEncoding(Configuration readerConfiguration)
     {
         // Encoding check
         String encoding = readerConfiguration.getString(Key.ENCODING, Constant.DEFAULT_ENCODING);
@@ -517,7 +516,7 @@ public final class StorageReaderUtil
      * @param readerConfiguration configuration to validate
      * @throws AddaxException if delimiter is invalid
      */
-    public static void validateFieldDelimiter(Configuration readerConfiguration)
+    private static void validateFieldDelimiter(Configuration readerConfiguration)
     {
         // Field delimiter check
         String delimiterInStr = readerConfiguration.getString(Key.FIELD_DELIMITER, ",");
@@ -536,7 +535,7 @@ public final class StorageReaderUtil
      *
      * @param readerConfiguration configuration to validate
      */
-    public static void validateColumn(Configuration readerConfiguration)
+    private static void validateColumn(Configuration readerConfiguration)
     {
         // Column validation: 1. index type 2. value type 3. when type is Date, may have format
         List<Configuration> columns = readerConfiguration.getListConfiguration(Key.COLUMN);
@@ -575,22 +574,4 @@ public final class StorageReaderUtil
         }
     }
 
-    /**
-     * Get the parent path of a path with wildcard, only the last level.
-     *
-     * @param regexPath path with potential wildcards
-     * @return parent path without wildcards
-     */
-    public static String getRegexPathParentPath(String regexPath)
-    {
-        int lastDirSeparator = regexPath.lastIndexOf(IOUtils.DIR_SEPARATOR);
-        String parentPath = regexPath.substring(0, lastDirSeparator + 1);
-
-        if (parentPath.contains("*") || parentPath.contains("?")) {
-            throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                    String.format("The path '%s' is illegal, ONLY the trail folder can contain wildcard * or ?",
-                            regexPath));
-        }
-        return parentPath;
-    }
 }

@@ -460,7 +460,7 @@ public final class StorageWriterUtil
      * @param taskPluginCollector collector for error handling
      * @return list of string values, or null if conversion fails
      */
-    public static List<String> recordToList(Record record, String nullFormat, DateFormat dateParse, TaskPluginCollector taskPluginCollector)
+    private static List<String> recordToList(Record record, String nullFormat, DateFormat dateParse, TaskPluginCollector taskPluginCollector)
     {
         try {
             List<String> splitRows = new ArrayList<>();
@@ -516,7 +516,7 @@ public final class StorageWriterUtil
      * @throws IOException if writing fails
      * @throws AddaxException if configuration is invalid
      */
-    public static void writeToSql(RecordReceiver lineReceiver, BufferedWriter writer, Configuration config)
+    private static void writeToSql(RecordReceiver lineReceiver, BufferedWriter writer, Configuration config)
             throws IOException
     {
         String tableName = config.getNecessaryValue(Key.TABLE, REQUIRED_VALUE);
