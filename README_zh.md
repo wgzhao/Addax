@@ -273,13 +273,11 @@ Failed record             :                   0
 
 ## Star History
 
-## Star History
-
-<a href="https://www.star-history.com/#wgzhao/Addax&Date">
+<a href="https://www.star-history.com/?type=date&repos=wgzhao%2FAddax">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=wgzhao/Addax&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=wgzhao/Addax&type=Date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=wgzhao/Addax&type=Date" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=wgzhao/Addax&type=date&theme=dark&legend=top-left&sealed_token=jmRwqY8lGtF59oVMCKpMzTA2yQHsU05z7ZovIgr_ynaROhApg1ZXRB87dPOm0m4igVW55GHeoXEIz7McZxpp5p_Nf54WwhRQNOzee9pX4co8fvEiGpfeklAM2mM3Q1LjqfOK8IFCNIQxfN5G_CU_KyYpNFbxeIPBarkG22jmvL6T0QO15VXsq2N63CJs" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=wgzhao/Addax&type=date&legend=top-left&sealed_token=jmRwqY8lGtF59oVMCKpMzTA2yQHsU05z7ZovIgr_ynaROhApg1ZXRB87dPOm0m4igVW55GHeoXEIz7McZxpp5p_Nf54WwhRQNOzee9pX4co8fvEiGpfeklAM2mM3Q1LjqfOK8IFCNIQxfN5G_CU_KyYpNFbxeIPBarkG22jmvL6T0QO15VXsq2N63CJs" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=wgzhao/Addax&type=date&legend=top-left&sealed_token=jmRwqY8lGtF59oVMCKpMzTA2yQHsU05z7ZovIgr_ynaROhApg1ZXRB87dPOm0m4igVW55GHeoXEIz7McZxpp5p_Nf54WwhRQNOzee9pX4co8fvEiGpfeklAM2mM3Q1LjqfOK8IFCNIQxfN5G_CU_KyYpNFbxeIPBarkG22jmvL6T0QO15VXsq2N63CJs" />
  </picture>
 </a>
 
