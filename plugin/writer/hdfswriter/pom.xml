@@ -103,6 +103,13 @@
             <artifactId>parquet-hadoop-bundle</artifactId>
         </dependency>
 
+        <!-- hadoop-common declares lz4-java as provided (it ships it in its own distro),
+             so supply it explicitly or hadoop Lz4Codec fails with NoClassDefFoundError -->
+        <dependency>
+            <groupId>org.lz4</groupId>
+            <artifactId>lz4-java</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>log4j-over-slf4j</artifactId>
