@@ -92,7 +92,12 @@ public final class StorageWriterUtil
 
     /**
      * Validate writer configuration parameters including write mode, encoding,
-     * compression, and field delimiter.
+     * and field delimiter.
+     *
+     * <p>Compression is deliberately not checked here: it is only meaningful for
+     * writers that emit through {@link #writeToStream}, while format-native writers
+     * (ORC/PARQUET/TEXT on hdfs/s3) accept their own codec sets. Those writers must
+     * invoke {@link #validateCompression} explicitly, or validate codecs themselves.
      *
      * @param writerConfiguration the configuration to validate
      * @throws AddaxException if validation fails
@@ -101,7 +106,6 @@ public final class StorageWriterUtil
     {
         validateWriteMode(writerConfiguration);
         validateEncoding(writerConfiguration);
-        validateCompression(writerConfiguration);
         validateFieldDelimiter(writerConfiguration);
         validateFileFormat(writerConfiguration);
     }
@@ -153,11 +157,15 @@ public final class StorageWriterUtil
     }
 
     /**
-     * Validate the compression parameter.
+     * Validate the compression parameter against the codecs commons-compress can emit.
+     *
+     * <p>Only writers that write through {@link #writeToStream} (whose {@code createWriter}
+     * maps the mode via commons-compress) should call this; format-native writers such as
+     * the hdfs/s3 writer have their own per-format codec vocabularies.
      *
      * @param writerConfiguration configuration to validate
      */
-    private static void validateCompression(Configuration writerConfiguration)
+    public static void validateCompression(Configuration writerConfiguration)
     {
         String compress = writerConfiguration.getString(Key.COMPRESS);
         if (StringUtils.isBlank(compress)) {

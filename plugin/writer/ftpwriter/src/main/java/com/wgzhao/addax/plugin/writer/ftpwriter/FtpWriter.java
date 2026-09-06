@@ -85,6 +85,8 @@ public class FtpWriter
             this.writerSliceConfig = this.getPluginJobConf();
             this.validateParameter();
             StorageWriterUtil.validateParameter(this.writerSliceConfig);
+            // files are emitted through writeToStream (commons-compress), so compress is checked here
+            StorageWriterUtil.validateCompression(this.writerSliceConfig);
             String keyPath = this.writerSliceConfig.getString(FtpKey.KEY_PATH, null);
             String keyPass = this.writerSliceConfig.getString(FtpKey.KEY_PASS, null);
 

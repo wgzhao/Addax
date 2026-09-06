@@ -87,6 +87,8 @@ public class TxtFileWriter
                 LOG.warn("The `format` item has been deprecated; please use `dateFormat` for configuration.");
             }
             StorageWriterUtil.validateParameter(this.writerSliceConfig);
+            // files are emitted through writeToStream (commons-compress), so compress is checked here
+            StorageWriterUtil.validateCompression(this.writerSliceConfig);
         }
 
         private void validateParameter()
