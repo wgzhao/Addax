@@ -207,9 +207,6 @@ public final class StorageReaderUtil
             Configuration readerSliceConfig, RecordSender recordSender,
             TaskPluginCollector taskPluginCollector)
     {
-        // Configure CSV parser
-        CSVFormat.Builder csvFormatBuilder = CSVFormat.DEFAULT.builder();
-
         // Get field delimiter
         String delimiterInStr = readerSliceConfig.getString(Key.FIELD_DELIMITER);
         if (delimiterInStr != null && delimiterInStr.length() != 1) {
@@ -219,12 +216,30 @@ public final class StorageReaderUtil
             LOG.warn("Uses [{}] as delimiter by default", Constant.DEFAULT_FIELD_DELIMITER);
         }
 
-        // Note: default value is ',', fieldDelimiter could be \n(lineDelimiter) for no fieldDelimiter
-        Character fieldDelimiter = readerSliceConfig.getChar(Key.FIELD_DELIMITER, Constant.DEFAULT_FIELD_DELIMITER);
-        csvFormatBuilder.setDelimiter(fieldDelimiter);
-
         // Null format configuration, note: no default value '\N'
         String nullFormat = readerSliceConfig.getString(Key.NULL_FORMAT);
+        List<ColumnEntry> column = getListColumnEntry(readerSliceConfig, Key.COLUMN);
+
+        // Note: default value is ',', fieldDelimiter could be \n(lineDelimiter) for no fieldDelimiter.
+        // commons-csv refuses line-break delimiters outright, so a '\n' (or '\r') fieldDelimiter is
+        // treated as "no field delimiter": each physical line is one single-field record, read
+        // line by line instead of parsed as CSV.
+        char fieldDelimiter = readerSliceConfig.getChar(Key.FIELD_DELIMITER, Constant.DEFAULT_FIELD_DELIMITER);
+        if (fieldDelimiter == '\n' || fieldDelimiter == '\r') {
+            boolean skipHeader = readerSliceConfig.getBool(Key.SKIP_HEADER, Constant.DEFAULT_SKIP_HEADER);
+            try {
+                readPlainLines(reader, column, nullFormat, skipHeader, recordSender, taskPluginCollector);
+            }
+            catch (IOException ioe) {
+                throw AddaxException.asAddaxException(
+                        IO_ERROR, String.format("Failed to read file [%s]", fileName), ioe);
+            }
+            return;
+        }
+
+        // Configure CSV parser
+        CSVFormat.Builder csvFormatBuilder = CSVFormat.DEFAULT.builder();
+        csvFormatBuilder.setDelimiter(fieldDelimiter);
         csvFormatBuilder.setNullString(nullFormat);
 
         // Header handling
@@ -232,8 +247,6 @@ public final class StorageReaderUtil
             csvFormatBuilder.setHeader();
             csvFormatBuilder.setSkipHeaderRecord(true);
         }
-
-        List<ColumnEntry> column = getListColumnEntry(readerSliceConfig, Key.COLUMN);
 
         // Process each line
         try (CSVParser csvParser = CSVParser.parse(reader, csvFormatBuilder.get())) {
@@ -259,6 +272,30 @@ public final class StorageReaderUtil
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
+        }
+    }
+
+    /**
+     * Read records where a physical line is the whole record (fieldDelimiter "\n"/"\r").
+     *
+     * <p>Mirrors the commons-csv semantics used for regular delimiters: the first line is
+     * dropped as a header when requested and completely empty lines produce no record.
+     */
+    private static void readPlainLines(BufferedReader reader, List<ColumnEntry> column, String nullFormat,
+            boolean skipHeader, RecordSender recordSender, TaskPluginCollector taskPluginCollector)
+            throws IOException
+    {
+        String line;
+        boolean headerPending = skipHeader;
+        while ((line = reader.readLine()) != null) {
+            if (headerPending) {
+                headerPending = false;
+                continue;
+            }
+            if (line.isEmpty()) {
+                continue;
+            }
+            transportOneRecord(recordSender, column, new String[] {line}, nullFormat, taskPluginCollector);
         }
     }
 

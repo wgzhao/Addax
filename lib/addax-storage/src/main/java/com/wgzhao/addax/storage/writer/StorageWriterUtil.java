@@ -435,12 +435,7 @@ public final class StorageWriterUtil
             Configuration config, TaskPluginCollector taskPluginCollector)
             throws IOException
     {
-        CSVFormat.Builder csvBuilder = CSVFormat.DEFAULT.builder();
-        csvBuilder.setRecordSeparator(IOUtils.LINE_SEPARATOR_UNIX);
-
         String nullFormat = config.getString(Key.NULL_FORMAT);
-        csvBuilder.setNullString(nullFormat);
-
         String dateFormat = config.getString(Key.DATE_FORMAT);
         DateFormat dateParse = StringUtils.isNotBlank(dateFormat) ? new SimpleDateFormat(dateFormat) : null;
 
@@ -450,6 +445,18 @@ public final class StorageWriterUtil
             throw AddaxException.illegalConfigValue(Key.FIELD_DELIMITER, delimiterInStr);
         }
         char fieldDelimiter = config.getChar(Key.FIELD_DELIMITER, Constant.DEFAULT_FIELD_DELIMITER);
+
+        // '\n' (or '\r') as fieldDelimiter is the historical "no field separator" marker (one
+        // field per physical line). commons-csv rejects line-break delimiters, so those records
+        // are emitted manually instead of going through CSVPrinter.
+        if (fieldDelimiter == '\n' || fieldDelimiter == '\r') {
+            writePlainRecords(lineReceiver, writer, nullFormat, dateParse, fieldDelimiter, taskPluginCollector);
+            return;
+        }
+
+        CSVFormat.Builder csvBuilder = CSVFormat.DEFAULT.builder();
+        csvBuilder.setRecordSeparator(IOUtils.LINE_SEPARATOR_UNIX);
+        csvBuilder.setNullString(nullFormat);
         csvBuilder.setDelimiter(fieldDelimiter);
 
         // Handle headers
@@ -465,6 +472,27 @@ public final class StorageWriterUtil
                 if (result != null) {
                     csvPrinter.printRecord(result);
                 }
+            }
+        }
+    }
+
+    /**
+     * Write records whose fields are separated by a line break (fieldDelimiter "\n"/"\r").
+     *
+     * <p>Fields are joined with the delimiter and the record is terminated by '\n', which
+     * puts every field of one record on its own physical line.
+     */
+    private static void writePlainRecords(RecordReceiver lineReceiver, BufferedWriter writer, String nullFormat,
+            DateFormat dateParse, char fieldDelimiter, TaskPluginCollector taskPluginCollector)
+            throws IOException
+    {
+        String separator = String.valueOf(fieldDelimiter);
+        Record record;
+        while ((record = lineReceiver.getFromReader()) != null) {
+            List<String> result = recordToList(record, nullFormat, dateParse, taskPluginCollector);
+            if (result != null) {
+                writer.write(String.join(separator, result));
+                writer.write('\n');
             }
         }
     }
