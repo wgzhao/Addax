@@ -21,7 +21,6 @@
 
 package com.wgzhao.addax.storage.reader;
 
-import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.wgzhao.addax.core.base.Constant;
 import com.wgzhao.addax.core.base.Key;
@@ -264,26 +263,25 @@ public final class StorageReaderUtil
     }
 
     /**
-     * Transport one record by parsing a single line of text.
+     * Transport one record parsed from a single line of text.
+     *
+     * <p>Callers that loop over many records (e.g. per-file readers) should resolve the
+     * column configuration once and reuse this overload; re-reading and re-deserializing
+     * the column config for every record dominates the cost on large files.
      *
      * @param recordSender sender for the processed record
-     * @param configuration configuration containing column and delimiter info
-     * @param taskPluginCollector collector for error handling
+     * @param columnConfigs resolved column configuration, or null for untyped passthrough
      * @param line the line of text to parse
+     * @param fieldDelimiter the character separating fields within the line
+     * @param nullFormat format string representing null values, or null
+     * @param taskPluginCollector collector for error handling
      */
-    public static void transportOneRecord(RecordSender recordSender, Configuration configuration,
-            TaskPluginCollector taskPluginCollector, String line)
+    public static void transportOneRecord(RecordSender recordSender, List<ColumnEntry> columnConfigs,
+            String line, char fieldDelimiter, String nullFormat, TaskPluginCollector taskPluginCollector)
     {
-        List<ColumnEntry> column = getListColumnEntry(configuration, Key.COLUMN);
-        // The nullFormat has no default value
-        String nullFormat = configuration.getString(Key.NULL_FORMAT);
-
-        // Note: default value is ',', fieldDelimiter could be \n(lineDelimiter) for no fieldDelimiter
-        Character fieldDelimiter = configuration.getChar(Key.FIELD_DELIMITER, Constant.DEFAULT_FIELD_DELIMITER);
-
         String[] sourceLine = splitPreservingEmptyFields(line, fieldDelimiter);
 
-        transportOneRecord(recordSender, column, sourceLine, nullFormat, taskPluginCollector);
+        transportOneRecord(recordSender, columnConfigs, sourceLine, nullFormat, taskPluginCollector);
     }
 
     /**
@@ -463,9 +461,17 @@ public final class StorageReaderUtil
             return null;
         }
 
-        List<ColumnEntry> result = new ArrayList<>();
+        // Copy the parsed JSON objects straight into ColumnEntry beans. Serializing each
+        // object back to JSON text only to re-parse it allocates two strings per column
+        // and is pointless when setFormat() already builds the DateFormat for us.
+        List<ColumnEntry> result = new ArrayList<>(lists.size());
         for (final JSONObject object : lists) {
-            result.add(JSON.parseObject(object.toJSONString(), ColumnEntry.class));
+            ColumnEntry entry = new ColumnEntry();
+            entry.setIndex(object.getInteger(Key.INDEX));
+            entry.setType(object.getString(Key.TYPE));
+            entry.setValue(object.getString(Key.VALUE));
+            entry.setFormat(object.getString(Key.FORMAT));
+            result.add(entry);
         }
         return result;
     }

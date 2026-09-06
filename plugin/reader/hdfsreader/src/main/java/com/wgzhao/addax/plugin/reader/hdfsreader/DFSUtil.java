@@ -24,6 +24,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.JSONWriter;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
+import com.wgzhao.addax.core.base.Constant;
 import com.wgzhao.addax.core.base.Key;
 import com.wgzhao.addax.core.element.ColumnEntry;
 import com.wgzhao.addax.core.exception.AddaxException;
@@ -282,6 +283,13 @@ public class DFSUtil
     {
         LOG.info("Begin to read the sequence file [{}].", sourceSequenceFilePath);
 
+        // Resolve the column layout once per file; doing it per record (as the removed
+        // Configuration-based entry point did) deserializes the same JSON config on
+        // every row and dominates the read cost on large sequence files.
+        List<ColumnEntry> columns = StorageReaderUtil.getListColumnEntry(readerSliceConfig, Key.COLUMN);
+        String nullFormat = readerSliceConfig.getString(Key.NULL_FORMAT);
+        char fieldDelimiter = readerSliceConfig.getChar(Key.FIELD_DELIMITER, Constant.DEFAULT_FIELD_DELIMITER);
+
         Path seqFilePath = new Path(sourceSequenceFilePath);
         try (SequenceFile.Reader reader = new SequenceFile.Reader(this.hadoopConf, SequenceFile.Reader.file(seqFilePath))) {
             //获取SequenceFile.Reader实例
@@ -289,8 +297,10 @@ public class DFSUtil
             Writable key = (Writable) ReflectionUtils.newInstance(reader.getKeyClass(), this.hadoopConf);
             Text value = new Text();
             while (reader.next(key, value)) {
-                if (StringUtils.isNotBlank(value.toString())) {
-                    StorageReaderUtil.transportOneRecord(recordSender, readerSliceConfig, taskPluginCollector, value.toString());
+                String record = value.toString();
+                if (StringUtils.isNotBlank(record)) {
+                    StorageReaderUtil.transportOneRecord(recordSender, columns, record, fieldDelimiter, nullFormat,
+                            taskPluginCollector);
                 }
             }
         }
