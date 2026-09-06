@@ -19,13 +19,11 @@
 
 package com.wgzhao.addax.plugin.reader.s3reader;
 
-import com.wgzhao.addax.core.base.Constant;
 import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.plugin.RecordSender;
 import com.wgzhao.addax.core.spi.Reader;
 import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.storage.reader.StorageReaderUtil;
-import org.apache.commons.io.Charsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -36,13 +34,10 @@ import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
 import java.io.InputStream;
-import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
@@ -78,53 +73,10 @@ public class S3Reader
             this.bucket = readerOriginConfig.getNecessaryValue(S3Key.BUCKET, REQUIRED_VALUE);
             readerOriginConfig.getNecessaryValue(S3Key.OBJECT, REQUIRED_VALUE);
 
-            String encoding = readerOriginConfig.getString(S3Key.ENCODING, Constant.DEFAULT_ENCODING);
-            try {
-                Charsets.toCharset(encoding);
-            }
-            catch (UnsupportedCharsetException uce) {
-                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                        String.format("unsupported encoding : [%s]", encoding), uce);
-            }
-            catch (Exception e) {
-                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                        String.format("Runtime Error : %s", e.getMessage()), e);
-            }
+            // Encoding, fieldDelimiter and column layout are shared with every other file
+            // reader; keeping a private copy here let the three validations drift apart.
+            StorageReaderUtil.validateParameter(readerOriginConfig);
 
-            // 检测是column 是否为 ["*"] 若是则填为空
-            List<Configuration> column = readerOriginConfig.getListConfiguration(S3Key.COLUMN);
-            if (null != column && 1 == column.size() && ("\"*\"".equals(column.get(0).toString())
-                    || "'*'".equals(column.get(0).toString()))) {
-                readerOriginConfig.set(S3Key.COLUMN, new ArrayList<String>());
-            }
-            else {
-                // column: 1. index type 2.value type 3.when type is Data, maybe with format string
-                List<Configuration> columns = readerOriginConfig.getListConfiguration(S3Key.COLUMN);
-
-                if (null == columns || columns.isEmpty()) {
-                    throw AddaxException.asAddaxException(
-                            REQUIRED_VALUE,
-                            "The item column is required");
-                }
-
-                for (Configuration eachColumnConf : columns) {
-                    eachColumnConf.getNecessaryValue(S3Key.TYPE, REQUIRED_VALUE);
-                    Integer columnIndex = eachColumnConf.getInt(S3Key.INDEX);
-                    String columnValue = eachColumnConf.getString(S3Key.VALUE);
-
-                    if (null == columnIndex && null == columnValue) {
-                        throw AddaxException.asAddaxException(
-                                CONFIG_ERROR,
-                                "You configured type, also configured index or value");
-                    }
-
-                    if (null != columnIndex && null != columnValue) {
-                        throw AddaxException.asAddaxException(
-                                CONFIG_ERROR,
-                                "You configured both index and value");
-                    }
-                }
-            }
             this.client = S3Util.initS3Client(readerOriginConfig);
         }
 

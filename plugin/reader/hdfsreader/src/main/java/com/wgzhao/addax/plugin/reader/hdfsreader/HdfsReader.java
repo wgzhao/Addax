@@ -26,20 +26,13 @@ import com.wgzhao.addax.core.spi.Reader;
 import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.storage.reader.StorageReaderUtil;
 import com.wgzhao.addax.storage.util.FileHelper;
-import org.apache.commons.io.Charsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import static com.wgzhao.addax.core.base.Key.COLUMN;
-import static com.wgzhao.addax.core.base.Key.ENCODING;
-import static com.wgzhao.addax.core.base.Key.INDEX;
-import static com.wgzhao.addax.core.base.Key.TYPE;
-import static com.wgzhao.addax.core.base.Key.VALUE;
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
 import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
@@ -102,20 +95,10 @@ public class HdfsReader
                         "The file type only supports " + HdfsConstant.SUPPORT_FILE_TYPE + " but not " + specifiedFileType);
             }
 
-            String encoding = this.readerOriginConfig.getString(ENCODING, "UTF-8");
+            // Encoding, fieldDelimiter and column layout are shared with every other file
+            // reader; keeping a private copy here let the three validations drift apart.
+            StorageReaderUtil.validateParameter(readerOriginConfig);
 
-            try {
-                Charsets.toCharset(encoding);
-            }
-            catch (UnsupportedCharsetException uce) {
-                throw AddaxException.asAddaxException(
-                        ILLEGAL_VALUE,
-                        "The encoding [" +  encoding + "] is unsupported.", uce);
-            }
-            catch (Exception e) {
-                throw AddaxException.asAddaxException(
-                        ILLEGAL_VALUE, "Exception occurred", e);
-            }
             //check Kerberos
             boolean haveKerberos = readerOriginConfig.getBool(Key.HAVE_KERBEROS, false);
             if (haveKerberos) {
@@ -123,51 +106,11 @@ public class HdfsReader
                 readerOriginConfig.getNecessaryValue(Key.KERBEROS_PRINCIPAL, REQUIRED_VALUE);
             }
 
-            // validate the Columns
-            validateColumns();
-
             // validate compress
             String compress = readerOriginConfig.getString(Key.COMPRESS, "NONE");
             if ("gzip".equalsIgnoreCase(compress)) {
                 // correct to gz
                 readerOriginConfig.set(Key.COMPRESS, "gz");
-            }
-        }
-
-        private void validateColumns()
-        {
-
-            // 检测是column 是否为 ["*"] 若是则填为空
-            List<Configuration> column = this.readerOriginConfig.getListConfiguration(COLUMN);
-            if (null != column && 1 == column.size()
-                    && ("\"*\"".equals(column.get(0).toString()) || "'*'".equals(column.get(0).toString()))) {
-                readerOriginConfig.set(COLUMN, new ArrayList<String>());
-            }
-            else {
-                // column: 1. index type 2.value type 3.when type is Data, may be dateFormat value
-                List<Configuration> columns = readerOriginConfig.getListConfiguration(COLUMN);
-
-                if (null == columns || columns.isEmpty()) {
-                    throw AddaxException.asAddaxException(CONFIG_ERROR,
-                            "The item columns is required.");
-                }
-
-                for (Configuration eachColumnConf : columns) {
-                    eachColumnConf.getNecessaryValue(TYPE, REQUIRED_VALUE);
-                    Integer columnIndex = eachColumnConf.getInt(INDEX);
-                    String columnValue = eachColumnConf.getString(VALUE);
-
-                    if (null == columnIndex && null == columnValue) {
-                        throw AddaxException.asAddaxException(
-                                CONFIG_ERROR,
-                                "The index or value must have one, both of them are null.");
-                    }
-
-                    if (null != columnIndex && null != columnValue) {
-                        throw AddaxException.asAddaxException(CONFIG_ERROR,
-                                "The index and value must have one, can not have both.");
-                    }
-                }
             }
         }
 

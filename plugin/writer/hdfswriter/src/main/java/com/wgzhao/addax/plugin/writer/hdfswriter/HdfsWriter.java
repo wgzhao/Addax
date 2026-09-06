@@ -27,7 +27,7 @@ import com.wgzhao.addax.core.spi.Writer;
 import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.core.util.ShellUtil;
 import com.wgzhao.addax.storage.util.FileHelper;
-import org.apache.commons.io.Charsets;
+import com.wgzhao.addax.storage.writer.StorageWriterUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.fs.Path;
 import org.apache.orc.CompressionKind;
@@ -121,27 +121,19 @@ public class HdfsWriter
             }
             processColumns(columns);
 
-            //writeMode check
-            this.writeMode = this.writerSliceConfig.getNecessaryValue(Key.WRITE_MODE, REQUIRED_VALUE);
-            if (!Constant.SUPPORTED_WRITE_MODE.contains(writeMode)) {
-                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                        String.format("The item writeMode only supports append, noConflict and overwrite, [%s] is unsupported yet.",
-                                writeMode));
-            }
             if ("TEXT".equals(fileType)) {
-                //fieldDelimiter check
+                // Required before the shared validator can fall back to its default delimiter
                 String fieldDelimiter = this.writerSliceConfig.getString(Key.FIELD_DELIMITER, null);
                 if (StringUtils.isEmpty(fieldDelimiter)) {
                     throw AddaxException.asAddaxException(REQUIRED_VALUE,
                             String.format("The item [%s] should be configured and valid while write TEXT file.", Key.FIELD_DELIMITER));
                 }
-
-                if (1 != fieldDelimiter.length()) {
-                    // warn: if it has, length must be one
-                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                            String.format("The field delimiter is only support single character, your configure: [%s]", fieldDelimiter));
-                }
             }
+
+            // Shared writeMode/encoding/fieldDelimiter checks live in the storage layer so
+            // every file-based writer validates them the same way
+            StorageWriterUtil.validateParameter(this.writerSliceConfig);
+            this.writeMode = this.writerSliceConfig.getString(Key.WRITE_MODE);
 
             //compress check
             validateCompression(fileType);
@@ -150,8 +142,6 @@ public class HdfsWriter
             }
             //Kerberos check
             validateKerberos();
-            // encoding check
-            validateEncoding();
 
             // trash
             this.skipTrash = this.writerSliceConfig.getBool(SKIP_TRASH, false);
@@ -436,18 +426,6 @@ public class HdfsWriter
             }
         }
 
-        private void validateEncoding()
-        {
-            var encoding = this.writerSliceConfig.getString(Key.ENCODING, Constant.DEFAULT_ENCODING).trim();
-            try {
-                this.writerSliceConfig.set(Key.ENCODING, encoding);
-                Charsets.toCharset(encoding);
-            }
-            catch (Exception e) {
-                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                        "The encoding [%s] is unsupported yet.".formatted(encoding), e);
-            }
-        }
     }
 
     /** Task. */
