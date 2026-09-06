@@ -301,7 +301,7 @@ public class HdfsHelper
             case "ZSTD" -> org.apache.hadoop.io.compress.ZStandardCodec.class;
             case "DEFLATE", "ZLIB" -> org.apache.hadoop.io.compress.DeflateCodec.class;
             default -> throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
-                    String.format("The compress mode [%s} is unsupported yet.", compress));
+                    String.format("The compress mode [%s] is unsupported yet.", compress));
         };
         return codecClass;
     }

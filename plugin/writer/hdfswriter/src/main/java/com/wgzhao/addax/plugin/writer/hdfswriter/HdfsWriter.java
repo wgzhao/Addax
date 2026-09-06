@@ -79,6 +79,10 @@ public class HdfsWriter
         /** Support format. */
         public static final Set<String> SUPPORT_FORMAT = Set.of("ORC", "PARQUET", "TEXT");
 
+        // Codecs the text writer can emit; keep in sync with HdfsHelper.getCompressCodec
+        private static final Set<String> TEXT_COMPRESS_CODECS = Set.of(
+                "GZIP", "BZIP2", "SNAPPY", "LZ4", "ZSTD", "DEFLATE", "ZLIB");
+
         // Create record for decimal configuration
         private record DecimalConfig(int precision, int scale) {}
 
@@ -422,6 +426,17 @@ public class HdfsWriter
                                         The PARQUET format only supports [%s] compression.
                                         Your configure [%s] is unsupported yet.
                                         """.formatted(Arrays.toString(CompressionCodecName.values()), compress));
+                    }
+                }
+                case "TEXT" -> {
+                    // Codecs mirror HdfsHelper.getCompressCodec; LZO is absent because writing it
+                    // needs the hadoop-lzo native library, which this project does not bundle.
+                    if (!"NONE".equals(compress) && !TEXT_COMPRESS_CODECS.contains(compress)) {
+                        throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                                """
+                                        The TEXT format only supports NONE, [%s] compression.
+                                        Your configure [%s] is unsupported yet (LZO writing requires the hadoop-lzo native library).
+                                        """.formatted(String.join(", ", TEXT_COMPRESS_CODECS), compress));
                     }
                 }
             }

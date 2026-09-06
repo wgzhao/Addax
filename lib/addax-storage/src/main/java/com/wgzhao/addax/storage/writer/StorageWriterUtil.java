@@ -163,10 +163,34 @@ public final class StorageWriterUtil
         if (StringUtils.isBlank(compress)) {
             writerConfiguration.set(Key.COMPRESS, null);
             LOG.debug("No compression specified");
+            return;
         }
-        else {
+
+        // Accept exactly what createWriter can actually produce, so an unsupported mode
+        // fails during job validation instead of midway through writing files.
+        String normalized = normalizeCompressName(compress);
+        Set<String> outputCompressorNames = new CompressorStreamFactory().getOutputStreamCompressorNames();
+        if ("none".equals(normalized) || "zip".equals(normalized) || outputCompressorNames.contains(normalized)) {
             LOG.debug("Compression specified: {}", compress);
+            return;
         }
+        throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE, String.format(
+                "The compress mode [%s] is unsupported; supported modes: none, zip, %s",
+                compress, String.join(", ", outputCompressorNames)));
+    }
+
+    /**
+     * Canonicalize a user-supplied compress name to the spelling commons-compress
+     * understands. Locale.ROOT keeps locale-sensitive JVMs (e.g. tr_TR) from mangling
+     * ASCII names such as "ZIP" into "zıp".
+     */
+    private static String normalizeCompressName(String compress)
+    {
+        return switch (compress.toLowerCase(Locale.ROOT)) {
+            case "gzip" -> "gz";
+            case "bz2" -> "bzip2";
+            default -> compress.toLowerCase(Locale.ROOT);
+        };
     }
 
     /**
@@ -362,13 +386,7 @@ public final class StorageWriterUtil
             return new BufferedWriter(new OutputStreamWriter(outputStream, encoding));
         }
 
-        // Normalize compress name for compatibility; Locale.ROOT keeps locale-sensitive JVMs
-        // (e.g. tr_TR) from mangling ASCII names such as "ZIP" -> "zıp"
-        String normalizedCompress = switch (compress.toLowerCase(Locale.ROOT)) {
-            case "gzip" -> "gz";
-            case "bz2" -> "bzip2";
-            default -> compress.toLowerCase(Locale.ROOT);
-        };
+        String normalizedCompress = normalizeCompressName(compress);
 
         if ("zip".equals(normalizedCompress)) {
             ZipCycleOutputStream zos = new ZipCycleOutputStream(outputStream, fileName);
