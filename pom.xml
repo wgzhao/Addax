@@ -129,7 +129,7 @@
         <sqlite.jdbc.version>3.50.3.0</sqlite.jdbc.version>
         <taos.jdbc.version>3.2.1</taos.jdbc.version>
         <trino.jdbc.version>351</trino.jdbc.version>
-        <ucanaccess.version>5.0.1</ucanaccess.version>
+        <ucanaccess.version>5.1.7</ucanaccess.version>
         <iceberg.version>1.11.0</iceberg.version>
 
         <!-- maven configuration -->
@@ -498,6 +498,14 @@
             </dependency>
 
             <dependency>
+                <!-- maintained fork of net.sf.ucanaccess, see https://github.com/spannm/ucanaccess -->
+                <!-- pulls in org.hsqldb:hsqldb 2.7.4, which fixes CVE-2022-41853, so no exclusion is needed -->
+                <groupId>io.github.spannm</groupId>
+                <artifactId>ucanaccess</artifactId>
+                <version>${ucanaccess.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>io.searchbox</groupId>
                 <artifactId>jest</artifactId>
                 <version>${jest.version}</version>
@@ -539,19 +547,6 @@
                 <groupId>joda-time</groupId>
                 <artifactId>joda-time</artifactId>
                 <version>${joda.time.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>net.sf.ucanaccess</groupId>
-                <artifactId>ucanaccess</artifactId>
-                <version>${ucanaccess.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <!-- CVE-2022-41853 -->
-                        <groupId>org.hsqldb</groupId>
-                        <artifactId>hsqldb</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
 
             <dependency>
