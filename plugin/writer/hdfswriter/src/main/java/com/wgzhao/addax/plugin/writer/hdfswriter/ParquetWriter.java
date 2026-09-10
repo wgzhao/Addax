@@ -311,22 +311,6 @@ public class ParquetWriter
     }
 
     /**
-     * Converts a DATE column to the number of days since the unix epoch.
-     * <p>
-     * A DATE arrives as an instant at local midnight, so it has to be read as a calendar date.
-     * Dividing the raw millis by {@code MILLIS_PER_DAY} instead counts elapsed days since the
-     * epoch and lands a day early in any zone east of UTC, which also disagreed with
-     * {@link OrcWriter} for the very same job configuration.
-     *
-     * @param column the column holding the date value
-     * @return the epoch day of the date
-     */
-    private static int dateToEpochDay(Column column)
-    {
-        return (int) new java.sql.Date(column.asLong()).toLocalDate().toEpochDay();
-    }
-
-    /**
      * Appends an array value to a Parquet group structure.
      * <p>
      * This method processes a JSON array string representation from a column

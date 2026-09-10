@@ -226,20 +226,6 @@ public class HdfsHelper
         }
     }
 
-    /**
-     * Delete one file, failing loudly when the filesystem reports that it could not.
-     *
-     * @param path the file to delete
-     * @throws IOException if the deletion was refused
-     */
-    private void remove(Path path, boolean recursive)
-            throws IOException
-    {
-        if (!fileSystem.delete(path, recursive)) {
-            throw new IOException(String.format("Failed to delete [%s]", path));
-        }
-    }
-
     /** Deletefilesfromdir. */
     public void deleteFilesFromDir(Path dir, boolean skipTrash)
     {
