@@ -371,8 +371,8 @@ public class AddaxGen
         }
 
         // bloom filters are not generated in v1; drop the template's sample columns
-        parameter.remove("bloom.filter.columns");
-        parameter.remove("bloom.filter.fpp");
+        parameter.remove("bloomColumns");
+        parameter.remove("bloomFpp");
     }
 
     /** Fills connection, credentials, columns and splitPk into a JDBC plugin template. */

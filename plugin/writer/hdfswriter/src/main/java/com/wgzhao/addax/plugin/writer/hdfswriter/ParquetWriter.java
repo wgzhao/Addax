@@ -25,6 +25,7 @@ import com.wgzhao.addax.core.base.Constant;
 import com.wgzhao.addax.core.base.Key;
 import com.wgzhao.addax.core.element.Column;
 import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.plugin.RecordReceiver;
 import com.wgzhao.addax.core.plugin.TaskPluginCollector;
 import com.wgzhao.addax.core.util.Configuration;
@@ -58,8 +59,10 @@ import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
+import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
 import static org.apache.parquet.schema.LogicalTypeAnnotation.decimalType;
 
 /** Parquet Writer. */
@@ -166,6 +169,10 @@ public class ParquetWriter
         Record record;
         while ((record = lineReceiver.getFromReader()) != null) {
             Group group = buildRecord(record, columns, taskPluginCollector, simpleGroupFactory);
+            if (group == null) {
+                // a field could not be converted; the record has been reported as dirty
+                continue;
+            }
             writer.write(group);
         }
     }
@@ -182,8 +189,9 @@ public class ParquetWriter
                 continue;
             }
 
-            String colName = columns.get(i).getString(Key.NAME);
-            String typename = columns.get(i).getString(Key.TYPE).toUpperCase();
+            Configuration columnConfig = columns.get(i);
+            String colName = columnConfig.getString(Key.NAME);
+            String typename = columnConfig.getString(Key.TYPE).trim().toUpperCase(Locale.ROOT);
 
             try {
                 if (typename.startsWith("ARRAY<")) {
@@ -193,13 +201,17 @@ public class ParquetWriter
                     appendMapValue(group, column, colName);
                 }
                 else {
-                    SupportHiveDataType columnType = SupportHiveDataType.valueOf(typename);
-                    appendValueByType(group, column, colName, columnType, columns.get(i));
+                    appendValueByType(group, column, colName, SupportHiveDataType.of(typename), columnConfig);
                 }
             }
-            catch (IllegalArgumentException e) {
-                logger.warn("Convert type [{}] into string", typename);
-                group.append(colName, column.asString());
+            catch (Exception e) {
+                // a value the declared type cannot hold is a dirty record, not a string to stuff
+                // into a typed field: SimpleGroup accepts it and the parquet writer then dies with
+                // a ClassCastException once the group reaches it
+                taskPluginCollector.collectDirtyRecord(record, String.format(
+                        "Type conversion error: target field type: [%s], field value: [%s], error: %s",
+                        columnConfig.getString(Key.TYPE), column.getRawData(), e.getMessage()));
+                return null;
             }
         }
         return group;
@@ -210,8 +222,8 @@ public class ParquetWriter
     {
 
         switch (columnType) {
-            case INT, INTEGER -> group.append(colName, Integer.parseInt(column.getRawData().toString()));
-            case BIGINT, LONG -> group.append(colName, column.asLong());
+            case TINYINT, SMALLINT, INT -> group.append(colName, Integer.parseInt(column.getRawData().toString()));
+            case BIGINT -> group.append(colName, column.asLong());
             case FLOAT -> group.append(colName, column.asDouble().floatValue());
             case DOUBLE -> group.append(colName, column.asDouble());
             case BOOLEAN -> group.append(colName, column.asBoolean());
@@ -390,7 +402,7 @@ public class ParquetWriter
         Type.Repetition repetition = Type.Repetition.OPTIONAL;
 
         for (Configuration column : columns) {
-            String type = column.getString(Key.TYPE).trim().toUpperCase();
+            String type = column.getString(Key.TYPE).trim().toUpperCase(Locale.ROOT);
             String fieldName = column.getString(Key.NAME);
             Type field = createFieldByType(type, fieldName, repetition, column);
             builder.addField(field);
@@ -428,14 +440,45 @@ public class ParquetWriter
         return getPrimitiveType(type, fieldName, repetition, column);
     }
 
+    /**
+     * Reduce a configured type name to the token the schema switch below is written in.
+     * <p>
+     * The configuration carries the SQL/Hive spellings: aliases ({@code integer}, {@code long})
+     * and parameters ({@code varchar(10)}, {@code char(3)}). None of them matched a case here, so
+     * such a column fell through to the parquet primitive lookup, threw, and was silently
+     * declared as a STRING - a different logical type from the one ORC wrote for the same config.
+     *
+     * @param type the configured type
+     * @return the canonical token, or the upper-cased input when it is not a Hive type at all
+     */
+    private static String canonicalTypeName(String type)
+    {
+        try {
+            return SupportHiveDataType.of(type).name();
+        }
+        catch (IllegalArgumentException e) {
+            // not part of the Hive vocabulary: BYTES and the parquet primitive type names
+            return type.trim().toUpperCase(Locale.ROOT);
+        }
+    }
+
     private static PrimitiveType getPrimitiveType(String type, String fieldName, Type.Repetition repetition, Configuration column)
     {
-        switch (type) {
-            case "INT" -> {
+        switch (canonicalTypeName(type)) {
+            case "TINYINT", "SMALLINT", "INT" -> {
                 return Types.primitive(PrimitiveType.PrimitiveTypeName.INT32, repetition).named(fieldName);
             }
-            case "BIGINT", "LONG" -> {
+            case "BIGINT" -> {
                 return Types.primitive(PrimitiveType.PrimitiveTypeName.INT64, repetition).named(fieldName);
+            }
+            case "FLOAT" -> {
+                return Types.primitive(PrimitiveType.PrimitiveTypeName.FLOAT, repetition).named(fieldName);
+            }
+            case "DOUBLE" -> {
+                return Types.primitive(PrimitiveType.PrimitiveTypeName.DOUBLE, repetition).named(fieldName);
+            }
+            case "BOOLEAN" -> {
+                return Types.primitive(PrimitiveType.PrimitiveTypeName.BOOLEAN, repetition).named(fieldName);
             }
             case "DECIMAL" -> {
                 int precision = column.getInt(Key.PRECISION, Constant.DEFAULT_DECIMAL_MAX_PRECISION);
@@ -445,12 +488,12 @@ public class ParquetWriter
                         .as(decimalType(scale, precision))
                         .named(fieldName);
             }
-            case "STRING" -> {
+            case "STRING", "VARCHAR", "CHAR" -> {
                 return Types.primitive(PrimitiveType.PrimitiveTypeName.BINARY, repetition)
                         .as(LogicalTypeAnnotation.stringType())
                         .named(fieldName);
             }
-            case "BYTES" -> {
+            case "BINARY", "BYTES" -> {
                 return Types.primitive(PrimitiveType.PrimitiveTypeName.BINARY, repetition)
                         .named(fieldName);
             }
@@ -463,18 +506,8 @@ public class ParquetWriter
                 return Types.primitive(PrimitiveType.PrimitiveTypeName.INT96, repetition)
                         .named(fieldName);
             }
-            default -> {
-                try {
-                    return Types.primitive(PrimitiveType.PrimitiveTypeName.valueOf(type), repetition)
-                            .named(fieldName);
-                }
-                catch (IllegalArgumentException e) {
-                    logger.warn("Unknown type: {}, using STRING instead", type);
-                    return Types.primitive(PrimitiveType.PrimitiveTypeName.BINARY, repetition)
-                            .as(LogicalTypeAnnotation.stringType())
-                            .named(fieldName);
-                }
-            }
+            default -> throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
+                    String.format("Unsupported field type. Field name: [%s], Field type: [%s].", fieldName, type));
         }
     }
 }

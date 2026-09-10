@@ -118,14 +118,16 @@ public final class StorageWriterUtil
      */
     private static void validateWriteMode(Configuration writerConfiguration)
     {
-        String writeMode = writerConfiguration.getNecessaryValue(Key.WRITE_MODE, REQUIRED_VALUE);
-        writeMode = writeMode.trim();
-        if (!SUPPORTED_WRITE_MODES.contains(writeMode)) {
-            throw AddaxException.illegalConfigValue(Key.WRITE_MODE, writeMode,
-                    "valid write modes " + String.join(",", SUPPORTED_WRITE_MODES));
-        }
-        writerConfiguration.set(Key.WRITE_MODE, writeMode);
-        LOG.debug("Validated write mode: {}", writeMode);
+        String writeMode = writerConfiguration.getNecessaryValue(Key.WRITE_MODE, REQUIRED_VALUE).trim();
+        // match case-insensitively but store the canonical spelling: the writers compare the
+        // value literally, so a job that spelled it "NONCONFLICT" used to run and now aborts
+        String canonicalMode = SUPPORTED_WRITE_MODES.stream()
+                .filter(mode -> mode.equalsIgnoreCase(writeMode))
+                .findFirst()
+                .orElseThrow(() -> AddaxException.illegalConfigValue(Key.WRITE_MODE, writeMode,
+                        "valid write modes " + String.join(",", SUPPORTED_WRITE_MODES)));
+        writerConfiguration.set(Key.WRITE_MODE, canonicalMode);
+        LOG.debug("Validated write mode: {}", canonicalMode);
     }
 
     /**
