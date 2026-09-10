@@ -29,8 +29,6 @@ import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.plugin.RecordReceiver;
 import com.wgzhao.addax.core.plugin.TaskPluginCollector;
 import com.wgzhao.addax.core.util.Configuration;
-import org.apache.avro.Conversions;
-import org.apache.avro.generic.GenericData;
 import org.apache.hadoop.fs.Path;
 import org.apache.parquet.avro.AvroReadSupport;
 import org.apache.parquet.avro.AvroWriteSupport;
@@ -76,9 +74,7 @@ public class ParquetWriter
     private static final int PAGE_SIZE = 1024 * 1024;
     private static final int DICTIONARY_PAGE_SIZE = 512 * 1024;
     private static final String WRITER_TIME_ZONE = "writer.time.zone";
-    private static final long MILLIS_PER_DAY = 86400000L;
     private static final int JULIAN_EPOCH_OFFSET_DAYS = 2440588;
-    private static final long NANOS_PER_MILLISECOND = 1000000L;
 
     /** Whether a configured column holds a single value, an array or a map. */
     private enum ColumnKind
@@ -157,8 +153,6 @@ public class ParquetWriter
 
     private void setupHadoopConfiguration(MessageType schema)
     {
-        GenericData decimalSupport = new GenericData();
-        decimalSupport.addLogicalTypeConversion(new Conversions.DecimalConversion());
         hadoopConf.setBoolean(AvroReadSupport.READ_INT96_AS_FIXED, true);
         hadoopConf.setBoolean(AvroWriteSupport.WRITE_FIXED_AS_INT96, true);
         GroupWriteSupport.setSchema(schema, hadoopConf);
@@ -397,7 +391,12 @@ public class ParquetWriter
     }
 
     /**
-     * Convert timestamp to parquet INT96
+     * Convert timestamp to parquet INT96.
+     * <p>
+     * INT96 holds a UTC instant, so the day and the time of day are both taken from the epoch
+     * milliseconds directly. This deliberately differs from {@link #formatTimeWithNanos}, which
+     * renders a TIME column as a wall clock in the configured zone: the two look alike but are
+     * not interchangeable, and unifying them would shift every INT96 timestamp by an offset.
      *
      * @param ts the {@link Timestamp} to convert
      * @return {@link Binary}

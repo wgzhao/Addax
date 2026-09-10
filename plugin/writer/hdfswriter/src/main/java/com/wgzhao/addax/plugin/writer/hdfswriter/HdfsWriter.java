@@ -44,7 +44,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.wgzhao.addax.core.base.Key.IGNORE_ERROR;
@@ -228,7 +227,7 @@ public class HdfsWriter
 
             hdfsHelper.moveFilesToDest(new Path(this.tmpStorePath), new Path(this.path));
 
-            // 删除临时目录
+            // remove the staging directory, whether or not post() already did
             hdfsHelper.deleteDir(new Path(tmpStorePath));
 
             //check postShell item
@@ -304,58 +303,6 @@ public class HdfsWriter
                 if (!hdfsHelper.isPathExists(tmpFilePath)) {
                     return tmpFilePath;
                 }
-            }
-        }
-
-        /**
-         * get decimal type precision
-         * if not specified, use DECIMAL_DEFAULT_PRECISION as default
-         * example:
-         * <pre>
-         *  decimal -&gt; 38
-         *  decimal(10) -&gt; 10
-         *  </pre>
-         *
-         * @param type decimal type including precision and scale (if present)
-         * @return decimal precision
-         */
-        private static int getDecimalPrecision(String type)
-        {
-            if (!type.contains("(")) {
-                return Constant.DEFAULT_DECIMAL_MAX_PRECISION;
-            }
-            else {
-                String regEx = "[^0-9]";
-                Pattern p = Pattern.compile(regEx);
-                Matcher m = p.matcher(type);
-                return Integer.parseInt(m.replaceAll(" ").trim().split(" ")[0]);
-            }
-        }
-
-        /**
-         * get decimal type scale
-         * if precision is not present, return DECIMAL_DEFAULT_SCALE
-         * if precision is present and not specify scale, return 0
-         * example:
-         * <pre>
-         *  decimal -&gt; 10
-         *  decimal(8) -&gt; 0
-         *  decimal(8,2) -&gt; 2
-         *  </pre>
-         *
-         * @param type decimal type string, including precision and scale (if present)
-         * @return decimal scale
-         */
-        private static int getDecimalScale(String type)
-        {
-            if (!type.contains("(")) {
-                return Constant.DEFAULT_DECIMAL_MAX_SCALE;
-            }
-            if (!type.contains(",")) {
-                return 0;
-            }
-            else {
-                return Integer.parseInt(type.split(",")[1].replace(")", "").trim());
             }
         }
 
