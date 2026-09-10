@@ -53,6 +53,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
@@ -71,10 +72,19 @@ public class OrcWriter
             ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd"));
     private static final ThreadLocal<SimpleDateFormat> TIMESTAMP_FORMAT =
             ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
-    // the type of the element in the array
-    private SupportHiveDataType elementType;
-    // the type of the value in the map
-    private SupportHiveDataType valueType;
+
+    /**
+     * The ORC schema together with the element/value type resolved for every configured column.
+     * <p>
+     * The collection types are held per column instead of as writer state: a table may declare
+     * several ARRAY or MAP columns whose element types differ, and a single field would keep only
+     * the last one parsed and apply it to all of them.
+     */
+    private record OrcLayout(TypeDescription schema,
+            List<SupportHiveDataType> elementTypes,
+            List<SupportHiveDataType> mapValueTypes)
+    {
+    }
 
     /** Orcwriter. */
     public OrcWriter(Configuration conf)
@@ -91,9 +101,10 @@ public class OrcWriter
      * @param record {@link Record}
      * @param columns table columns, {@link List}
      * @param taskPluginCollector {@link TaskPluginCollector}
+     * @param layout the schema and the per-column collection types
      */
     private void setRow(VectorizedRowBatch batch, int row, Record record, List<Configuration> columns,
-            TaskPluginCollector taskPluginCollector)
+            TaskPluginCollector taskPluginCollector, OrcLayout layout)
     {
         for (int i = 0; i < columns.size(); i++) {
             Configuration eachColumnConf = columns.get(i);
@@ -109,12 +120,14 @@ public class OrcWriter
             }
 
             if (type.startsWith("ARRAY")) {
-                appendArrayValue(row, recordColumn, (ListColumnVector) col);
+                appendArrayValue(row, recordColumn, (ListColumnVector) col,
+                        layout.elementTypes().get(i), eachColumnConf);
                 continue;
             }
 
             if (type.startsWith("MAP")) {
-                appendMapValue(row, recordColumn, (MapColumnVector) col);
+                appendMapValue(row, recordColumn, (MapColumnVector) col,
+                        layout.mapValueTypes().get(i), eachColumnConf);
                 continue;
             }
 
@@ -196,8 +209,11 @@ public class OrcWriter
      * @param row the row number in the batch
      * @param recordColumn the record column containing the array value
      * @param col the column vector to append the array value to
+     * @param elementType the element type declared for this column
+     * @param eachColumnConf the configuration of this column
      */
-    private void appendArrayValue(int row, Column recordColumn, ListColumnVector col)
+    private void appendArrayValue(int row, Column recordColumn, ListColumnVector col,
+            SupportHiveDataType elementType, Configuration eachColumnConf)
     {
         // "['value1','value2'] ,convert the string to a list of V
         String arrayString = recordColumn.asString();
@@ -212,7 +228,8 @@ public class OrcWriter
                 col.childCount++;
                 continue;
             }
-            appendPrimitiveColumn(col.childCount, elementType, col.child, new StringColumn(o.toString()), null, elementType.toString());
+            appendPrimitiveColumn(col.childCount, elementType, col.child,
+                    new StringColumn(o.toString()), eachColumnConf, elementType.toString());
 
             col.childCount++;
         }
@@ -224,8 +241,11 @@ public class OrcWriter
      * @param row the row number in the batch
      * @param recordColumn the record column containing the array value
      * @param col the column vector to append the array value to
+     * @param valueType the value type declared for this column
+     * @param eachColumnConf the configuration of this column
      */
-    private void appendMapValue(int row, Column recordColumn, MapColumnVector col)
+    private void appendMapValue(int row, Column recordColumn, MapColumnVector col,
+            SupportHiveDataType valueType, Configuration eachColumnConf)
     {
         // assume the column is a map of V or the string of map of V
         // {key1:value1,key2:value2}
@@ -250,7 +270,8 @@ public class OrcWriter
             }
             else {
                 col.values.isNull[col.childCount] = false;
-                appendPrimitiveColumn(col.childCount, valueType, mapValueVector, new StringColumn(value.toString()), null, valueType.toString());
+                appendPrimitiveColumn(col.childCount, valueType, mapValueVector,
+                        new StringColumn(value.toString()), eachColumnConf, valueType.toString());
             }
             col.childCount++;
         }
@@ -273,7 +294,7 @@ public class OrcWriter
         }
         else if (colType == Column.Type.DATE) {
             if (((DateColumn) column).getSubType() == DateColumn.DateType.TIME) {
-                buffer = formatTimeWithNanos(column).getBytes(StandardCharsets.UTF_8);
+                buffer = formatTimeWithNanos(column, columnTimeZone).getBytes(StandardCharsets.UTF_8);
             }
             else {
                 buffer = DATE_FORMAT.get().format(column.asDate()).getBytes(StandardCharsets.UTF_8);
@@ -297,7 +318,8 @@ public class OrcWriter
         String compress = config.getString(Key.COMPRESS, "NONE").toUpperCase();
         int batchSize = config.getInt(Key.BATCH_SIZE, DEFAULT_BATCH_SIZE);
 
-        TypeDescription schema = buildOrcSchema(columns);
+        OrcLayout layout = buildOrcSchema(columns);
+        TypeDescription schema = layout.schema();
         Path filePath = new Path(fileName);
         org.apache.orc.OrcFile.WriterOptions writerOptions =
                 buildWriterOptions(conf, config, schema, columns, compress);
@@ -309,7 +331,7 @@ public class OrcWriter
 
             while ((record = lineReceiver.getFromReader()) != null) {
                 int row = batch.size++;
-                setRow(batch, row, record, columns, taskPluginCollector);
+                setRow(batch, row, record, columns, taskPluginCollector, layout);
 
                 if (batch.size == batch.getMaxSize()) {
                     writer.addRowBatch(batch);
@@ -333,15 +355,19 @@ public class OrcWriter
      * Builds the ORC schema based on the provided column configurations.
      *
      * @param columns the list of column configurations
-     * @return the ORC schema as a TypeDescription object
+     * @return the ORC schema along with the collection types resolved per column
      */
-    private TypeDescription buildOrcSchema(List<Configuration> columns)
+    private OrcLayout buildOrcSchema(List<Configuration> columns)
     {
         TypeDescription schema = TypeDescription.createStruct().setAttribute("creator", "addax");
+        List<SupportHiveDataType> elementTypes = new ArrayList<>(columns.size());
+        List<SupportHiveDataType> mapValueTypes = new ArrayList<>(columns.size());
 
         for (Configuration column : columns) {
             String typeName = column.getString(Key.TYPE).toLowerCase();
             String fieldName = column.getString(Key.NAME);
+            SupportHiveDataType elementType = null;
+            SupportHiveDataType mapValueType = null;
 
             if ("decimal".equalsIgnoreCase(typeName)) {
                 int precision = column.getInt(Key.PRECISION, Constant.DEFAULT_DECIMAL_MAX_PRECISION);
@@ -349,9 +375,9 @@ public class OrcWriter
                 schema.addField(fieldName, TypeDescription.createDecimal().withScale(scale).withPrecision(precision));
             }
             else if (typeName.startsWith("array")) {
-                String elementType = typeName.substring(typeName.indexOf("<") + 1, typeName.indexOf(">"));
-                TypeDescription elementTypeDesc = TypeDescription.fromString(elementType);
-                this.elementType = SupportHiveDataType.valueOf(elementType.toUpperCase());
+                String elementTypeName = typeName.substring(typeName.indexOf("<") + 1, typeName.indexOf(">"));
+                TypeDescription elementTypeDesc = TypeDescription.fromString(elementTypeName);
+                elementType = SupportHiveDataType.valueOf(elementTypeName.toUpperCase());
                 schema.addField(fieldName, TypeDescription.createList(elementTypeDesc));
             }
             else if (typeName.startsWith("map")) {
@@ -359,14 +385,18 @@ public class OrcWriter
                 String[] keyValueTypes = keyValueType.split(",");
                 TypeDescription keyTypeDesc = TypeDescription.fromString(keyValueTypes[0]);
                 TypeDescription valueTypeDesc = TypeDescription.fromString(keyValueTypes[1].trim());
-                this.valueType = SupportHiveDataType.valueOf(keyValueTypes[1].trim().toUpperCase());
+                mapValueType = SupportHiveDataType.valueOf(keyValueTypes[1].trim().toUpperCase());
                 schema.addField(fieldName, TypeDescription.createMap(keyTypeDesc, valueTypeDesc));
             }
             else {
                 schema.addField(fieldName, TypeDescription.fromString(typeName));
             }
+
+            // stay aligned with the configured column order, setRow indexes these by column
+            elementTypes.add(elementType);
+            mapValueTypes.add(mapValueType);
         }
-        return schema;
+        return new OrcLayout(schema, elementTypes, mapValueTypes);
     }
 
     private org.apache.orc.OrcFile.WriterOptions buildWriterOptions(org.apache.hadoop.conf.Configuration hadoopConf,

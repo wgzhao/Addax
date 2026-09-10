@@ -220,9 +220,25 @@ public class ParquetWriter
                 group.append(colName, decimalToBinary(column.asString(), scale));
             }
             case TIMESTAMP -> group.append(colName, tsToBinary(column.asTimestamp()));
-            case DATE -> group.append(colName, (int) Math.round(column.asLong() * 1.0 / MILLIS_PER_DAY));
-            default -> group.append(colName, formatTimeWithNanos(column));
+            case DATE -> group.append(colName, dateToEpochDay(column));
+            default -> group.append(colName, formatTimeWithNanos(column, columnTimeZone));
         }
+    }
+
+    /**
+     * Converts a DATE column to the number of days since the unix epoch.
+     * <p>
+     * A DATE arrives as an instant at local midnight, so it has to be read as a calendar date.
+     * Dividing the raw millis by {@code MILLIS_PER_DAY} instead counts elapsed days since the
+     * epoch and lands a day early in any zone east of UTC, which also disagreed with
+     * {@link OrcWriter} for the very same job configuration.
+     *
+     * @param column the column holding the date value
+     * @return the epoch day of the date
+     */
+    private static int dateToEpochDay(Column column)
+    {
+        return (int) new java.sql.Date(column.asLong()).toLocalDate().toEpochDay();
     }
 
     /**
@@ -320,8 +336,11 @@ public class ParquetWriter
     private Binary tsToBinary(Timestamp ts)
     {
         long millis = ts.getTime();
-        int julianDays = (int) (millis / MILLIS_PER_DAY) + JULIAN_EPOCH_OFFSET_DAYS;
-        long nanosOfDay = (millis % MILLIS_PER_DAY) * NANOS_PER_MILLISECOND + (ts.getNanos() % (int) NANOS_PER_MILLISECOND);
+        // floorDiv/floorMod rather than plain division: truncation rounds towards zero, so any
+        // pre-1970 value would leave a negative time-of-day inside the 12-byte INT96 buffer
+        int julianDays = (int) Math.floorDiv(millis, MILLIS_PER_DAY) + JULIAN_EPOCH_OFFSET_DAYS;
+        long nanosOfDay = Math.floorMod(millis, MILLIS_PER_DAY) * NANOS_PER_MILLISECOND
+                + ts.getNanos() % NANOS_PER_MILLISECOND;
 
         // Write INT96 timestamp
         byte[] timestampBuffer = new byte[12];

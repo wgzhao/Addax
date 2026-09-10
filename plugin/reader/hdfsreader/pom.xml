@@ -105,6 +105,13 @@
             <artifactId>parquet-hadoop-bundle</artifactId>
         </dependency>
 
+        <!-- hadoop-common declares lz4-java as provided (it ships it in its own distro),
+             so supply it explicitly or reading LZ4 parquet/text fails with NoClassDefFoundError -->
+        <dependency>
+            <groupId>org.lz4</groupId>
+            <artifactId>lz4-java</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.xerial.snappy</groupId>
             <artifactId>snappy-java</artifactId>

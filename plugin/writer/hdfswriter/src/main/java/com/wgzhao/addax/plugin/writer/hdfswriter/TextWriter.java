@@ -107,7 +107,7 @@ public class TextWriter
     }
 
     /** Transportonerecord. */
-    public static MutablePair<Text, Boolean> transportOneRecord(
+    public MutablePair<Text, Boolean> transportOneRecord(
             Record record, char fieldDelimiter, List<Configuration> columnsConfiguration, TaskPluginCollector taskPluginCollector)
     {
         MutablePair<List<Object>, Boolean> transportResultList = transportOneRecord(record, columnsConfiguration, taskPluginCollector);
@@ -120,7 +120,7 @@ public class TextWriter
     }
 
     /** Transportonerecord. */
-    public static MutablePair<List<Object>, Boolean> transportOneRecord(
+    public MutablePair<List<Object>, Boolean> transportOneRecord(
             Record record, List<Configuration> columnsConfiguration,
             TaskPluginCollector taskPluginCollector)
     {
@@ -145,7 +145,7 @@ public class TextWriter
                             case BIGINT -> recordList.add(column.asLong());
                             case FLOAT -> recordList.add(Float.valueOf(rowData));
                             case DOUBLE -> recordList.add(column.asDouble());
-                            case STRING, VARCHAR, CHAR -> recordList.add(formatTimeWithNanos(column));
+                            case STRING, VARCHAR, CHAR -> recordList.add(formatTimeWithNanos(column, columnTimeZone));
                             case DECIMAL -> recordList.add(HiveDecimal.create(column.asBigDecimal()));
                             case BOOLEAN -> recordList.add(column.asBoolean());
                             case DATE -> recordList.add(org.apache.hadoop.hive.common.type.Date.valueOf(column.asString()));
