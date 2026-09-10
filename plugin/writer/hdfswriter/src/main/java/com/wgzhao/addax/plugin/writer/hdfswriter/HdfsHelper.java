@@ -78,8 +78,11 @@ public class HdfsHelper
     // otherwise a TIME value is written one offset away from every other representation of it
     private static final String COLUMN_TIME_ZONE = "common.column.timeZone";
     private static final String DEFAULT_COLUMN_TIME_ZONE = "GMT+8";
-    private static final long MILLIS_PER_DAY = 86_400_000L;
-    private static final long NANOS_PER_MILLISECOND = 1_000_000L;
+
+    // shared with ParquetWriter, which splits the same millisecond value into a julian day and a
+    // time of day when it encodes an INT96 timestamp
+    protected static final long MILLIS_PER_DAY = 86_400_000L;
+    protected static final long NANOS_PER_MILLISECOND = 1_000_000L;
 
     /** The zone used to render DATE/TIME columns. */
     protected TimeZone columnTimeZone = TimeZone.getTimeZone(DEFAULT_COLUMN_TIME_ZONE);
@@ -109,7 +112,6 @@ public class HdfsHelper
 
         hadoopConf.set("fs.defaultFS", defaultFS);
 
-        //是否有Kerberos认证
         boolean haveKerberos = taskConfig.getBool(HAVE_KERBEROS, false);
         if (haveKerberos) {
             String kerberosKeytabFilePath = taskConfig.getString(KERBEROS_KEYTAB_FILE_PATH);
@@ -455,6 +457,10 @@ public class HdfsHelper
      * When the column is a DateColumn with TIME subtype and has non-zero nanos,
      * produces ISO-8601 format like {@code HH:mm:ss.SSSSSS} with trailing zeros trimmed.
      * When nanos is zero, delegates to the default {@code column.asString()} ({@code HH:mm:ss}).
+     * <p>
+     * The result is a wall clock reading in the configured column zone, which is what every other
+     * rendering of the value uses. It is not the same computation as ParquetWriter.tsToBinary,
+     * which encodes a UTC instant; see the note there before changing either.
      *
      * @param column the input column to format
      * @param timeZone the zone the time-of-day is expressed in
