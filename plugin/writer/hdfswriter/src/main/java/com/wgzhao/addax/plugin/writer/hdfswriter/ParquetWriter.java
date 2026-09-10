@@ -57,6 +57,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.sql.Timestamp;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -78,6 +79,30 @@ public class ParquetWriter
     private static final long MILLIS_PER_DAY = 86400000L;
     private static final int JULIAN_EPOCH_OFFSET_DAYS = 2440588;
     private static final long NANOS_PER_MILLISECOND = 1000000L;
+
+    /** Whether a configured column holds a single value, an array or a map. */
+    private enum ColumnKind
+    {
+        SCALAR, ARRAY, MAP
+    }
+
+    /**
+     * The resolved shape of one configured column.
+     * <p>
+     * Resolved once before the records are read so that the per-field path does not re-read and
+     * re-parse the configuration for every field of every record: each lookup walks the
+     * configuration path and allocates several short-lived objects on the way.
+     *
+     * @param name the field name
+     * @param declaredType the type as configured, for diagnostics
+     * @param kind whether the column holds a single value, an array or a map
+     * @param type the resolved type of a scalar column
+     * @param scale the decimal scale
+     */
+    private record ColumnPlan(String name, String declaredType, ColumnKind kind,
+            SupportHiveDataType type, int scale)
+    {
+    }
 
     /** Parquetwriter. */
     public ParquetWriter(Configuration conf)
@@ -113,8 +138,9 @@ public class ParquetWriter
         String compress = config.getString(Key.COMPRESS, "UNCOMPRESSED").toUpperCase().trim();
         CompressionCodecName codecName = CompressionCodecName.fromConf(compress.equals("NONE") ? "UNCOMPRESSED" : compress);
 
-        // Construct parquet schema
+        // Construct parquet schema, which also validates the configured types
         MessageType schema = generateParquetSchema(columns);
+        List<ColumnPlan> plans = resolveColumns(columns);
         Path path = new Path(fileName);
         logger.info("Begin to write parquet file [{}]", fileName);
 
@@ -122,7 +148,7 @@ public class ParquetWriter
         setupHadoopConfiguration(schema);
 
         try (org.apache.parquet.hadoop.ParquetWriter<Group> writer = createParquetWriter(path, codecName, schema)) {
-            writeRecords(lineReceiver, columns, taskPluginCollector, writer, schema);
+            writeRecords(lineReceiver, plans, taskPluginCollector, writer, schema);
         }
         catch (IOException e) {
             throw new RuntimeException("Failed to write Parquet file: " + fileName, e);
@@ -159,7 +185,7 @@ public class ParquetWriter
                 .build();
     }
 
-    private void writeRecords(RecordReceiver lineReceiver, List<Configuration> columns,
+    private void writeRecords(RecordReceiver lineReceiver, List<ColumnPlan> plans,
             TaskPluginCollector taskPluginCollector, org.apache.parquet.hadoop.ParquetWriter<Group> writer,
             MessageType schema)
             throws IOException
@@ -168,7 +194,7 @@ public class ParquetWriter
         SimpleGroupFactory simpleGroupFactory = new SimpleGroupFactory(schema);
         Record record;
         while ((record = lineReceiver.getFromReader()) != null) {
-            Group group = buildRecord(record, columns, taskPluginCollector, simpleGroupFactory);
+            Group group = buildRecord(record, plans, taskPluginCollector, simpleGroupFactory);
             if (group == null) {
                 // a field could not be converted; the record has been reported as dirty
                 continue;
@@ -179,7 +205,7 @@ public class ParquetWriter
 
     /** Buildrecord. */
     public Group buildRecord(
-            Record record, List<Configuration> columns,
+            Record record, List<ColumnPlan> plans,
             TaskPluginCollector taskPluginCollector, SimpleGroupFactory simpleGroupFactory)
     {
         Group group = simpleGroupFactory.newGroup();
@@ -189,19 +215,12 @@ public class ParquetWriter
                 continue;
             }
 
-            Configuration columnConfig = columns.get(i);
-            String colName = columnConfig.getString(Key.NAME);
-            String typename = columnConfig.getString(Key.TYPE).trim().toUpperCase(Locale.ROOT);
-
+            ColumnPlan plan = plans.get(i);
             try {
-                if (typename.startsWith("ARRAY<")) {
-                    appendArrayValue(group, column, colName);
-                }
-                else if (typename.startsWith("MAP<")) {
-                    appendMapValue(group, column, colName);
-                }
-                else {
-                    appendValueByType(group, column, colName, SupportHiveDataType.of(typename), columnConfig);
+                switch (plan.kind()) {
+                    case ARRAY -> appendArrayValue(group, column, plan.name());
+                    case MAP -> appendMapValue(group, column, plan.name());
+                    case SCALAR -> appendValueByType(group, column, plan);
                 }
             }
             catch (Exception e) {
@@ -210,30 +229,68 @@ public class ParquetWriter
                 // a ClassCastException once the group reaches it
                 taskPluginCollector.collectDirtyRecord(record, String.format(
                         "Type conversion error: target field type: [%s], field value: [%s], error: %s",
-                        columnConfig.getString(Key.TYPE), column.getRawData(), e.getMessage()));
+                        plan.declaredType(), column.getRawData(), e.getMessage()));
                 return null;
             }
         }
         return group;
     }
 
-    private void appendValueByType(Group group, Column column, String colName,
-            SupportHiveDataType columnType, Configuration colConfig)
+    /**
+     * Resolve every configured column before a single record is read.
+     * <p>
+     * A column type the writer cannot convert fails here rather than on every record, which would
+     * collect a dirty record for each row and leave an empty file behind a job that reported
+     * success.
+     *
+     * @param columns the configured columns
+     * @return the resolved plans, in column order
+     */
+    private static List<ColumnPlan> resolveColumns(List<Configuration> columns)
     {
+        List<ColumnPlan> plans = new ArrayList<>(columns.size());
+        for (Configuration column : columns) {
+            String declaredType = column.getString(Key.TYPE);
+            String name = column.getString(Key.NAME);
+            String upper = declaredType.trim().toUpperCase(Locale.ROOT);
+            int scale = column.getInt(Key.SCALE, Constant.DEFAULT_DECIMAL_MAX_SCALE);
 
-        switch (columnType) {
-            case TINYINT, SMALLINT, INT -> group.append(colName, Integer.parseInt(column.getRawData().toString()));
-            case BIGINT -> group.append(colName, column.asLong());
-            case FLOAT -> group.append(colName, column.asDouble().floatValue());
-            case DOUBLE -> group.append(colName, column.asDouble());
-            case BOOLEAN -> group.append(colName, column.asBoolean());
-            case DECIMAL -> {
-                int scale = colConfig.getInt(Key.SCALE, Constant.DEFAULT_DECIMAL_MAX_SCALE);
-                group.append(colName, decimalToBinary(column.asString(), scale));
+            ColumnKind kind;
+            SupportHiveDataType type = null;
+            if (upper.startsWith("ARRAY<")) {
+                kind = ColumnKind.ARRAY;
             }
-            case TIMESTAMP -> group.append(colName, tsToBinary(column.asTimestamp()));
-            case DATE -> group.append(colName, dateToEpochDay(column));
-            default -> group.append(colName, formatTimeWithNanos(column, columnTimeZone));
+            else if (upper.startsWith("MAP<")) {
+                kind = ColumnKind.MAP;
+            }
+            else {
+                kind = ColumnKind.SCALAR;
+                try {
+                    type = SupportHiveDataType.of(upper);
+                }
+                catch (IllegalArgumentException e) {
+                    throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
+                            String.format("Unsupported field type. Field name: [%s], Field type: [%s].",
+                                    name, declaredType));
+                }
+            }
+            plans.add(new ColumnPlan(name, declaredType, kind, type, scale));
+        }
+        return plans;
+    }
+
+    private void appendValueByType(Group group, Column column, ColumnPlan plan)
+    {
+        switch (plan.type()) {
+            case TINYINT, SMALLINT, INT -> group.append(plan.name(), Integer.parseInt(column.getRawData().toString()));
+            case BIGINT -> group.append(plan.name(), column.asLong());
+            case FLOAT -> group.append(plan.name(), column.asDouble().floatValue());
+            case DOUBLE -> group.append(plan.name(), column.asDouble());
+            case BOOLEAN -> group.append(plan.name(), column.asBoolean());
+            case DECIMAL -> group.append(plan.name(), decimalToBinary(column.asBigDecimal(), plan.scale()));
+            case TIMESTAMP -> group.append(plan.name(), tsToBinary(column.asTimestamp()));
+            case DATE -> group.append(plan.name(), dateToEpochDay(column));
+            default -> group.append(plan.name(), formatTimeWithNanos(column, columnTimeZone));
         }
     }
 
@@ -366,13 +423,12 @@ public class ParquetWriter
     /**
      * Convert Decimal to {@link Binary} using fixed 16 bytes array
      *
-     * @param decimal the decimal value string to convert
+     * @param bigDecimal the decimal value to convert
      * @param scale the desired scale
      * @return {@link Binary}
      */
-    private Binary decimalToBinary(String decimal, int scale)
+    private Binary decimalToBinary(BigDecimal bigDecimal, int scale)
     {
-        BigDecimal bigDecimal = new BigDecimal(decimal);
         int realScale = bigDecimal.scale();
         RoundingMode mode = scale >= realScale ? RoundingMode.UNNECESSARY : RoundingMode.HALF_UP;
 

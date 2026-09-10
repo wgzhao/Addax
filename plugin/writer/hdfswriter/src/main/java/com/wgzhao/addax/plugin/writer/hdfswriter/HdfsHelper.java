@@ -192,19 +192,24 @@ public class HdfsHelper
         return exist;
     }
 
-    /** Checks whether the pathdir condition holds. */
-    public boolean isPathDir(String filePath)
+    /**
+     * Read the metadata of a path, so that existence and kind cost one call instead of two.
+     *
+     * @param filePath the path to inspect
+     * @return the status, or null when the path does not exist
+     */
+    public FileStatus getPathStatus(String filePath)
     {
-        Path path = new Path(filePath);
-        boolean isDir;
         try {
-            isDir = fileSystem.getFileStatus(path).isDirectory();
+            return fileSystem.getFileStatus(new Path(filePath));
+        }
+        catch (FileNotFoundException e) {
+            return null;
         }
         catch (IOException e) {
-            LOG.error("Network IO exception occurred while checking if path [{}] is directory or not.", filePath);
+            LOG.error("Network IO exception occurred while reading the status of path [{}]", filePath);
             throw AddaxException.asAddaxException(IO_ERROR, e);
         }
-        return isDir;
     }
 
     /**
