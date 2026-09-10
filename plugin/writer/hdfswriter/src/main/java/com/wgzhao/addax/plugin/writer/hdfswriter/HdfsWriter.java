@@ -29,6 +29,7 @@ import com.wgzhao.addax.core.util.ShellUtil;
 import com.wgzhao.addax.storage.util.FileHelper;
 import com.wgzhao.addax.storage.writer.StorageWriterUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.orc.CompressionKind;
 import org.apache.parquet.hadoop.metadata.CompressionCodecName;
@@ -38,12 +39,13 @@ import org.slf4j.LoggerFactory;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static com.wgzhao.addax.core.base.Key.IGNORE_ERROR;
 import static com.wgzhao.addax.core.base.Key.POST_SHELL;
@@ -71,6 +73,9 @@ public class HdfsWriter
         private String fileName;
         private String writeMode;
         private HdfsHelper hdfsHelper = null;
+
+        // the names already present under path, listed once by prepare() and reused by split()
+        private Set<String> existingFileNames = Set.of();
 
         // option bypasses trash, if enabled, and immediately deletes
         private boolean skipTrash = false;
@@ -162,28 +167,33 @@ public class HdfsWriter
             this.tmpStorePath = buildTmpFilePath(path);
 
             // Verify whether the path is a directory if it exists.
-            if (hdfsHelper.isPathExists(path)) {
-                if (!hdfsHelper.isPathDir(path)) {
+            FileStatus pathStatus = hdfsHelper.getPathStatus(path);
+            if (pathStatus != null) {
+                if (!pathStatus.isDirectory()) {
                     throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                             String.format("The item path you configured [%s] is exists ,but it is not directory", path));
                 }
 
                 // staging directories (".<uuid>") are this plugin's own leftovers rather than
                 // data, and the reader side skips hidden entries too
-                Path[] existFilePaths = Arrays.stream(hdfsHelper.hdfsDirList(path))
-                        .filter(existPath -> !existPath.getName().startsWith("."))
-                        .toArray(Path[]::new);
+                List<String> existingNames = Arrays.stream(hdfsHelper.hdfsDirList(path))
+                        .map(Path::getName)
+                        .filter(name -> !name.startsWith("."))
+                        .toList();
 
-                boolean isExistFile = existFilePaths.length > 0;
                 if ("append".equals(writeMode)) {
                     LOG.info("The current write mode is set to 'append', no cleanup is performed before writing. " +
                             "Files with the prefix [{}] are written in the [{}] directory.", fileName, path);
                 }
-                else if ("nonConflict".equals(writeMode) && isExistFile) {
+                else if ("nonConflict".equals(writeMode) && !existingNames.isEmpty()) {
                     throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                             String.format("The current writeMode is set to 'nonConflict', but the directory [%s] is not empty, it includes the sub-path(s): [%s]",
-                                    path, String.join(",", Arrays.stream(existFilePaths).map(Path::getName).collect(Collectors.toSet()))));
+                                    path, String.join(",", new LinkedHashSet<>(existingNames))));
                 }
+
+                // split() mints a name per task and needs exactly this listing; re-reading a
+                // warehouse partition here costs a full directory scan for nothing
+                this.existingFileNames = new HashSet<>(existingNames);
             }
             else {
                 if (this.writerSliceConfig.getBool(CREATE_PATH, false)) {
@@ -255,11 +265,9 @@ public class HdfsWriter
             List<Configuration> writerSplitConfigs = new ArrayList<>();
             String filePrefix = fileName;
 
-            // compare bare file names: post() moves each staging file into <path> under exactly
-            // the name built below, while hdfsDirList returns fully qualified paths
-            Set<String> existingFileNames = Arrays.stream(hdfsHelper.hdfsDirList(path))
-                    .map(Path::getName)
-                    .collect(Collectors.toSet());
+            // the names already present under path, listed by prepare(); compared as bare names
+            // because post() moves each staging file into <path> under exactly the name built below
+            Set<String> takenNames = new HashSet<>(existingFileNames);
 
             String fileType = this.writerSliceConfig.getString(Key.FILE_TYPE, "txt").toLowerCase();
             for (int i = 0; i < mandatoryNumber; i++) {
@@ -272,7 +280,7 @@ public class HdfsWriter
                 do {
                     taskFileName = String.format("%s_%s.%s", filePrefix, FileHelper.generateFileMiddleName(), fileType);
                 }
-                while (!existingFileNames.add(taskFileName));
+                while (!takenNames.add(taskFileName));
 
                 String tmpFullFileName = String.format("%s/%s", tmpStorePath, taskFileName);
                 splitTaskConfig.set(Key.FILE_NAME, tmpFullFileName);
