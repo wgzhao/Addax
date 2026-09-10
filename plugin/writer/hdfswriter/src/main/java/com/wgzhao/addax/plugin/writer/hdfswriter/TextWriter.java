@@ -19,6 +19,7 @@
 
 package com.wgzhao.addax.plugin.writer.hdfswriter;
 
+import com.wgzhao.addax.core.base.Constant;
 import com.wgzhao.addax.core.base.Key;
 import com.wgzhao.addax.core.element.Column;
 import com.wgzhao.addax.core.element.Record;
@@ -42,11 +43,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
@@ -58,6 +62,17 @@ public class TextWriter
 {
     private final static Logger logger = LoggerFactory.getLogger(TextWriter.class.getName());
 
+    /**
+     * The per-task options that shape every output line.
+     *
+     * @param fieldDelimiter the delimiter placed between two fields
+     * @param encoding the charset the line is written in
+     * @param nullFormat the text written for a null field, or null to keep it empty
+     */
+    private record TextOptions(char fieldDelimiter, Charset encoding, String nullFormat)
+    {
+    }
+
     /** Textwriter. */
     public TextWriter(Configuration conf)
     {
@@ -68,9 +83,12 @@ public class TextWriter
     @Override
     public void write(RecordReceiver lineReceiver, Configuration config, String fileName, TaskPluginCollector taskPluginCollector)
     {
-        char fieldDelimiter = config.getChar(Key.FIELD_DELIMITER);
         List<Configuration> columns = config.getListConfiguration(Key.COLUMN);
-        String compress = config.getString(Key.COMPRESS, "NONE").toUpperCase().trim();
+        String compress = config.getString(Key.COMPRESS, "NONE").toUpperCase(Locale.ROOT).trim();
+        TextOptions options = new TextOptions(
+                config.getChar(Key.FIELD_DELIMITER),
+                Charset.forName(config.getString(Key.ENCODING, Constant.DEFAULT_ENCODING)),
+                config.getString(Key.NULL_FORMAT, null));
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmm");
         String attempt = "attempt_" + dateFormat.format(new Date()) + "_0001_m_000000_0";
@@ -91,7 +109,7 @@ public class TextWriter
                     .getRecordWriter(fileSystem, conf, outputPath.toString(), Reporter.NULL);
             Record record;
             while ((record = lineReceiver.getFromReader()) != null) {
-                MutablePair<Text, Boolean> transportResult = transportOneRecord(record, fieldDelimiter, columns, taskPluginCollector);
+                MutablePair<Text, Boolean> transportResult = transportOneRecord(record, columns, taskPluginCollector, options);
                 if (Boolean.FALSE.equals(transportResult.getRight())) {
                     writer.write(NullWritable.get(), transportResult.getLeft());
                 }
@@ -100,29 +118,34 @@ public class TextWriter
         }
         catch (IOException e) {
             logger.error("IO exception occurred while writing text file [{}]", fileName);
-            Path path = new Path(fileName);
-            deleteDir(path.getParent());
+            // no per-task cleanup here: the parent is the staging directory shared by every split
+            // task, and Job.destroy() removes the whole staging directory on failure anyway
             throw AddaxException.asAddaxException(IO_ERROR, e);
         }
     }
 
     /** Transportonerecord. */
     public MutablePair<Text, Boolean> transportOneRecord(
-            Record record, char fieldDelimiter, List<Configuration> columnsConfiguration, TaskPluginCollector taskPluginCollector)
+            Record record, List<Configuration> columnsConfiguration,
+            TaskPluginCollector taskPluginCollector, TextOptions options)
     {
-        MutablePair<List<Object>, Boolean> transportResultList = transportOneRecord(record, columnsConfiguration, taskPluginCollector);
+        MutablePair<List<Object>, Boolean> transportResultList =
+                toFieldList(record, columnsConfiguration, taskPluginCollector, options);
         MutablePair<Text, Boolean> transportResult = new MutablePair<>();
         transportResult.setRight(false);
-        Text recordResult = new Text(StringUtils.join(transportResultList.getLeft(), fieldDelimiter));
+        // a Text is a plain byte container: encoding the line here is what makes the configured
+        // encoding reach the file, because LineRecordWriter writes the bytes through untouched
+        Text recordResult = new Text(StringUtils.join(transportResultList.getLeft(), options.fieldDelimiter())
+                .getBytes(options.encoding()));
         transportResult.setRight(transportResultList.getRight());
         transportResult.setLeft(recordResult);
         return transportResult;
     }
 
     /** Transportonerecord. */
-    public MutablePair<List<Object>, Boolean> transportOneRecord(
+    public MutablePair<List<Object>, Boolean> toFieldList(
             Record record, List<Configuration> columnsConfiguration,
-            TaskPluginCollector taskPluginCollector)
+            TaskPluginCollector taskPluginCollector, TextOptions options)
     {
 
         MutablePair<List<Object>, Boolean> transportResult = new MutablePair<>();
@@ -135,9 +158,11 @@ public class TextWriter
                 column = record.getColumn(i);
                 if (null != column.getRawData()) {
                     String rowData = column.getRawData().toString();
-                    SupportHiveDataType columnType = SupportHiveDataType.valueOf(
-                            columnsConfiguration.get(i).getString(Key.TYPE).toUpperCase());
                     try {
+                        // resolve inside the try: an unsupported type is a per-record conversion
+                        // failure that belongs in the dirty records, not a task-killing throw
+                        SupportHiveDataType columnType = SupportHiveDataType.of(
+                                columnsConfiguration.get(i).getString(Key.TYPE));
                         switch (columnType) {
                             case TINYINT -> recordList.add(Byte.valueOf(rowData));
                             case SMALLINT -> recordList.add(Short.valueOf(rowData));
@@ -150,7 +175,9 @@ public class TextWriter
                             case BOOLEAN -> recordList.add(column.asBoolean());
                             case DATE -> recordList.add(org.apache.hadoop.hive.common.type.Date.valueOf(column.asString()));
                             case TIMESTAMP -> recordList.add(Timestamp.valueOf(column.asString()));
-                            case BINARY -> recordList.add(column.asBytes());
+                            // base64 rather than the raw array: joining a byte[] would render its
+                            // identity hash and lose the content entirely
+                            case BINARY -> recordList.add(Base64.getEncoder().encodeToString(column.asBytes()));
                             default -> throw AddaxException.asAddaxException(
                                     NOT_SUPPORT_TYPE,
                                     String.format(
@@ -163,7 +190,7 @@ public class TextWriter
                     catch (Exception e) {
                         logger.warn("Warn: convert field[{}] from [{}] to [{}] error.",
                                 columnsConfiguration.get(i).getString(Key.NAME),
-                                column.getRawData(), columnType);
+                                column.getRawData(), columnsConfiguration.get(i).getString(Key.TYPE));
                         String message = String.format(
                                 "Type conversion error：target field type: [%s], field value: [%s].",
                                 columnsConfiguration.get(i).getString(Key.TYPE), column.getRawData());
@@ -173,8 +200,9 @@ public class TextWriter
                     }
                 }
                 else {
-                    // warn: it's all ok if nullFormat is null
-                    recordList.add(null);
+                    // nullFormat stays null when it is not configured, which renders as an empty
+                    // field exactly as before
+                    recordList.add(options.nullFormat());
                 }
             }
         }

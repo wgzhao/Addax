@@ -32,9 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.fs.CommonConfigurationKeys;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.RemoteIterator;
 import org.apache.hadoop.fs.Trash;
 import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.mapred.JobConf;
@@ -48,6 +46,8 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TimeZone;
@@ -207,27 +207,60 @@ public class HdfsHelper
         return isDir;
     }
 
+    /**
+     * Delete one file, failing loudly when the filesystem reports that it could not.
+     *
+     * @param path the file to delete
+     * @throws IOException if the deletion was refused
+     */
+    private void remove(Path path, boolean recursive)
+            throws IOException
+    {
+        if (!fileSystem.delete(path, recursive)) {
+            throw new IOException(String.format("Failed to delete [%s]", path));
+        }
+    }
+
     /** Deletefilesfromdir. */
     public void deleteFilesFromDir(Path dir, boolean skipTrash)
     {
         try {
-            final RemoteIterator<LocatedFileStatus> files = fileSystem.listFiles(dir, false);
+            final Trash trash;
             if (skipTrash) {
-                while (files.hasNext()) {
-                    final LocatedFileStatus next = files.next();
-                    LOG.info("Delete the file [{}]", next.getPath());
-                    fileSystem.delete(next.getPath(), false);
-                }
+                trash = null;
             }
             else {
                 if (hadoopConf.getInt(CommonConfigurationKeys.FS_TRASH_INTERVAL_KEY, 0) == 0) {
                     hadoopConf.set(CommonConfigurationKeys.FS_TRASH_INTERVAL_KEY, "10080"); // 7 days
                 }
-                final Trash trash = new Trash(hadoopConf);
-                while (files.hasNext()) {
-                    final LocatedFileStatus next = files.next();
-                    LOG.info("Move the file [{}] to Trash", next.getPath());
-                    trash.moveToTrash(next.getPath());
+                trash = new Trash(hadoopConf);
+            }
+
+            // listStatus rather than listFiles(recursive=false): an overwrite has to clear the
+            // sub-directories of a partition tree too, and a non-recursive file listing left them
+            // and their contents behind next to the newly written files
+            for (FileStatus entry : fileSystem.listStatus(dir)) {
+                Path entryPath = entry.getPath();
+
+                // hidden entries are this plugin's own staging directory, and the readers skip
+                // them as well, so they are not part of the data being replaced
+                if (entryPath.getName().startsWith(".")) {
+                    continue;
+                }
+
+                if (trash == null) {
+                    LOG.info("Delete the [{}]", entryPath);
+                    remove(entryPath, entry.isDirectory());
+                }
+                else {
+                    LOG.info("Move the [{}] to Trash", entryPath);
+                    // the call reports failure by returning false rather than by throwing, and the
+                    // caller writes the new files right afterwards, so an unchecked false would
+                    // silently leave the previous run's data in place
+                    if (!trash.moveToTrash(entryPath)) {
+                        throw AddaxException.asAddaxException(IO_ERROR,
+                                String.format("Failed to move [%s] to Trash", entryPath));
+                    }
                 }
             }
         }
@@ -280,8 +313,21 @@ public class HdfsHelper
             final FileStatus[] fileStatuses = fileSystem.listStatus(sourceDir);
             for (FileStatus file : fileStatuses) {
                 if (file.isFile() && file.getLen() > 0) {
-                    LOG.info("Begin to move the file [{}] to [{}].", file.getPath(), targetDir);
-                    fileSystem.rename(file.getPath(), new Path(targetDir, file.getPath().getName()));
+                    Path dest = new Path(targetDir, file.getPath().getName());
+                    // rename() reports several failures by returning false instead of throwing on
+                    // HDFS, but on the local and other FileSystem implementations it silently
+                    // replaces an existing name, and the caller deletes the staging directory
+                    // right afterwards either way
+                    if (fileSystem.exists(dest)) {
+                        throw AddaxException.asAddaxException(IO_ERROR, String.format(
+                                "Refusing to move [%s]: the destination [%s] already exists.",
+                                file.getPath(), dest));
+                    }
+                    LOG.info("Begin to move the file [{}] to [{}].", file.getPath(), dest);
+                    if (!fileSystem.rename(file.getPath(), dest)) {
+                        throw AddaxException.asAddaxException(IO_ERROR,
+                                String.format("Failed to move the file [%s] to [%s]", file.getPath(), dest));
+                    }
                 }
             }
         }
@@ -303,19 +349,36 @@ public class HdfsHelper
         }
     }
 
+    /**
+     * The codecs {@link #getCompressCodec} can instantiate, so that validation and execution
+     * consult one list instead of two that have to be kept in sync by hand.
+     * <p>
+     * LZO is absent because writing it needs the hadoop-lzo native library, and ZSTD because
+     * hadoop's {@code ZStandardCodec} is built on native libhadoop rather than the zstd-jni jar:
+     * both fail at task runtime with "native library not available" if they are let through.
+     */
+    private static final Map<String, Class<? extends CompressionCodec>> COMPRESS_CODECS = Map.of(
+            "GZIP", org.apache.hadoop.io.compress.GzipCodec.class,
+            "BZIP2", org.apache.hadoop.io.compress.BZip2Codec.class,
+            "SNAPPY", org.apache.hadoop.io.compress.SnappyCodec.class,
+            "LZ4", org.apache.hadoop.io.compress.Lz4Codec.class,
+            "DEFLATE", org.apache.hadoop.io.compress.DeflateCodec.class,
+            "ZLIB", org.apache.hadoop.io.compress.DeflateCodec.class);
+
+    /** The names of the codecs the text writer can emit. */
+    public static Set<String> compressCodecNames()
+    {
+        return COMPRESS_CODECS.keySet();
+    }
+
     public Class<? extends CompressionCodec> getCompressCodec(String compress)
     {
-        compress = compress.toUpperCase();
-        Class<? extends CompressionCodec> codecClass = switch (compress) {
-            case "GZIP" -> org.apache.hadoop.io.compress.GzipCodec.class;
-            case "BZIP2" -> org.apache.hadoop.io.compress.BZip2Codec.class;
-            case "SNAPPY" -> org.apache.hadoop.io.compress.SnappyCodec.class;
-            case "LZ4" -> org.apache.hadoop.io.compress.Lz4Codec.class;
-            case "ZSTD" -> org.apache.hadoop.io.compress.ZStandardCodec.class;
-            case "DEFLATE", "ZLIB" -> org.apache.hadoop.io.compress.DeflateCodec.class;
-            default -> throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
-                    String.format("The compress mode [%s] is unsupported yet.", compress));
-        };
+        String normalized = compress.trim().toUpperCase(Locale.ROOT);
+        Class<? extends CompressionCodec> codecClass = COMPRESS_CODECS.get(normalized);
+        if (codecClass == null) {
+            throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
+                    String.format("The compress mode [%s] is unsupported yet.", normalized));
+        }
         return codecClass;
     }
 

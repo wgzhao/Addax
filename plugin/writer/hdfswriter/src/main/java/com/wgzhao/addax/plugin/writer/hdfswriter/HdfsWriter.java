@@ -79,10 +79,6 @@ public class HdfsWriter
         /** Support format. */
         public static final Set<String> SUPPORT_FORMAT = Set.of("ORC", "PARQUET", "TEXT");
 
-        // Codecs the text writer can emit; keep in sync with HdfsHelper.getCompressCodec
-        private static final Set<String> TEXT_COMPRESS_CODECS = Set.of(
-                "GZIP", "BZIP2", "SNAPPY", "LZ4", "ZSTD", "DEFLATE", "ZLIB");
-
         // Create record for decimal configuration
         private record DecimalConfig(int precision, int scale) {}
 
@@ -172,7 +168,11 @@ public class HdfsWriter
                             String.format("The item path you configured [%s] is exists ,but it is not directory", path));
                 }
 
-                Path[] existFilePaths = hdfsHelper.hdfsDirList(path);
+                // staging directories (".<uuid>") are this plugin's own leftovers rather than
+                // data, and the reader side skips hidden entries too
+                Path[] existFilePaths = Arrays.stream(hdfsHelper.hdfsDirList(path))
+                        .filter(existPath -> !existPath.getName().startsWith("."))
+                        .toArray(Path[]::new);
 
                 boolean isExistFile = existFilePaths.length > 0;
                 if ("append".equals(writeMode)) {
@@ -210,7 +210,9 @@ public class HdfsWriter
         @Override
         public void post()
         {
-            if ("overwrite".equals(writeMode)) {
+            // truncate carries the same meaning here as overwrite: the new files always get
+            // freshly generated names, so there is nothing to preserve from the previous run
+            if ("overwrite".equals(writeMode) || "truncate".equals(writeMode)) {
                 hdfsHelper.deleteFilesFromDir(new Path(path), this.skipTrash);
             }
 
@@ -232,6 +234,16 @@ public class HdfsWriter
         @Override
         public void destroy()
         {
+            // post() runs only on the success path, so without this a failed job would leave the
+            // staging directory - and the partial files inside it - in the table directory
+            if (tmpStorePath != null) {
+                try {
+                    hdfsHelper.deleteDir(new Path(tmpStorePath));
+                }
+                catch (Exception e) {
+                    LOG.warn("Failed to clean the temporary directory [{}]: {}", tmpStorePath, e.getMessage());
+                }
+            }
             hdfsHelper.closeFileSystem();
         }
 
@@ -243,22 +255,26 @@ public class HdfsWriter
             List<Configuration> writerSplitConfigs = new ArrayList<>();
             String filePrefix = fileName;
 
-            Set<String> allFiles = Arrays.stream(hdfsHelper.hdfsDirList(path)).map(Path::toString).collect(Collectors.toSet());
+            // compare bare file names: post() moves each staging file into <path> under exactly
+            // the name built below, while hdfsDirList returns fully qualified paths
+            Set<String> existingFileNames = Arrays.stream(hdfsHelper.hdfsDirList(path))
+                    .map(Path::getName)
+                    .collect(Collectors.toSet());
 
             String fileType = this.writerSliceConfig.getString(Key.FILE_TYPE, "txt").toLowerCase();
-            String tmpFullFileName;
-            String endFullFileName;
             for (int i = 0; i < mandatoryNumber; i++) {
-                // handle same file name
                 Configuration splitTaskConfig = this.writerSliceConfig.clone();
 
+                // one middle name for both the staging file and the collision check; a second,
+                // independently random name would be tested against the destination instead of
+                // the file that is actually moved there, which defeats the guard
+                String taskFileName;
                 do {
-                    tmpFullFileName = String.format("%s/%s_%s.%s", tmpStorePath, filePrefix, FileHelper.generateFileMiddleName(), fileType);
-                    endFullFileName = String.format("%s/%s_%s.%s", path, filePrefix, FileHelper.generateFileMiddleName(), fileType);
+                    taskFileName = String.format("%s_%s.%s", filePrefix, FileHelper.generateFileMiddleName(), fileType);
                 }
-                while (allFiles.contains(endFullFileName));
-                allFiles.add(endFullFileName);
+                while (!existingFileNames.add(taskFileName));
 
+                String tmpFullFileName = String.format("%s/%s", tmpStorePath, taskFileName);
                 splitTaskConfig.set(Key.FILE_NAME, tmpFullFileName);
 
                 LOG.info("The split wrote files :[{}]", tmpFullFileName);
@@ -419,14 +435,15 @@ public class HdfsWriter
                     }
                 }
                 case "TEXT" -> {
-                    // Codecs mirror HdfsHelper.getCompressCodec; LZO is absent because writing it
-                    // needs the hadoop-lzo native library, which this project does not bundle.
-                    if (!"NONE".equals(compress) && !TEXT_COMPRESS_CODECS.contains(compress)) {
+                    // one list for both validation and lookup, so a codec can never pass here and
+                    // then fail inside the task after the data has already been read
+                    Set<String> codecs = HdfsHelper.compressCodecNames();
+                    if (!"NONE".equals(compress) && !codecs.contains(compress)) {
                         throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                                 """
                                         The TEXT format only supports NONE, [%s] compression.
-                                        Your configure [%s] is unsupported yet (LZO writing requires the hadoop-lzo native library).
-                                        """.formatted(String.join(", ", TEXT_COMPRESS_CODECS), compress));
+                                        Your configure [%s] is unsupported yet.
+                                        """.formatted(String.join(", ", codecs), compress));
                     }
                 }
             }

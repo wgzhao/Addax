@@ -56,6 +56,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
@@ -108,7 +109,7 @@ public class OrcWriter
     {
         for (int i = 0; i < columns.size(); i++) {
             Configuration eachColumnConf = columns.get(i);
-            String type = eachColumnConf.getString(Key.TYPE).trim().toUpperCase();
+            String type = eachColumnConf.getString(Key.TYPE).trim().toUpperCase(Locale.ROOT);
             ColumnVector col = batch.cols[i];
 
             // Handle null values
@@ -119,19 +120,21 @@ public class OrcWriter
                 continue;
             }
 
-            if (type.startsWith("ARRAY")) {
-                appendArrayValue(row, recordColumn, (ListColumnVector) col,
-                        layout.elementTypes().get(i), eachColumnConf);
-                continue;
-            }
-
-            if (type.startsWith("MAP")) {
-                appendMapValue(row, recordColumn, (MapColumnVector) col,
-                        layout.mapValueTypes().get(i), eachColumnConf);
-                continue;
-            }
-
+            // the collection branches share the try below as well: outside it their failures
+            // escaped as a raw ClassCastException from the middle of a batch
             try {
+                if (type.startsWith("ARRAY")) {
+                    appendArrayValue(row, recordColumn, (ListColumnVector) col,
+                            layout.elementTypes().get(i), eachColumnConf);
+                    continue;
+                }
+
+                if (type.startsWith("MAP")) {
+                    appendMapValue(row, recordColumn, (MapColumnVector) col,
+                            layout.mapValueTypes().get(i), eachColumnConf);
+                    continue;
+                }
+
                 // Determine column type
                 SupportHiveDataType columnType;
                 if (type.startsWith("DECIMAL")) {
@@ -139,7 +142,7 @@ public class OrcWriter
                 }
                 else {
                     try {
-                        columnType = SupportHiveDataType.valueOf(type);
+                        columnType = SupportHiveDataType.of(type);
                     }
                     catch (IllegalArgumentException e) {
                         throw AddaxException.asAddaxException(
@@ -254,7 +257,7 @@ public class OrcWriter
         // convert the string to a map of V
         col.offsets[row] = col.childCount;
         col.lengths[row] = jsonObject.size();
-        // The key in map must be a string type
+        // buildOrcSchema rejects every other key type, so this cast cannot fail here
         BytesColumnVector mapKeyVector = (BytesColumnVector) col.keys;
         ColumnVector mapValueVector = col.values;
         for (Map.Entry<String, Object> entry : jsonObject.entrySet()) {
@@ -315,7 +318,7 @@ public class OrcWriter
             TaskPluginCollector taskPluginCollector)
     {
         List<Configuration> columns = config.getListConfiguration(Key.COLUMN);
-        String compress = config.getString(Key.COMPRESS, "NONE").toUpperCase();
+        String compress = config.getString(Key.COMPRESS, "NONE").toUpperCase(Locale.ROOT).trim();
         int batchSize = config.getInt(Key.BATCH_SIZE, DEFAULT_BATCH_SIZE);
 
         OrcLayout layout = buildOrcSchema(columns);
@@ -346,8 +349,49 @@ public class OrcWriter
         }
         catch (IOException e) {
             logger.error("IO exception occurred while writing file [{}]: {}", fileName, e.getMessage());
-            deleteDir(filePath.getParent());
+            // no per-task cleanup here: the parent is the staging directory shared by every split
+            // task, and Job.destroy() removes the whole staging directory on failure anyway
             throw AddaxException.asAddaxException(IO_ERROR, e);
+        }
+    }
+
+    /**
+     * Translate a configured type into the spelling ORC's parser understands.
+     * <p>
+     * The configuration accepts the SQL aliases ({@code integer}, {@code long}) that the rest of
+     * the plugin also accepts, but {@code TypeDescription.fromString} only knows {@code int} and
+     * {@code bigint} and aborted the task before a single record was read.
+     *
+     * @param type the configured type, lower case and trimmed
+     * @return the ORC type name
+     */
+    private static String toOrcTypeName(String type)
+    {
+        return switch (type) {
+            case "integer" -> "int";
+            case "long" -> "bigint";
+            default -> type;
+        };
+    }
+
+    /**
+     * Reject a map key type the writer cannot produce.
+     * <p>
+     * The key is always read out of a JSON object, so it is a string, and {@code appendMapValue}
+     * writes it through a bytes vector. Any other key type used to be accepted here and then fail
+     * with a ClassCastException in the middle of a batch, after the file had been opened.
+     *
+     * @param fieldName the field being built, for the error message
+     * @param keyType the configured key type
+     */
+    private static void validateMapKeyType(String fieldName, String keyType)
+    {
+        SupportHiveDataType type = SupportHiveDataType.of(keyType);
+        if (type != SupportHiveDataType.STRING && type != SupportHiveDataType.VARCHAR
+                && type != SupportHiveDataType.CHAR) {
+            throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
+                    String.format("The key of the map field [%s] must be a string type, but got [%s].",
+                            fieldName, keyType.trim()));
         }
     }
 
@@ -364,7 +408,7 @@ public class OrcWriter
         List<SupportHiveDataType> mapValueTypes = new ArrayList<>(columns.size());
 
         for (Configuration column : columns) {
-            String typeName = column.getString(Key.TYPE).toLowerCase();
+            String typeName = column.getString(Key.TYPE).toLowerCase(Locale.ROOT);
             String fieldName = column.getString(Key.NAME);
             SupportHiveDataType elementType = null;
             SupportHiveDataType mapValueType = null;
@@ -375,21 +419,23 @@ public class OrcWriter
                 schema.addField(fieldName, TypeDescription.createDecimal().withScale(scale).withPrecision(precision));
             }
             else if (typeName.startsWith("array")) {
-                String elementTypeName = typeName.substring(typeName.indexOf("<") + 1, typeName.indexOf(">"));
-                TypeDescription elementTypeDesc = TypeDescription.fromString(elementTypeName);
-                elementType = SupportHiveDataType.valueOf(elementTypeName.toUpperCase());
+                String elementTypeName = typeName.substring(typeName.indexOf("<") + 1, typeName.lastIndexOf(">"));
+                TypeDescription elementTypeDesc = TypeDescription.fromString(toOrcTypeName(elementTypeName.trim()));
+                elementType = SupportHiveDataType.of(elementTypeName);
                 schema.addField(fieldName, TypeDescription.createList(elementTypeDesc));
             }
             else if (typeName.startsWith("map")) {
-                String keyValueType = typeName.substring(typeName.indexOf("<") + 1, typeName.indexOf(">"));
-                String[] keyValueTypes = keyValueType.split(",");
-                TypeDescription keyTypeDesc = TypeDescription.fromString(keyValueTypes[0]);
-                TypeDescription valueTypeDesc = TypeDescription.fromString(keyValueTypes[1].trim());
-                mapValueType = SupportHiveDataType.valueOf(keyValueTypes[1].trim().toUpperCase());
+                String keyValueType = typeName.substring(typeName.indexOf("<") + 1, typeName.lastIndexOf(">"));
+                // limit 2: a parameterised value type carries its own comma, e.g. map<string,decimal(10,2)>
+                String[] keyValueTypes = keyValueType.split(",", 2);
+                validateMapKeyType(fieldName, keyValueTypes[0]);
+                TypeDescription keyTypeDesc = TypeDescription.fromString(toOrcTypeName(keyValueTypes[0].trim()));
+                TypeDescription valueTypeDesc = TypeDescription.fromString(toOrcTypeName(keyValueTypes[1].trim()));
+                mapValueType = SupportHiveDataType.of(keyValueTypes[1]);
                 schema.addField(fieldName, TypeDescription.createMap(keyTypeDesc, valueTypeDesc));
             }
             else {
-                schema.addField(fieldName, TypeDescription.fromString(typeName));
+                schema.addField(fieldName, TypeDescription.fromString(toOrcTypeName(typeName.trim())));
             }
 
             // stay aligned with the configured column order, setRow indexes these by column
