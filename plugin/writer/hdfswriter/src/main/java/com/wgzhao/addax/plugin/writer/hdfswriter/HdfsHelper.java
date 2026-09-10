@@ -50,6 +50,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import static com.wgzhao.addax.core.base.Key.HAVE_KERBEROS;
@@ -73,6 +74,16 @@ public class HdfsHelper
     protected org.apache.hadoop.conf.Configuration hadoopConf = null;
     private static final double DEFAULT_BLOOM_FILTER_FPP = 0.05d;
 
+    // Column rendering has to agree with Column.asString(), which formats in this same zone,
+    // otherwise a TIME value is written one offset away from every other representation of it
+    private static final String COLUMN_TIME_ZONE = "common.column.timeZone";
+    private static final String DEFAULT_COLUMN_TIME_ZONE = "GMT+8";
+    private static final long MILLIS_PER_DAY = 86_400_000L;
+    private static final long NANOS_PER_MILLISECOND = 1_000_000L;
+
+    /** The zone used to render DATE/TIME columns. */
+    protected TimeZone columnTimeZone = TimeZone.getTimeZone(DEFAULT_COLUMN_TIME_ZONE);
+
     record BloomFilterConfig(String columns, double fpp)
     {
     }
@@ -81,6 +92,8 @@ public class HdfsHelper
     {
         hadoopConf = new org.apache.hadoop.conf.Configuration();
         String defaultFS = taskConfig.getString(Key.DEFAULT_FS);
+        this.columnTimeZone = TimeZone.getTimeZone(
+                taskConfig.getString(COLUMN_TIME_ZONE, DEFAULT_COLUMN_TIME_ZONE));
         Configuration hadoopSiteParams = taskConfig.getConfiguration(Key.HADOOP_CONFIG);
         JSONObject hadoopSiteParamsAsJsonObject = JSON.parseObject(taskConfig.getString(Key.HADOOP_CONFIG));
         if (null != hadoopSiteParams) {
@@ -376,15 +389,19 @@ public class HdfsHelper
      * When nanos is zero, delegates to the default {@code column.asString()} ({@code HH:mm:ss}).
      *
      * @param column the input column to format
+     * @param timeZone the zone the time-of-day is expressed in
      * @return formatted time string with full precision when applicable
      */
-    protected static String formatTimeWithNanos(Column column)
+    protected static String formatTimeWithNanos(Column column, TimeZone timeZone)
     {
         if (column.getType() == Column.Type.DATE && ((DateColumn) column).getSubType() == DateColumn.DateType.TIME) {
             long nanos = ((DateColumn) column).getNanos();
             if (nanos > 0) {
                 long timeMs = (Long) column.getRawData();
-                long totalNanosOfDay = (timeMs % 86_400_000L) * 1_000_000L + (nanos % 1_000_000L);
+                // The raw value is an instant, not a wall clock reading: apply the same zone the
+                // default asString() path uses, and floorMod so pre-1970 values stay in range
+                long millisOfDay = Math.floorMod(timeMs + timeZone.getOffset(timeMs), MILLIS_PER_DAY);
+                long totalNanosOfDay = millisOfDay * NANOS_PER_MILLISECOND + nanos % NANOS_PER_MILLISECOND;
                 return LocalTime.ofNanoOfDay(totalNanosOfDay).toString();
             }
         }
