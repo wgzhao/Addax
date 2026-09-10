@@ -44,7 +44,7 @@
         </dependency>
 
         <dependency>
-            <groupId>net.sf.ucanaccess</groupId>
+            <groupId>io.github.spannm</groupId>
             <artifactId>ucanaccess</artifactId>
         </dependency>
 
