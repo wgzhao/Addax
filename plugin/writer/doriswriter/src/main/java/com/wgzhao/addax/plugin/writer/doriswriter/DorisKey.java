@@ -46,6 +46,10 @@ public class DorisKey
 
     private static final int MAX_RETRIES = 3;
     private static final long DEFAULT_FLUSH_INTERVAL = 3_000;
+    private static final int DEFAULT_CONNECT_TIMEOUT = 5_000;
+    private static final int DEFAULT_SOCKET_TIMEOUT = 600_000;
+    private static final int DEFAULT_CONNECTION_REQUEST_TIMEOUT = 5_000;
+    private static final long DEFAULT_HOST_COOLDOWN_MS = 30_000;
 
     private static final String LOAD_PROPS_FORMAT = "format";
 
@@ -61,6 +65,10 @@ public class DorisKey
     private static final String LOAD_PROPS = "loadProps";
     private static final String COLUMN_SEPARATOR = "column_separator";
     private static final String LINE_SEPARATOR = "line_delimiter";
+    private static final String CONNECT_TIMEOUT = "connectTimeout";
+    private static final String SOCKET_TIMEOUT = "socketTimeout";
+    private static final String CONNECTION_REQUEST_TIMEOUT = "connectionRequestTimeout";
+    private static final String HOST_COOLDOWN_MS = "hostCooldownMs";
     private static final String DEFAULT_LABEL_PREFIX = "addax_doris_writer_";
 
     private final Configuration loadProps;
@@ -194,10 +202,39 @@ public class DorisKey
         return MAX_RETRIES;
     }
 
-    /** Returns the batchsize. */
+    /**
+     * Returns the max rows of a single stream load batch.
+     *
+     * <p>This plugin, like every other writer in the project, reads `batchSize` as a row
+     * count.  It is *not* a byte limit here, unlike the DataX doriswriter.</p>
+     */
     public long getBatchSize()
     {
         return options.getLong(BATCH_SIZE, DEFAULT_BATCH_SIZE);
+    }
+
+    /** Returns the connecttimeout. */
+    public int getConnectTimeout()
+    {
+        return options.getInt(CONNECT_TIMEOUT, DEFAULT_CONNECT_TIMEOUT);
+    }
+
+    /** Returns the sockettimeout. */
+    public int getSocketTimeout()
+    {
+        return options.getInt(SOCKET_TIMEOUT, DEFAULT_SOCKET_TIMEOUT);
+    }
+
+    /** Returns the connectionrequesttimeout. */
+    public int getConnectionRequestTimeout()
+    {
+        return options.getInt(CONNECTION_REQUEST_TIMEOUT, DEFAULT_CONNECTION_REQUEST_TIMEOUT);
+    }
+
+    /** Returns how long a failed load host is skipped, in milliseconds. */
+    public long getHostCooldownMs()
+    {
+        return options.getLong(HOST_COOLDOWN_MS, DEFAULT_HOST_COOLDOWN_MS);
     }
 
     /** Returns the flushinterval. */
