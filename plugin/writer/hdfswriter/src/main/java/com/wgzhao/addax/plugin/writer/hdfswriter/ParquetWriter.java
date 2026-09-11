@@ -132,7 +132,7 @@ public class ParquetWriter
     {
         List<Configuration> columns = config.getListConfiguration(Key.COLUMN);
         String compress = config.getString(Key.COMPRESS, "UNCOMPRESSED").toUpperCase().trim();
-        CompressionCodecName codecName = CompressionCodecName.fromConf(compress.equals("NONE") ? "UNCOMPRESSED" : compress);
+        CompressionCodecName codecName = resolveCodec(compress);
 
         // Construct parquet schema, which also validates the configured types
         MessageType schema = generateParquetSchema(columns);
@@ -149,6 +149,19 @@ public class ParquetWriter
         catch (IOException e) {
             throw new RuntimeException("Failed to write Parquet file: " + fileName, e);
         }
+    }
+
+    /**
+     * Resolve the configured compression name to the codec the file is written with.
+     * <p>
+     * LZ4 is upgraded to LZ4_RAW on purpose: parquet's plain LZ4 codec writes the Hadoop framing
+     * that parquet-format deprecated (codec 5), which only readers carrying lz4-java can decode.
+     * LZ4_RAW (codec 7) is what every modern engine writes and reads.
+     */
+    private static CompressionCodecName resolveCodec(String compress)
+    {
+        CompressionCodecName codecName = CompressionCodecName.fromConf("NONE".equals(compress) ? "UNCOMPRESSED" : compress);
+        return codecName == CompressionCodecName.LZ4 ? CompressionCodecName.LZ4_RAW : codecName;
     }
 
     private void setupHadoopConfiguration(MessageType schema)
