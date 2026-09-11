@@ -8,6 +8,8 @@
       "col2"
     ],
     "batchSize": 102400,
+    "flushInterval": 3000,
+    "flushQueueLength": 1,
     "loadUrl": [
       "fe:fe_port"
     ],
