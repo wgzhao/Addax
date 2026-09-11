@@ -12,6 +12,10 @@ updates:
     ignore:
       - dependency-name: "ojbdc8"
         versions: ["21.x"]
+      # 19.x needs protobuf-java 4.x, but the root pom pins protobuf-java to 3.25.5,
+      # so the bump ships a classpath that fails when the Flight classes initialise (#1492)
+      - dependency-name: "org.apache.arrow:flight-sql-jdbc-core"
+        versions: ["19.x"]
   # Maintain dependencies for GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
