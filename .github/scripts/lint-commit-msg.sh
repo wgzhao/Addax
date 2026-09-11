@@ -29,8 +29,11 @@ if [[ -z "$header" ]]; then
   exit 1
 fi
 
-if (( ${#header} > 100 )); then
-  echo "commit header exceeds 100 chars (${#header}): $header" >&2
+# GitHub appends " (#123)" when squash-merging, so measure the authored subject only.
+subject="$(sed -E 's/ \(#[0-9]+\)$//' <<<"$header")"
+
+if (( ${#subject} > 100 )); then
+  echo "commit header exceeds 100 chars (${#subject}): $subject" >&2
   exit 1
 fi
 

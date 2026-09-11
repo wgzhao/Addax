@@ -22,8 +22,12 @@ jobs:
           fetch-depth: 0
       - name: Lint commit messages in PR
         run: |
+          # Do not add a `git fetch --depth=1` of the base branch here: it marks
+          # origin/<base> shallow, and once master moves past the PR branch the
+          # base ref stops being an ancestor of HEAD, so the range below degenerates
+          # to nearly the whole repository history and the job fails on commits that
+          # are already on master. actions/checkout (fetch-depth: 0) already has it.
           base="origin/${{ github.base_ref }}"
-          git fetch --no-tags --prune --depth=1 origin "${{ github.base_ref }}"
           commits=$(git rev-list --no-merges "$base"..HEAD)
           if [[ -z "$commits" ]]; then
             echo "no non-merge commits to lint"
