@@ -12,10 +12,16 @@ updates:
     ignore:
       - dependency-name: "ojbdc8"
         versions: ["21.x"]
-      # 19.x needs protobuf-java 4.x, but the root pom pins protobuf-java to 3.25.5,
-      # so the bump ships a classpath that fails when the Flight classes initialise (#1492)
+      # every release from 18.3.0 on ships protobuf 4.x gencode, but the root pom pins
+      # protobuf-java to 3.25.5, so the resolved classpath fails when the Flight classes
+      # initialise (see #1492 and #1541); 18.2.x stays eligible
       - dependency-name: "org.apache.arrow:flight-sql-jdbc-core"
-        versions: ["19.x"]
+        versions: [">=18.3.0"]
+      # 2.0.0 is a table-format and engine major three release lines ahead of the 1.2.0
+      # this plugin pins, so it needs a deliberate migration and a test against the target
+      # Paimon deployment, not a dependency bump (#1540)
+      - dependency-name: "org.apache.paimon:*"
+        versions: ["2.x"]
   # Maintain dependencies for GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
