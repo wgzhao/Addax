@@ -336,6 +336,12 @@ ensure_java17_runtime() {
     abort "JDK 17 runtime not found. In NONINTERACTIVE mode, please install JDK 17 manually before running this script."
   fi
 
+  # Why: `curl ... | bash` feeds the script itself on stdin, so reading a prompt
+  # from stdin would silently swallow the next line of the script instead.
+  if [[ ! -r /dev/tty ]]; then
+    abort "JDK 17 runtime not found and no terminal is available to ask for permission. Please install JDK 17 manually and rerun this script."
+  fi
+
   echo "JDK 17 runtime was not detected on this system."
   if command -v java >/dev/null 2>&1; then
     current_java_major="$(get_java_major_version_from_bin "$(command -v java)" || true)"
@@ -344,7 +350,7 @@ ensure_java17_runtime() {
     fi
   fi
 
-  if ! read -r -p "Do you want this script to install JDK 17 now? [y/N] " response; then
+  if ! read -r -p "Do you want this script to install JDK 17 now? [y/N] " response 2>/dev/null </dev/tty; then
     response="n"
   fi
 
@@ -429,15 +435,21 @@ if [[ -d "${ADDAX_REPOSITORY}" ]]; then
     abort "NONINTERACTIVE mode detected: refusing to reinstall automatically. Remove ${ADDAX_REPOSITORY} manually and retry."
   fi
 
+  # Why: Same as the JDK prompt below — under `curl ... | bash` stdin is the
+  # script itself, so the prompt must come from the terminal instead.
+  if [[ ! -r /dev/tty ]]; then
+    abort "No terminal is available to ask for confirmation. Remove ${ADDAX_REPOSITORY} manually and retry."
+  fi
+
   echo "Do you want to reinstall? This script will clean up ${ADDAX_REPOSITORY}."
   response=""
-  if ! read -r -p "Do you want to continue? [y/N] " response; then
+  if ! read -r -p "Do you want to continue? [y/N] " response 2>/dev/null </dev/tty; then
     response="n"
   fi
 
   response="$(printf "%s" "${response}" | tr '[:upper:]' '[:lower:]')"
   if [[ "${response}" != "y" ]]; then
-    exit 1
+    abort "Reinstall declined. Nothing was changed."
   fi
 
   safe_remove_repository "${ADDAX_REPOSITORY}"
