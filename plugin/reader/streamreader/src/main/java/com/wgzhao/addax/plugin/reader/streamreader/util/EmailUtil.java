@@ -19,30 +19,28 @@
  *
  */
 
-package com.wgzhao.addax.plugin.reader.datareader.util;
+package com.wgzhao.addax.plugin.reader.streamreader.util;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
-/** Stock Util. */
-public class StockUtil
+import java.util.random.RandomGenerator;
+
+/** Email Util. */
+public final class EmailUtil
 {
+    private static final String[] EMAIL_DOMAIN = {"gmail.com", "yahoo.com", "aol.com", "qq.com", "163.com", "sina.com",
+            "sina.com.cn", "proton.me", "outlook.com", "hotmail.com", "icloud.com"};
 
-    // China stock symbol prefix
-    private static final String[] CODE_PREFIXES = {
-            "68", "10", "16", "75", "42", "73", "07", "90", "87", "13", "14", "08", "11", "43", "19", "71", "01", "56", "70", "37", "76",
-            "12", "88", "00", "51", "72", "60", "50", "03", "29", "83", "18", "02", "20", "40", "06", "15", "09", "38", "58", "17", "36",
-            "30", "78"
-    };
+    /** The upper bound of the length of the user part of an email address. */
+    private static final int USER_LENGTH = 10;
 
-    /** Nextstockcode. */
-    public static String nextStockCode()
+    private EmailUtil() {}
+
+    /** Nextemail. */
+    public static String nextEmail(RandomGenerator rng)
     {
-        return CommonUtil.randChoose(CODE_PREFIXES) + RandomStringUtils.secure().nextNumeric(4);
-    }
-
-    /** Nextstockaccount. */
-    public static String nextStockAccount()
-    {
-        return RandomStringUtils.secure().nextNumeric(10);
+        return RandomStringUtils.insecure().nextAlphanumeric(rng.nextInt(3, USER_LENGTH))
+                + "@"
+                + CommonUtil.randChoose(rng, EMAIL_DOMAIN);
     }
 }

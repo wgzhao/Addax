@@ -44,12 +44,14 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalQueries;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.random.RandomGenerator;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
@@ -120,8 +122,25 @@ public record ColumnSpec(Type type, Rule rule)
     {
     }
 
+    /**
+     * A value produced by one of the {@link Generator built-in data rules}, the type of the column
+     * is fixed by the rule.
+     *
+     * @param generator the rule that produces the value
+     */
+    public record Generated(Generator generator) implements Rule
+    {
+    }
+
     /** The value that stands for a SQL NULL. */
     private static final String NULL_VALUE = "null";
+
+    /** The rules whose value type is selected by the type item, the other rules have a fixed type. */
+    private static final String CONSTANT_RULE = "constant";
+    private static final String RANDOM_RULE = "random";
+    private static final String INCR_RULE = "incr";
+    private static final Set<String> FUNCTION_RULES = Set.of(CONSTANT_RULE, RANDOM_RULE, INCR_RULE);
+    private static final String FUNCTION_RULES_HINT = "constant, random, incr";
 
     /** The random range of a {@link Type#TIMESTAMP} column. */
     private static final long TIMESTAMP_LOWER_BOUND = 1_100_000_000_000L;
@@ -147,16 +166,83 @@ public record ColumnSpec(Type type, Rule rule)
 
     /**
      * Parse and validate the configuration of one column.
+     * <p>
+     * Two forms are supported. The {@code rule} item names the generation rule of the column and the
+     * {@code value} item is its parameter; when {@code rule} is absent, the legacy form applies, where
+     * the {@code random} and the {@code incr} items select the function of the column and a bare
+     * {@code value} is a constant.
      *
      * @param column the configuration of the column
      * @return the generation rule of the column
      */
     public static ColumnSpec parse(Configuration column)
     {
+        String rule = column.getString(StreamConstant.RULE);
+        return StringUtils.isBlank(rule) ? parseFunctionColumn(column) : parseRuleColumn(column, rule);
+    }
+
+    /**
+     * Parse a column that selects its rule with the {@code rule} item.
+     *
+     * @param column the configuration of the column
+     * @param rule the configured rule name
+     * @return the generation rule of the column
+     */
+    private static ColumnSpec parseRuleColumn(Configuration column, String rule)
+    {
+        Generator generator = Generator.of(rule);
+        if (null != generator) {
+            return parseGeneratedColumn(column, generator, rule);
+        }
+
+        String ruleName = Generator.normalize(rule);
+        if (!FUNCTION_RULES.contains(ruleName)) {
+            throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
+                    String.format("The column rule [%s] is unsupported, the supported rules are %s, %s.",
+                            rule, Generator.names(), FUNCTION_RULES_HINT));
+        }
+
         Type type = parseType(column.getString(Key.TYPE));
-        String dateFormat = Type.DATE == type
-                ? column.getString(Key.DATE_FORMAT, Constant.DEFAULT_DATE_FORMAT)
-                : null;
+        String dateFormat = dateFormat(column, type);
+        String value = column.getNecessaryValue(Key.VALUE, REQUIRED_VALUE);
+        return switch (ruleName) {
+            case CONSTANT_RULE -> new ColumnSpec(type, constantValue(type, dateFormat, value));
+            case RANDOM_RULE -> new ColumnSpec(type, parseRandom(type, dateFormat, value));
+            default -> new ColumnSpec(type, parseIncrement(type, dateFormat, value));
+        };
+    }
+
+    /**
+     * Parse a column whose value comes from a built-in data rule. The type of such a column is fixed
+     * by the rule, so a configured type is only accepted when it is the type of the rule.
+     *
+     * @param column the configuration of the column
+     * @param generator the rule of the column
+     * @param rule the configured rule name
+     * @return the generation rule of the column
+     */
+    private static ColumnSpec parseGeneratedColumn(Configuration column, Generator generator, String rule)
+    {
+        String typeName = column.getString(Key.TYPE);
+        if (StringUtils.isNotBlank(typeName) && generator.type() != parseType(typeName)) {
+            throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                    String.format("The rule [%s] always produces a %s value, the configured type [%s] is not supported.",
+                            rule, generator.type(), typeName));
+        }
+        return new ColumnSpec(generator.type(), new Generated(generator));
+    }
+
+    /**
+     * Parse a column in the legacy form, where the {@code random} and the {@code incr} items select
+     * the function of the column.
+     *
+     * @param column the configuration of the column
+     * @return the generation rule of the column
+     */
+    private static ColumnSpec parseFunctionColumn(Configuration column)
+    {
+        Type type = parseType(column.getString(Key.TYPE));
+        String dateFormat = dateFormat(column, type);
 
         String random = column.getString(StreamConstant.RANDOM);
         if (StringUtils.isNotBlank(random)) {
@@ -169,8 +255,17 @@ public record ColumnSpec(Type type, Rule rule)
         }
 
         String value = column.getNecessaryValue(Key.VALUE, REQUIRED_VALUE);
-        long dateMillis = Type.DATE == type ? parseDate(value, dateFormat).getTime() : 0L;
-        return new ColumnSpec(type, new ConstantValue(value, dateMillis));
+        return new ColumnSpec(type, constantValue(type, dateFormat, value));
+    }
+
+    private static ConstantValue constantValue(Type type, String dateFormat, String value)
+    {
+        return new ConstantValue(value, Type.DATE == type ? parseDate(value, dateFormat).getTime() : 0L);
+    }
+
+    private static String dateFormat(Configuration column, Type type)
+    {
+        return Type.DATE == type ? column.getString(Key.DATE_FORMAT, Constant.DEFAULT_DATE_FORMAT) : null;
     }
 
     /**
@@ -197,6 +292,9 @@ public record ColumnSpec(Type type, Rule rule)
                     .plus(ordinal * increment.step(), increment.unit())
                     .toInstant());
             return new DateColumn(date);
+        }
+        if (this.rule instanceof Generated generated) {
+            return generated.generator().generate(rng);
         }
         throw new IllegalStateException("The rule " + this.rule + " is not supported.");
     }
@@ -383,6 +481,12 @@ public record ColumnSpec(Type type, Rule rule)
         try {
             TemporalAccessor parsed = DateTimeFormatter.ofPattern(dateFormat).parse(value);
             LocalTime time = parsed.query(TemporalQueries.localTime());
+            if (null == time && parsed.isSupported(ChronoField.HOUR_OF_AMPM)) {
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE, String.format(
+                        "The date value [%s] does not match the date format [%s]: 'hh' is the hour of a 12 hour "
+                                + "clock and needs an AM/PM marker to be readable, use 'HH' for the hour of the day.",
+                        value, dateFormat));
+            }
             LocalDateTime dateTime = LocalDateTime.of(LocalDate.from(parsed), null == time ? LocalTime.MIDNIGHT : time);
             return Date.from(dateTime.atZone(ZoneId.systemDefault()).toInstant());
         }

@@ -99,14 +99,6 @@
             <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/reader/datareader/target/datareader-${project.version}/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <fileMode>0644</fileMode>
-            <outputDirectory>/</outputDirectory>
-        </fileSet>
-        <fileSet>
             <directory>plugin/reader/dbfreader/target/dbfreader-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>

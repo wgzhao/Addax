@@ -19,15 +19,17 @@
  *
  */
 
-package com.wgzhao.addax.plugin.reader.datareader.util;
+package com.wgzhao.addax.plugin.reader.streamreader.util;
 
-import org.apache.commons.rng.simple.RandomSource;
+import java.util.random.RandomGenerator;
 
 /**
  * generate a faker address
  */
-public class AddressUtil
+public final class AddressUtil
 {
+    private AddressUtil() {}
+
     private static final String[] COUNTRIES = {
             "阿富汗", "阿拉斯加", "阿尔巴尼亚", "阿尔及利亚", "安道尔", "安哥拉", "安圭拉岛英", "安提瓜和巴布达",
             "阿根廷", "亚美尼亚", "阿鲁巴岛", "阿森松", "澳大利亚", "奥地利", "阿塞拜疆", "巴林", "孟加拉国",
@@ -93,21 +95,21 @@ public class AddressUtil
     private static final String[] STREET_SUFFIXES = {"街", "路"};
 
     /** Nextaddress. */
-    public static String nextAddress()
+    public static String nextAddress(RandomGenerator rng)
     {
-        return String.format("%s%s%s%s区%s%s%d号", CommonUtil.randChoose(PROVINCES),
-                CommonUtil.randChoose(CITIES),
-                CommonUtil.randChoose(CITY_SUFFIXES),
-                CommonUtil.randChoose(DISTRICTS),
-                CommonUtil.randChoose(STREETS),
-                CommonUtil.randChoose(STREET_SUFFIXES),
-                RandomSource.XO_RO_SHI_RO_1024_PP.create().nextInt(0, 300)
+        return String.format("%s%s%s%s区%s%s%d号", CommonUtil.randChoose(rng, PROVINCES),
+                CommonUtil.randChoose(rng, CITIES),
+                CommonUtil.randChoose(rng, CITY_SUFFIXES),
+                CommonUtil.randChoose(rng, DISTRICTS),
+                CommonUtil.randChoose(rng, STREETS),
+                CommonUtil.randChoose(rng, STREET_SUFFIXES),
+                rng.nextInt(1, 300)
         );
     }
 
     /** Nextcountry. */
-    public static String nextCountry()
+    public static String nextCountry(RandomGenerator rng)
     {
-        return CommonUtil.randChoose(COUNTRIES);
+        return CommonUtil.randChoose(rng, COUNTRIES);
     }
 }

@@ -19,20 +19,17 @@
  *
  */
 
-package com.wgzhao.addax.plugin.reader.datareader.util;
+package com.wgzhao.addax.plugin.reader.streamreader.util;
 
-import org.apache.commons.lang3.time.DateUtils;
-import org.apache.commons.rng.UniformRandomProvider;
-import org.apache.commons.rng.simple.RandomSource;
-
-import java.text.SimpleDateFormat;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.random.RandomGenerator;
 
 /** Id Card Util. */
-public class IdCardUtil
+public final class IdCardUtil
 {
+    private IdCardUtil() {}
+
     // http://www.stats.gov.cn/tjsj/tjbz/xzqhdm/201504/t20150415_712722.html
     private static final String[] AREA_CODES = {
             "110000", "110100", "110101", "110102", "110105", "110106", "110107", "110108", "110109", "110111", "110112", "110113",
@@ -332,14 +329,18 @@ public class IdCardUtil
     private static final int MIN_AGE = 18;
     private static final int MAX_AGE = 99;
 
-    private static final String[] FEMALE_NUM = {"0", "2", "4", "6", "8"};
-    private static final String[] MALE_NUM = {"1", "3", "5", "7", "9"};
+    /** The digits of a even (female) and odd (male) sequence code, the last digit encodes the gender. */
+    private static final char[] FEMALE_NUM = {'0', '2', '4', '6', '8'};
+    private static final char[] MALE_NUM = {'1', '3', '5', '7', '9'};
 
-    private static Date randomBirth()
+    private static final DateTimeFormatter BIRTH_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd");
+
+    private static LocalDate randomBirth(RandomGenerator rng)
     {
-        Date minAge = Date.from(Instant.now().minus(Duration.ofDays(MAX_AGE * 365)));
-        return DateUtils.addDays(minAge, 
-        RandomSource.XO_RO_SHI_RO_128_PP.create().nextInt(MIN_AGE, MAX_AGE) * 365);
+        // a random birthday within [MIN_AGE, MAX_AGE) years, on a random day inside that year
+        return LocalDate.now()
+                .minusYears(rng.nextInt(MIN_AGE, MAX_AGE))
+                .minusDays(rng.nextInt(0, 365));
     }
 
     /**
@@ -364,23 +365,16 @@ public class IdCardUtil
     }
 
     /** Nextidcard. */
-    public static String nextIdCard()
+    public static String nextIdCard(RandomGenerator rng)
     {
-        StringBuilder sb = new StringBuilder();
-        sb.append(CommonUtil.randChoose(AREA_CODES));
-        Date birth = IdCardUtil.randomBirth();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        sb.append(sdf.format(birth));
-
-        UniformRandomProvider rng = RandomSource.XO_RO_SHI_RO_128_PP.create();
-
-        if (rng.nextInt(0, 1) <= 0.5) {
-            sb.append(CommonUtil.randChoose(FEMALE_NUM));
-        }
-        else {
-            sb.append(CommonUtil.randChoose(MALE_NUM));
-        }
+        StringBuilder sb = new StringBuilder(18);
+        // the 6 digits area code, the 8 digits birthday and a 3 digits sequence code
+        sb.append(CommonUtil.randChoose(rng, AREA_CODES));
+        sb.append(BIRTH_FORMAT.format(randomBirth(rng)));
         sb.append(rng.nextInt(0, 10)).append(rng.nextInt(0, 10));
+        // the 17th digit is the last digit of the sequence code and encodes the gender
+        char[] gender = rng.nextBoolean() ? MALE_NUM : FEMALE_NUM;
+        sb.append(gender[rng.nextInt(gender.length)]);
         sb.append(checkSum(sb.toString()));
         return sb.toString();
     }

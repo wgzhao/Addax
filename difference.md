@@ -18,7 +18,7 @@
 - **性能优化**：rdbms 模块使用共享连接池缓存，避免每次查询重复创建/销毁数据源；通信与格式化等热点代码做了线程安全与性能优化
 - **通配符列**：支持 `column: "*"` 配置，无需枚举全部列即可同步所有字段（MongoDB、流式插件等）
 - **命令行增强**：`addax.sh` 支持 `-p` 注入作业变量、`-L` 设置日志级别、`-d` 调试模式、`-j` 自定义 JVM 参数、自定义日志文件名
-- **测试支持**：内置 `datareader`（假数据生成器），便于快速验证链路和压测
+- **测试支持**：`streamreader` 内置假数据生成规则（身份证、银行卡、地址、公司等），便于快速验证链路和压测
 
 ## 精简
 
@@ -35,22 +35,21 @@
 
 1. accessreader（Access 数据库）
 2. databendreader（Databend）
-3. datareader（假数据生成器）
-4. dbfreader（DBF 文件）
-5. elasticsearchreader（Elasticsearch，DataX 仅有 writer）
-6. excelreader（Excel 文件）
-7. hanareader（SAP HANA）
-8. hbase20xreader（HBase 2.x，DataX 仅有老版本）
-9. hivereader（Hive 表）
-10. httpreader（HTTP 接口，支持鉴权与 JSON 请求体）
-11. influxdbreader（InfluxDB）
-12. influxdb2reader（InfluxDB 2.x）
-13. jsonfilereader（JSON 文件）
-14. kafkareader（Kafka）
-15. kudureader（Kudu，DataX 仅有 writer）
-16. redisreader（Redis）
-17. s3reader（Amazon S3 及兼容对象存储）
-18. sqlitereader（SQLite）
+3. dbfreader（DBF 文件）
+4. elasticsearchreader（Elasticsearch，DataX 仅有 writer）
+5. excelreader（Excel 文件）
+6. hanareader（SAP HANA）
+7. hbase20xreader（HBase 2.x，DataX 仅有老版本）
+8. hivereader（Hive 表）
+9. httpreader（HTTP 接口，支持鉴权与 JSON 请求体）
+10. influxdbreader（InfluxDB）
+11. influxdb2reader（InfluxDB 2.x）
+12. jsonfilereader（JSON 文件）
+13. kafkareader（Kafka）
+14. kudureader（Kudu，DataX 仅有 writer）
+15. redisreader（Redis）
+16. s3reader（Amazon S3 及兼容对象存储）
+17. sqlitereader（SQLite）
 
 ### Writer
 
@@ -85,7 +84,7 @@
 - **HBase**：hbase11xsqlwriter 支持 Kerberos 认证
 - **Kudu**：reader/writer 均支持 Kerberos 认证
 - **Excel**：writer 直接生成 XML 文件，写入性能大幅提升
-- **Stream**：streamwriter 二进制列输出 hex 预览，终端与日志输出保持一致
+- **Stream**：streamreader 在 DataX 的 streamreader 之上增加了内置数据规则（身份证、银行卡、地址、公司、股票代码等 16 种），可以直接生成贴合业务的数据；streamwriter 二进制列输出 hex 预览，终端与日志输出保持一致
 - **安装部署**：提供 `install.sh` 一键安装脚本（Linux/macOS）和 Docker 镜像，支持快速部署
 
 ## 工程与维护

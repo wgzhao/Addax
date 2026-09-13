@@ -19,20 +19,20 @@
  *
  */
 
-package com.wgzhao.addax.plugin.reader.datareader.util;
+package com.wgzhao.addax.plugin.reader.streamreader.util;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
-import java.security.SecureRandom;
+import java.util.random.RandomGenerator;
 
 /**
  * generate bank info
  * include bank account
  * bank name
  */
-public class BankUtil
+public final class BankUtil
 {
-    private static final SecureRandom RANDOM = new SecureRandom();
+    private BankUtil() {}
 
     private static final String[] BANKS = {
             "北京银行", "天津银行", "沧州银行", "承德银行", "廊坊银行", "秦皇岛商行", "河北银行", "唐山商行", "张家口商行", "邢台商行", "保定商行",
@@ -69,28 +69,29 @@ public class BankUtil
     /**
      * generate a faker bank company name
      *
+     * @param rng the random generator of the caller
      * @return bank name
      */
-    public static String nextBank()
+    public static String nextBank(RandomGenerator rng)
     {
-        return BANKS[RANDOM.nextInt(BANKS.length)];
+        return BANKS[rng.nextInt(BANKS.length)];
     }
 
     /** Nextdebitcard. */
-    public static String nextDebitCard()
+    public static String nextDebitCard(RandomGenerator rng)
     {
         StringBuilder sb = new StringBuilder();
-        sb.append(CommonUtil.randChoose(DEBIT_CARD_PREFIXES));
-        sb.append(RandomStringUtils.secure().nextNumeric(DEBIT_CARD_LENGTH - sb.length()));
+        sb.append(CommonUtil.randChoose(rng, DEBIT_CARD_PREFIXES));
+        sb.append(RandomStringUtils.insecure().nextNumeric(DEBIT_CARD_LENGTH - sb.length()));
         return sb.toString();
     }
 
     /** Nextcreditcard. */
-    public static String nextCreditCard()
+    public static String nextCreditCard(RandomGenerator rng)
     {
         StringBuilder sb = new StringBuilder();
-        sb.append(CommonUtil.randChoose(CREDIT_CARD_PREFIXES));
-        sb.append(RandomStringUtils.secure().nextNumeric(CREDIT_CARD_LENGTH - sb.length()));
+        sb.append(CommonUtil.randChoose(rng, CREDIT_CARD_PREFIXES));
+        sb.append(RandomStringUtils.insecure().nextNumeric(CREDIT_CARD_LENGTH - sb.length()));
         return sb.toString();
     }
 }

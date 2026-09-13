@@ -19,16 +19,17 @@
  *
  */
 
-package com.wgzhao.addax.plugin.reader.datareader.util;
-
-import org.apache.commons.rng.simple.RandomSource;
+package com.wgzhao.addax.plugin.reader.streamreader.util;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.random.RandomGenerator;
 
 /** Geo Util. */
-public class GeoUtil
+public final class GeoUtil
 {
+    private GeoUtil() {}
+
     private static final String[][] LAND_COORDS = {
             {"42.50729", "1.53414", "les Escaldes", "AD", "Europe/Andorra"},
             {"36.21544", "65.93249", "Sar-e Pul", "AF", "Asia/Kabul"},
@@ -993,38 +994,38 @@ public class GeoUtil
     /**
      * Optionally center the coordinate and pick a point within radius.
      *
+     * @param rng the random generator of the caller
      * @return a BigDecimal number
      */
-    private static BigDecimal coordinate()
+    private static BigDecimal coordinate(RandomGenerator rng)
     {
-        return BigDecimal.valueOf((
-                        RandomSource.XO_RO_SHI_RO_128_PP.create().nextDouble(0, 360000000) - 180000000) / 1000000.0)
+        return BigDecimal.valueOf((rng.nextDouble(0, 360000000) - 180000000) / 1000000.0)
                 .setScale(7, RoundingMode.HALF_UP);
     }
 
     /** Latitude. */
-    public static BigDecimal latitude()
+    public static BigDecimal latitude(RandomGenerator rng)
     {
         // Latitude has a range of -90 to 90, so divide by two.
-        return GeoUtil.coordinate().divide(new BigDecimal(2), RoundingMode.CEILING);
+        return GeoUtil.coordinate(rng).divide(new BigDecimal(2), RoundingMode.CEILING);
     }
 
     /** Longitude. */
-    public static BigDecimal longitude()
+    public static BigDecimal longitude(RandomGenerator rng)
     {
-        return GeoUtil.coordinate();
+        return GeoUtil.coordinate(rng);
     }
 
     /** Nextlatlng. */
-    public static BigDecimal[] nextLatlng()
+    public static BigDecimal[] nextLatlng(RandomGenerator rng)
     {
-        return new BigDecimal[] {GeoUtil.latitude(), GeoUtil.longitude()};
+        return new BigDecimal[] {GeoUtil.latitude(rng), GeoUtil.longitude(rng)};
     }
 
     /** Nextlatlngonland. */
-    public static BigDecimal[] nextLatlngOnLand()
+    public static BigDecimal[] nextLatlngOnLand(RandomGenerator rng)
     {
-        String[] res = CommonUtil.randChoose(LAND_COORDS);
+        String[] res = CommonUtil.randChoose(rng, LAND_COORDS);
         return new BigDecimal[] {new BigDecimal(res[0]), new BigDecimal(res[1])};
     }
 }

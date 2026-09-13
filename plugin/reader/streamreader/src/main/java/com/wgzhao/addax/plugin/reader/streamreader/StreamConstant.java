@@ -22,6 +22,9 @@ package com.wgzhao.addax.plugin.reader.streamreader;
 /** Stream Constant configuration keys. */
 public final class StreamConstant
 {
+    /** The generation rule of a column. */
+    public static final String RULE = "rule";
+
     /** The random function of a column. */
     public static final String RANDOM = "random";
 

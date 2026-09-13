@@ -19,13 +19,17 @@
  *
  */
 
-package com.wgzhao.addax.plugin.reader.datareader.util;
+package com.wgzhao.addax.plugin.reader.streamreader.util;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
+import java.util.random.RandomGenerator;
+
 /** Phone Util. */
-public class PhoneUtil
+public final class PhoneUtil
 {
+    private PhoneUtil() {}
+
     /**
      * Array of Chinese mobile phone number prefixes (first 3 digits).
      * Represents the mobile prefixes used by major carriers in China:
@@ -38,8 +42,8 @@ public class PhoneUtil
 
 
     /** Nextphonenumber. */
-    public static String nextPhoneNumber()
+    public static String nextPhoneNumber(RandomGenerator rng)
     {
-        return CommonUtil.randChoose(PHONE_NUMBER_PREFIXES) + RandomStringUtils.secure().nextNumeric(8);
+        return CommonUtil.randChoose(rng, PHONE_NUMBER_PREFIXES) + RandomStringUtils.insecure().nextNumeric(8);
     }
 }
