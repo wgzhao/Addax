@@ -49,6 +49,11 @@
         </dependency>
 
         <dependency>
+            <groupId>at.yawk.lz4</groupId>
+            <artifactId>lz4-java</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>com.fasterxml.woodstox</groupId>
             <artifactId>woodstox-core</artifactId>
         </dependency>
@@ -62,6 +67,14 @@
             <groupId>org.apache.paimon</groupId>
             <artifactId>paimon-core</artifactId>
             <version>${paimon.version}</version>
+            <exclusions>
+                <!-- paimon-common pulls the discontinued org.lz4:lz4-java,
+                     the maintained fork below replaces it -->
+                <exclusion>
+                    <groupId>org.lz4</groupId>
+                    <artifactId>lz4-java</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
