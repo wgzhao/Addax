@@ -45,6 +45,14 @@
             <artifactId>addax-storage</artifactId>
         </dependency>
 
+        <!-- hadoop-common declares lz4-java as provided (it ships it in its own distro),
+             so supply it explicitly or hadoop Lz4Codec fails with NoClassDefFoundError.
+             Use the maintained fork: upstream org.lz4:lz4-java is discontinued and unpatched -->
+        <dependency>
+            <groupId>at.yawk.lz4</groupId>
+            <artifactId>lz4-java</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>com.fasterxml.woodstox</groupId>
             <artifactId>woodstox-core</artifactId>
@@ -101,13 +109,6 @@
         <dependency>
             <groupId>org.apache.parquet</groupId>
             <artifactId>parquet-hadoop-bundle</artifactId>
-        </dependency>
-
-        <!-- hadoop-common declares lz4-java as provided (it ships it in its own distro),
-             so supply it explicitly or hadoop Lz4Codec fails with NoClassDefFoundError -->
-        <dependency>
-            <groupId>org.lz4</groupId>
-            <artifactId>lz4-java</artifactId>
         </dependency>
 
         <dependency>

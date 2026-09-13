@@ -45,14 +45,16 @@
             <artifactId>addax-rdbms</artifactId>
         </dependency>
 
+        <!-- clickhouse client needs LZ4; use the maintained fork, upstream
+             org.lz4:lz4-java is discontinued and unpatched -->
         <dependency>
-            <groupId>com.clickhouse</groupId>
-            <artifactId>clickhouse-jdbc</artifactId>
+            <groupId>at.yawk.lz4</groupId>
+            <artifactId>lz4-java</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.lz4</groupId>
-            <artifactId>lz4-java</artifactId>
+            <groupId>com.clickhouse</groupId>
+            <artifactId>clickhouse-jdbc</artifactId>
         </dependency>
 
         <dependency>
