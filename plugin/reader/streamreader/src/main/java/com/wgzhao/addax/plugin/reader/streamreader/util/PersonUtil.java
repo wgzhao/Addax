@@ -19,13 +19,15 @@
  *
  */
 
-package com.wgzhao.addax.plugin.reader.datareader.util;
+package com.wgzhao.addax.plugin.reader.streamreader.util;
 
-import org.apache.commons.rng.simple.RandomSource;
+import java.util.random.RandomGenerator;
 
 /** Person Util. */
-public class PersonUtil
+public final class PersonUtil
 {
+    private PersonUtil() {}
+
     private static final String[] FIRST_NAMES_MALE = {
             "伟", "强", "磊", "洋", "勇", "军", "杰", "涛", "超", "明", "刚", "平", "辉", "鹏", "华", "飞",
             "鑫", "波", "斌", "宇", "浩", "凯", "健", "俊", "帆", "帅", "旭", "宁", "龙", "林", "欢", "佳",
@@ -58,15 +60,19 @@ public class PersonUtil
             "湛", "宾", "戎", "勾", "茅", "利", "于", "呼", "居", "揭", "干", "但", "尉", "冶", "斯", "元", "束", "檀", "衣", "信", "展", "阴", "昝", "智", "幸",
             "奉", "植", "衡", "富", "尧", "闭", "由"};
 
+    /** The ratio of the female given names, the rest are male. */
+    private static final double FEMALE_RATIO = 0.4;
+
     /** Nextname. */
-    public static String nextName()
+    public static String nextName(RandomGenerator rng)
     {
         StringBuilder sb = new StringBuilder();
-        sb.append(CommonUtil.randChoose(LAST_NAMES));
-        if (RandomSource.XO_SHI_RO_128_PP.create().nextInt(0, 1) < 0.4) {
-            sb.append(CommonUtil.randChoose(FIRST_NAMES_FEMALE));
-        } else {
-            sb.append(CommonUtil.randChoose(FIRST_NAMES_MALE));
+        sb.append(CommonUtil.randChoose(rng, LAST_NAMES));
+        if (rng.nextDouble() < FEMALE_RATIO) {
+            sb.append(CommonUtil.randChoose(rng, FIRST_NAMES_FEMALE));
+        }
+        else {
+            sb.append(CommonUtil.randChoose(rng, FIRST_NAMES_MALE));
         }
         return sb.toString();
     }

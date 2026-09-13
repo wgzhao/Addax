@@ -82,7 +82,7 @@ public class StreamReader
 
             List<String> normalizedColumns = new ArrayList<>(columns.size());
             for (Configuration eachColumn : columns) {
-                removeConflictedItems(eachColumn);
+                normalizeColumn(eachColumn);
                 ColumnSpec.parse(eachColumn);
                 normalizedColumns.add(eachColumn.toJSON());
             }
@@ -90,28 +90,47 @@ public class StreamReader
         }
 
         /**
-         * A constant value is prior to the random and increment functions, drop the functions when
-         * more than one of them is configured on the same column.
+         * Drop the items that the column ignores, so that only the form that is actually used is passed
+         * to the tasks.
          *
          * @param column the configuration of the column
          */
-        private void removeConflictedItems(Configuration column)
+        private void normalizeColumn(Configuration column)
         {
-            String columnValue = column.getString(Key.VALUE);
-            String columnRandom = column.getString(StreamConstant.RANDOM);
-            String columnIncr = column.getString(StreamConstant.INCR);
-            if (StringUtils.isBlank(columnValue) || StringUtils.isAllBlank(columnRandom, columnIncr)) {
+            String rule = column.getString(StreamConstant.RULE);
+            if (StringUtils.isNotBlank(rule)) {
+                // the rule item selects the generation rule, the legacy items are meaningless
+                dropIgnoredItem(column, StreamConstant.RANDOM, String.format("the rule [%s] is used instead", rule));
+                dropIgnoredItem(column, StreamConstant.INCR, String.format("the rule [%s] is used instead", rule));
+                if (null != Generator.of(rule)) {
+                    dropIgnoredItem(column, Key.VALUE, String.format("the rule [%s] builds the value itself", rule));
+                }
                 return;
             }
 
-            LOG.warn("The column value [{}] is a constant, the configured random [{}] / incr [{}] function is ignored.",
-                    columnValue, columnRandom, columnIncr);
-            if (StringUtils.isNotBlank(columnRandom)) {
-                column.remove(StreamConstant.RANDOM);
+            // in the legacy form a constant value is prior to the random and increment functions
+            if (StringUtils.isBlank(column.getString(Key.VALUE))) {
+                return;
             }
-            if (StringUtils.isNotBlank(columnIncr)) {
-                column.remove(StreamConstant.INCR);
+            dropIgnoredItem(column, StreamConstant.RANDOM, "the column value is a constant");
+            dropIgnoredItem(column, StreamConstant.INCR, "the column value is a constant");
+        }
+
+        /**
+         * Remove an item that the column ignores, and warn about it.
+         *
+         * @param column the configuration of the column
+         * @param key the item to drop
+         * @param reason why the item is ignored
+         */
+        private void dropIgnoredItem(Configuration column, String key, String reason)
+        {
+            String value = column.getString(key);
+            if (StringUtils.isBlank(value)) {
+                return;
             }
+            LOG.warn("The column item [{}] with the value [{}] is ignored: {}.", key, value, reason);
+            column.remove(key);
         }
 
         @Override

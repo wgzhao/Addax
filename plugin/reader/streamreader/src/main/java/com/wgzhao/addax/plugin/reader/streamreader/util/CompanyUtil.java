@@ -19,11 +19,15 @@
  *
  */
 
-package com.wgzhao.addax.plugin.reader.datareader.util;
+package com.wgzhao.addax.plugin.reader.streamreader.util;
+
+import java.util.random.RandomGenerator;
 
 /** Company Util. */
-public class CompanyUtil
+public final class CompanyUtil
 {
+    private CompanyUtil() {}
+
     private static final String[] COMPANY_PREFIXES = {
             "超艺", "和泰", "九方", "鑫博腾飞", "戴硕电子", "济南亿次元", "海创", "创联世纪", "凌云", "泰麒麟", "彩虹", "兰金电子", "晖来计算机", "天益",
             "恒聪百汇", "菊风", "惠派国际", "创汇", "思优", "时空盒数字", "易动力", "飞海科技", "华泰通安", "盟新", "商软冠联", "图龙信息", "易动力",
@@ -38,10 +42,10 @@ public class CompanyUtil
             "有限合伙企业", "集团"};
 
     /** Nextcompany. */
-    public static String nextCompany()
+    public static String nextCompany(RandomGenerator rng)
     {
-        return CommonUtil.randChoose(COMPANY_PREFIXES)
-                + CommonUtil.randChoose(COMPANY_TYPES)
-                + CommonUtil.randChoose(COMPANY_SUFFIXES);
+        return CommonUtil.randChoose(rng, COMPANY_PREFIXES)
+                + CommonUtil.randChoose(rng, COMPANY_TYPES)
+                + CommonUtil.randChoose(rng, COMPANY_SUFFIXES);
     }
 }
