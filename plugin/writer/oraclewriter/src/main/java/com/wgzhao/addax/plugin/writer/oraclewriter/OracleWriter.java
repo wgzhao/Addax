@@ -21,18 +21,23 @@ package com.wgzhao.addax.plugin.writer.oraclewriter;
 
 import com.wgzhao.addax.core.base.Key;
 import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.element.Record;
 import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.plugin.RecordReceiver;
 import com.wgzhao.addax.core.spi.Writer;
 import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.writer.CommonRdbmsWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Blob;
 import java.sql.Clob;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
@@ -103,8 +108,21 @@ public class OracleWriter
     public static class Task
             extends Writer.Task
     {
+        /**
+         * A LOB column accepts an inline bind up to the SQL VARCHAR2/RAW limit. Only values
+         * beyond it need a temporary LOB, and every temporary LOB costs a server round trip
+         * when it is created and another when the locator is bound.
+         */
+        private static final int MAX_INLINE_LOB_SIZE = 4000;
+
+        private static final Logger LOG = LoggerFactory.getLogger(Task.class);
+
         private Configuration writerSliceConfig;
         private CommonRdbmsWriter.Task commonRdbmsWriterTask;
+
+        /** temporary LOBs built while binding the current batch, released once it has executed */
+        private final List<Blob> pendingBlobs = new ArrayList<>();
+        private final List<Clob> pendingClobs = new ArrayList<>();
 
         @Override
         public void init()
@@ -117,15 +135,25 @@ public class OracleWriter
                         throws SQLException
                 {
                     if (columnSqlType == Types.CLOB) {
+                        String value = column.asString();
+                        if (value == null || value.length() <= MAX_INLINE_LOB_SIZE) {
+                            return super.fillPreparedStatementColumnType(preparedStatement, columnIndex, columnSqlType, column);
+                        }
                         Clob clob = preparedStatement.getConnection().createClob();
-                        clob.setString(1, column.asString());
+                        clob.setString(1, value);
                         preparedStatement.setClob(columnIndex, clob);
+                        pendingClobs.add(clob);
                         return preparedStatement;
                     }
                     if (columnSqlType == Types.BLOB) {
+                        byte[] value = column.asBytes();
+                        if (value == null || value.length <= MAX_INLINE_LOB_SIZE) {
+                            return super.fillPreparedStatementColumnType(preparedStatement, columnIndex, columnSqlType, column);
+                        }
                         Blob blob = preparedStatement.getConnection().createBlob();
-                        blob.setBytes(1, column.asBytes());
+                        blob.setBytes(1, value);
                         preparedStatement.setBlob(columnIndex, blob);
+                        pendingBlobs.add(blob);
                         return preparedStatement;
                     }
 
@@ -135,8 +163,44 @@ public class OracleWriter
                     }
                     return super.fillPreparedStatementColumnType(preparedStatement, columnIndex, columnSqlType, column);
                 }
+
+                @Override
+                protected void doBatchInsert(Connection connection, List<Record> buffer, boolean supportCommit)
+                        throws SQLException
+                {
+                    try {
+                        super.doBatchInsert(connection, buffer, supportCommit);
+                    }
+                    finally {
+                        // the locators have reached the server by now; keeping the temporary
+                        // LOBs any longer only holds temp tablespace for the life of the connection
+                        releaseLobs();
+                    }
+                }
             };
             commonRdbmsWriterTask.init(writerSliceConfig);
+        }
+
+        private void releaseLobs()
+        {
+            for (Blob blob : pendingBlobs) {
+                try {
+                    blob.free();
+                }
+                catch (SQLException e) {
+                    LOG.warn("Failed to free a temporary BLOB: {}", e.getMessage());
+                }
+            }
+            pendingBlobs.clear();
+            for (Clob clob : pendingClobs) {
+                try {
+                    clob.free();
+                }
+                catch (SQLException e) {
+                    LOG.warn("Failed to free a temporary CLOB: {}", e.getMessage());
+                }
+            }
+            pendingClobs.clear();
         }
 
         @Override
