@@ -58,41 +58,17 @@ sh addax.sh -job /path/to/job.json
 
 ## Git / PR 标准流程
 
-当用户明确提出“提交并创建 PR”时，默认按以下流程执行（除非用户另有说明）：
-
-1. 创建新分支后再提交，分支名建议使用 `feat/<topic>` 或 `fix/<topic>` 格式，根据本次修改的性质选择 `feat`（新功能）或 `fix`（修复）。例如：`feat/add-protobuf-dependency`。
-2. 使用英文编写 commit message：
-   - `title` 简洁明确（建议 Conventional Commits 风格）。
-   - `description/body` 说明动机、核心改动、验证情况。
-3. 使用 `gh` 命令创建 PR，不只推送分支：
-   - 示例：`gh pr create --base master --head <branch> --title "<english title>" --body-file <file>`
-4. PR 内容必须使用英文，遵循 [PR 模板](.github/pull_request_template.md) 进行填写
-5. 若无特别要求，PR 设为 Ready for review（非 Draft）。
-
-以上流程可由一句 "提交并创建 PR" 触发，不需要用户重复描述细节格式要求。
+用户明确要求"提交并创建 PR"时，按 `.claude/skills/git-pr-flow/SKILL.md` 执行（分支命名、commit 语言、`gh pr create`、PR 模板与 Ready for review 等要求都在其中）。
 
 ## Commit Message 规范
 
-为保证提交历史可读、可检索、可自动化发布，统一使用 Conventional Commits 格式：
+格式 `<type>(<scope>)!: <subject>` 由 `.github/scripts/lint-commit-msg.sh` 强制校验，本地已通过 `core.hooksPath=.githooks` 生效；校验失败时会打印全部机械规则，此处不再重复。以下是脚本查不出、需要自行判断的部分：
 
-```text
-<type>(<scope>)!: <subject>
-
-[optional body]
-
-[optional footer(s)]
-```
-
-### 1) 标题（第一行）强制规则
-
-- 必须使用英文。
-- `type` 必填，且只能是：`feat`、`fix`、`refactor`、`perf`、`docs`、`test`、`build`、`ci`、`chore`、`revert`。
-- `scope` 必填（本项目强制），用于标识模块或插件。
-- `subject` 使用祈使句现在时（如 add/fix/remove/refactor）；不强制小写开头，允许包含句点（如 `bump x from 1.0 to 2.0`、含 `java.time`/`build-module.sh` 等命名）。
-- 标题总长度不超过 100 个字符。
+- 标题必须使用英文；`subject` 用祈使句现在时。
 - 单个 commit 只做一件事，禁止混入无关改动。
+- `feat`/`fix`/`refactor`/`perf` 必须写 `why:` / `what:` / `impact:` 三行，描述要紧跟在冒号后同一行内（脚本只检查行首前缀，换行不会报错）。
 
-### 2) Scope 约束
+### Scope 约束
 
 优先使用以下 scope：
 
@@ -100,29 +76,12 @@ sh addax.sh -job /path/to/job.json
 - `lib-rdbms`、`lib-storage`
 - `plugin-<name>`（例如：`plugin-hdfswriter`、`plugin-mongodbreader`）
 
-### 3) Body 规则
-
-- 对 `feat`、`fix`、`refactor`、`perf`，body **必须**写（CI 校验 `.github/scripts/lint-commit-msg.sh` 会检查）。
-- body 必须包含以下三行行首前缀，冒号后紧跟空格再接描述，描述须在同一行内（不能换行到下一行）：
-   - `why: ...` — 为什么改
-   - `what: ...` — 改了什么
-   - `impact: ...` — 影响范围、兼容性、性能或行为变化
-- 示例：
-
-  ```text
-  why: the existing code called column.asLong() which throws CONVERT_OVER_FLOW for values > Long.MAX_VALUE.
-
-  what: use setBigDecimal when column type is STRING to handle overflow values from UNSIGNED BIGINT.
-
-  impact: unsigned bigint values >= 2^63 no longer cause errors during transfer.
-  ```
-
-### 4) Footer 规则
+### Footer 规则
 
 - 关联 issue：`Refs: #123` 或 `Closes: #123`。
 - 破坏性变更必须使用 `!` 或 `BREAKING CHANGE:`，并明确迁移方式。
 
-### 5) 历史风格映射（统一口径）
+### 历史风格映射（统一口径）
 
 - `feature` -> `feat`
 - `bugfix` -> `fix`
@@ -131,21 +90,4 @@ sh addax.sh -job /path/to/job.json
 - `[chore][3rd]` -> `chore(deps)`
 - `[chore][action]` / `[chore][github][action]` -> `ci(github-actions)`
 
-### 6) 示例
-
-```text
-feat(plugin-mongodbreader): support wildcard collection matching
-fix(lib-rdbms): avoid quoted-column mismatch in excludeColumn
-refactor(core): split yaml and json job config parser
-ci(github-actions): bump setup-java to v5
-chore(release): prepare 6.0.12
-docs(readme): clarify plugin development workflow
-```
-
-### 7) 自动校验（本地 + CI）
-
-- 本仓库提供统一校验脚本：`.github/scripts/lint-commit-msg.sh`。
-- 本地启用方式（仅需一次）：
-   - `git config core.hooksPath .githooks`
-   - `chmod +x .githooks/commit-msg .github/scripts/lint-commit-msg.sh`
-- CI 在 PR 中会校验所有非 merge commit；任一 commit message 不符合规范将直接失败。
+本地启用校验（仅需一次）：`git config core.hooksPath .githooks`；`chmod +x .githooks/commit-msg .github/scripts/lint-commit-msg.sh`
