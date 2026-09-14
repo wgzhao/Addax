@@ -109,11 +109,15 @@ public class OracleWriter
             extends Writer.Task
     {
         /**
-         * A LOB column accepts an inline bind up to the SQL VARCHAR2/RAW limit. Only values
-         * beyond it need a temporary LOB, and every temporary LOB costs a server round trip
-         * when it is created and another when the locator is bound.
+         * The largest value the merge template can bind directly. Past a TTC field the server drops
+         * the connection with ORA-03146 / ORA-03138 / ORA-03106 instead of answering with an error,
+         * which is what issues #1030 and #1092 report. Measured against 21c XE with ojdbc 19.18:
+         * a merge binds at most 8191 characters of text or 32767 bytes of binary, and the limit
+         * counts characters, not encoded bytes (8000 CJK characters, 24000 bytes, still bind).
          */
-        private static final int MAX_INLINE_LOB_SIZE = 4000;
+        private static final int MAX_INLINE_CLOB_CHARS = 8191;
+
+        private static final int MAX_INLINE_BLOB_BYTES = 32767;
 
         private static final Logger LOG = LoggerFactory.getLogger(Task.class);
 
@@ -134,9 +138,22 @@ public class OracleWriter
                 protected PreparedStatement fillPreparedStatementColumnType(PreparedStatement preparedStatement, int columnIndex, int columnSqlType, Column column)
                         throws SQLException
                 {
-                    if (columnSqlType == Types.CLOB) {
+                    if (columnSqlType == Types.NVARCHAR || columnSqlType == Types.NCHAR) {
+                        preparedStatement.setNString(columnIndex, column.asString());
+                        return preparedStatement;
+                    }
+
+                    // An INSERT resolves the type of a placeholder from the target column, so the
+                    // server turns a value of any size into the LOB column value. The MERGE template
+                    // resolves it from the surrounding expression instead, and that is the only
+                    // statement shape that has to stage a large value in a temporary LOB first.
+                    if (writeMode == null || !writeMode.toLowerCase().startsWith("update")) {
+                        return super.fillPreparedStatementColumnType(preparedStatement, columnIndex, columnSqlType, column);
+                    }
+
+                    if (columnSqlType == Types.CLOB || columnSqlType == Types.NCLOB) {
                         String value = column.asString();
-                        if (value == null || value.length() <= MAX_INLINE_LOB_SIZE) {
+                        if (value == null || value.length() <= MAX_INLINE_CLOB_CHARS) {
                             return super.fillPreparedStatementColumnType(preparedStatement, columnIndex, columnSqlType, column);
                         }
                         Clob clob = preparedStatement.getConnection().createClob();
@@ -147,18 +164,13 @@ public class OracleWriter
                     }
                     if (columnSqlType == Types.BLOB) {
                         byte[] value = column.asBytes();
-                        if (value == null || value.length <= MAX_INLINE_LOB_SIZE) {
+                        if (value == null || value.length <= MAX_INLINE_BLOB_BYTES) {
                             return super.fillPreparedStatementColumnType(preparedStatement, columnIndex, columnSqlType, column);
                         }
                         Blob blob = preparedStatement.getConnection().createBlob();
                         blob.setBytes(1, value);
                         preparedStatement.setBlob(columnIndex, blob);
                         pendingBlobs.add(blob);
-                        return preparedStatement;
-                    }
-
-                    if (columnSqlType == Types.NVARCHAR || columnSqlType == Types.NCHAR) {
-                        preparedStatement.setNString(columnIndex, column.asString());
                         return preparedStatement;
                     }
                     return super.fillPreparedStatementColumnType(preparedStatement, columnIndex, columnSqlType, column);
