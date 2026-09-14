@@ -125,11 +125,42 @@ class DirtyColumn
 
     private static final String NOT_SUPPORT_METHOD = "该方法不支持!";
 
+    /** leading bytes of a binary column kept in the logged record */
+    private static final int MAX_BINARY_PREVIEW = 64;
+
     private DirtyColumn(Column column, int index)
     {
-        this(null == column ? null : column.getRawData(),
+        this(toLoggableRawData(column),
                 null == column ? Column.Type.NULL : column.getType(),
                 null == column ? 0 : column.getByteSize(), index);
+    }
+
+    /**
+     * A binary column carries its whole payload, and serializing that payload as a JSON array
+     * of numbers multiplies its size several times over: a single 9MB BLOB used to produce a
+     * 33MB log line, and the collector logs up to 128 dirty records per task. Only the length
+     * plus a short hex preview is kept.
+     */
+    private static Object toLoggableRawData(Column column)
+    {
+        if (null == column) {
+            return null;
+        }
+        Object rawData = column.getRawData();
+        if (!(rawData instanceof byte[] bytes)) {
+            return rawData;
+        }
+
+        int show = Math.min(bytes.length, MAX_BINARY_PREVIEW);
+        StringBuilder preview = new StringBuilder(2 + show * 2 + 24);
+        preview.append("0x");
+        for (int i = 0; i < show; i++) {
+            preview.append(String.format("%02X", bytes[i]));
+        }
+        if (bytes.length > show) {
+            preview.append("...(").append(bytes.length).append(" bytes)");
+        }
+        return preview.toString();
     }
 
     private DirtyColumn(Object object, Type type, int byteSize, int index)

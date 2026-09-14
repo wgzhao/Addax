@@ -53,6 +53,7 @@ import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -547,7 +548,18 @@ public final class StorageWriterUtil
      */
     private static String convertColumnToString(Column column, String nullFormat, DateFormat dateParse)
     {
-        if (column == null || column.getRawData() == null || column.asString().equals(nullFormat)) {
+        if (column == null || column.getRawData() == null) {
+            return nullFormat;
+        }
+
+        // A binary value decoded as text loses every byte above 0x7F to U+FFFD and lets 0x0A
+        // through unescaped; base64 keeps it intact and matches what the hdfs writers emit
+        // for their BINARY columns.
+        if (column.getType() == Column.Type.BYTES) {
+            return Base64.getEncoder().encodeToString(column.asBytes());
+        }
+
+        if (column.asString().equals(nullFormat)) {
             return nullFormat;
         }
 
@@ -673,6 +685,10 @@ public final class StorageWriterUtil
             // Numeric and boolean columns don't need quotes
             else if (column instanceof LongColumn || column instanceof BoolColumn) {
                 sb.append(column.asString());
+            }
+            // a binary value rendered as text would be mangled; base64 stays a valid literal
+            else if (column.getType() == Column.Type.BYTES) {
+                sb.append("'").append(Base64.getEncoder().encodeToString(column.asBytes())).append("'");
             }
             else {
                 // Escape single quotes in string values

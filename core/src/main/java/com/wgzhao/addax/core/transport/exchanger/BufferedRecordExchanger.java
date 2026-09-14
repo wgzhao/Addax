@@ -38,6 +38,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.OVER_LIMIT_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.SHUT_DOWN_TASK;
 import static com.wgzhao.addax.core.util.container.CoreConstant.CORE_TRANSPORT_CHANNEL_CAPACITY_BYTE;
 import static com.wgzhao.addax.core.util.container.CoreConstant.CORE_TRANSPORT_EXCHANGER_BUFFER_SIZE;
@@ -123,9 +124,15 @@ public class BufferedRecordExchanger
         Validate.notNull(record, "The record cannot be empty.");
 
         if (record.getMemorySize() > this.byteCapacity) {
-            this.pluginCollector.collectDirtyRecord(record,
-                    new Exception(String.format("A single record exceeds the size limit. The current limit is %d", this.byteCapacity)));
-            return;
+            // such a record can never be queued: the channel byte budget it would wait for is
+            // already exceeded by the record alone. Dropping it would lose the row while the
+            // job still reported success, so the task fails instead.
+            String message = String.format(
+                    "A single record requires %d bytes, which exceeds the transport channel byte capacity of %d. "
+                            + "Raise core.transport.channel.byteCapacity to accept records of this size.",
+                    record.getMemorySize(), this.byteCapacity);
+            this.pluginCollector.collectDirtyRecord(record, new Exception(message));
+            throw AddaxException.asAddaxException(OVER_LIMIT_ERROR, message);
         }
 
         boolean isFull = (this.bufferIndex >= this.bufferSize
