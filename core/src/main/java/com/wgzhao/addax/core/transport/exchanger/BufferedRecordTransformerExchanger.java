@@ -126,9 +126,15 @@ public class BufferedRecordTransformerExchanger
         }
 
         if (record.getMemorySize() > this.byteCapacity) {
-            this.pluginCollector.collectDirtyRecord(record,
-                    new Exception(String.format("A single record exceeds the size limit. The current limit is %d", this.byteCapacity)));
-            return;
+            // such a record can never be queued: the channel byte budget it would wait for is
+            // already exceeded by the record alone. Dropping it would lose the row while the
+            // job still reported success, so the task fails instead.
+            String message = String.format(
+                    "A single record requires %d bytes, which exceeds the transport channel byte capacity of %d. "
+                            + "Raise core.transport.channel.byteCapacity to accept records of this size.",
+                    record.getMemorySize(), this.byteCapacity);
+            this.pluginCollector.collectDirtyRecord(record, new Exception(message));
+            throw AddaxException.asAddaxException(ErrorCode.OVER_LIMIT_ERROR, message);
         }
 
         boolean isFull = (this.bufferIndex >= this.bufferSize
