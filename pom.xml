@@ -82,7 +82,7 @@
         <influxdb.client.version>8.0.0</influxdb.client.version>
         <logback.version>1.5.34</logback.version>
         <log4j.version>2.26.1</log4j.version>
-        <jansi.version>2.4.2</jansi.version>
+        <jansi.version>2.4.3</jansi.version>
         <javacsv.version>2.0</javacsv.version>
         <javadbf.version>1.14.1</javadbf.version>
         <jest.version>6.3.1</jest.version>
