@@ -112,7 +112,7 @@
         <woodstox.version>7.1.1</woodstox.version>
         <xz.version>1.12</xz.version>
         <zookeeper.version>3.7.2</zookeeper.version>
-        <zstd.version>1.5.7-15</zstd.version>
+        <zstd.version>1.5.7-16</zstd.version>
 
         <!-- jdbc driver version -->
         <cassandra.jdbc.version>3.11.5</cassandra.jdbc.version>
