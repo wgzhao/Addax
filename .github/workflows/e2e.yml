@@ -27,8 +27,11 @@ jobs:
   e2e:
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    # A literal, not ${{ runner.temp }}: the `runner` context is not available in a
+    # job-level env block, and referencing it there makes GitHub reject the whole file
+    # as an invalid workflow -- the job never runs and no step output explains why.
     env:
-      E2E_WORK_DIR: ${{ runner.temp }}/addax-e2e
+      E2E_WORK_DIR: /tmp/addax-e2e
     steps:
       - uses: actions/checkout@v7
 
