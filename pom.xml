@@ -61,7 +61,7 @@
         <commons.io.version>2.22.0</commons.io.version>
         <commons.lang3.version>3.20.0</commons.lang3.version>
         <commons.logging.version>1.4.0</commons.logging.version>
-        <commons.net.version>3.11.1</commons.net.version>
+        <commons.net.version>3.13.0</commons.net.version>
         <commons.rng.version>1.6</commons.rng.version>
         <commons.text.version>1.13.1</commons.text.version>
         <curator.version>4.2.0</curator.version>
