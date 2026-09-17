@@ -77,21 +77,22 @@ rt_logs() { # container, lines
 }
 
 # Names of containers, running or not. Docker can filter server side; Apple's CLI
-# cannot (and `container inspect` exits 0 even for a name that does not exist, so
-# it is useless as an existence test).
+# cannot (and `container inspect` exits 0 even for a name that does not exist, so it
+# is useless as an existence test).
 rt_all_names() {
     case "$E2E_RUNTIME" in
         docker) docker ps -a --format '{{.Names}}' ;;
-        container) container ls -a --format json 2>/dev/null |
-            grep -o '"id":"[^"]*"' | cut -d'"' -f4 || true ;;
+        container) container ls -a -q 2>/dev/null || true ;;
     esac
 }
 
+# `container ls -q` lists only running containers, like `docker ps`. Do NOT use
+# `container ls --format json` here: that output includes stopped containers even
+# without -a, so a stopped container looks running and never gets started.
 rt_running_names() {
     case "$E2E_RUNTIME" in
         docker) docker ps --format '{{.Names}}' ;;
-        container) container ls --format json 2>/dev/null |
-            grep -o '"id":"[^"]*"' | cut -d'"' -f4 || true ;;
+        container) container ls -q 2>/dev/null || true ;;
     esac
 }
 

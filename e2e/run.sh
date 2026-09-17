@@ -147,6 +147,10 @@ run_case() { # case_dir -- runs in a subshell, so a failure cannot take the suit
     export CASE_DIR="$case_dir"
     export CASE_NAME="$name"
 
+    [ -f "$case_dir/case.env" ] ||
+        die "$case_dir has no case.env. Every case directory needs one (at minimum
+DBS=...); a directory without it is not a case."
+
     cp "$case_dir/case.env" "$E2E_CASE_WORK/case.env"
 
     # shellcheck source=/dev/null

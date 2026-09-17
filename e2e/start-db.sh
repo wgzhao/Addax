@@ -82,6 +82,13 @@ start_one() { # db
         esac
     fi
 
+    # Fail here rather than after the readiness timeout: if the runtime refused to
+    # start the container, waiting three minutes only hides the real message.
+    rt_is_running "$container" ||
+        die "$db: container ${container} is not running after the start attempt.
+Re-run the start command directly to see the runtime's error:
+  E2E_RUNTIME=${E2E_RUNTIME} rt start ${container}      # docker start / container start"
+
     db_wait "$db" "$WAIT_TIMEOUT" || die "$db is not ready (see container log above)"
 }
 
