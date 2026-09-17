@@ -1,0 +1,70 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 1
+      },
+      "errorLimit": {
+        "record": 0
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "mysqlreader",
+          "parameter": {
+            "username": "${mysql_user}",
+            "password": "${mysql_password}",
+            "column": [
+              "id",
+              "b1",
+              "b3",
+              "b8",
+              "b8_48",
+              "b16",
+              "b64",
+              "b_null"
+            ],
+            "splitPk": "id",
+            "connection": {
+              "table": [
+                "e2e_bit_src"
+              ],
+              "jdbcUrl": [
+                "${mysql_jdbc_url}"
+              ],
+              "fetchSize": 1024
+            }
+          }
+        },
+        "writer": {
+          "name": "postgresqlwriter",
+          "parameter": {
+            "username": "${postgres_user}",
+            "password": "${postgres_password}",
+            "writeMode": "insert",
+            "column": [
+              "id",
+              "b1",
+              "b3",
+              "b8",
+              "b8_48",
+              "b16",
+              "b64",
+              "b_null"
+            ],
+            "preSql": [
+              "delete from @table"
+            ],
+            "connection": {
+              "table": [
+                "e2e_bit_dst"
+              ],
+              "jdbcUrl": "${postgres_jdbc_url}"
+            }
+          }
+        }
+      }
+    ]
+  }
+}
