@@ -1,0 +1,3 @@
+4,back\slash,40,4444.44,0,   padded   
+5,,50,0.0,1,O'Brien
+6,ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-,60,-99.99,0,<null>

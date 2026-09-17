@@ -1,0 +1,42 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 1
+      },
+      "errorLimit": {
+        "record": 0
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "mysqlreader",
+          "parameter": {
+            "username": "${mysql_user}",
+            "password": "${mysql_password}",
+            "column": ["id", "name", "qty", "price", "active", "note", "d", "t", "dt", "ts"],
+            "connection": {
+              "table": ["e2e_src"],
+              "jdbcUrl": ["${mysql_jdbc_url}"]
+            }
+          }
+        },
+        "writer": {
+          "name": "mysqlwriter",
+          "parameter": {
+            "username": "${mysql_user}",
+            "password": "${mysql_password}",
+            "writeMode": "insert",
+            "column": ["id", "name", "qty", "price", "active", "note", "d", "t", "dt", "ts"],
+            "preSql": ["delete from @table"],
+            "connection": {
+              "table": ["e2e_dst"],
+              "jdbcUrl": "${mysql_jdbc_url}"
+            }
+          }
+        }
+      }
+    ]
+  }
+}

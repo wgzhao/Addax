@@ -1,0 +1,41 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 1
+      },
+      "errorLimit": {
+        "record": 0
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "mysqlreader",
+          "parameter": {
+            "username": "${mysql_user}",
+            "password": "${mysql_password}",
+            "column": ["id", "name", "qty", "price", "active", "note"],
+            "connection": {
+              "table": ["e2e_src"],
+              "jdbcUrl": ["${mysql_jdbc_url}"]
+            }
+          }
+        },
+        "writer": {
+          "name": "txtfilewriter",
+          "parameter": {
+            "path": "${e2e_out_dir}",
+            "fileName": "e2e_src",
+            "fileFormat": "csv",
+            "writeMode": "truncate",
+            "fieldDelimiter": ",",
+            "nullFormat": "<null>",
+            "encoding": "UTF-8",
+            "header": ["id", "name", "qty", "price", "active", "note"]
+          }
+        }
+      }
+    ]
+  }
+}

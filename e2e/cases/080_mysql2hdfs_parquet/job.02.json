@@ -1,0 +1,46 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 1
+      },
+      "errorLimit": {
+        "record": 0
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "hdfsreader",
+          "parameter": {
+            "defaultFS": "file:///",
+            "path": "${e2e_out_dir}/parquet",
+            "fileType": "PARQUET",
+            "encoding": "UTF-8",
+            "nullFormat": "<null>",
+            "column": [
+              { "index": 0, "type": "int" },
+              { "index": 1, "type": "string" },
+              { "index": 2, "type": "int" },
+              { "index": 3, "type": "double" },
+              { "index": 4, "type": "int" },
+              { "index": 5, "type": "string" }
+            ]
+          }
+        },
+        "writer": {
+          "name": "txtfilewriter",
+          "parameter": {
+            "path": "${e2e_out_dir}/txt",
+            "fileName": "roundtrip",
+            "fileFormat": "csv",
+            "writeMode": "truncate",
+            "fieldDelimiter": ",",
+            "nullFormat": "<null>",
+            "encoding": "UTF-8"
+          }
+        }
+      }
+    ]
+  }
+}

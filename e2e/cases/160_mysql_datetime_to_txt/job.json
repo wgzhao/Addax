@@ -1,0 +1,48 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 1
+      },
+      "errorLimit": {
+        "record": 0
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "mysqlreader",
+          "parameter": {
+            "username": "${mysql_user}",
+            "password": "${mysql_password}",
+            "column": [
+              "id",
+              "d",
+              "t",
+              "dt",
+              "ts"
+            ],
+            "connection": {
+              "table": [
+                "e2e_src"
+              ],
+              "jdbcUrl": "${mysql_jdbc_url}"
+            }
+          }
+        },
+        "writer": {
+          "name": "txtfilewriter",
+          "parameter": {
+            "path": "${e2e_out_dir}",
+            "fileName": "e2e_src",
+            "fileFormat": "text",
+            "writeMode": "truncate",
+            "fieldDelimiter": ",",
+            "nullFormat": "<null>",
+            "dateFormat": "yyyy-MM-dd HH:mm:ss"
+          }
+        }
+      }
+    ]
+  }
+}
