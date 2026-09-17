@@ -179,7 +179,7 @@ public enum DataBaseType
     }
 
     /**
-     * Appends MySQL-specific JDBC parameters for writer operations.
+     * Appends database-specific JDBC parameters for writer operations.
      * Optimizes for batch operations and data consistency.
      *
      * @param jdbc Original JDBC URL
@@ -187,6 +187,24 @@ public enum DataBaseType
      */
     public String appendJDBCSuffixForWriter(String jdbc)
     {
+        if (this == ClickHouse) {
+            // clickhouse-jdbc 0.10.0 stopped forcing async_insert=0 on every connection, so a
+            // batch rejected by the server would no longer raise SQLException here and the rows
+            // would be lost without the one-row-at-a-time retry in CommonRdbmsWriter; keep the
+            // synchronous behaviour the dirty record handling depends on, unless the URL asks
+            // for asynchronous inserts explicitly
+            if (jdbc.contains("async_insert")) {
+                return jdbc;
+            }
+            String suffix = "clickhouse_setting_async_insert=0";
+            if (jdbc.contains("?")) {
+                return jdbc + "&" + suffix;
+            }
+            else {
+                return jdbc + "?" + suffix;
+            }
+        }
+
         if (this == MySql) {
             String suffix;
             if ("com.mysql.jdbc.Driver".equals(this.driverClassName) || "com.mysql.cj.jdbc.Driver".equals(this.driverClassName)) {
