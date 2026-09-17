@@ -110,7 +110,7 @@
         <snappy.version>1.1.10.8</snappy.version>
         <snakeyaml.version>2.7</snakeyaml.version>
         <woodstox.version>7.1.1</woodstox.version>
-        <xz.version>1.10</xz.version>
+        <xz.version>1.12</xz.version>
         <zookeeper.version>3.7.2</zookeeper.version>
         <zstd.version>1.5.7-15</zstd.version>
 
