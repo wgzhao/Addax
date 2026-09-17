@@ -433,8 +433,11 @@ public class CommonRdbmsReader
                 case Types.BOOLEAN:
                     return newBoolColumn(rs, i);
                 case Types.BIT:
-                    // bit(1) -> Types.BIT  use BooleanColumn
-                    // bit(>1) -> Types.VARBINARY use BytesColumn
+                    // bit(1) -> Types.BIT, use BooleanColumn
+                    // bit(>1) -> Types.BIT, use BytesColumn holding the packed byte form
+                    // (ceil(precision/8) bytes, most significant byte first), which is what the
+                    // drivers return from getBytes; a driver that returns the printable 0/1 form
+                    // instead (pgjdbc) must convert it in its own plugin, see BitUtil
                     if (cachedPrecisions[i] == 1) {
                         return newBoolColumn(rs, i);
                     }

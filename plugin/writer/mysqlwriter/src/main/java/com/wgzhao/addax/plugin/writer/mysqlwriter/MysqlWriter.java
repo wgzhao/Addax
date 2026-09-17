@@ -26,6 +26,7 @@ import com.wgzhao.addax.core.plugin.RecordReceiver;
 import com.wgzhao.addax.core.spi.ErrorCode;
 import com.wgzhao.addax.core.spi.Writer;
 import com.wgzhao.addax.core.util.Configuration;
+import com.wgzhao.addax.rdbms.util.BitUtil;
 import com.wgzhao.addax.rdbms.util.DBUtil;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.writer.CommonRdbmsWriter;
@@ -35,6 +36,8 @@ import org.locationtech.jts.io.WKBReader;
 import org.locationtech.jts.io.WKBWriter;
 import org.locationtech.jts.io.WKTReader;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -124,8 +127,25 @@ public class MysqlWriter
                             preparedStatement.setBoolean(columnIndex, column.asBoolean());
                         }
                         else {
-                            // BIT ( > 1) -> byte[]
-                            preparedStatement.setObject(columnIndex, Integer.valueOf(column.asString(), 2));
+                            // BIT(>1) arrives packed in bytes, as the printable 0/1 form or as a
+                            // plain number, depending on where it came from; binding the numeric
+                            // value lets the server build the bit pattern, which stays exact for
+                            // every width up to BIT(64)
+                            BigInteger bitValue;
+                            try {
+                                bitValue = BitUtil.toValue(column);
+                            }
+                            catch (AddaxException e) {
+                                // collect the offending value as a dirty record instead of
+                                // aborting the whole task
+                                throw new SQLException(e.getMessage(), e);
+                            }
+                            if (bitValue.bitLength() < Long.SIZE) {
+                                preparedStatement.setLong(columnIndex, bitValue.longValue());
+                            }
+                            else {
+                                preparedStatement.setBigDecimal(columnIndex, new BigDecimal(bitValue));
+                            }
                         }
                         return preparedStatement;
                     }
