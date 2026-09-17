@@ -1,0 +1,48 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 1
+      },
+      "errorLimit": {
+        "record": 0
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "mysqlreader",
+          "parameter": {
+            "username": "${mysql_user}",
+            "password": "${mysql_password}",
+            "column": ["id", "name", "qty", "price", "active", "note"],
+            "connection": {
+              "table": ["e2e_src"],
+              "jdbcUrl": ["${mysql_jdbc_url}"]
+            }
+          }
+        },
+        "writer": {
+          "name": "hdfswriter",
+          "parameter": {
+            "defaultFS": "file:///",
+            "path": "${e2e_out_dir}/parquet",
+            "fileName": "e2e_src",
+            "fileType": "PARQUET",
+            "compress": "NONE",
+            "writeMode": "overwrite",
+            "skipTrash": true,
+            "column": [
+              { "name": "id", "type": "int" },
+              { "name": "name", "type": "string" },
+              { "name": "qty", "type": "int" },
+              { "name": "price", "type": "double" },
+              { "name": "active", "type": "int" },
+              { "name": "note", "type": "string" }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

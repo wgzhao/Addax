@@ -1,0 +1,1 @@
+INSERT INTO e2e_dst(id,name,qty,price,active,note) VALUES (1,'plain',10,'1.50',1,'first'), (2,'张三',20,'22.00',0,NULL), (3,'a,b"c',30,'333.33',1,''), (4,'back\slash',40,'4444.44',0,'   padded   '), (5,'',50,'0.00',1,'O''Brien'), (6,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-',60,'-99.99',0,NULL);

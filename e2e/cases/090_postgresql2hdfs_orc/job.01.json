@@ -1,0 +1,48 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 1
+      },
+      "errorLimit": {
+        "record": 0
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "postgresqlreader",
+          "parameter": {
+            "username": "${postgres_user}",
+            "password": "${postgres_password}",
+            "column": ["id", "name", "qty", "price", "active", "note"],
+            "connection": {
+              "table": ["e2e_src"],
+              "jdbcUrl": ["${postgres_jdbc_url}"]
+            }
+          }
+        },
+        "writer": {
+          "name": "hdfswriter",
+          "parameter": {
+            "defaultFS": "file:///",
+            "path": "${e2e_out_dir}/orc",
+            "fileName": "e2e_src",
+            "fileType": "ORC",
+            "compress": "NONE",
+            "writeMode": "overwrite",
+            "skipTrash": true,
+            "column": [
+              { "name": "id", "type": "int" },
+              { "name": "name", "type": "string" },
+              { "name": "qty", "type": "int" },
+              { "name": "price", "type": "double" },
+              { "name": "active", "type": "int" },
+              { "name": "note", "type": "string" }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

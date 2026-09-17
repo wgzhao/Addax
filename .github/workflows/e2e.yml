@@ -1,0 +1,92 @@
+name: E2E
+
+# Runs the real distribution against throwaway databases: build, start MySQL and
+# PostgreSQL, run every job under e2e/cases/, assert the results. See e2e/README.md.
+#
+# Not a required status check yet -- the summary on the run page is the visibility
+# mechanism until the suite has a track record. Promote it deliberately.
+
+on:
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+    inputs:
+      cases:
+        description: 'case globs to run (space separated, empty = all)'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      E2E_WORK_DIR: ${{ runner.temp }}/addax-e2e
+    steps:
+      - uses: actions/checkout@v7
+
+      # Before setup-java, so the JDK tool cache is written after the delete. The
+      # build materialises every module's target/ (the assembled distribution alone
+      # is ~1.7 GB) alongside the Maven repository and two database images.
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/local/lib/android /opt/ghc /usr/share/dotnet /usr/local/share/boost
+          sudo docker image prune -af >/dev/null
+          df -h /
+
+      - name: Set up Maven
+        uses: stCarolas/setup-maven@v5
+        with:
+          maven-version: 3.8.8
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v6.0.1
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      # Two invocations, and the second must not clean: the root package.xml consumes
+      # the per-module target/<artifactId>-<version>/ trees produced by the first, and
+      # the distribution profile renames them. Keep -T 1 on the second: the root
+      # module's descriptor reads sibling modules' target/ directories, which is only
+      # safe once those modules have finished.
+      - name: Build distribution
+        env:
+          MAVEN_OPTS: "-DskipTests -Dmaven.javadoc.skip=true -Dmaven.source.skip=true -Dgpg.skip=true"
+        run: |
+          mvn -B -V -T 1C clean package
+          mvn -B -V -T 1 package -Pdistribution
+          ls -d target/addax-*/
+
+      - name: Start databases
+        run: e2e/start-db.sh --dbs mysql,postgres
+
+      - name: Run E2E cases
+        run: e2e/run.sh --dbs mysql,postgres ${{ github.event.inputs.cases || '' }}
+
+      # The suite writes a summary table to $GITHUB_STEP_SUMMARY as well; this is the
+      # part that explains why a case failed.
+      - name: Case logs
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: e2e-logs
+          path: ${{ env.E2E_WORK_DIR }}
+          retention-days: 5
+          if-no-files-found: ignore
+
+      - name: Database container logs
+        if: failure()
+        run: |
+          for c in addax-e2e-mysql addax-e2e-postgres; do
+            echo "===== $c ====="
+            docker logs --tail 200 "$c" 2>&1 || true
+          done
