@@ -19,6 +19,7 @@
 
 package com.wgzhao.addax.plugin.reader.postgresqlreader;
 
+import com.wgzhao.addax.core.element.BytesColumn;
 import com.wgzhao.addax.core.element.Column;
 import com.wgzhao.addax.core.element.DoubleColumn;
 import com.wgzhao.addax.core.exception.AddaxException;
@@ -26,6 +27,7 @@ import com.wgzhao.addax.core.plugin.RecordSender;
 import com.wgzhao.addax.core.spi.Reader;
 import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.rdbms.reader.CommonRdbmsReader;
+import com.wgzhao.addax.rdbms.util.BitUtil;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 
 import java.io.UnsupportedEncodingException;
@@ -107,6 +109,17 @@ public class PostgresqlReader
                     if (metaData.getColumnType(i) == Types.DOUBLE && metaData.isCurrency(i)) {
                         // money type has currency symbol( etc $) and thousands separator(,)
                         return new DoubleColumn(Double.valueOf(rs.getString(i).substring(1).replace(",", "")));
+                    }
+                    if (metaData.getColumnType(i) == Types.BIT && metaData.getPrecision(i) != 1) {
+                        // pgjdbc hands over the printable form of a bit(n) value while the other
+                        // drivers return it packed, so normalize it here and let the writers see
+                        // one convention; a value without a declared width (a function result,
+                        // for instance) is packed by its own length
+                        String bits = rs.getString(i);
+                        int precision = metaData.getPrecision(i);
+                        return new BytesColumn(bits == null ? null
+                                : BitUtil.toPackedBytes(BitUtil.parseBitString(bits),
+                                        precision > 1 ? precision : Math.max(1, bits.trim().length())));
                     }
                     return super.createColumn(rs, metaData, i);
                 }

@@ -27,12 +27,14 @@ import com.wgzhao.addax.core.plugin.RecordReceiver;
 import com.wgzhao.addax.core.spi.ErrorCode;
 import com.wgzhao.addax.core.spi.Writer;
 import com.wgzhao.addax.core.util.Configuration;
+import com.wgzhao.addax.rdbms.util.BitUtil;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.writer.CommonRdbmsWriter;
 import org.postgresql.util.PGobject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigInteger;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -110,6 +112,8 @@ public class PostgresqlWriter
         private List<Integer> hasZColumns;
         private static final String HAS_Z_COLUMN = "hasZColumns";
         private static final String GEOMETRY = "geometry";
+        /** a bit column that accepts any width, such as bit varying, declares no precision */
+        private static final int NO_WIDTH = -1;
 
         @Override
         public void init()
@@ -151,14 +155,9 @@ public class PostgresqlWriter
                     }
 
                     if (columnSqlType == Types.BIT) {
-                        String v;
-                        if (column.getType() == Column.Type.BOOL) {
-                            v = column.asBoolean() ? "1" : "0";
-                        }
-                        else {
-                            v = bytes2Binary(column.asBytes());
-                        }
-                        preparedStatement.setString(columnIndex, v);
+                        // a bit(n) column holds exactly n bits, so the value is rendered in the
+                        // width the target column declares, whatever form it arrived in
+                        preparedStatement.setString(columnIndex, bitString(column, bindingPrecisions[columnIndex]));
                         return preparedStatement;
                     }
                     else if (columnSqlType == Types.ARRAY || columnSqlType == Types.OTHER) {
@@ -168,6 +167,15 @@ public class PostgresqlWriter
                             return preparedStatement;
                         }
                         String columnTypeName = getColumnTypeName(columnIndex);
+                        if (isBitVarying(columnTypeName) && column.getType() == Column.Type.BYTES) {
+                            // a bit varying column declares no width, so a value a reader delivered
+                            // packed is rendered as the bit string it holds
+                            PGobject bitObject = new PGobject();
+                            bitObject.setType(columnTypeName);
+                            bitObject.setValue(bitString(column, NO_WIDTH));
+                            preparedStatement.setObject(columnIndex, bitObject, Types.OTHER);
+                            return preparedStatement;
+                        }
                         String pgObjectTypeName;
                         if (isArray(columnTypeName)) {
                             Optional<String> columnTypeOptional = extractArrayType(columnTypeName);
@@ -195,7 +203,9 @@ public class PostgresqlWriter
                         PGobject pgObject = new PGobject();
                         pgObject.setType(pgObjectTypeName);
                         pgObject.setValue((String) rawData);
-                        preparedStatement.setObject(columnIndex, pgObject);
+                        // the explicit type is required: without it the driver cannot infer how to
+                        // send a PGobject while the statement parameter types are still unknown
+                        preparedStatement.setObject(columnIndex, pgObject, Types.OTHER);
                         return preparedStatement;
                     }
                     return super.fillPreparedStatementColumnType(preparedStatement, columnIndex, columnSqlType, column);
@@ -217,13 +227,34 @@ public class PostgresqlWriter
             this.hasZColumns = writerSliceConfig.getList(HAS_Z_COLUMN, Integer.class);
         }
 
-        private String bytes2Binary(byte[] bytes)
+        /**
+         * Renders a bit value in the printable 0/1 form, in the width the target column declares
+         * when it declares one. {@link BitUtil#toValue(Column)} reads whichever form the value
+         * arrived in: bytes packed by a reader, the 0/1 form from a file source, a single bit from
+         * a boolean or the number itself from a numeric source.
+         *
+         * @param column the value to render
+         * @param precision the width of the target bit column, or {@link #NO_WIDTH} for a column
+         *         that accepts any width, such as bit varying
+         * @return the bit string
+         * @throws SQLException if the value cannot be read as a bit value or does not fit
+         */
+        private String bitString(Column column, int precision)
+                throws SQLException
         {
-            StringBuilder sb = new StringBuilder();
-            for (byte b : bytes) {
-                sb.append(String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0'));
+            try {
+                BigInteger value = BitUtil.toValue(column);
+                return precision > 0 ? BitUtil.toBitString(value, precision) : BitUtil.toBitString(value);
             }
-            return sb.toString();
+            catch (AddaxException e) {
+                // collect the offending value as a dirty record instead of aborting the whole task
+                throw new SQLException(e.getMessage(), e);
+            }
+        }
+
+        private static boolean isBitVarying(String columnTypeName)
+        {
+            return "varbit".equalsIgnoreCase(columnTypeName) || "bit varying".equalsIgnoreCase(columnTypeName);
         }
 
         private boolean isGeometry(String columnTypeName)

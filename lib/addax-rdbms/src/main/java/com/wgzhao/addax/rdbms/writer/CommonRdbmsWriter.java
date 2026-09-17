@@ -334,7 +334,8 @@ public class CommonRdbmsWriter
         // so the per-record bind loop stops boxing and re-looking-up maps for every cell
         private int[] bindingSqlTypes;
         private int[] bindingScales;
-        private int[] bindingPrecisions;
+        /** the declared width of a bit column, read by the plugins that bind bit values */
+        protected int[] bindingPrecisions;
         private String[] bindingTypeNames;
         private String[] bindingColumnNames;
 
@@ -880,9 +881,10 @@ public class CommonRdbmsWriter
                     break;
 
                 // warn: bit(1) -> Types.BIT using setBoolean
-                // warn: bit(>1) -> Types.VARBINARY using setBytes
+                // warn: bit(>1) -> Types.BIT carrying the packed byte form, using setBytes
                 case Types.BIT:
-                    // bit(1) -> setBoolean; bit(>1) -> treat as VARBINARY and use setBytes
+                    // the readers hand a bit(>1) value over packed (see BitUtil); the drivers of
+                    // the databases that reach this branch accept those bytes as they are
                     if (bindingPrecisions[columnIndex] == 1) {
                         preparedStatement.setBoolean(columnIndex, column.asBoolean());
                     }
