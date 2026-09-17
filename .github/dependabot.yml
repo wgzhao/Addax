@@ -22,6 +22,12 @@ updates:
       # Paimon deployment, not a dependency bump (#1540)
       - dependency-name: "org.apache.paimon:*"
         versions: ["2.x"]
+      # 4.0.0 is the promoted alias of the DataStax 4.x driver, whose API moved to
+      # com.datastax.oss.driver.api.core.*; the cassandra reader/writer plugins still
+      # target the 3.x namespace, so the bump breaks compilation (see #1577).
+      # Migrating them is a plugin rewrite, not a dependency update
+      - dependency-name: "com.datastax.cassandra:cassandra-driver-core"
+        versions: ["4.x"]
   # Maintain dependencies for GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
