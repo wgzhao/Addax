@@ -1,0 +1,70 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 1
+      },
+      "errorLimit": {
+        "record": 0
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "postgresqlreader",
+          "parameter": {
+            "username": "${postgres_user}",
+            "password": "${postgres_password}",
+            "column": [
+              "id",
+              "name",
+              "qty",
+              "price",
+              "active",
+              "note",
+              "d",
+              "t",
+              "dt",
+              "ts"
+            ],
+            "connection": {
+              "table": [
+                "e2e_src"
+              ],
+              "jdbcUrl": "${postgres_jdbc_url}"
+            }
+          }
+        },
+        "writer": {
+          "name": "postgresqlwriter",
+          "parameter": {
+            "username": "${postgres_user}",
+            "password": "${postgres_password}",
+            "writeMode": "insert",
+            "column": [
+              "id",
+              "name",
+              "qty",
+              "price",
+              "active",
+              "note",
+              "d",
+              "t",
+              "dt",
+              "ts"
+            ],
+            "preSql": [
+              "delete from @table"
+            ],
+            "connection": {
+              "table": [
+                "e2e_dst"
+              ],
+              "jdbcUrl": "${postgres_jdbc_url}"
+            }
+          }
+        }
+      }
+    ]
+  }
+}

@@ -22,7 +22,11 @@ CREATE TABLE e2e_src
     qty    INT           NOT NULL,
     price  DECIMAL(10, 2) NOT NULL,
     active TINYINT       NOT NULL,
-    note   VARCHAR(200)  NULL
+    note   VARCHAR(200)  NULL,
+    d      DATE          NULL,
+    t      TIME          NULL,
+    dt     DATETIME      NULL,
+    ts     TIMESTAMP     NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
@@ -34,7 +38,11 @@ CREATE TABLE e2e_dst
     qty    INT           NOT NULL,
     price  DECIMAL(10, 2) NOT NULL,
     active TINYINT       NOT NULL,
-    note   VARCHAR(200)  NULL
+    note   VARCHAR(200)  NULL,
+    d      DATE          NULL,
+    t      TIME          NULL,
+    dt     DATETIME      NULL,
+    ts     TIMESTAMP     NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
@@ -46,7 +54,11 @@ CREATE TABLE e2e_upsert
     qty    INT           NOT NULL,
     price  DECIMAL(10, 2) NOT NULL,
     active TINYINT       NOT NULL,
-    note   VARCHAR(200)  NULL
+    note   VARCHAR(200)  NULL,
+    d      DATE          NULL,
+    t      TIME          NULL,
+    dt     DATETIME      NULL,
+    ts     TIMESTAMP     NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 

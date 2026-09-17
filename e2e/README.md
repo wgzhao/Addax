@@ -118,6 +118,50 @@ A case runs when every database it lists in `DBS` is covered by `--dbs`, so
 Golden files are deliberately small enough to review by eye in a pull request. That is
 the only thing standing between this suite and goldens that quietly encode a bug.
 
+## Date and time
+
+The fixture carries `d`, `t`, `dt` and `ts` on every table, seeded with the values
+that break implementations: just after the epoch, the far end of the MySQL TIMESTAMP
+range (2038-01-19), a leap day, a pre-epoch date, and NULLs. The two dialects declare
+them so the rows stay logically identical -- MySQL `TIMESTAMP` where PostgreSQL has
+`timestamptz`, which is the one column whose JDBC type differs meaningfully between
+the two.
+
+Two different things are being asserted, and the distinction matters:
+
+- **Naive columns** (`DATE`, `TIME`, `DATETIME` / `timestamp`) hold a wall clock. Their
+  goldens assert the wall clock survived.
+- **tz-aware columns** (`TIMESTAMP` / `timestamptz`) hold an instant. Their goldens
+  render it `AT TIME ZONE 'UTC'`, so the comparison says nothing about which zone the
+  process ran in -- and that is the point. `150_postgresql_datetime_tz` runs the exact
+  same job as `140` with `CASE_TZ=Asia/Shanghai` against the **same golden**: if the
+  pipeline ever let the JVM's zone leak into a stored instant, 140 would still pass and
+  150 would fail by eight hours.
+
+The JVM default timezone is otherwise pinned to `UTC` for every job (see `TZ=` in
+`lib/addax.sh`), because it decides the wall clock for the whole RDBMS path: the reader
+converts through `Calendar.getInstance()`, the drivers render in the connection's zone,
+and `TimestampColumn.asString()` uses it directly. Without the pin, a laptop in
+Asia/Shanghai and a CI runner in UTC produce different text from the same job, and a
+golden could only ever be right on one of them.
+
+Two quirks are recorded in the goldens rather than worked around:
+
+- A writer-level `dateFormat` (txtfilewriter, `fileFormat: csv`/`text`) formats **every**
+  date/time column through one pattern, including `TIME` -- whose value is
+  millis-of-day, so it comes out anchored at the epoch:
+  `08:30:45` renders as `1970-01-01 08:30:45` (`160_mysql_datetime_to_txt`).
+- Without a `dateFormat`, the column's Java class decides the zone: `DATE`/`TIME` become
+  a `DateColumn` and render through `common.column.timeZone` (PRC/`GMT+8` by default),
+  while `TIMESTAMP` becomes a `TimestampColumn` and renders through the JVM zone. Two
+  columns of the same row can therefore be rendered in different zones.
+
+Also worth knowing when writing job files: `connection.jdbcUrl` is read with
+`getString()`, so it must be a **plain string**. The list form (`["jdbc:..."]`) is
+tolerated on the reader side -- cases 010 and 020 exercise it -- but on the writer side
+it fails with `Cannot create JDBC driver ... for connect URL '["jdbc:..."]'`, which at
+least names the mangled URL.
+
 Every job sets an explicit `errorLimit`:
 
 ```json
@@ -212,6 +256,11 @@ In CI the whole work directory is uploaded as the `e2e-logs` artifact on failure
 | 100_mysql2hdfs_overwrite | mysqlreader | hdfswriter | `overwrite` replaces the previous file |
 | 110_mysql2txt_append | mysqlreader | txtfilewriter | append semantics (known defect) |
 | 120_postgresql2txt_sql | postgresqlreader | txtfilewriter | `fileFormat: sql` |
+| 130_mysql_datetime | mysqlreader | mysqlwriter | DATE, TIME, DATETIME, TIMESTAMP round-trip |
+| 140_postgresql_datetime | postgresqlreader | postgresqlwriter | date, time, timestamp, timestamptz round-trip |
+| 150_postgresql_datetime_tz | postgresqlreader | postgresqlwriter | same, run with a JVM zone 8 hours from UTC |
+| 160_mysql_datetime_to_txt | mysqlreader | txtfilewriter | writer-level `dateFormat` rendering |
+| 170_mysql_datetime_to_postgresql | mysqlreader | postgresqlwriter | the same values across dialects |
 
 The fixture behind all of them is six rows carrying the values that readers and writers
 actually get wrong: CJK, an embedded delimiter and double quote, a backslash, leading
@@ -224,10 +273,15 @@ value, and negative and zero decimals.
   amd64-only, so on Apple Silicon it would run under emulation. The harness is built
   for it as an addition: a `DBS` value, a `start-db.sh` branch, a `fixtures/oracle/`
   pair, and a matrix leg in the workflow.
-- **Date and time columns.** Deliberately absent from the fixture: `core.json` defaults
-  `common.column.timeZone` to `PRC` while the containers run UTC, which makes a wrong
-  diff far more likely than a real defect. Needs its own case with the timezone
-  question settled first.
+- **Date and time through the hdfs writers.** Every case that targets `hdfswriter`
+  still uses only the original six columns, so the ORC and Parquet timestamp paths
+  (`OrcWriter`'s `SimpleDateFormat`, Parquet's INT96 handling) and their `hdfsreader`
+  counterparts are untested. This is the largest remaining gap: those paths pick their
+  own zones, and `MyParquetReader` treats INT96 as UTC while `MyOrcReader` uses the JVM
+  default.
+- **The other mirror direction.** 170 covers MySQL -> PostgreSQL for date/time values;
+  PostgreSQL -> MySQL (a `timestamptz` read as a string and parsed into a MySQL
+  `TIMESTAMP`) is not covered.
 - **Decimal columns through hdfswriter.** The hdfs cases declare `price` as `double`,
   so the goldens show `1.5` rather than `1.50`. A `decimal(10,2)` case would cover the
   scale-preserving path.

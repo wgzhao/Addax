@@ -13,7 +13,11 @@ CREATE TABLE e2e_src
     qty    integer      NOT NULL,
     price  numeric(10, 2) NOT NULL,
     active smallint     NOT NULL,
-    note   varchar(200) NULL
+    note   varchar(200) NULL,
+    d      date          NULL,
+    t      time          NULL,
+    dt     timestamp     NULL,
+    ts     timestamptz   NULL
 );
 
 DROP TABLE IF EXISTS e2e_dst;
@@ -24,7 +28,11 @@ CREATE TABLE e2e_dst
     qty    integer      NOT NULL,
     price  numeric(10, 2) NOT NULL,
     active smallint     NOT NULL,
-    note   varchar(200) NULL
+    note   varchar(200) NULL,
+    d      date          NULL,
+    t      time          NULL,
+    dt     timestamp     NULL,
+    ts     timestamptz   NULL
 );
 
 DROP TABLE IF EXISTS e2e_upsert;
@@ -35,7 +43,11 @@ CREATE TABLE e2e_upsert
     qty    integer      NOT NULL,
     price  numeric(10, 2) NOT NULL,
     active smallint     NOT NULL,
-    note   varchar(200) NULL
+    note   varchar(200) NULL,
+    d      date          NULL,
+    t      time          NULL,
+    dt     timestamp     NULL,
+    ts     timestamptz   NULL
 );
 
 DROP TABLE IF EXISTS e2e_audit;

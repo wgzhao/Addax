@@ -85,12 +85,24 @@ run_addax_job() { # job_file, log_dir
     base="$(basename "$job" .json)"
     out="$logdir/${base}.console.log"
 
-    log "  addax.sh ${base}"
+    # TZ pins the JVM default timezone, which is what decides the wall clock for
+    # every timestamp the RDBMS path handles (the reader converts through
+    # Calendar.getInstance(), the drivers render in the connection's zone) and which
+    # TimestampColumn.asString() uses when a file writer has no dateFormat. Without
+    # it the same job produces different text on a laptop (Asia/Shanghai) and on a
+    # CI runner (UTC), and the goldens would only be valid on one of them.
+    #
+    # A case can override it with CASE_TZ in case.env -- the timezone *aware* cases do
+    # exactly that, because their whole point is that the instant survives a zone
+    # change while the rendered wall clock does not.
+    local tz="${CASE_TZ:-UTC}"
+
+    log "  addax.sh ${base}  (TZ=${tz})"
     if command -v timeout >/dev/null 2>&1; then
-        timeout "${E2E_JOB_TIMEOUT:-600}" "$ADDAX_HOME/bin/addax.sh" \
+        TZ="$tz" timeout "${E2E_JOB_TIMEOUT:-600}" "$ADDAX_HOME/bin/addax.sh" \
             -p"$ADDAX_PARAMS" -l "$logdir" -L info "$job" >"$out" 2>&1 || rc=$?
     else
-        "$ADDAX_HOME/bin/addax.sh" \
+        TZ="$tz" "$ADDAX_HOME/bin/addax.sh" \
             -p"$ADDAX_PARAMS" -l "$logdir" -L info "$job" >"$out" 2>&1 || rc=$?
     fi
 
