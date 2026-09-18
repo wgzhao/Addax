@@ -79,6 +79,41 @@ build_addax_params() {
 # Run one job file. The job path is a positional argument: `-job x.json` is NOT
 # supported (getopt consumes it as `-j ob`, silently injecting a bogus JVM option).
 # Exit codes from Engine.main: 0 success, 1 bad CLI, 2 job failure.
+# Runs one SQL statement against a DuckDB database file.
+#
+# DuckDB is embedded, so there is no server for start-db.sh to bring up and no fixture
+# directory to seed: a case that needs a table has to build the database file itself.
+# The table also has to exist before the job starts -- CommonRdbmsWriter.Job.init reads
+# its column metadata during pretreatment, while preSql only runs later, in the task.
+#
+# The statement is executed through the driver shipped in the distribution, so the setup
+# never depends on a duckdb CLI being installed. The scratch source file is reused across
+# calls within a case; JDK 17, which the suite already requires, compiles it on the fly.
+addax_duckdb_sql() { # database_file, sql
+    local db="$1" sql="$2" src
+    src="${E2E_CASE_WORK:-${TMPDIR:-/tmp}}/DuckDbSql.java"
+    if [ ! -f "$src" ]; then
+        cat >"$src" <<'JAVA'
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
+
+public class DuckDbSql
+{
+    public static void main(String[] args) throws Exception
+    {
+        try (Connection conn = DriverManager.getConnection(args[0]);
+                Statement stmt = conn.createStatement()) {
+            stmt.execute(args[1]);
+        }
+    }
+}
+JAVA
+    fi
+    java --class-path "${ADDAX_HOME}/plugin/writer/duckdbwriter/libs/*" "$src" \
+        "jdbc:duckdb:${db}" "$sql" || die "failed to run against $db: $sql"
+}
+
 run_addax_job() { # job_file, log_dir
     local job="$1" logdir="$2"
     local base out rc=0

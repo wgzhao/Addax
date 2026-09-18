@@ -1,0 +1,35 @@
+{
+  "job": {
+    "setting": {
+      "speed": { "channel": 1 },
+      "errorLimit": { "record": 0 }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "duckdbreader",
+          "parameter": {
+            "column": ["id", "name", "qty", "price", "active"],
+            "connection": {
+              "table": ["e2e_src"],
+              "jdbcUrl": "jdbc:duckdb:${e2e_out_dir}/e2e.duckdb"
+            }
+          }
+        },
+        "writer": {
+          "name": "txtfilewriter",
+          "parameter": {
+            "path": "${e2e_out_dir}",
+            "fileName": "duckdb_out",
+            "fileFormat": "csv",
+            "writeMode": "truncate",
+            "fieldDelimiter": ",",
+            "nullFormat": "<null>",
+            "encoding": "UTF-8",
+            "header": ["id", "name", "qty", "price", "active"]
+          }
+        }
+      }
+    ]
+  }
+}

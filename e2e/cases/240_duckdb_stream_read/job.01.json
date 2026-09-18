@@ -1,0 +1,37 @@
+{
+  "job": {
+    "setting": {
+      "speed": { "channel": 1 },
+      "errorLimit": { "record": 0 }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "duckdbreader",
+          "parameter": {
+            "column": ["*"],
+            "connection": {
+              "jdbcUrl": "jdbc:duckdb:${e2e_out_dir}/big.duckdb",
+              "querySql": [
+                "SELECT range AS id, 'row-' || range AS name, range * 1.5 AS price FROM range(0, 200000)"
+              ]
+            }
+          }
+        },
+        "writer": {
+          "name": "txtfilewriter",
+          "parameter": {
+            "path": "${e2e_out_dir}",
+            "fileName": "big",
+            "fileFormat": "csv",
+            "writeMode": "truncate",
+            "fieldDelimiter": ",",
+            "nullFormat": "<null>",
+            "encoding": "UTF-8",
+            "header": ["id", "name", "price"]
+          }
+        }
+      }
+    ]
+  }
+}

@@ -155,7 +155,9 @@ DBS=...); a directory without it is not a case."
 
     # shellcheck source=/dev/null
     . "$case_dir/case.env"
-    : "${DBS:?case.env must define DBS}"
+    # declare, not populate: an embedded database (DuckDB, SQLite) is a file the case
+    # builds itself, so DBS is legitimately empty and no container is involved
+    : "${DBS?case.env must define DBS}"
     SRC_DB="${SRC_DB:-}"
     DST_DB="${DST_DB:-}"
     export DBS SRC_DB DST_DB
