@@ -1,0 +1,15 @@
+{
+  "name": "duckdbreader",
+  "parameter": {
+    "column": [
+      "*"
+    ],
+    "connection": {
+      "jdbcUrl": "jdbc:duckdb:/tmp/test.duckdb",
+      "table": [
+        "test"
+      ]
+    },
+    "where": ""
+  }
+}

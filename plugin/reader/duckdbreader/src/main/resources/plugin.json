@@ -1,0 +1,6 @@
+{
+  "name": "duckdbreader",
+  "class": "com.wgzhao.addax.plugin.reader.duckdbreader.DuckDbReader",
+  "description": "read a DuckDB database file or in-memory database via jdbc protocol",
+  "developer": "wgzhao"
+}
