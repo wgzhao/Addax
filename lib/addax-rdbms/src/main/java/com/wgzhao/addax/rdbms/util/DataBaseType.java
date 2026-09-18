@@ -92,6 +92,9 @@ public enum DataBaseType
     /** Databend cloud-native data warehouse */
     Databend("databend", "com.databend.jdbc.DatabendDriver"),
 
+    /** DuckDB embedded analytical database, backed by a single file or memory */
+    DuckDB("duckdb", "org.duckdb.DuckDBDriver"),
+
     /** Microsoft Access database via UCanAccess driver */
     Access("access","net.ucanaccess.jdbc.UcanaccessDriver"),
 
@@ -162,6 +165,10 @@ public enum DataBaseType
      */
     public String appendJDBCSuffixForReader(String jdbc)
     {
+        if (this == DuckDB) {
+            return appendDuckDbStreaming(jdbc);
+        }
+
         if (this == MySql) {
             String suffix = "yearIsDateType=false&zeroDateTimeBehavior=convertToNull&tinyInt1isBit=false&rewriteBatchedStatements=true";
             if (!"com.mysql.jdbc.Driver".equals(this.driverClassName) && !jdbc.contains("useSSL=")) {
@@ -187,6 +194,10 @@ public enum DataBaseType
      */
     public String appendJDBCSuffixForWriter(String jdbc)
     {
+        if (this == DuckDB) {
+            return appendDuckDbStreaming(jdbc);
+        }
+
         if (this == ClickHouse) {
             // clickhouse-jdbc 0.10.0 stopped forcing async_insert=0 on every connection, so a
             // batch rejected by the server would no longer raise SQLException here and the rows
@@ -221,6 +232,24 @@ public enum DataBaseType
             }
         }
         return jdbc;
+    }
+
+    /**
+     * DuckDB materializes a result set in full unless streaming is requested, which does not
+     * scale for large tables. Both ends of a job get the identical suffix on purpose:
+     * connections to one database file share a cached instance, and a connection asking for a
+     * configuration that differs from the one that created the instance is rejected outright.
+     *
+     * @param jdbc Original JDBC URL
+     * @return JDBC URL with streaming enabled
+     */
+    private static String appendDuckDbStreaming(String jdbc)
+    {
+        if (jdbc.contains("jdbc_stream_results")) {
+            return jdbc;
+        }
+        // DuckDB separates connection options with ';' rather than '?' / '&'
+        return jdbc + ";jdbc_stream_results=true";
     }
 
     /**
@@ -277,7 +306,7 @@ public enum DataBaseType
         if (this == MySql || this == Doris || this == Hive) {
             return "`" + columnName.replace("`", "``") + "`";
         }
-        if (this == Presto || this == Trino || this == Oracle || this == PostgreSQL) {
+        if (this == Presto || this == Trino || this == Oracle || this == PostgreSQL || this == DuckDB) {
             return columnName.startsWith("\"") ? columnName : "\"" + columnName + "\"";
         }
         if (this == SQLServer) {

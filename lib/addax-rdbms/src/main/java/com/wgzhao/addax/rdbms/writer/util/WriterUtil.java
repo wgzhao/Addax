@@ -184,7 +184,8 @@ public final class WriterUtil
                 writeDataSqlTemplate = doOracleOrSqlServerUpdate(writeMode, columnHolders, valueHolders, dataBaseType) +
                         "INSERT (" + columns + ") VALUES ( " + placeHolders + " )";
             }
-            else if (dataBaseType == DataBaseType.PostgreSQL) {
+            else if (dataBaseType == DataBaseType.PostgreSQL || dataBaseType == DataBaseType.DuckDB) {
+                // DuckDB implements the same ON CONFLICT ... DO UPDATE syntax as PostgreSQL
                 writeDataSqlTemplate = "INSERT INTO %s (" + columns + ") VALUES ( " + placeHolders + " )" +
                         doPostgresqlUpdate(writeMode, columnHolders);
             }
@@ -195,6 +196,11 @@ public final class WriterUtil
             else {
                 throw AddaxException.illegalConfigValue(Key.WRITE_MODE, writeMode);
             }
+        }
+        else if (dataBaseType == DataBaseType.DuckDB && mode.startsWith("replace")) {
+            // DuckDB has no REPLACE INTO; INSERT OR REPLACE is the equivalent and still
+            // requires a PRIMARY KEY or UNIQUE constraint to resolve the conflict
+            writeDataSqlTemplate = "INSERT OR REPLACE INTO %s ( " + columns + ") VALUES ( " + placeHolders + " )";
         }
         else {
             writeDataSqlTemplate = writeMode + " INTO %s ( " + columns + ") VALUES ( " + placeHolders + " )";
