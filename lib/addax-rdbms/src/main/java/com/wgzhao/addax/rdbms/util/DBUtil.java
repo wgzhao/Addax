@@ -21,6 +21,7 @@
 
 package com.wgzhao.addax.rdbms.util;
 
+import com.alibaba.druid.DbType;
 import com.alibaba.druid.sql.parser.SQLParserUtils;
 import com.alibaba.druid.sql.parser.SQLStatementParser;
 import com.wgzhao.addax.core.base.Key;
@@ -649,7 +650,12 @@ public final class DBUtil
      */
     public static void sqlValid(String sql, DataBaseType dataBaseType)
     {
-        SQLStatementParser statementParser = SQLParserUtils.createSQLStatementParser(sql, dataBaseType.getTypeName());
+        // createSQLStatementParser(String, String) falls back to DbType.valueOf, which throws for
+        // any dialect Druid does not know; resolving with DbType.of first keeps unknown dialects
+        // parseable instead of aborting the whole job
+        DbType dbType = DbType.of(dataBaseType.getTypeName());
+        SQLStatementParser statementParser =
+                SQLParserUtils.createSQLStatementParser(sql, dbType == null ? DbType.other : dbType);
         statementParser.parseStatementList();
     }
 
