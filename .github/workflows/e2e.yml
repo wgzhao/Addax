@@ -3,12 +3,33 @@ name: E2E
 # Runs the real distribution against throwaway databases: build, start MySQL and
 # PostgreSQL, run every job under e2e/cases/, assert the results. See e2e/README.md.
 #
+# Only pull requests that can change the outcome trigger this job. The filter below
+# is the Java sources plus the non-Java inputs the job actually consumes: the build
+# descriptors that decide what lands in the distribution, the plugin metadata the
+# loader reads, the assets copied from core, and the suite itself. A documentation
+# only pull request no longer spends six minutes building a distribution that
+# cannot fail. workflow_dispatch ignores the filter and always runs the suite.
+#
 # Not a required status check yet -- the summary on the run page is the visibility
-# mechanism until the suite has a track record. Promote it deliberately.
+# mechanism until the suite has a track record. Promote it deliberately, and note
+# that a path-filtered job never reports a status at all, so making it required
+# would block every pull request the filter skips.
 
 on:
   pull_request:
     branches: [ master ]
+    paths:
+      - '**/*.java'
+      - '**/pom.xml'
+      - '**/package.xml'
+      - '**/src/main/resources/**'
+      - 'core/src/main/bin/**'
+      - 'core/src/main/conf/**'
+      - 'core/src/main/job/**'
+      - 'e2e/**'
+      # Without this the job cannot validate its own changes: a pull request that
+      # only edits this file would trigger nothing.
+      - '.github/workflows/e2e.yml'
   workflow_dispatch:
     inputs:
       cases:
