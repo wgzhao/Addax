@@ -24,6 +24,13 @@ if [[ "$header" =~ ^(fixup\!|squash\!)\  ]]; then
   exit 0
 fi
 
+# Allow the commits maven-release-plugin writes while preparing a release; their
+# "[maven-release-plugin] prepare release <version>" header carries no type and no
+# scope, and the plugin offers no way to shape it beyond that prefix.
+if [[ "$header" =~ ^\[maven-release-plugin\]\  ]]; then
+  exit 0
+fi
+
 if [[ -z "$header" ]]; then
   echo "commit message header is empty" >&2
   exit 1
