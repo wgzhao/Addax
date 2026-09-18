@@ -32,7 +32,10 @@ jobs:
           # base ref stops being an ancestor of HEAD, so the range below degenerates
           # to nearly the whole repository history and the job fails on commits that
           # are already on master. actions/checkout (fetch-depth: 0) already has it.
-          base="origin/${{ github.base_ref }}"
+          #
+          # A manual run carries no base_ref, and the empty value makes the range
+          # below `origin/..HEAD`, which git rejects as an ambiguous argument.
+          base="origin/${{ github.base_ref || 'master' }}"
           commits=$(git rev-list --no-merges "$base"..HEAD)
           if [[ -z "$commits" ]]; then
             echo "no non-merge commits to lint"
