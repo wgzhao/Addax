@@ -10,7 +10,7 @@ Releases are triggered **by pushing a version tag** (e.g. `6.0.13`). The tag pus
 2. Generate a changelog from git log since the previous tag
 3. Create a GitHub Release with the tarball and its `sha256sum` file
 4. Build and push Docker images to Docker Hub and Quay.io (`:<version>` and `:latest`)
-5. Deploy artifacts to Maven Central (`mvn deploy -DautoPublish=true -DwaitUntil=PUBLISHED`)
+5. Deploy artifacts to Maven Central (`mvn deploy -DautoPublish=true -DwaitUntil=VALIDATED`). The job returns once the deployment has been uploaded and validated; Central then publishes it on its own, a few minutes later — so a green workflow means "validated", and the artifacts appear on `repo1.maven.org` shortly after.
 
 **Important:** the CI workflow runs `mvn deploy` itself. As a maintainer you **never** run `mvn release:perform` — you only run `mvn release:prepare` locally, then push the tag.
 

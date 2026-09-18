@@ -140,7 +140,11 @@ jobs:
         run: |
           # the settings.xml written by setup-java lives in the workspace and is
           # not picked up by maven automatically, so point to it explicitly
-          mvn -B -V -s "${{ github.workspace }}/settings.xml" -DskipTests -DautoPublish=true -DwaitUntil=PUBLISHED deploy
+          # waitUntil=VALIDATED, not PUBLISHED: autoPublish already has Central
+          # release the deployment once it validates, so waiting for that last
+          # state only parked the job for ~18 minutes (and waitMaxTime, 30
+          # minutes, would fail the build even when the publish then succeeded).
+          mvn -B -V -s "${{ github.workspace }}/settings.xml" -DskipTests -DautoPublish=true -DwaitUntil=VALIDATED deploy
         env:
           # setup-java v6 writes settings.xml with ${env.X} placeholders that are
           # interpolated when maven runs here, so the vars must exist in this step
