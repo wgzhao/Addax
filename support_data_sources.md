@@ -9,6 +9,7 @@
 | DB2                 | :white_check_mark: | :white_check_mark: | rbdmsreader/rdbmswriter                 | not fully tested                |
 | DBF                 | :white_check_mark: | :white_check_mark: | dbfreader/dbfwriter                     |                                 |
 | Doris               | :white_check_mark: | :white_check_mark: | dorisreader/doriswriter                 |                                 |
+| DuckDB              | :white_check_mark: | :white_check_mark: | duckdbreader/duckdbwriter               | embedded file/in-memory only    |
 | ElasticSearch       | :white_check_mark: | :white_check_mark: | elasticsearchreader/elasticsearchwriter | originally from [@Kestrong][1]  |
 | Excel               | :white_check_mark: | :white_check_mark: | excelreader/excelwriter                 |                                 |
 | FTP                 | :white_check_mark: | :white_check_mark: | ftpreader/ftpwriter                     |                                 |
