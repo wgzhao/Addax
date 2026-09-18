@@ -359,7 +359,7 @@ while [ $# -gt 0 ]; do
             VERSION="$2"
             shift 2
             ;;
-        --offline)
+        -o|--offline)
             OFFLINE=1
             shift
             ;;
