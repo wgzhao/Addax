@@ -107,6 +107,14 @@
             <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
+            <directory>plugin/reader/duckdbreader/target/duckdbreader-${project.version}/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <fileMode>0644</fileMode>
+            <outputDirectory>/</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>plugin/reader/elasticsearchreader/target/elasticsearchreader-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
@@ -358,6 +366,14 @@
         </fileSet>
         <fileSet>
             <directory>plugin/writer/doriswriter/target/doriswriter-${project.version}/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <fileMode>0644</fileMode>
+            <outputDirectory>/</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>plugin/writer/duckdbwriter/target/duckdbwriter-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
