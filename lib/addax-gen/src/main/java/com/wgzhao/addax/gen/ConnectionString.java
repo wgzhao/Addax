@@ -85,6 +85,9 @@ public class ConnectionString
             Map.entry("sqlite", new Scheme(DataBaseType.SQLite, 0,
                     "jdbc:sqlite:{db}",
                     "sqlitereader", "sqlitewriter")),
+            Map.entry("duckdb", new Scheme(DataBaseType.DuckDB, 0,
+                    "jdbc:duckdb:{db}",
+                    "duckdbreader", "duckdbwriter")),
             Map.entry("tdengine", new Scheme(DataBaseType.TDengine, 6030,
                     "jdbc:TAOS-RS://{host}:{port}/{db}",
                     "tdenginereader", "tdenginewriter")),
@@ -153,8 +156,8 @@ public class ConnectionString
         String host;
         int port;
         String database;
-        if (schemeName.equals("sqlite")) {
-            // sqlite has no host/port; the path is the database file
+        if (schemeName.equals("sqlite") || schemeName.equals("duckdb")) {
+            // neither database has a host/port; the path is the database file itself
             host = "localhost";
             port = 0;
             database = hostPart;

@@ -1,0 +1,35 @@
+{
+  "job": {
+    "setting": {
+      "speed": { "channel": 1 },
+      "errorLimit": { "record": 0 }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "duckdbreader",
+          "parameter": {
+            "column": ["*"],
+            "connection": {
+              "table": ["typed"],
+              "jdbcUrl": "jdbc:duckdb:${e2e_out_dir}/typed.duckdb"
+            }
+          }
+        },
+        "writer": {
+          "name": "txtfilewriter",
+          "parameter": {
+            "path": "${e2e_out_dir}",
+            "fileName": "typed_out",
+            "fileFormat": "csv",
+            "writeMode": "truncate",
+            "fieldDelimiter": "|",
+            "nullFormat": "<null>",
+            "encoding": "UTF-8",
+            "header": ["h", "d", "u", "j", "l", "s", "m", "bit", "ts", "tz", "dt", "t"]
+          }
+        }
+      }
+    ]
+  }
+}

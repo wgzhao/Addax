@@ -1,0 +1,4 @@
+id,name,qty,price,active
+1,alice,3,1.25,true
+2,bob,7,2.50,false
+3,carol,11,3.75,true

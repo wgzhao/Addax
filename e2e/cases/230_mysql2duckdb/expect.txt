@@ -1,0 +1,7 @@
+id,name,qty,price,active,note
+1,plain,10,1.50,true,first
+2,张三,20,22.00,false,<null>
+3,"a,b""c",30,333.33,true,
+4,back\slash,40,4444.44,false,"   padded   "
+5,,50,0.00,true,O'Brien
+6,ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-,60,-99.99,false,<null>
