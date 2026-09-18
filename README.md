@@ -3,10 +3,10 @@
 </p>
 <h1 align="center">Addax</h1>
 <p align="center">
-    <b>A versatile open-source ETL tool</b>
+    <b>Any source. Any target. Fast.</b>
 </p>
 <p align="center">
-Addax is an extensible ETL (Extract, Transform, Load) tool supporting over 20 SQL/NoSQL data sources, forked from Alibaba's <a href="https://github.com/alibaba/datax">DataX</a>, which has been frozen since 2023 — Addax is its actively maintained successor.
+Addax is an actively maintained successor to Alibaba's <a href="https://github.com/alibaba/datax">DataX</a>, which has been frozen since 2023 — a fast, versatile, open-source ETL (Extract, Transform, Load) tool supporting over 30 RDBMS and NoSQL data sources.
 It provides a growing ecosystem of plugins and offers easy-to-follow configuration for data integrations.
 </p>
 <p align="center">
@@ -24,7 +24,7 @@ It provides a growing ecosystem of plugins and offers easy-to-follow configurati
 
 ## 🚀 Features
 
-- Supports 20+ SQL and NoSQL data sources, and easily extendable for more.
+- Supports 30+ SQL and NoSQL data sources, and easily extendable for more.
 - Configurable via simple JSON-based job descriptions.
 - Actively maintained with improved architecture and added functionality compared to [DataX](https://github.com/alibaba/datax).
 - Docker images for quick deployment.

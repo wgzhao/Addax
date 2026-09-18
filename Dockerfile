@@ -34,11 +34,10 @@ EOF
 FROM eclipse-temurin:17-jre-noble
 LABEL maintainer="wgzhao <wgzhao@gmail.com>"
 LABEL version="latest"
-LABEL description="Addax is a versatile open-source ETL tool that can seamlessly transfer data between various RDBMS and NoSQL databases, making it an ideal solution for data migration."
+LABEL description="Actively maintained successor to Alibaba DataX — a fast, versatile, open-source ETL tool for 30+ RDBMS and NoSQL data sources."
 
 COPY --from=build  /src/target/addax-* /opt/addax/
 
 WORKDIR /opt/addax
 
 RUN chmod 755 /opt/addax/bin/*
-

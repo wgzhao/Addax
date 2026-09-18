@@ -24,7 +24,7 @@
     <artifactId>addax-all</artifactId>
     <version>6.1.1-SNAPSHOT</version>
     <name>addax-all</name>
-    <description>Addax: a versatile open-source ETL tool</description>
+    <description>Actively maintained successor to Alibaba DataX — a fast, versatile, open-source ETL tool for 30+ RDBMS and NoSQL data sources.</description>
     <packaging>pom</packaging>
     <url>https://wgzhao.github.io/Addax</url>
 

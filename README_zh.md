@@ -1,7 +1,7 @@
 <p align="center">
     <img alt="Addax Logo" src="https://github.com/wgzhao/Addax/blob/master/images/logo.svg?raw=true" width="205" />
 </p>
-<p align="center">Addax 是一个支持主流数据库的通用数据采集工具</p>
+<p align="center"><b>任意数据源，任意目标，就是快</b></p>
 <p align="center"><a href="https://addax.wgzhao.com">使用文档</a> 详细描述了如何安装使用，针对每个插件都有详细的说明和样例配置文档 </p>
 <p align="center">
    <a href="https://github.com/wgzhao/Addax/releases">
@@ -12,7 +12,7 @@
    </a>
 </p>
 
-该项目原始代码来自阿里开源的 [DataX](https://github.com/alibaba/datax) （DataX 官方仓库自 2023 年后已停止更新），在此基础上经过了大量的改进，持续活跃维护，并提供了更多的读写插件，详细情况可参考[与DataX的主要区别](difference.md)
+Addax 是阿里开源 [DataX](https://github.com/alibaba/datax) 的活跃维护继任者（DataX 官方仓库自 2023 年后已停止更新）—— 一个快速、通用的开源 ETL 工具，支持 30+ 关系型与非关系型数据源。在此基础上经过了大量的改进，持续活跃维护，并提供了更多的读写插件，详细情况可参考[与DataX的主要区别](difference.md)
 
 ## 项目状态
 
@@ -27,7 +27,7 @@
 
 ## 支持的数据库一览表
 
-Addax 支持超过 20 种[关系型和非关系型数据库](support_data_sources.md)，通过简单的配置，还可以快速增加更多的数据源支持。
+Addax 支持超过 30 种[关系型和非关系型数据库](support_data_sources.md)，通过简单的配置，还可以快速增加更多的数据源支持。
 
 <table>
 <tr>

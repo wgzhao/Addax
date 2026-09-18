@@ -1,6 +1,6 @@
 # Contributing to Addax
 
-Thanks for your interest in Addax.  Our goal is to build a comprehensive data integration platform that covers all data integration requirements.
+Thanks for your interest in Addax. Our goal is to build the most capable open-source ETL tool, covering as many data-integration scenarios as possible.
 
 ## Getting Started
 

@@ -161,12 +161,12 @@
           <tspan
                         font-family="Roboto, DIN Alternate, sans-serif"
                         font-weight="600"
-                        font-size="80"
+                        font-size="88"
                         letter-spacing="1"
                         fill="#f0f6fc"
                         x="0"
                         y="56"
-                    >Rapidly empower data integration</tspan>
+                    >Any source. Any target. Fast.</tspan>
         </text>
       </g>
 
