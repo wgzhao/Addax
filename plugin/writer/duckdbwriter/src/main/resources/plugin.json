@@ -1,0 +1,6 @@
+{
+  "name": "duckdbwriter",
+  "class": "com.wgzhao.addax.plugin.writer.duckdbwriter.DuckDbWriter",
+  "description": "write data to a DuckDB database file via jdbc protocol",
+  "developer": "wgzhao"
+}

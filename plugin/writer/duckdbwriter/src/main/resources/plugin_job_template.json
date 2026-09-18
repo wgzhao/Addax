@@ -1,0 +1,16 @@
+{
+  "name": "duckdbwriter",
+  "parameter": {
+    "writeMode": "insert",
+    "column": [
+      "*"
+    ],
+    "preSql": [],
+    "connection": {
+      "jdbcUrl": "jdbc:duckdb:/tmp/test.duckdb",
+      "table": [
+        "addax_tbl"
+      ]
+    }
+  }
+}
