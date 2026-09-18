@@ -103,12 +103,12 @@ Addax supports a wide range of database systems and file sources. Below is a sel
 </tr>
 <tr>
 <td><img src="./images/logos/trino.svg" height="50px" alt="Trino" style="border: 1px solid #ddd;"></td>
-<td><img src="./images/logos/access.svg" height="50px" alt="Access" style="border: 1px solid #add;"></td>
-<td><img src="./images/logos/sap.svg" height="50px" alt="SAP HANA" style="border: 1px solid #add;"></td>
-<td><img src="./images/logos/paimon.svg" height="50px" alt="Paimon" style="border: 1px solid #add;"></td>
+<td><img src="./images/logos/access.svg" height="50px" alt="Access" style="border: 1px solid #ddd;"></td>
+<td><img src="./images/logos/sap.svg" height="50px" alt="SAP HANA" style="border: 1px solid #ddd;"></td>
+<td><img src="./images/logos/paimon.svg" height="50px" alt="Paimon" style="border: 1px solid #ddd;"></td>
 </tr>
 <tr>
-<td><img src="./images/logos/iceberg.svg" height="50px" alt="Iceberg" style="border: 1px solid #add;"></td>
+<td><img src="./images/logos/iceberg.svg" height="50px" alt="Iceberg" style="border: 1px solid #ddd;"></td>
 <td><img src="./images/logos/duckdb.svg" height="50px" alt="DuckDB" style="border: 1px solid #ddd;"></td>
 </tr>
 </table>
