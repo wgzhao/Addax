@@ -130,7 +130,7 @@
         <sqlite.jdbc.version>3.50.3.0</sqlite.jdbc.version>
         <taos.jdbc.version>3.2.1</taos.jdbc.version>
         <trino.jdbc.version>351</trino.jdbc.version>
-        <ucanaccess.version>5.1.7</ucanaccess.version>
+        <ucanaccess.version>5.1.8</ucanaccess.version>
         <iceberg.version>1.11.0</iceberg.version>
 
         <!-- maven configuration -->
