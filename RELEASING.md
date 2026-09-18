@@ -37,25 +37,25 @@ A release is a "maintenance release": dependency/CVE updates and bug fixes, no n
 2. **Prepare the release with maven-release-plugin** (batch mode, no auto-push — pushes are done manually in step 3):
    ```
    mvn release:prepare -B -DpushChanges=false \
-       -DreleaseVersion=6.0.13 -DdevelopmentVersion=6.0.14-SNAPSHOT
+       -DreleaseVersion=6.1.0 -DdevelopmentVersion=6.1.1-SNAPSHOT
    ```
    This creates:
-   - commit `[maven-release-plugin] prepare release 6.0.13` (version bumped to release version)
+   - commit `[maven-release-plugin] prepare release 6.1.0` (version bumped to release version)
    - commit `[maven-release-plugin] prepare for next development iteration` (version bumped to next SNAPSHOT)
-   - tag `6.0.13` (`tagNameFormat` is `@{project.version}`, no `v` prefix)
+   - tag `6.1.0` (`tagNameFormat` is `@{project.version}`, no `v` prefix)
 
    **Verify the tag before pushing** (a stale `release.properties` from a failed run can silently tag the wrong tree):
    ```
-   git show 6.0.13:pom.xml | grep -m1 '<version>'   # must be 6.0.13, not -SNAPSHOT
-   git log --oneline 6.0.13 -2                       # must show the prepare-release commit
+   git show 6.1.0:pom.xml | grep -m1 '<version>'   # must be 6.1.0, not -SNAPSHOT
+   git log --oneline 6.1.0 -2                       # must show the prepare-release commit
    ```
 
 3. **Push the branch and the tag.**
    ```
    git push origin master
-   git push origin 6.0.13
+   git push origin 6.1.0
    ```
-   The tag push starts the release workflow — follow it at **Actions → Maven Package**. Note the tag content is what gets built: if a fix is needed after the tag is pushed, cherry-pick it onto the release commit, `git tag -f 6.0.13`, delete the remote tag and push it again.
+   The tag push starts the release workflow — follow it at **Actions → Maven Package**. Note the tag content is what gets built: if a fix is needed after the tag is pushed, cherry-pick it onto the release commit, `git tag -f 6.1.0`, delete the remote tag and push it again.
 
 4. **Verify the release.** Check each artifact after the workflow finishes:
    - [GitHub Release](https://github.com/wgzhao/Addax/releases) exists with `addax-<version>.tar.gz` and `.sha256sum.asc` assets
