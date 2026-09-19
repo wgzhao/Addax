@@ -157,7 +157,7 @@
 
       <!-- 副标题优化：调整位置，增强对比度和层级 -->
       <g id="Graphic_8">
-        <text transform="translate(60 450)" fill="#f0f6fc">
+        <text transform="translate(640 450)" fill="#f0f6fc" text-anchor="middle">
           <tspan
                         font-family="Roboto, DIN Alternate, sans-serif"
                         font-weight="600"
