@@ -20,12 +20,9 @@
 package com.wgzhao.addax.plugin.writer.mongodbwriter;
 
 import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONArray;
-import com.alibaba.fastjson2.JSONObject;
-import com.mongodb.BasicDBObject;
-import com.mongodb.MongoClient;
+import com.mongodb.MongoException;
+import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.BulkWriteOptions;
 import com.mongodb.client.model.ReplaceOneModel;
 import com.mongodb.client.model.ReplaceOptions;
@@ -42,9 +39,16 @@ import com.wgzhao.addax.plugin.writer.mongodbwriter.util.MongoUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.regex.Pattern;
 
 import static com.wgzhao.addax.core.base.Constant.DEFAULT_BATCH_SIZE;
 import static com.wgzhao.addax.core.base.Key.BATCH_SIZE;
@@ -62,6 +66,7 @@ import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 public class MongoDBWriter
         extends Writer
 {
+    private static final Logger LOG = LoggerFactory.getLogger(MongoDBWriter.class);
 
     /** Job. */
     public static class Job
@@ -69,6 +74,8 @@ public class MongoDBWriter
     {
 
         private Configuration originalConfig = null;
+
+        private MongoClient mongoClient;
 
         @Override
         public List<Configuration> split(int mandatoryNumber)
@@ -103,20 +110,17 @@ public class MongoDBWriter
 
             String dbName = connConf.getNecessaryValue(DATABASE, REQUIRED_VALUE);
             String collection = connConf.getNecessaryValue(KeyConstant.MONGO_COLLECTION_NAME, REQUIRED_VALUE);
-            String authDb = connConf.getString("authDb", dbName);
-            String username = connConf.getString(USERNAME);
-            String password = connConf.getString(PASSWORD);
+            String authDb = connConf.getString(KeyConstant.MONGO_AUTH_DB, dbName);
+            // the credentials live next to the connection, exactly where the task reads them
+            String username = originalConfig.getString(USERNAME);
+            String password = originalConfig.getString(PASSWORD);
             if (password != null && password.startsWith(Constant.ENC_PASSWORD_PREFIX)) {
                 // encrypted password, need to decrypt
-                password = EncryptUtil.decrypt(password.substring(6, password.length() - 1));
+                password = EncryptUtil.decrypt(password.substring(Constant.ENC_PASSWORD_PREFIX.length(), password.length() - 1));
             }
-            MongoClient mongoClient;
-            if (StringUtils.isEmpty((username)) || StringUtils.isEmpty((password))) {
-                mongoClient = MongoUtil.initMongoClient(address);
-            }
-            else {
-                mongoClient = MongoUtil.initCredentialMongoClient(address, username, password, authDb);
-            }
+            this.mongoClient = StringUtils.isEmpty(username) || StringUtils.isEmpty(password)
+                    ? MongoUtil.initMongoClient(address)
+                    : MongoUtil.initCredentialMongoClient(address, username, password, authDb);
 
             String preSqls = connConf.getString(PRE_SQL);
             if (StringUtils.isNotBlank(preSqls)) {
@@ -126,45 +130,66 @@ public class MongoDBWriter
 
         private void executePreSql(MongoClient mongoClient, String database, String collection, Configuration preSql)
         {
-
-            MongoDatabase db = mongoClient.getDatabase(database);
-            MongoCollection<Document> col = db.getCollection(collection);
             String type = preSql.getString("type");
             if (StringUtils.isBlank(type)) {
                 return;
             }
 
-            if (type.equals("drop")) {
+            MongoCollection<Document> col = mongoClient.getDatabase(database).getCollection(collection);
+            if (type.equalsIgnoreCase("drop")) {
                 col.drop();
             }
-            else if (type.equals("remove")) {
-                String json = preSql.getString("json");
-                BasicDBObject query;
-                if (!StringUtils.isBlank(json)) {
-                    query = new BasicDBObject();
-                    List<Object> items = preSql.getList("item", Object.class);
-                    for (Object con : items) {
-                        Configuration _conf = Configuration.from(con.toString());
-                        if (StringUtils.isBlank((_conf.getString("condition")))) {
-                            query.put(_conf.getString("name"), _conf.get("value"));
-                        }
-                        else {
-                            query.put(_conf.getString("name"),
-                                    new BasicDBObject(_conf.getString("condition"), _conf.get("value")));
-                        }
-                    }
-                }
-                else {
-                    query = (BasicDBObject) JSON.parse(json);
-                }
-                col.deleteMany(query);
+            else if (type.equalsIgnoreCase("remove")) {
+                col.deleteMany(buildRemoveFilter(preSql));
             }
+            else {
+                LOG.warn("Unsupported preSql type [{}], only [drop] and [remove] are supported, nothing is done", type);
+            }
+        }
+
+        /**
+         * Build the filter of a preSql remove operation. Only {@code item} parses the conditions one by one,
+         * {@code json} is a raw filter document, both may be combined.
+         */
+        private Document buildRemoveFilter(Configuration preSql)
+        {
+            Document filter = null;
+            String json = preSql.getString("json");
+            if (StringUtils.isNotBlank(json)) {
+                filter = Document.parse(json);
+            }
+
+            List<Configuration> items = preSql.getListConfiguration("item");
+            if (!items.isEmpty()) {
+                Document conditions = new Document();
+                for (Configuration item : items) {
+                    String name = item.getString("name");
+                    if (StringUtils.isBlank(name)) {
+                        throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                                "Each preSql remove item requires a [name]");
+                    }
+                    String condition = item.getString("condition");
+                    conditions.put(name, StringUtils.isBlank(condition)
+                            ? item.get("value") : new Document(condition, item.get("value")));
+                }
+                filter = filter == null ? conditions : new Document("$and", List.of(filter, conditions));
+            }
+
+            if (filter == null || filter.isEmpty()) {
+                // a missing filter would delete every document of the collection
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                        "The preSql remove operation requires a non-empty [json] or [item] condition");
+            }
+            return filter;
         }
 
         @Override
         public void destroy()
         {
-
+            if (mongoClient != null) {
+                mongoClient.close();
+                mongoClient = null;
+            }
         }
     }
 
@@ -177,11 +202,17 @@ public class MongoDBWriter
 
         private String database = null;
         private String collection = null;
-        private Integer batchSize = null;
-        private JSONArray mongodbColumnMeta = null;
-        private String writeMode = null;
-        private String updateKey;
+        private int batchSize;
         private boolean wildcardMode = false;
+        private List<ColumnPlan> columnPlans = null;
+        private boolean update = false;
+        private String[] updateKeyPath = null;
+
+        /** Buffered documents together with their source records, so a failed write can be reported as a dirty record. */
+        private final List<Pending> buffer = new ArrayList<>();
+
+        /** A converted document and the record it was built from. */
+        private record Pending(Record record, Document data) {}
 
         @Override
         public void init()
@@ -190,11 +221,11 @@ public class MongoDBWriter
             String userName = writerSliceConfig.getString(USERNAME);
             String password = writerSliceConfig.getString(PASSWORD);
             if (password != null && password.startsWith(Constant.ENC_PASSWORD_PREFIX)) {
-                password = EncryptUtil.decrypt(password.substring(6, password.length() - 1));
+                password = EncryptUtil.decrypt(password.substring(Constant.ENC_PASSWORD_PREFIX.length(), password.length() - 1));
             }
             Configuration connConf = writerSliceConfig.getConfiguration(CONNECTION);
             this.database = connConf.getString(DATABASE);
-            String authDb = connConf.getString("authDb", this.database);
+            String authDb = connConf.getString(KeyConstant.MONGO_AUTH_DB, this.database);
             List<Object> addressList = connConf.getList(KeyConstant.MONGO_ADDRESS, Object.class);
             this.mongoClient = StringUtils.isNotEmpty(userName) && StringUtils.isNotEmpty(password) ?
                     MongoUtil.initCredentialMongoClient(addressList, userName, password, authDb) :
@@ -203,100 +234,152 @@ public class MongoDBWriter
             this.collection = connConf.getString(KeyConstant.MONGO_COLLECTION_NAME);
             this.batchSize = writerSliceConfig.getInt(BATCH_SIZE, DEFAULT_BATCH_SIZE);
 
-            // support wildcard column config: if COLUMN is exactly "*", we operate in wildcardMode
-            List<Object> columnConf = writerSliceConfig.getList(COLUMN, Object.class);
-            if (columnConf.size() == 1 && "*".equals(columnConf.get(0).toString())) {
+            buildColumnPlans(writerSliceConfig);
+            parseWriteMode(writerSliceConfig);
+        }
+
+        /**
+         * Resolve the destination columns once per task, either as a column plan per column or as
+         * wildcard mode where every record carries one whole document as a JSON string.
+         */
+        private void buildColumnPlans(Configuration writerSliceConfig)
+        {
+            Object rawColumn = writerSliceConfig.get(COLUMN);
+            if (rawColumn == null) {
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                        "The configuration column is required, configure the column list or [\"*\"]");
+            }
+
+            // a single column may be configured either as one object or as a one element list
+            List<?> columnConf = rawColumn instanceof List<?> list ? list : List.of(rawColumn);
+            if (columnConf.size() == 1 && "*".equals(String.valueOf(columnConf.get(0)))) {
                 this.wildcardMode = true;
-                this.mongodbColumnMeta = null;
-            }
-            else {
-                this.mongodbColumnMeta = JSON.parseArray(writerSliceConfig.getString(COLUMN));
+                return;
             }
 
-            this.writeMode = writerSliceConfig.getString(WRITE_MODE, "insert");
-
-            if (this.writeMode.startsWith("update")) {
-                if (!this.writeMode.contains("(")) {
+            List<ColumnPlan> plans = new ArrayList<>(columnConf.size());
+            for (Object columnMeta : columnConf) {
+                if (!(columnMeta instanceof Map)) {
                     throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                            "When specifying the mode is update, you MUST both specify the field to be updated");
+                            "Each configured column must be an object carrying [name] and [type]");
                 }
-                this.updateKey = this.writeMode.split("\\(")[1].replace(")", "");
-                this.writeMode = "update";
+                plans.add(ColumnPlan.of(Configuration.from(JSON.toJSONString(columnMeta))));
             }
+            this.columnPlans = plans;
+        }
+
+        private void parseWriteMode(Configuration writerSliceConfig)
+        {
+            String writeMode = writerSliceConfig.getString(WRITE_MODE, "insert");
+            if (!writeMode.startsWith("update")) {
+                return;
+            }
+            int begin = writeMode.indexOf('(');
+            int end = writeMode.lastIndexOf(')');
+            if (begin < 0 || end <= begin + 1) {
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                        "When specifying the mode is update, you MUST both specify the field to be updated, for example update(unique_id)");
+            }
+            this.update = true;
+            String updateKey = writeMode.substring(begin + 1, end).trim();
+            this.updateKeyPath = ColumnPlan.splitPath(updateKey);
         }
 
         @Override
         public void startWrite(RecordReceiver lineReceiver)
         {
-            MongoDatabase db = mongoClient.getDatabase(database);
-            MongoCollection<BasicDBObject> col = db.getCollection(this.collection, BasicDBObject.class);
-            List<Record> writerBuffer = new ArrayList<>(this.batchSize);
+            MongoCollection<Document> col = mongoClient.getDatabase(database).getCollection(this.collection, Document.class);
             Record record;
             while ((record = lineReceiver.getFromReader()) != null) {
-                writerBuffer.add(record);
-                if (writerBuffer.size() >= this.batchSize) {
-                    doBatchInsert(col, writerBuffer, mongodbColumnMeta);
-                    writerBuffer.clear();
+                Document data = processRecord(record);
+                if (data != null) {
+                    buffer.add(new Pending(record, data));
+                }
+                if (buffer.size() >= this.batchSize) {
+                    flush(col);
                 }
             }
-            if (!writerBuffer.isEmpty()) {
-                doBatchInsert(col, writerBuffer, mongodbColumnMeta);
-                writerBuffer.clear();
-            }
+            flush(col);
         }
 
-        private void doBatchInsert(MongoCollection<BasicDBObject> collection, List<Record> writerBuffer, JSONArray columnMeta)
+        /**
+         * Write the buffered documents. A failed batch is retried one document at a time, so that
+         * a single rejected document does not fail the whole task.
+         */
+        private void flush(MongoCollection<Document> collection)
         {
-            List<BasicDBObject> dataList = new ArrayList<>();
-            for (Record record : writerBuffer) {
-                BasicDBObject data = processRecord(record, columnMeta);
-                if (data != null) {
-                    dataList.add(data);
-                }
-            }
-
-            // If there's nothing to write (all records were dirty or filtered), skip DB call to avoid driver error
-            if (dataList.isEmpty()) {
+            if (buffer.isEmpty()) {
                 return;
             }
-
-            if ("update".equals(writeMode)) {
-                List<ReplaceOneModel<BasicDBObject>> replaceOneModelList = dataList.stream()
-                        .map(data -> {
-                            BasicDBObject query = new BasicDBObject();
-                            Object updateKeyValue = getNestedValue(data, updateKey);
-                            // build nested query with the same dotted path
-                            setNestedField(query, updateKey, updateKeyValue);
-                            return new ReplaceOneModel<>(query, data, new ReplaceOptions().upsert(true));
-                        })
-                        .toList();
-                collection.bulkWrite(replaceOneModelList, new BulkWriteOptions().ordered(false));
+            try {
+                List<Document> dataList = new ArrayList<>(buffer.size());
+                for (Pending pending : buffer) {
+                    dataList.add(pending.data());
+                }
+                if (update) {
+                    List<ReplaceOneModel<Document>> models = new ArrayList<>(buffer.size());
+                    for (Document data : dataList) {
+                        models.add(new ReplaceOneModel<>(buildUpdateQuery(data), data, new ReplaceOptions().upsert(true)));
+                    }
+                    collection.bulkWrite(models, new BulkWriteOptions().ordered(false));
+                }
+                else {
+                    collection.insertMany(dataList);
+                }
             }
-            else {
-                collection.insertMany(dataList);
+            catch (MongoException e) {
+                LOG.warn("Failed to write a batch of [{}] documents, try to write them one at a time. reason: {}",
+                        buffer.size(), e.getMessage());
+                for (Pending pending : buffer) {
+                    try {
+                        if (update) {
+                            collection.replaceOne(buildUpdateQuery(pending.data()), pending.data(),
+                                    new ReplaceOptions().upsert(true));
+                        }
+                        else {
+                            collection.insertOne(pending.data());
+                        }
+                    }
+                    catch (MongoException ex) {
+                        LOG.debug("Failed to write one document: {}", ex.getMessage());
+                        super.getTaskPluginCollector().collectDirtyRecord(pending.record(), ex);
+                    }
+                }
+            }
+            finally {
+                buffer.clear();
             }
         }
 
-        private BasicDBObject processRecord(Record record, JSONArray columnMeta)
+        private Document buildUpdateQuery(Document data)
         {
-            BasicDBObject data = new BasicDBObject();
-            if (this.wildcardMode) {
-                // take the record as a full JSON document
-                Column jsonColumn = record.getColumn(0);
-                if (StringUtils.isEmpty(jsonColumn.asString())) {
-                    return data;
-                } else {
-                    // Use MongoDB driver's extended JSON parser so constructs like
-                    // {"_id": {"$oid": "..."}} are converted to ObjectId, etc.
-                    Document doc = Document.parse(jsonColumn.asString());
-                    return new BasicDBObject(doc);
-                }
-            }
+            Document query = new Document();
+            setNestedField(query, updateKeyPath, getNestedValue(data, updateKeyPath));
+            return query;
+        }
+
+        private Document processRecord(Record record)
+        {
             try {
+                if (this.wildcardMode) {
+                    String json = record.getColumn(0).asString();
+                    // an empty column means an empty document, which is not worth inserting
+                    if (StringUtils.isEmpty(json)) {
+                        return null;
+                    }
+                    // the driver's extended JSON parser restores ObjectId, Date and so on
+                    return Document.parse(json);
+                }
+
+                Document data = new Document();
                 for (int i = 0; i < record.getColumnNumber(); i++) {
-                    processColumn(record.getColumn(i), columnMeta.getJSONObject(i), data);
+                    processColumn(record.getColumn(i), getColumnPlan(i), data);
                 }
                 return data;
+            }
+            catch (AddaxException e) {
+                // a configuration error would make every record dirty, fail the task instead
+                throw e;
             }
             catch (Exception e) {
                 super.getTaskPluginCollector().collectDirtyRecord(record, e);
@@ -304,132 +387,89 @@ public class MongoDBWriter
             }
         }
 
-        private void processColumn(Column column, JSONObject meta, BasicDBObject data)
+        private ColumnPlan getColumnPlan(int index)
         {
-            String type = meta.getString(KeyConstant.COLUMN_TYPE);
-            String name = meta.getString(KeyConstant.COLUMN_NAME);
+            if (index >= columnPlans.size()) {
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                        "The record carries more columns than the configured column list");
+            }
+            return columnPlans.get(index);
+        }
 
-            if (StringUtils.isEmpty(column.asString())) {
-                // use helper to support nested dotted names
-                setNestedField(data, name, KeyConstant.isArrayType(type.toLowerCase()) ? new Object[0] : column.asString());
+        private void processColumn(Column column, ColumnPlan plan, Document data)
+        {
+            Object rawData = column.getRawData();
+            if (rawData == null || (rawData instanceof String str && str.isEmpty())) {
+                setNestedField(data, plan.path(),
+                        plan.type() == ColumnType.ARRAY ? List.of() : column.asString());
                 return;
             }
 
             if (column instanceof StringColumn) {
-                processStringColumn(column, type, name, meta, data);
+                processStringColumn(column, plan, data);
             }
             else {
-                processPrimitiveColumn(column, type, name, data);
+                processPrimitiveColumn(column, plan, data);
             }
         }
 
-        private void processStringColumn(Column column, String type, String name, JSONObject meta, BasicDBObject data)
+        private void processStringColumn(Column column, ColumnPlan plan, Document data)
         {
-            try {
-                if (KeyConstant.isObjectIdType(type.toLowerCase())) {
-                    setNestedField(data, name, new ObjectId(column.asString()));
+            String value = column.asString();
+            switch (plan.type()) {
+                case OBJECT_ID -> setNestedField(data, plan.path(), new ObjectId(value));
+                case ARRAY -> {
+                    String[] items = plan.splitter().split(value);
+                    Function<String, Object> itemParser = plan.itemParser();
+                    setNestedField(data, plan.path(), itemParser == null
+                            ? List.of(items) : Arrays.stream(items).map(itemParser).toList());
                 }
-                else if (KeyConstant.isArrayType(type.toLowerCase())) {
-                    String splitter = meta.getString(KeyConstant.COLUMN_SPLITTER);
-                    if (StringUtils.isEmpty(splitter)) {
-                        throw AddaxException.asAddaxException(ILLEGAL_VALUE, ILLEGAL_VALUE.getDescription());
-                    }
-                    String itemType = meta.getString(KeyConstant.ITEM_TYPE);
-                    if (StringUtils.isNotEmpty(itemType)) {
-                        String[] item = column.asString().split(splitter);
-                        switch (itemType.toUpperCase()) {
-                            case "DOUBLE" -> setNestedField(data, name, parseArray(item, Double::parseDouble));
-                            case "INT" -> setNestedField(data, name, parseArray(item, Integer::parseInt));
-                            case "LONG" -> setNestedField(data, name, parseArray(item, Long::parseLong));
-                            case "BOOL" -> setNestedField(data, name, parseArray(item, Boolean::parseBoolean));
-                            case "BYTES" -> setNestedField(data, name, parseArray(item, Byte::parseByte));
-                            default -> setNestedField(data, name, item);
-                        }
-                    }
-                    else {
-                        setNestedField(data, name, column.asString().split(splitter));
-                    }
-                }
-                else if ("json".equalsIgnoreCase(type)) {
-                    Object mode = JSON.parse(column.asString());
-                    setNestedField(data, name, JSON.toJSON(mode));
+                case JSON -> setNestedField(data, plan.path(), JSON.toJSON(JSON.parse(value)));
+                default -> setNestedField(data, plan.path(), value);
+            }
+        }
+
+        private void processPrimitiveColumn(Column column, ColumnPlan plan, Document data)
+        {
+            switch (plan.type()) {
+                case INT -> setNestedField(data, plan.path(), Math.toIntExact(column.asLong()));
+                case LONG -> setNestedField(data, plan.path(), column.asLong());
+                case DATE -> setNestedField(data, plan.path(), column.asDate());
+                case DOUBLE -> setNestedField(data, plan.path(), column.asDouble());
+                case BOOL -> setNestedField(data, plan.path(), column.asBoolean());
+                case BYTES -> setNestedField(data, plan.path(), column.asBytes());
+                default -> setNestedField(data, plan.path(), column.asString());
+            }
+        }
+
+        /**
+         * Store a value under its destination path, creating the intermediate documents of a
+         * dotted path as needed. An existing non document value on the path is replaced.
+         */
+        private void setNestedField(Document root, String[] path, Object value)
+        {
+            Document current = root;
+            for (int i = 0; i < path.length - 1; i++) {
+                if (current.get(path[i]) instanceof Document child) {
+                    current = child;
                 }
                 else {
-                    setNestedField(data, name, column.asString());
+                    Document child = new Document();
+                    current.put(path[i], child);
+                    current = child;
                 }
             }
-            catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+            current.put(path[path.length - 1], value);
         }
 
-        private <T> T[] parseArray(String[] items, java.util.function.Function<String, T> parser)
+        private Object getNestedValue(Document root, String[] path)
         {
-            return java.util.Arrays.stream(items).map(parser).toArray(size -> (T[]) java.lang.reflect.Array.newInstance(parser.apply("").getClass(), size));
-        }
-
-        private void processPrimitiveColumn(Column column, String type, String name, BasicDBObject data)
-        {
-            switch (type.toUpperCase()) {
-                case "LONG" -> setNestedField(data, name, column.asLong());
-                case "DATE" -> setNestedField(data, name, column.asDate());
-                case "DOUBLE" -> setNestedField(data, name, column.asDouble());
-                case "BOOL" -> setNestedField(data, name, column.asBoolean());
-                case "BYTES" -> setNestedField(data, name, column.asBytes());
-                default -> setNestedField(data, name, column.asString());
-            }
-        }
-
-        // Helper to set a value into a BasicDBObject using dotted path names.
-        // If the path is simple (no dot) it behaves like put; otherwise it creates nested BasicDBObject as needed.
-        private void setNestedField(BasicDBObject root, String dottedName, Object value)
-        {
-            if (dottedName == null || !dottedName.contains(".")) {
-                root.put(dottedName, value);
-                return;
-            }
-            String[] parts = dottedName.split("\\.");
-            BasicDBObject current = root;
-            for (int i = 0; i < parts.length - 1; i++) {
-                String part = parts[i];
-                Object child = current.get(part);
-                if (child == null) {
-                    BasicDBObject next = new BasicDBObject();
-                    current.put(part, next);
-                    current = next;
-                }
-                else if (child instanceof BasicDBObject) {
-                    current = (BasicDBObject) child;
-                }
-                else if (child instanceof Document docChild) {
-                    // convert org.bson.Document to BasicDBObject for consistent operations
-                    BasicDBObject next = new BasicDBObject(docChild);
-                    current.put(part, next);
-                    current = next;
-                }
-                else {
-                    // existing non-document value at intermediary path, overwrite with nested object
-                    BasicDBObject next = new BasicDBObject();
-                    current.put(part, next);
-                    current = next;
-                }
-            }
-            current.put(parts[parts.length - 1], value);
-        }
-
-        // Helper to read a nested value from BasicDBObject by dotted path.
-        private Object getNestedValue(BasicDBObject root, String dottedName)
-        {
-            if (dottedName == null || !dottedName.contains(".")) {
-                return root.get(dottedName);
-            }
-            String[] parts = dottedName.split("\\.");
             Object current = root;
-            for (String part : parts) {
-                if (!(current instanceof BasicDBObject currentObj)) {
+            for (String part : path) {
+                if (!(current instanceof Document currentDoc)) {
                     return null;
                 }
-                current = currentObj.get(part);
+                current = currentDoc.get(part);
                 if (current == null) {
                     return null;
                 }
@@ -440,8 +480,83 @@ public class MongoDBWriter
         @Override
         public void destroy()
         {
-            //
+            if (mongoClient != null) {
+                mongoClient.close();
+                mongoClient = null;
+            }
+        }
+
+        /** The MongoDB type a column is written as, resolved from the configured type name once per task. */
+        private enum ColumnType
+        {
+            OBJECT_ID, ARRAY, JSON, INT, LONG, DATE, DOUBLE, BOOL, BYTES, STRING;
+
+            static ColumnType of(String type)
+            {
+                return switch (type.toLowerCase(Locale.ROOT)) {
+                    case "objectid" -> OBJECT_ID;
+                    case "array" -> ARRAY;
+                    case "json" -> JSON;
+                    case "int", "int32" -> INT;
+                    case "long" -> LONG;
+                    case "date" -> DATE;
+                    case "double" -> DOUBLE;
+                    case "bool" -> BOOL;
+                    case "bytes" -> BYTES;
+                    default -> STRING;
+                };
+            }
+        }
+
+        /** Column metadata resolved once per task, so the per record path parses no names and types. */
+        private record ColumnPlan(String name, String[] path, ColumnType type, Pattern splitter,
+                                  Function<String, Object> itemParser)
+        {
+            static ColumnPlan of(Configuration meta)
+            {
+                String name = meta.getString(KeyConstant.COLUMN_NAME);
+                String type = meta.getString(KeyConstant.COLUMN_TYPE);
+                if (StringUtils.isBlank(name) || StringUtils.isBlank(type)) {
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                            "The column configuration requires both [name] and [type]");
+                }
+
+                ColumnType columnType = ColumnType.of(type);
+                if (columnType != ColumnType.ARRAY) {
+                    return new ColumnPlan(name, splitPath(name), columnType, null, null);
+                }
+
+                String rawSplitter = meta.getString(KeyConstant.COLUMN_SPLITTER);
+                if (StringUtils.isEmpty(rawSplitter)) {
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                            String.format("The column [%s] is declared as an array, but no splitter is specified", name));
+                }
+                // the splitter is a literal separator, not a regular expression
+                return new ColumnPlan(name, splitPath(name), columnType,
+                        Pattern.compile(Pattern.quote(rawSplitter)),
+                        itemParser(meta.getString(KeyConstant.ITEM_TYPE)));
+            }
+
+            static String[] splitPath(String name)
+            {
+                return name.contains(".") ? name.split("\\.") : new String[] {name};
+            }
+
+            /** @return the parser of one array item, or null to keep the items as strings */
+            private static Function<String, Object> itemParser(String itemType)
+            {
+                if (StringUtils.isEmpty(itemType)) {
+                    return null;
+                }
+                return switch (itemType.toUpperCase(Locale.ROOT)) {
+                    case "DOUBLE" -> Double::parseDouble;
+                    case "INT" -> Integer::parseInt;
+                    case "LONG" -> Long::parseLong;
+                    case "BOOL" -> Boolean::parseBoolean;
+                    case "BYTES" -> Byte::parseByte;
+                    default -> null;
+                };
+            }
         }
     }
 }
-

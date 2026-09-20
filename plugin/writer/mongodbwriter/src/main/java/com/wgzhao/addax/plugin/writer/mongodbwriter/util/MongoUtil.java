@@ -19,104 +19,52 @@
 
 package com.wgzhao.addax.plugin.writer.mongodbwriter.util;
 
-import com.wgzhao.addax.core.exception.AddaxException;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientOptions;
+import com.mongodb.ConnectionString;
+import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoCredential;
-import com.mongodb.ServerAddress;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.wgzhao.addax.core.exception.AddaxException;
 
-import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
 /** Mongo Util. */
-public class MongoUtil
+public final class MongoUtil
 {
+
+    private MongoUtil() {}
 
     /** Initmongoclient. */
     public static MongoClient initMongoClient(List<Object> addressList)
     {
-
-        if (addressList == null || addressList.isEmpty()) {
-            throw AddaxException.asAddaxException(ILLEGAL_VALUE, "不合法参数");
-        }
-        try {
-            return new MongoClient(parseServerAddress(addressList));
-        }
-        catch (UnknownHostException e) {
-            throw AddaxException.asAddaxException(ILLEGAL_VALUE, "不合法的地址");
-        }
-        catch (NumberFormatException e) {
-            throw AddaxException.asAddaxException(ILLEGAL_VALUE, "不合法参数");
-        }
-        catch (Exception e) {
-            throw AddaxException.asAddaxException(RUNTIME_ERROR, "未知异常");
-        }
+        return initCredentialMongoClient(addressList, null, null, null);
     }
 
     /** Initcredentialmongoclient. */
     public static MongoClient initCredentialMongoClient(List<Object> addressList, String userName, String password, String database)
     {
-
-        if (!isHostPortPattern(addressList)) {
-            throw AddaxException.asAddaxException(ILLEGAL_VALUE, "不合法参数");
+        if (addressList == null || addressList.isEmpty()) {
+            throw AddaxException.asAddaxException(ILLEGAL_VALUE, "The MongoDB connection address must not be empty");
         }
+
+        // let the driver parse the host list, it reports the reason of a malformed address itself
+        String hosts = String.join(",", addressList.stream().map(String::valueOf).toList());
+        MongoClientSettings.Builder builder;
         try {
-            MongoCredential credential = MongoCredential.createCredential(userName, database, password.toCharArray());
-            return new MongoClient(parseServerAddress(addressList), credential, new MongoClientOptions.Builder().build());
+            builder = MongoClientSettings.builder().applyConnectionString(new ConnectionString("mongodb://" + hosts));
         }
-        catch (UnknownHostException e) {
-            throw AddaxException.asAddaxException(ILLEGAL_VALUE, "不合法的地址");
+        catch (IllegalArgumentException e) {
+            throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                    String.format("Invalid MongoDB address [%s]: %s", hosts, e.getMessage()));
         }
-        catch (NumberFormatException e) {
-            throw AddaxException.asAddaxException(ILLEGAL_VALUE, "不合法参数");
-        }
-        catch (Exception e) {
-            throw AddaxException.asAddaxException(RUNTIME_ERROR, "未知异常");
-        }
-    }
 
-    /**
-     * 判断地址类型是否符合要求
-     *
-     * @param addressList list of object
-     * @return boolean
-     */
-    private static boolean isHostPortPattern(List<Object> addressList)
-    {
-        for (Object address : addressList) {
-            String regex = "(\\S+):([0-9]+)";
-            if (!((String) address).matches(regex)) {
-                return false;
-            }
+        if (userName != null && !userName.isEmpty() && password != null && !password.isEmpty()) {
+            // pass the password as a credential instead of embedding it into the uri,
+            // which would require percent-encoding
+            builder.credential(MongoCredential.createCredential(userName, database, password.toCharArray()));
         }
-        return true;
-    }
-
-    /**
-     * 转换为mongo地址协议
-     *
-     * @param rawAddressList raw address list
-     * @return List of ServerAddress
-     * @throws UnknownHostException host not reached
-     */
-    private static List<ServerAddress> parseServerAddress(List<Object> rawAddressList)
-            throws UnknownHostException
-    {
-        List<ServerAddress> addressList = new ArrayList<>();
-        for (Object address : rawAddressList) {
-            String[] tempAddress = ((String) address).split(":");
-            try {
-                ServerAddress sa = new ServerAddress(tempAddress[0], Integer.parseInt(tempAddress[1]));
-                addressList.add(sa);
-            }
-            catch (Exception e) {
-                throw new UnknownHostException();
-            }
-        }
-        return addressList;
+        return MongoClients.create(builder.build());
     }
 }
