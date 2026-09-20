@@ -373,9 +373,8 @@ public class JsonReader
 
         /**
          * Read a file that holds a single json document. Every index has to match a json array and one
-         * record is sent per element, so that arrays of the same length line up positionally. Note that
-         * only leaf paths can be used, an index like {@code $.data[*].a.v} skips the elements whose
-         * {@code a} is missing and shifts the remaining values into the wrong records.
+         * record is sent per element, so that arrays of the same length line up positionally. Each of
+         * them has to point at a leaf, see {@link JsonKey#SINGLE_LINE} for what that requires.
          *
          * @param reader the content of the file
          * @param recordSender the sender the records are sent to

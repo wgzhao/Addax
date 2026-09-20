@@ -29,7 +29,10 @@ public final class JsonKey
      * Whether every record is stored on a line of its own.
      * <p>
      * A value of true (the default) means the file is in the JSON Lines layout, false means the whole
-     * file holds one json document and every index matches a json array.
+     * file holds one json document and every index matches a json array, one record per element. The
+     * records of a document are built by position, so every index must point at a leaf that exists in
+     * every element: an index like {@code $.data[*].a.v} skips the elements whose {@code a} is
+     * missing and moves the remaining values into the records of other elements.
      */
     public static final String SINGLE_LINE = "singleLine";
 
