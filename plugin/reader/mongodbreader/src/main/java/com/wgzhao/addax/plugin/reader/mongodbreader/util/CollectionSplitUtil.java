@@ -63,7 +63,8 @@ public class CollectionSplitUtil
         Configuration connConf = originalSliceConfig.getConfiguration(CONNECTION);
         String dbName = connConf.getString(DATABASE);
         String collectionExpr = connConf.getString(KeyConstant.MONGO_COLLECTION_NAME);
-        Document queryFilter = parseQueryFilter(originalSliceConfig.getString(KeyConstant.MONGO_QUERY));
+        Document queryFilter = MongoUtil.parseFilter(originalSliceConfig.get(KeyConstant.MONGO_QUERY),
+                KeyConstant.MONGO_QUERY);
 
         if (StringUtils.isBlank(dbName) || StringUtils.isBlank(collectionExpr) || mongoClient == null) {
             throw AddaxException.asAddaxException(ILLEGAL_VALUE, ILLEGAL_VALUE.getDescription());
@@ -337,14 +338,6 @@ public class CollectionSplitUtil
         }
 
         return splitPoints;
-    }
-
-    private static Document parseQueryFilter(String query)
-    {
-        if (StringUtils.isBlank(query)) {
-            return null;
-        }
-        return Document.parse(query);
     }
 
     private static boolean hasQueryFilter(Document queryFilter)

@@ -117,7 +117,7 @@ public class MongoDBReader
         private String database = null;
         private String collection = null;
 
-        private String query = null;
+        private Document userFilter = null;
 
         private Object lowerBound = null;
         private Object upperBound = null;
@@ -137,7 +137,8 @@ public class MongoDBReader
                 password = EncryptUtil.decrypt(password.substring(Constant.ENC_PASSWORD_PREFIX.length(), password.length() - 1));
             }
             this.fetchSize = readerSliceConfig.getInt(FETCH_SIZE, DEFAULT_FETCH_SIZE);
-            this.query = readerSliceConfig.getString(KeyConstant.MONGO_QUERY);
+            this.userFilter = MongoUtil.parseFilter(readerSliceConfig.get(KeyConstant.MONGO_QUERY),
+                    KeyConstant.MONGO_QUERY);
             this.rowConverter = new MongoRowConverter(parseColumns(readerSliceConfig));
             this.lowerBound = readerSliceConfig.get(KeyConstant.LOWER_BOUND);
             this.upperBound = readerSliceConfig.get(KeyConstant.UPPER_BOUND);
@@ -225,8 +226,8 @@ public class MongoDBReader
                         new Document("$gte", toBound(lowerBound)).append("$lt", toBound(upperBound)));
             }
 
-            if (StringUtils.isNotEmpty(query)) {
-                filter = new Document("$and", List.of(filter, Document.parse(query)));
+            if (userFilter != null && !userFilter.isEmpty()) {
+                filter = new Document("$and", List.of(filter, userFilter));
             }
 
             return filter;

@@ -19,12 +19,17 @@
 
 package com.wgzhao.addax.plugin.reader.mongodbreader.util;
 
+import com.alibaba.fastjson2.JSON;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoCredential;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.wgzhao.addax.core.exception.AddaxException;
+import org.apache.commons.lang3.StringUtils;
+import org.bson.BsonInvalidOperationException;
+import org.bson.Document;
+import org.bson.json.JsonParseException;
 
 import java.util.List;
 
@@ -66,5 +71,37 @@ public final class MongoUtil
             builder.credential(MongoCredential.createCredential(userName, database, password.toCharArray()));
         }
         return MongoClients.create(builder.build());
+    }
+
+    /**
+     * Parse a filter, configured either as extended JSON text or as a json object.
+     * The driver's parser is not a JavaScript engine, so a date cannot be written as the shell's
+     * {@code new Date('2026-09-20')}.
+     *
+     * @param value the configured filter, a String of extended JSON or a parsed json object
+     * @param parameter the name of the parameter, reported when the value is rejected
+     * @return the filter, or null when nothing is configured
+     */
+    public static Document parseFilter(Object value, String parameter)
+    {
+        if (value == null) {
+            return null;
+        }
+        // an object is re-serialized because only the driver's parser restores the extended JSON
+        // literals, a plain nested map would send $date and $oid as ordinary field names
+        String json = value instanceof String text ? text : JSON.toJSONString(value);
+        if (StringUtils.isBlank(json)) {
+            return null;
+        }
+        try {
+            return Document.parse(json);
+        }
+        catch (JsonParseException | BsonInvalidOperationException e) {
+            throw AddaxException.asAddaxException(ILLEGAL_VALUE, String.format(
+                    "Invalid filter in the [%s] parameter: %s. The filter is read as extended JSON, not as "
+                            + "JavaScript, so a date is written as {\"$date\": \"2026-09-20T00:00:00+08:00\"} "
+                            + "or as {\"$date\": 1789833600000}",
+                    parameter, StringUtils.removeEnd(e.getMessage(), ".")));
+        }
     }
 }
