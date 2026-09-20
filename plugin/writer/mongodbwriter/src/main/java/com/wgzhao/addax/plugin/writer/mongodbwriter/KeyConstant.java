@@ -29,11 +29,8 @@ public class KeyConstant
     /** Mongo address. */
     public static final String MONGO_ADDRESS = "address";
 
-    /** Array type. */
-    public static final String ARRAY_TYPE = "array";
-
-    /** Object id type. */
-    public static final String OBJECT_ID_TYPE = "objectid";
+    /** Mongo auth db. */
+    public static final String MONGO_AUTH_DB = "authDb";
 
     /** Mongo collection name. */
     public static final String MONGO_COLLECTION_NAME = "collection";
@@ -51,17 +48,4 @@ public class KeyConstant
     public static final String COLUMN_SPLITTER = "splitter";
 
     private KeyConstant() {}
-
-    /** Checks whether the arraytype condition holds. */
-    public static boolean isArrayType(String type)
-    {
-        return ARRAY_TYPE.equals(type);
-    }
-
-    /** Checks whether the objectidtype condition holds. */
-    public static boolean isObjectIdType(String type)
-    {
-        return OBJECT_ID_TYPE.equals(type);
-    }
-
 }

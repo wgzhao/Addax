@@ -19,18 +19,13 @@
 
 package com.wgzhao.addax.plugin.reader.mongodbreader;
 
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
-import com.mongodb.client.MongoDatabase;
 import com.wgzhao.addax.core.base.Constant;
 import com.wgzhao.addax.core.base.Key;
-import com.wgzhao.addax.core.element.BoolColumn;
-import com.wgzhao.addax.core.element.DateColumn;
-import com.wgzhao.addax.core.element.DoubleColumn;
-import com.wgzhao.addax.core.element.LongColumn;
 import com.wgzhao.addax.core.element.Record;
-import com.wgzhao.addax.core.element.StringColumn;
 import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.plugin.RecordSender;
 import com.wgzhao.addax.core.spi.Reader;
@@ -38,11 +33,13 @@ import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.core.util.EncryptUtil;
 import com.wgzhao.addax.plugin.reader.mongodbreader.util.CollectionSplitUtil;
 import com.wgzhao.addax.plugin.reader.mongodbreader.util.MongoUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.BsonDocument;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.wgzhao.addax.core.base.Constant.DEFAULT_FETCH_SIZE;
@@ -69,11 +66,6 @@ public class MongoDBReader
 
         private MongoClient mongoClient;
 
-        private boolean notNullAndEmpty(String obj)
-        {
-            return obj != null && !obj.isEmpty();
-        }
-
         @Override
         public List<Configuration> split(int adviceNumber)
         {
@@ -84,35 +76,34 @@ public class MongoDBReader
         public void init()
         {
             this.originalConfig = getPluginJobConf();
-            // check required configuration
-            String userName = originalConfig.getNecessaryValue(USERNAME, REQUIRED_VALUE);
+            // the credentials are optional, a MongoDB without access control needs none
+            String userName = originalConfig.getString(USERNAME);
             String password = originalConfig.getString(PASSWORD);
             if (password != null && password.startsWith(Constant.ENC_PASSWORD_PREFIX)) {
                 // encrypted password, need to decrypt
-                password = EncryptUtil.decrypt(password.substring(6, password.length() - 1));
+                password = EncryptUtil.decrypt(password.substring(Constant.ENC_PASSWORD_PREFIX.length(), password.length() - 1));
                 originalConfig.set(Key.PASSWORD, password);
             }
             Configuration connConf = originalConfig.getConfiguration(CONNECTION);
             String database = connConf.getNecessaryValue(DATABASE, REQUIRED_VALUE);
             String authDb = connConf.getString(KeyConstant.MONGO_AUTH_DB, database);
             List<Object> addressList = connConf.getList(KeyConstant.MONGO_ADDRESS, Object.class);
-            List<String> columns = originalConfig.getList(COLUMN, String.class);
-            if (columns == null) {
+            if (originalConfig.getList(COLUMN, Object.class).isEmpty()) {
                 throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                        "The configuration column must be required and DOES NOT support null columns");
+                        "The configuration column is required and must not be empty");
             }
-            if (notNullAndEmpty((userName)) && notNullAndEmpty((password))) {
-                this.mongoClient = MongoUtil.initCredentialMongoClient(addressList, userName, password, authDb);
-            }
-            else {
-                this.mongoClient = MongoUtil.initMongoClient(addressList);
-            }
+            this.mongoClient = StringUtils.isEmpty(userName) || StringUtils.isEmpty(password)
+                    ? MongoUtil.initMongoClient(addressList)
+                    : MongoUtil.initCredentialMongoClient(addressList, userName, password, authDb);
         }
 
         @Override
         public void destroy()
         {
-            //
+            if (mongoClient != null) {
+                mongoClient.close();
+                mongoClient = null;
+            }
         }
     }
 
@@ -126,17 +117,14 @@ public class MongoDBReader
         private String database = null;
         private String collection = null;
 
-        private String query = null;
+        private Document userFilter = null;
 
-        private List<String> mongodbColumnMeta = null;
         private Object lowerBound = null;
         private Object upperBound = null;
         private boolean isObjectId = true;
         private int fetchSize;
 
-        private final MongoRowConverter rowConverter = new MongoRowConverter();
-
-        private record MongoQueryFilter(Document filter, boolean isObjectId) {}
+        private MongoRowConverter rowConverter;
 
         @Override
         public void init()
@@ -146,11 +134,12 @@ public class MongoDBReader
             String password = readerSliceConfig.getString(PASSWORD);
             if (password != null && password.startsWith(Constant.ENC_PASSWORD_PREFIX)) {
                 // encrypted password, need to decrypt
-                password = EncryptUtil.decrypt(password.substring(6, password.length() - 1));
+                password = EncryptUtil.decrypt(password.substring(Constant.ENC_PASSWORD_PREFIX.length(), password.length() - 1));
             }
             this.fetchSize = readerSliceConfig.getInt(FETCH_SIZE, DEFAULT_FETCH_SIZE);
-            this.query = readerSliceConfig.getString(KeyConstant.MONGO_QUERY);
-            this.mongodbColumnMeta = readerSliceConfig.getList(COLUMN, String.class);
+            this.userFilter = MongoUtil.parseFilter(readerSliceConfig.get(KeyConstant.MONGO_QUERY),
+                    KeyConstant.MONGO_QUERY);
+            this.rowConverter = new MongoRowConverter(parseColumns(readerSliceConfig));
             this.lowerBound = readerSliceConfig.get(KeyConstant.LOWER_BOUND);
             this.upperBound = readerSliceConfig.get(KeyConstant.UPPER_BOUND);
             this.isObjectId = readerSliceConfig.getBool(KeyConstant.IS_OBJECT_ID);
@@ -160,37 +149,45 @@ public class MongoDBReader
             this.collection = connConf.getString(KeyConstant.MONGO_COLLECTION_NAME);
             String authDb = connConf.getString(KeyConstant.MONGO_AUTH_DB, this.database);
             List<Object> addressList = connConf.getList(KeyConstant.MONGO_ADDRESS, Object.class);
-            if (notNullAndEmpty((userName)) && notNullAndEmpty((password))) {
-                this.mongoClient = MongoUtil.initCredentialMongoClient(addressList, userName, password, authDb);
+            this.mongoClient = StringUtils.isEmpty(userName) || StringUtils.isEmpty(password)
+                    ? MongoUtil.initMongoClient(addressList)
+                    : MongoUtil.initCredentialMongoClient(addressList, userName, password, authDb);
+        }
+
+        private static List<String> parseColumns(Configuration readerSliceConfig)
+        {
+            List<Object> rawColumns = readerSliceConfig.getList(COLUMN, Object.class);
+            if (rawColumns.isEmpty()) {
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                        "The configuration column is required and must not be empty");
             }
-            else {
-                this.mongoClient = MongoUtil.initMongoClient(addressList);
+            List<String> columns = new ArrayList<>(rawColumns.size());
+            for (Object rawColumn : rawColumns) {
+                if (!(rawColumn instanceof String column)) {
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                            String.format("The configured column [%s] must be a string", rawColumn));
+                }
+                columns.add(column);
             }
+            return columns;
         }
 
         @Override
         public void startRead(RecordSender recordSender)
         {
-
-            if (lowerBound == null || upperBound == null ||
-                    mongoClient == null || database == null ||
-                    collection == null || mongodbColumnMeta == null) {
-                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                        ILLEGAL_VALUE.getDescription());
+            MongoCollection<BsonDocument> bsonCollection = mongoClient.getDatabase(database)
+                    .getCollection(this.collection, BsonDocument.class);
+            FindIterable<BsonDocument> documents = bsonCollection.find(buildQueryFilter()).batchSize(fetchSize);
+            Bson projection = rowConverter.projection();
+            if (projection != null) {
+                // read only the configured fields, the constants need no field at all
+                documents = documents.projection(projection);
             }
 
-            MongoDatabase db = mongoClient.getDatabase(database);
-            MongoCollection<BsonDocument> bsonCollection = rowConverter.getBsonCollection(db, collection);
-
-            MongoQueryFilter queryFilter = buildQueryFilter();
-            try (MongoCursor<BsonDocument> dbCursor = bsonCollection.find(queryFilter.filter())
-                    .batchSize(fetchSize)
-                    .iterator()) {
-
-                while (dbCursor.hasNext()) {
-                    BsonDocument doc = dbCursor.next();
+            try (MongoCursor<BsonDocument> cursor = documents.iterator()) {
+                while (cursor.hasNext()) {
                     Record record = recordSender.createRecord();
-                    rowConverter.processOne(doc, record, mongodbColumnMeta);
+                    rowConverter.processOne(cursor.next(), record);
                     recordSender.sendToWriter(record);
                 }
             }
@@ -199,39 +196,47 @@ public class MongoDBReader
         @Override
         public void destroy()
         {
-            //
+            if (mongoClient != null) {
+                mongoClient.close();
+                mongoClient = null;
+            }
         }
 
-        private boolean notNullAndEmpty(String obj)
+        /**
+         * @return the filter of this slice, never null
+         */
+        private Document buildQueryFilter()
         {
-            return obj != null && !obj.isEmpty();
-        }
+            if (lowerBound == null || upperBound == null) {
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                        "The task slice carries no bounds, please check the collection splitting");
+            }
 
-        private MongoQueryFilter buildQueryFilter()
-        {
             Document filter = new Document();
-            if (lowerBound.equals("min")) {
-                if (!upperBound.equals("max")) {
-                    filter.append(KeyConstant.MONGO_PRIMARY_ID,
-                            new Document("$lt", isObjectId ? new ObjectId(upperBound.toString()) : upperBound));
+            if ("min".equals(lowerBound)) {
+                if (!"max".equals(upperBound)) {
+                    filter.append(KeyConstant.MONGO_PRIMARY_ID, new Document("$lt", toBound(upperBound)));
                 }
             }
-            else if (upperBound.equals("max")) {
-                filter.append(KeyConstant.MONGO_PRIMARY_ID,
-                        new Document("$gte", isObjectId ? new ObjectId(lowerBound.toString()) : lowerBound));
+            else if ("max".equals(upperBound)) {
+                filter.append(KeyConstant.MONGO_PRIMARY_ID, new Document("$gte", toBound(lowerBound)));
             }
             else {
                 filter.append(KeyConstant.MONGO_PRIMARY_ID,
-                        new Document("$gte", isObjectId ? new ObjectId(lowerBound.toString()) : lowerBound)
-                                .append("$lt", isObjectId ? new ObjectId(upperBound.toString()) : upperBound));
+                        new Document("$gte", toBound(lowerBound)).append("$lt", toBound(upperBound)));
             }
 
-            if (query != null && !query.isEmpty()) {
-                Document queryFilter = Document.parse(query);
-                filter = new Document("$and", List.of(filter, queryFilter));
+            if (userFilter != null && !userFilter.isEmpty()) {
+                filter = new Document("$and", List.of(filter, userFilter));
             }
 
-            return new MongoQueryFilter(filter, isObjectId);
+            return filter;
+        }
+
+        private Object toBound(Object bound)
+        {
+            // the bounds of an ObjectId primary key travel as hex strings
+            return isObjectId && bound instanceof String text ? new ObjectId(text) : bound;
         }
     }
 }

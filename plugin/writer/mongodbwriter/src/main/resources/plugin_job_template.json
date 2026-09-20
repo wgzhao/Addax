@@ -22,19 +22,14 @@
         "type": "int"
       }
     ],
-    "upsertInfo": {
-      "isUpsert": "true",
-      "upsertKey": "unique_id"
-    },
-    "connection": [
-      {
-        "address": [
-          "127.0.0.1:32768"
-        ],
-        "database": "tag_per_data",
-        "collection": "tag_data",
-        "authDb": "admin"
-      }
-    ]
+    "writeMode": "insert",
+    "connection": {
+      "address": [
+        "127.0.0.1:27017"
+      ],
+      "database": "tag_per_data",
+      "collection": "tag_data",
+      "authDb": "admin"
+    }
   }
 }

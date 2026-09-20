@@ -28,13 +28,18 @@ import com.mongodb.client.MongoDatabase;
 import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.plugin.reader.mongodbreader.KeyConstant;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.wgzhao.addax.core.base.Key.CONNECTION;
 import static com.wgzhao.addax.core.base.Key.DATABASE;
@@ -43,30 +48,34 @@ import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 /** Collection Split Util. */
 public class CollectionSplitUtil
 {
+    private static final Logger LOG = LoggerFactory.getLogger(CollectionSplitUtil.class);
+
+    /** The document count is unknown, the collection must not be split blindly. */
+    private static final long UNKNOWN_DOC_COUNT = -1L;
+
     private CollectionSplitUtil() {}
 
     /** Dosplit. */
     public static List<Configuration> doSplit(Configuration originalSliceConfig, int adviceNumber, MongoClient mongoClient)
     {
-
         List<Configuration> confList = new ArrayList<>();
 
         Configuration connConf = originalSliceConfig.getConfiguration(CONNECTION);
         String dbName = connConf.getString(DATABASE);
-
         String collectionExpr = connConf.getString(KeyConstant.MONGO_COLLECTION_NAME);
-        Document queryFilter = parseQueryFilter(originalSliceConfig.getString(KeyConstant.MONGO_QUERY));
+        Document queryFilter = MongoUtil.parseFilter(originalSliceConfig.get(KeyConstant.MONGO_QUERY),
+                KeyConstant.MONGO_QUERY);
 
-        if (null == dbName || dbName.isEmpty() || null == collectionExpr || collectionExpr.isEmpty() || mongoClient == null) {
-            throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                    ILLEGAL_VALUE.getDescription());
+        if (StringUtils.isBlank(dbName) || StringUtils.isBlank(collectionExpr) || mongoClient == null) {
+            throw AddaxException.asAddaxException(ILLEGAL_VALUE, ILLEGAL_VALUE.getDescription());
         }
 
         List<String> expandedCollections = CollectionExpandUtil.expandCollectionNames(collectionExpr);
         List<String> availableCollections = getAvailableCollections(mongoClient, dbName, expandedCollections);
-
         if (availableCollections.isEmpty()) {
-            return confList;
+            throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                    String.format("None of the collections [%s] exists in the database [%s]",
+                            String.join(", ", expandedCollections), dbName));
         }
 
         Map<String, Long> docCountCache = new HashMap<>();
@@ -82,13 +91,13 @@ public class CollectionSplitUtil
             boolean isObjectId = isPrimaryIdObjectId(mongoClient, dbName, collName);
             int splitNumber = splitPlan.getOrDefault(collName, 1);
 
-            long docCount = docCountCache.getOrDefault(collName, -1L);
+            long docCount = docCountCache.getOrDefault(collName, UNKNOWN_DOC_COUNT);
             List<Range> rangeList = doSplitCollection(splitNumber, mongoClient, dbName, collName, isObjectId, queryFilter, docCount);
             for (Range range : rangeList) {
                 Configuration conf = originalSliceConfig.clone();
                 conf.set(CONNECTION + "." + KeyConstant.MONGO_COLLECTION_NAME, collName);
-                conf.set(KeyConstant.LOWER_BOUND, range.lowerBound);
-                conf.set(KeyConstant.UPPER_BOUND, range.upperBound);
+                conf.set(KeyConstant.LOWER_BOUND, range.lowerBound());
+                conf.set(KeyConstant.UPPER_BOUND, range.upperBound());
                 conf.set(KeyConstant.IS_OBJECT_ID, isObjectId);
                 confList.add(conf);
             }
@@ -100,12 +109,15 @@ public class CollectionSplitUtil
     private static List<String> getAvailableCollections(MongoClient mongoClient, String dbName, List<String> expandedCollections)
     {
         MongoDatabase database = mongoClient.getDatabase(dbName);
-        List<String> existingNames = database.listCollectionNames().into(new ArrayList<>());
+        Set<String> existingNames = new HashSet<>(database.listCollectionNames().into(new ArrayList<>()));
         List<String> availableCollections = new ArrayList<>();
 
         for (String collection : expandedCollections) {
             if (existingNames.contains(collection)) {
                 availableCollections.add(collection);
+            }
+            else {
+                LOG.warn("The collection [{}] does not exist in the database [{}], skip it", collection, dbName);
             }
         }
         return availableCollections;
@@ -115,7 +127,7 @@ public class CollectionSplitUtil
     {
         MongoDatabase database = mongoClient.getDatabase(dbName);
         MongoCollection<Document> col = database.getCollection(collName);
-        Document doc = col.find().limit(1).first();
+        Document doc = col.find().projection(new Document(KeyConstant.MONGO_PRIMARY_ID, 1)).limit(1).first();
         if (doc == null) {
             return false;
         }
@@ -131,10 +143,6 @@ public class CollectionSplitUtil
             int adviceNumber)
     {
         Map<String, Integer> splitPlan = new HashMap<>();
-        if (collections.isEmpty()) {
-            return splitPlan;
-        }
-
         int totalCollectionCount = collections.size();
         int totalTaskCount = Math.max(adviceNumber, totalCollectionCount);
         int extraTaskCount = totalTaskCount - totalCollectionCount;
@@ -148,10 +156,12 @@ public class CollectionSplitUtil
             return splitPlan;
         }
 
+        MongoDatabase database = mongoClient.getDatabase(dbName);
         long totalDocCount = 0L;
         for (String collection : collections) {
-            long count = Math.max(fetchDocCount(mongoClient, dbName, collection, queryFilter), 0L);
-            docCountCache.put(collection, count);
+            // an unknown count takes no share of the ratio, its own split decision is taken later
+            long count = Math.max(docCountCache.computeIfAbsent(collection,
+                    name -> fetchDocCount(database, name, queryFilter)), 0L);
             totalDocCount += count;
         }
 
@@ -174,36 +184,28 @@ public class CollectionSplitUtil
         }
 
         int remain = extraTaskCount - assigned;
-        quotas.sort((o1, o2) -> Double.compare(o2.remainder, o1.remainder));
+        quotas.sort((o1, o2) -> Double.compare(o2.remainder(), o1.remainder()));
         for (int i = 0; i < remain; i++) {
             Quota quota = quotas.get(i % quotas.size());
-            splitPlan.put(quota.collection, splitPlan.get(quota.collection) + 1);
+            splitPlan.put(quota.collection(), splitPlan.get(quota.collection()) + 1);
         }
         return splitPlan;
     }
 
-    private static long fetchDocCount(MongoClient mongoClient, String dbName, String collName, Document queryFilter)
+    /**
+     * @return the number of documents, or {@link #UNKNOWN_DOC_COUNT} when the server refuses to count
+     */
+    private static long fetchDocCount(MongoDatabase database, String collName, Document queryFilter)
     {
-        MongoDatabase database = mongoClient.getDatabase(dbName);
+        MongoCollection<Document> col = database.getCollection(collName);
         try {
-            if (hasQueryFilter(queryFilter)) {
-                return database.getCollection(collName).countDocuments(queryFilter);
-            }
-            Document result = database.runCommand(new Document("collStats", collName));
-            Object count = result.get("count");
-            if (count instanceof Integer) {
-                return ((Integer) count).longValue();
-            }
-            if (count instanceof Long) {
-                return (Long) count;
-            }
-            if (count instanceof Double) {
-                return ((Double) count).longValue();
-            }
-            return 0L;
+            // estimatedDocumentCount reads collection metadata instead of scanning the documents
+            return hasQueryFilter(queryFilter) ? col.countDocuments(queryFilter) : col.estimatedDocumentCount();
         }
         catch (Exception e) {
-            return 0L;
+            LOG.warn("Failed to count the documents of the collection [{}], treat it as unknown. reason: {}",
+                    collName, e.getMessage());
+            return UNKNOWN_DOC_COUNT;
         }
     }
 
@@ -211,124 +213,89 @@ public class CollectionSplitUtil
     private static List<Range> doSplitCollection(int adviceNumber, MongoClient mongoClient,
             String dbName, String collName, boolean isObjectId, Document queryFilter, long knownDocCount)
     {
-
         MongoDatabase database = mongoClient.getDatabase(dbName);
         MongoCollection<Document> col = database.getCollection(collName);
-        List<Range> rangeList = new ArrayList<>();
-        if (adviceNumber == 1) {
-            Range range = new Range();
-            range.lowerBound = "min";
-            range.upperBound = "max";
-            rangeList.add(range);
-            return rangeList;
-        }
 
-        long docCount = knownDocCount >= 0 ? knownDocCount : fetchDocCount(mongoClient, dbName, collName, queryFilter);
-        if (docCount == 0) {
-            return rangeList;
-        }
-        if (adviceNumber > docCount) {
-            adviceNumber = (int) docCount;
-        }
         if (adviceNumber <= 1) {
-            Range range = new Range();
-            range.lowerBound = "min";
-            range.upperBound = "max";
-            rangeList.add(range);
-            return rangeList;
+            return List.of(new Range("min", "max"));
         }
 
-        Document result = database.runCommand(new Document("collStats", collName));
-        int avgObjSize = 1;
-        Object avgObjSizeObj = result.get("avgObjSize");
-        if (avgObjSizeObj instanceof Integer) {
-            avgObjSize = (Integer) avgObjSizeObj;
+        long docCount = knownDocCount >= 0 ? knownDocCount : fetchDocCount(database, collName, queryFilter);
+        if (docCount == UNKNOWN_DOC_COUNT) {
+            // a wrong split boundary silently loses records, read the whole collection instead
+            return List.of(new Range("min", "max"));
         }
-        else if (avgObjSizeObj instanceof Double) {
-            avgObjSize = ((Double) avgObjSizeObj).intValue();
-        }
-        int splitPointCount = adviceNumber - 1;
-        long chunkDocCount = docCount / adviceNumber;
-        ArrayList<Object> splitPoints = new ArrayList<>();
-        boolean supportSplitVector = !hasQueryFilter(queryFilter);
-
-        // test if user has splitVector role(clusterManager)
-        if (supportSplitVector) {
-            try {
-                database.runCommand(new Document("splitVector", dbName + "." + collName)
-                        .append("keyPattern", new Document(KeyConstant.MONGO_PRIMARY_ID, 1))
-                        .append("force", true));
-            }
-            catch (MongoCommandException e) {
-                if (e.getErrorCode() == KeyConstant.MONGO_UNAUTHORIZED_ERR_CODE ||
-                        e.getErrorCode() == KeyConstant.MONGO_ILLEGAL_OP_ERR_CODE ||
-                        e.getErrorCode() == KeyConstant.MONGO_COMMAND_NOT_FOUND_CODE) {
-                    supportSplitVector = false;
-                }
-                else {
-                    supportSplitVector = false;
-                }
-            }
+        if (docCount == 0) {
+            LOG.warn("Skip the collection [{}], it holds no document matching the query", collName);
+            return List.of();
         }
 
-        if (supportSplitVector) {
-            try {
-                boolean forceMedianSplit = false;
-                long maxChunkSize = (docCount / splitPointCount - 1) * 2L * avgObjSize / (1024 * 1024);
-                // splitVector can use storage metadata to avoid a full scan when query is absent.
-                if (maxChunkSize < 1) {
-                    forceMedianSplit = true;
-                }
-                if (!forceMedianSplit) {
-                    result = database.runCommand(new Document("splitVector", dbName + "." + collName)
-                            .append("keyPattern", new Document(KeyConstant.MONGO_PRIMARY_ID, 1))
-                            .append("maxChunkSize", maxChunkSize)
-                            .append("maxSplitPoints", adviceNumber - 1));
-                }
-                else {
-                    result = database.runCommand(new Document("splitVector", dbName + "." + collName)
-                            .append("keyPattern", new Document(KeyConstant.MONGO_PRIMARY_ID, 1))
-                            .append("force", true));
-                }
-                List<?> splitKeys = result.get("splitKeys", List.class);
-
-                if (splitKeys != null) {
-                    for (Object splitKeyObj : splitKeys) {
-                        Document splitKey = (Document) splitKeyObj;
-                        Object id = splitKey.get(KeyConstant.MONGO_PRIMARY_ID);
-                        if (isObjectId) {
-                            ObjectId oid = (ObjectId) id;
-                            splitPoints.add(oid.toHexString());
-                        }
-                        else {
-                            splitPoints.add(id);
-                        }
-                    }
-                }
-            }
-            catch (Exception e) {
-                splitPoints.clear();
-            }
+        int splitNumber = (int) Math.min(adviceNumber, docCount);
+        if (splitNumber <= 1) {
+            return List.of(new Range("min", "max"));
         }
 
+        int splitPointCount = splitNumber - 1;
+        long chunkDocCount = docCount / splitNumber;
+
+        List<Object> splitPoints = hasQueryFilter(queryFilter)
+                ? List.of()
+                : fetchSplitPointsFromServer(database, dbName, collName, adviceNumber, splitPointCount, docCount, isObjectId);
         if (splitPoints.isEmpty()) {
-            splitPoints.addAll(sampleSplitPointsSequentially(col, queryFilter, splitPointCount, chunkDocCount, isObjectId));
+            splitPoints = sampleSplitPointsSequentially(col, queryFilter, splitPointCount, chunkDocCount, isObjectId);
         }
 
-        Object lastObjectId = "min";
+        List<Range> rangeList = new ArrayList<>(splitPoints.size() + 1);
+        Object lowerBound = "min";
         for (Object splitPoint : splitPoints) {
-            Range range = new Range();
-            range.lowerBound = lastObjectId;
-            lastObjectId = splitPoint;
-            range.upperBound = lastObjectId;
-            rangeList.add(range);
+            rangeList.add(new Range(lowerBound, splitPoint));
+            lowerBound = splitPoint;
         }
-        Range range = new Range();
-        range.lowerBound = lastObjectId;
-        range.upperBound = "max";
-        rangeList.add(range);
-
+        rangeList.add(new Range(lowerBound, "max"));
         return rangeList;
+    }
+
+    /**
+     * Ask the server for split points. splitVector is an internal command that needs a privileged
+     * account and a shard aware deployment, so a refusal only means sampling the collection instead.
+     */
+    private static List<Object> fetchSplitPointsFromServer(MongoDatabase database, String dbName, String collName,
+            int adviceNumber, int splitPointCount, long docCount, boolean isObjectId)
+    {
+        Document splitVector = new Document("splitVector", dbName + "." + collName)
+                .append("keyPattern", new Document(KeyConstant.MONGO_PRIMARY_ID, 1));
+        try {
+            // collStats is deprecated since MongoDB 6.2 and may be denied on hosted clusters
+            Document stats = database.runCommand(new Document("collStats", collName));
+            long avgObjSize = stats.get("avgObjSize") instanceof Number number ? number.longValue() : 1L;
+            long maxChunkSize = (docCount / splitPointCount - 1) * 2L * avgObjSize / (1024 * 1024);
+            if (maxChunkSize > 0) {
+                splitVector.append("maxChunkSize", maxChunkSize).append("maxSplitPoints", adviceNumber - 1);
+            }
+            else {
+                // a forced split scans the collection, but it is the only way for a small one
+                splitVector.append("force", true);
+            }
+
+            Document result = database.runCommand(splitVector);
+            List<?> splitKeys = result.get("splitKeys", List.class);
+            if (splitKeys == null) {
+                return List.of();
+            }
+
+            List<Object> splitPoints = new ArrayList<>(splitKeys.size());
+            for (Object splitKey : splitKeys) {
+                Object id = ((Document) splitKey).get(KeyConstant.MONGO_PRIMARY_ID);
+                // an ObjectId has to travel as a hex string, the split configuration is plain json
+                splitPoints.add(isObjectId ? ((ObjectId) id).toHexString() : id);
+            }
+            return splitPoints;
+        }
+        catch (MongoCommandException | ClassCastException e) {
+            LOG.warn("Failed to split the collection [{}] by the server side splitVector, sample it instead. reason: {}",
+                    collName, e.getMessage());
+            return List.of();
+        }
     }
 
     private static List<Object> sampleSplitPointsSequentially(MongoCollection<Document> collection,
@@ -373,34 +340,14 @@ public class CollectionSplitUtil
         return splitPoints;
     }
 
-    private static Document parseQueryFilter(String query)
-    {
-        if (query == null || query.trim().isEmpty()) {
-            return null;
-        }
-        return Document.parse(query);
-    }
-
     private static boolean hasQueryFilter(Document queryFilter)
     {
         return queryFilter != null && !queryFilter.isEmpty();
     }
-}
 
-class Quota
-{
-    String collection;
-    double remainder;
+    /** A range of the primary key read by one task, {@code min} and {@code max} are unbounded. */
+    private record Range(Object lowerBound, Object upperBound) {}
 
-    Quota(String collection, double remainder)
-    {
-        this.collection = collection;
-        this.remainder = remainder;
-    }
-}
-
-class Range
-{
-    Object lowerBound;
-    Object upperBound;
+    /** The fractional part of a collection's share of the extra tasks. */
+    private record Quota(String collection, double remainder) {}
 }
