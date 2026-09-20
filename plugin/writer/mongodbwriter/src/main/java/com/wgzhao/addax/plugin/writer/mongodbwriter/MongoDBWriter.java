@@ -153,11 +153,7 @@ public class MongoDBWriter
          */
         private Document buildRemoveFilter(Configuration preSql)
         {
-            Document filter = null;
-            String json = preSql.getString("json");
-            if (StringUtils.isNotBlank(json)) {
-                filter = Document.parse(json);
-            }
+            Document filter = MongoUtil.parseFilter(preSql.get("json"), "preSql.json");
 
             List<Configuration> items = preSql.getListConfiguration("item");
             if (!items.isEmpty()) {
