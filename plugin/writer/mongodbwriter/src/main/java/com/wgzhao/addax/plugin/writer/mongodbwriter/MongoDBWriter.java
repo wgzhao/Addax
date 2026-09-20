@@ -122,7 +122,15 @@ public class MongoDBWriter
                     ? MongoUtil.initMongoClient(address)
                     : MongoUtil.initCredentialMongoClient(address, username, password, authDb);
 
-            String preSqls = connConf.getString(PRE_SQL);
+            // preSql is a writer parameter, as in every other writer; the connection block is still
+            // read because that is where the plugin used to take it from
+            String preSqls = originalConfig.getString(PRE_SQL);
+            if (StringUtils.isBlank(preSqls)) {
+                preSqls = connConf.getString(PRE_SQL);
+            }
+            else if (StringUtils.isNotBlank(connConf.getString(PRE_SQL))) {
+                LOG.warn("Both [preSql] and [connection.preSql] are configured, [preSql] is used");
+            }
             if (StringUtils.isNotBlank(preSqls)) {
                 executePreSql(mongoClient, dbName, collection, Configuration.from(preSqls));
             }
