@@ -18,6 +18,14 @@
 mvn clean package -T1C -DskipTests
 ```
 
+### 打包发行版（产出可运行的目录树）
+
+```bash
+mvn package -Pdistribution -T1C -DskipTests
+```
+
+只有带 `-Pdistribution` 才会在 `target/addax-<version>/` 下组装出 `lib/` 和 `plugin/`，`bin/addax.sh` 依赖该目录结构，源码树里的脚本无法直接运行。
+
 ### 单模块编译（以 dorisreader 为例）
 
 ```bash
@@ -35,13 +43,13 @@ mvn clean package -pl :dorisreader -am
 ## 运行流程
 
 1. 编辑一个 `json` 格式或者 `yaml` 格式的 Job 配置文件，指定 Reader、Writer 以及相关参数，可以参考 `core/src/main/job` 下的例子
-2. 执行 `core/src/main/bin/addax.sh` 脚本，job 文件是位置参数（`-j` 是 JVM 参数，勿写成 `-job`），例如：
+2. 执行发行版目录里的 `bin/addax.sh` 脚本，job 文件是位置参数（`-j` 是 JVM 参数，勿写成 `-job`），例如：
 
 ```bash
-sh core/src/main/bin/addax.sh /path/to/job.json
+sh target/addax-<version>/bin/addax.sh /path/to/job.json
 ```
 
-程序运行的内部流程和新增插件的开发流程可以参考 [plugin development 文档](https://github.com/wgzhao/addax-docs/raw/refs/heads/master/docs/plugin-development.md)
+程序运行的内部流程和新增插件的开发流程可以参考 [plugin development 文档](https://addax.wgzhao.com/plugin-development.html)
 
 
 ## 架构与设计宗旨
