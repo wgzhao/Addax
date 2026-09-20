@@ -19,158 +19,177 @@
 
 package com.wgzhao.addax.plugin.reader.mongodbreader;
 
-import com.mongodb.client.MongoDatabase;
 import com.wgzhao.addax.core.element.BoolColumn;
+import com.wgzhao.addax.core.element.Column;
 import com.wgzhao.addax.core.element.DateColumn;
 import com.wgzhao.addax.core.element.DoubleColumn;
 import com.wgzhao.addax.core.element.LongColumn;
 import com.wgzhao.addax.core.element.Record;
-import com.mongodb.client.MongoCollection;
 import com.wgzhao.addax.core.element.StringColumn;
 import org.bson.BsonDocument;
-import org.bson.BsonInvalidOperationException;
-import org.bson.BsonType;
+import org.bson.BsonInt32;
 import org.bson.BsonValue;
+import org.bson.conversions.Bson;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.BiConsumer;
+import java.util.function.Supplier;
+import java.util.regex.Pattern;
 
 /**
  * MongoDB row converter that transforms BSON documents into Addax records.
- * This class handles the conversion of MongoDB BSON data types to corresponding
- * Addax column types with caching mechanism for performance optimization.
- *
- * @author wgzhao
- * @since 6.0.5
+ * Every configured column is resolved into a plan once per task, so the per record path
+ * performs neither name parsing nor a type lookup through a cache.
  */
 public class MongoRowConverter
 {
     /**
-     * Cache for column handlers keyed by explicit column name (used in explicit-mode).
+     * A column name made of digits and at most one dot is a numeric constant, as documented.
      */
-    private final Map<String, BiConsumer<BsonValue, Record>> handlers = new ConcurrentHashMap<>();
+    private static final Pattern NUMBER_CONSTANT = Pattern.compile("\\d+(\\.\\d+)?");
 
-    /**
-     * Get nested field value from a BSON document, supporting dot notation like "col.subcol1", "col.subcol2.subsubcol3".
-     */
-    private BsonValue getNestedValue(BsonDocument doc, String columnPath) {
-        String[] keys = columnPath.split("\\.");
-        BsonValue current = doc;
-        for (String key : keys) {
-            if (current == null || current.isNull()) {
-                return null;
-            }
-            if (!current.isDocument()) {
-                return null;
-            }
-            BsonDocument currentDoc = current.asDocument();
-            if (!currentDoc.containsKey(key)) {
-                return null;
-            }
-            current = currentDoc.get(key);
+    private final List<ColumnPlan> plans;
+
+    private final boolean wildcard;
+
+    public MongoRowConverter(List<String> columns)
+    {
+        List<ColumnPlan> resolved = new ArrayList<>(columns.size());
+        for (String column : columns) {
+            resolved.add(ColumnPlan.of(column));
         }
-        return current;
+        this.plans = List.copyOf(resolved);
+        this.wildcard = this.plans.size() == 1 && "*".equals(this.plans.get(0).name());
     }
 
     /**
-     * Processes a single BSON document and converts specified columns to record format.
-     * Supports two modes:
-     *  - explicit columns: the provided columns are treated as the target schema (supports nested fields via dot notation)
-     *  - wildcard mode (single column "*"): iterate the document's top-level fields in document order and convert each
-     *    field value into a column on-the-fly. Top-level complex types (DOCUMENT/ARRAY) are serialized to JSON/string.
-     *
-     * @param doc the BSON document to process
-     * @param record the target record to populate with converted columns
-     * @param columns an iterable of column names to extract from the document
+     * @return the fields this converter reads, or null to read the whole document
      */
-    public void processOne(BsonDocument doc, Record record, Iterable<String> columns)
+    public Bson projection()
     {
-        // Normalize columns into a list so we can inspect size and reuse easily
-        List<String> cols = new ArrayList<>();
-        columns.forEach(cols::add);
-
-        boolean wildcard = cols.size() == 1 && "*".equals(cols.get(0));
-
         if (wildcard) {
-            // Wildcard mode: emit the whole BSON document as a single JSON string column
-            // so downstream writer can parse and write the full document back to MongoDB.
-            record.addColumn(new StringColumn(doc.toJson()));
+            return null;
+        }
+        BsonDocument projection = new BsonDocument();
+        boolean hasField = false;
+        for (ColumnPlan plan : plans) {
+            if (!plan.isConstant()) {
+                projection.put(plan.path()[0], new BsonInt32(1));
+                hasField = true;
+            }
+        }
+        if (!hasField) {
+            // an empty projection would return every field, name one to keep the transfer minimal
+            projection.put(KeyConstant.MONGO_PRIMARY_ID, new BsonInt32(1));
+        }
+        return projection;
+    }
+
+    /**
+     * Convert one BSON document into a record.
+     *
+     * @param document the document read from the collection
+     * @param record the target record to populate with converted columns
+     */
+    public void processOne(BsonDocument document, Record record)
+    {
+        if (wildcard) {
+            // the whole document travels as a single JSON column
+            record.addColumn(new StringColumn(document.toJson()));
             return;
         }
-
-        // Explicit columns mode (keep previous behavior and caching by column name)
-        for (String col : cols) {
-            if (col.startsWith("'")) {
-                record.addColumn(new StringColumn(col.substring(1, col.length() - 1)));
-                continue;
-            }
-            BsonValue val = getNestedValue(doc, col); // Support nested fields
-            if (val == null || val.isNull()) {
-                record.addColumn(new StringColumn());
-                continue;
-            }
-            BiConsumer<BsonValue, Record> h = handlers.get(col);
-            if (h != null) {
-                try {
-                    h.accept(val, record);
-                } catch(BsonInvalidOperationException e) {
-                    record.addColumn(new StringColumn());
-                }
-                continue;
-            }
-            BiConsumer<BsonValue, Record> generated = createHandler(val.getBsonType());
-            handlers.put(col, generated);
-            try {
-                generated.accept(val, record);
-            } catch (BsonInvalidOperationException e) {
-                record.addColumn(new StringColumn());
-            }
+        for (ColumnPlan plan : plans) {
+            record.addColumn(plan.toColumn(document));
         }
     }
 
-    /**
-     * Creates a handler function for converting BSON values to Addax columns
-     * based on the BSON type. This method uses a switch expression to map
-     * each BSON type to its corresponding Addax column type.
-     *
-     * Note: DECIMAL128 is converted to StringColumn to preserve precision.
-     * Complex types (DOCUMENT/ARRAY) are serialized to JSON/string.
-     *
-     * @param t the BSON type to create a handler for
-     * @return a BiConsumer that can convert BSON values of the specified type
-     *         to appropriate Addax columns
-     */
-    private BiConsumer<BsonValue, Record> createHandler(BsonType t)
+    private static Column toColumn(BsonValue value)
     {
-        return switch (t) {
-            case DOUBLE -> (v, r) -> r.addColumn(new DoubleColumn(v.asDouble().getValue()));
-            case INT32 -> (v, r) -> r.addColumn(new LongColumn(v.asInt32().getValue()));
-            case INT64 -> (v, r) -> r.addColumn(new LongColumn(v.asInt64().getValue()));
-            case DECIMAL128 -> (v, r) -> r.addColumn(new StringColumn(v.asDecimal128().getValue().toString()));
-            case BOOLEAN -> (v, r) -> r.addColumn(new BoolColumn(v.asBoolean().getValue()));
-            case DATE_TIME -> (v, r) -> r.addColumn(new DateColumn(new java.util.Date(v.asDateTime().getValue())));
-            case DOCUMENT -> (v, r) -> r.addColumn(new StringColumn(v.asDocument().toJson()));
-            case OBJECT_ID -> (v, r) -> r.addColumn(new StringColumn(v.asObjectId().getValue().toHexString()));
-            case STRING -> (v, r) -> r.addColumn(new StringColumn(v.asString().getValue()));
-            case ARRAY -> (v, r) -> r.addColumn(new StringColumn((v.asArray().getValues().toString())));
-            default -> (v, r) -> r.addColumn(new StringColumn(v.toString()));
+        return switch (value.getBsonType()) {
+            case DOUBLE -> new DoubleColumn(value.asDouble().getValue());
+            case INT32 -> new LongColumn(value.asInt32().getValue());
+            case INT64 -> new LongColumn(value.asInt64().getValue());
+            // a decimal keeps its exact textual form, a double would round it
+            case DECIMAL128 -> new StringColumn(value.asDecimal128().getValue().toString());
+            case BOOLEAN -> new BoolColumn(value.asBoolean().getValue());
+            case DATE_TIME -> new DateColumn(new Date(value.asDateTime().getValue()));
+            case DOCUMENT -> new StringColumn(value.asDocument().toJson());
+            case OBJECT_ID -> new StringColumn(value.asObjectId().getValue().toHexString());
+            case STRING -> new StringColumn(value.asString().getValue());
+            case ARRAY -> new StringColumn(toJson(value));
+            default -> new StringColumn(value.toString());
         };
     }
 
     /**
-     * Retrieves a MongoDB collection configured to work with BSON documents.
-     * This method returns a collection that can be used to query MongoDB
-     * and receive results as BSON documents.
-     *
-     * @param db the MongoDB database instance
-     * @param name the name of the collection to retrieve
-     * @return a MongoCollection configured for BSON document operations
+     * Serialize a BSON value to extended JSON. Only a document can do that directly, so a value
+     * of another type is wrapped and the wrapper stripped again. This keeps arrays readable as
+     * valid JSON instead of a Java list representation.
      */
-    public MongoCollection<BsonDocument> getBsonCollection(MongoDatabase db, String name)
+    private static String toJson(BsonValue value)
     {
-        return db.getCollection(name, BsonDocument.class);
+        if (value instanceof BsonDocument document) {
+            return document.toJson();
+        }
+        String json = new BsonDocument("v", value).toJson();
+        return json.substring(json.indexOf(':') + 1, json.length() - 1).trim();
+    }
+
+    /**
+     * A configured column resolved once: either a constant appended to every record, or a field
+     * of the document addressed by a pre-split dotted path.
+     */
+    private record ColumnPlan(String name, String[] path, Supplier<Column> constant)
+    {
+        static ColumnPlan of(String column)
+        {
+            // a quoted column is the documented way to append a constant string,
+            // and a numeric column is appended as a number
+            if (column.length() >= 2 && column.startsWith("'") && column.endsWith("'")) {
+                String value = column.substring(1, column.length() - 1);
+                return new ColumnPlan(column, null, () -> new StringColumn(value));
+            }
+            if (NUMBER_CONSTANT.matcher(column).matches()) {
+                return new ColumnPlan(column, null, column.contains(".")
+                        ? () -> new DoubleColumn(Double.parseDouble(column))
+                        : () -> new LongColumn(Long.parseLong(column)));
+            }
+            return new ColumnPlan(column, column.contains(".") ? column.split("\\.") : new String[] {column}, null);
+        }
+
+        boolean isConstant()
+        {
+            return constant != null;
+        }
+
+        Column toColumn(BsonDocument document)
+        {
+            if (constant != null) {
+                return constant.get();
+            }
+            BsonValue value = get(document);
+            return value == null ? new StringColumn() : MongoRowConverter.toColumn(value);
+        }
+
+        /**
+         * @return the value at the dotted path, null if a part of the path is absent
+         */
+        private BsonValue get(BsonDocument document)
+        {
+            BsonValue current = document;
+            for (String key : path) {
+                if (!current.isDocument()) {
+                    return null;
+                }
+                BsonDocument currentDocument = current.asDocument();
+                if (!currentDocument.containsKey(key)) {
+                    return null;
+                }
+                current = currentDocument.get(key);
+            }
+            // an absent field and a null value are both read as an empty column
+            return current.isNull() ? null : current;
+        }
     }
 }

@@ -46,12 +46,5 @@ public class KeyConstant
     /** Mongo primary id. */
     public static final String MONGO_PRIMARY_ID = "_id";
 
-    /** Mongo unauthorized err code. */
-    public static final int MONGO_UNAUTHORIZED_ERR_CODE = 13;
-    /** Mongo illegal op err code. */
-    public static final int MONGO_ILLEGAL_OP_ERR_CODE = 20;
-    /** Mongo command not found code. */
-    public static final int MONGO_COMMAND_NOT_FOUND_CODE = 59;
-
     private KeyConstant() {}
 }
