@@ -23,9 +23,9 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.ParseContext;
+import com.jayway.jsonpath.spi.json.JsonProvider;
 import com.wgzhao.addax.core.base.Constant;
 import com.wgzhao.addax.core.base.Key;
-import com.wgzhao.addax.core.compress.ZipCycleInputStream;
 import com.wgzhao.addax.core.element.BoolColumn;
 import com.wgzhao.addax.core.element.Column;
 import com.wgzhao.addax.core.element.DateColumn;
@@ -37,31 +37,32 @@ import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.plugin.RecordSender;
 import com.wgzhao.addax.core.spi.Reader;
 import com.wgzhao.addax.core.util.Configuration;
+import com.wgzhao.addax.storage.reader.StorageReaderUtil;
 import com.wgzhao.addax.storage.util.FileHelper;
 import org.apache.commons.compress.compressors.CompressorException;
-import org.apache.commons.compress.compressors.CompressorInputStream;
-import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.io.Charsets;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.nio.charset.UnsupportedCharsetException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONVERT_NOT_SUPPORT;
 import static com.wgzhao.addax.core.spi.ErrorCode.ENCODING_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
@@ -73,6 +74,56 @@ import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 public class JsonReader
         extends Reader
 {
+    /**
+     * The declared type of a column. It is a fixed part of the job configuration, so it is resolved
+     * once when the column plan is built instead of once for every record.
+     */
+    private enum ColumnType
+    {
+        STRING, LONG, DOUBLE, BOOLEAN, DATE;
+
+        static ColumnType of(String name)
+        {
+            return switch (name.toLowerCase(Locale.ROOT)) {
+                case "string" -> STRING;
+                case "long" -> LONG;
+                case "double" -> DOUBLE;
+                case "boolean" -> BOOLEAN;
+                case "date" -> DATE;
+                default -> throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
+                        "The type %s is unsupported".formatted(name));
+            };
+        }
+
+        /**
+         * Converts a raw value into a column of this type. A null value yields a null column, the
+         * element constructors accept null for that reason.
+         *
+         * @param value the value read from the json document
+         * @param dateFormat the format used to parse a date column, ignored for the other types
+         * @return the parsed column
+         */
+        Column parse(String value, DateFormat dateFormat)
+        {
+            try {
+                return switch (this) {
+                    case STRING -> new StringColumn(value);
+                    case LONG -> new LongColumn(value);
+                    case DOUBLE -> new DoubleColumn(value);
+                    case BOOLEAN -> new BoolColumn(value);
+                    // without an explicit format, the formats configured by common.column.* are tried
+                    case DATE -> dateFormat != null && value != null
+                            ? new DateColumn(dateFormat.parse(value))
+                            : new DateColumn(new StringColumn(value).asDate());
+                };
+            }
+            catch (Exception e) {
+                throw AddaxException.asAddaxException(CONVERT_NOT_SUPPORT,
+                        "Cannot convert the value [%s] to %s".formatted(value, this), e);
+            }
+        }
+    }
+
     /** Job. */
     public static class Job
             extends Reader.Job
@@ -96,17 +147,17 @@ public class JsonReader
         private void validateParameter()
         {
             // Compatible with the old version, path is a string before
-            String pathInString = this.originConfig.getNecessaryValue(Key.PATH,
-                    REQUIRED_VALUE);
-            if (!pathInString.startsWith("[") && !pathInString.endsWith("]")) {
-                path = List.of(pathInString);
-            }
-            else {
+            this.originConfig.getNecessaryValue(Key.PATH, REQUIRED_VALUE);
+            Object pathValue = this.originConfig.get(Key.PATH);
+            if (pathValue instanceof List) {
                 path = this.originConfig.getList(Key.PATH, String.class);
-                if (path == null || path.isEmpty()) {
+                if (path.isEmpty()) {
                     throw AddaxException.asAddaxException(REQUIRED_VALUE,
                             "The item `path` must be not empty");
                 }
+            }
+            else {
+                path = List.of(String.valueOf(pathValue));
             }
 
             String encoding = this.originConfig.getString(Key.ENCODING, Constant.DEFAULT_ENCODING);
@@ -130,16 +181,19 @@ public class JsonReader
                 }
             }
 
-            // column: 1. index type 2.value type 3.when type is Date, may have
             var columns = this.originConfig.getListConfiguration(Key.COLUMN);
-            if (columns != null && !columns.isEmpty()) {
-                columns.forEach(this::validateColumn);
+            if (columns == null || columns.isEmpty()) {
+                throw AddaxException.asAddaxException(REQUIRED_VALUE,
+                        "The item `column` must be not empty");
             }
+            columns.forEach(this::validateColumn);
         }
 
         private void validateColumn(Configuration columnConf)
         {
             columnConf.getNecessaryValue(Key.TYPE, REQUIRED_VALUE);
+            // fail early on an unsupported type instead of on the first record
+            ColumnType.of(columnConf.getString(Key.TYPE));
             var columnIndex = columnConf.getString(Key.INDEX);
             var columnValue = columnConf.getString(Key.VALUE);
 
@@ -198,124 +252,206 @@ public class JsonReader
     {
         private static final Logger LOG = LoggerFactory.getLogger(Task.class);
 
-        // Use record for column configuration
-        private record ColumnConfig(String type, String value, String index, String format) {}
+        /**
+         * Everything needed to read one column. Resolving the configuration, compiling the json path
+         * and building the date formatter once per column keeps the record loop free of that work.
+         *
+         * @param type the declared type of the column
+         * @param path the compiled json path, null for a constant column
+         * @param constant the column emitted for every record, null when the column comes from the document
+         * @param dateFormat the formatter of a date column, null when no format is configured
+         */
+        private record ColumnPlan(ColumnType type, JsonPath path, Column constant, DateFormat dateFormat) {}
 
         private List<String> sourceFiles;
-        private List<Configuration> columns;
-        private String compressType;
+        private List<ColumnPlan> columnPlans;
         private String encoding;
+        private String compress;
+        private boolean singleLine;
 
         private ParseContext parse;
-        private boolean multiline;
+        private JsonProvider jsonProvider;
 
         @Override
         public void init()
         {
             Configuration readerSliceConfig = this.getPluginJobConf();
             this.sourceFiles = readerSliceConfig.getList(Key.SOURCE_FILES, String.class);
-            this.columns = readerSliceConfig.getListConfiguration(Key.COLUMN);
-            this.compressType = readerSliceConfig.getString(Key.COMPRESS, null);
-            this.encoding = readerSliceConfig.getString(Key.ENCODING, "utf-8");
-            this.multiline = readerSliceConfig.getBool("singleLine", true);
-            // return null for missing leafs.
-            com.jayway.jsonpath.Configuration jsonConf = com.jayway.jsonpath.Configuration.defaultConfiguration();
-            jsonConf.addOptions(Option.DEFAULT_PATH_LEAF_TO_NULL);
+            this.encoding = readerSliceConfig.getString(Key.ENCODING, Constant.DEFAULT_ENCODING);
+            this.compress = readerSliceConfig.getString(Key.COMPRESS, null);
+            this.singleLine = readerSliceConfig.getBool(JsonKey.SINGLE_LINE, true);
+            // a path that matches nothing yields a null column instead of failing the whole job
+            com.jayway.jsonpath.Configuration jsonConf = com.jayway.jsonpath.Configuration
+                    .defaultConfiguration()
+                    .addOptions(Option.DEFAULT_PATH_LEAF_TO_NULL, Option.SUPPRESS_EXCEPTIONS);
             this.parse = JsonPath.using(jsonConf);
+            this.jsonProvider = jsonConf.jsonProvider();
+            this.columnPlans = buildColumnPlans(readerSliceConfig.getListConfiguration(Key.COLUMN));
         }
 
-        private List<Column> parseFromJson(String json)
+        private List<ColumnPlan> buildColumnPlans(List<Configuration> columns)
         {
-            List<Column> splitLine = new ArrayList<>();
-            DocumentContext document = parse.parse(json);
-            String tempValue;
-            for (Configuration eachColumnConf : columns) {
-                String columnIndex = eachColumnConf.getString(Key.INDEX);
-                String columnType = eachColumnConf.getString(Key.TYPE).toLowerCase();
-                String columnFormat = eachColumnConf.getString(Key.FORMAT);
-                String columnValue = eachColumnConf.getString(Key.VALUE);
-                // 这里是为了支持常量Value 现在需要考虑做容错，如果json里面没有的解析路径置为null
-                if (null != columnValue) {
-                    tempValue = columnValue;
+            List<ColumnPlan> plans = new ArrayList<>(columns.size());
+            for (Configuration column : columns) {
+                ColumnType type = ColumnType.of(column.getNecessaryValue(Key.TYPE, REQUIRED_VALUE));
+                DateFormat dateFormat = type == ColumnType.DATE ? dateFormatOf(column.getString(Key.FORMAT)) : null;
+                String value = column.getString(Key.VALUE);
+                // a constant column is parsed once and then shared by every record
+                Column constant = value == null ? null : type.parse(value, dateFormat);
+                JsonPath path = value == null ? JsonPath.compile(column.getString(Key.INDEX)) : null;
+                plans.add(new ColumnPlan(type, path, constant, dateFormat));
+            }
+            return plans;
+        }
+
+        private static DateFormat dateFormatOf(String format)
+        {
+            // SimpleDateFormat is not thread safe, but a task is only read by a single thread
+            return StringUtils.isBlank(format) ? null : new SimpleDateFormat(format);
+        }
+
+        /**
+         * Converts a value of the document into the column it is declared as.
+         *
+         * @param plan the plan of a column that is read from the document
+         * @param value the value matched by the json path of the column
+         * @return the parsed column
+         */
+        private Column toColumn(ColumnPlan plan, Object value)
+        {
+            if (value == null) {
+                return plan.type().parse(null, plan.dateFormat());
+            }
+            if (value instanceof Map || value instanceof List) {
+                // a container cannot be converted to a scalar type, keep its json text instead of dropping it
+                return plan.type().parse(jsonProvider.toJson(value), plan.dateFormat());
+            }
+            return plan.type().parse(String.valueOf(value), plan.dateFormat());
+        }
+
+        /**
+         * Read a file in the JSON Lines layout, every line holds one json object.
+         *
+         * @param reader the content of the file
+         * @param recordSender the sender the records are sent to
+         * @return the number of records that were read
+         * @throws IOException if the file cannot be read
+         */
+        private long parseJsonLines(BufferedReader reader, RecordSender recordSender)
+                throws IOException
+        {
+            long recordNum = 0;
+            // a column may legitimately be absent from some records, warn about it only once
+            boolean[] nullWarned = new boolean[columnPlans.size()];
+            String jsonLine;
+            while ((jsonLine = reader.readLine()) != null) {
+                if (jsonLine.isBlank()) {
+                    // a blank line holds no record, skip it instead of failing the job
+                    continue;
                 }
-                else {
-                    tempValue = document.read(columnIndex, columnType.getClass());
+                DocumentContext document = parse.parse(jsonLine);
+                Record record = recordSender.createRecord();
+                for (int i = 0; i < columnPlans.size(); i++) {
+                    ColumnPlan plan = columnPlans.get(i);
+                    if (plan.constant() != null) {
+                        record.addColumn(plan.constant());
+                        continue;
+                    }
+                    Object value = document.read(plan.path());
+                    if (value == null && !nullWarned[i]) {
+                        nullWarned[i] = true;
+                        LOG.warn("The index [{}] matches no value in some records, the column is null there",
+                                plan.path().getPath());
+                    }
+                    record.addColumn(toColumn(plan, value));
                 }
-                Column insertColumn = getColumn(columnType, tempValue, columnFormat);
-                splitLine.add(insertColumn);
+                recordSender.sendToWriter(record);
+                recordNum++;
             }
-            return splitLine;
+            return recordNum;
         }
 
-        private Column getColumn(String type, String columnValue, String columnFormat)
+        /**
+         * Read a file that holds a single json document. Every index has to match a json array and one
+         * record is sent per element, so that arrays of the same length line up positionally. Each of
+         * them has to point at a leaf, see {@link JsonKey#SINGLE_LINE} for what that requires.
+         *
+         * @param reader the content of the file
+         * @param recordSender the sender the records are sent to
+         * @return the number of records that were read
+         * @throws IOException if the file cannot be read
+         */
+        private long parseJsonDocument(BufferedReader reader, RecordSender recordSender)
+                throws IOException
         {
-            return switch (type.toLowerCase()) {
-                case "string" -> new StringColumn(columnValue);
-                case "double" -> tryParseDouble(columnValue);
-                case "boolean" -> tryParseBoolean(columnValue);
-                case "long" -> tryParseLong(columnValue);
-                case "date" -> tryParseDate(columnValue, columnFormat);
-                default -> throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
-                        "The type %s is unsupported".formatted(type));
-            };
-        }
+            StringWriter buffer = new StringWriter(Constant.DEFAULT_BUFFER_SIZE);
+            reader.transferTo(buffer);
+            DocumentContext document = parse.parse(buffer.toString());
 
-        private Column tryParseDouble(String value)
-        {
-            try {
-                return new DoubleColumn(value);
-            }
-            catch (Exception e) {
-                throw new IllegalArgumentException(
-                        "Type cast error, cannot cast %s to DOUBLE".formatted(value));
-            }
-        }
-
-        private Column tryParseBoolean(String value)
-        {
-            try {
-                return new BoolColumn(value);
-            }
-            catch (Exception e) {
-                throw new IllegalArgumentException(
-                        "Type cast error, cannot cast %s to BOOLEAN".formatted(value));
-            }
-        }
-
-        private Column tryParseLong(String value)
-        {
-            try {
-                return new LongColumn(value);
-            }
-            catch (Exception e) {
-                LOG.error(e.getMessage());
-                throw new IllegalArgumentException(
-                        "Type cast error, cannot cast %s to LONG".formatted(value));
-            }
-        }
-
-        private Column tryParseDate(String value, String format)
-        {
-            try {
-                if (StringUtils.isNotBlank(format)) {
-                    var dateFormat = new SimpleDateFormat(format);
-                    return new DateColumn(dateFormat.parse(value));
+            List<List<?>> columns = new ArrayList<>(columnPlans.size());
+            JsonPath counterPath = null;
+            boolean hasDocumentColumn = false;
+            int recordNum = -1;
+            for (ColumnPlan plan : columnPlans) {
+                if (plan.constant() != null) {
+                    columns.add(null);
+                    continue;
                 }
-                return new DateColumn(new StringColumn(value).asDate());
+                hasDocumentColumn = true;
+                JsonPath path = plan.path();
+                if (!(document.read(path) instanceof List<?> values)) {
+                    throw AddaxException.asAddaxException(CONFIG_ERROR,
+                            "The index [%s] does not match a json array, when `%s` is false every index must be a multi-value path such as $.data[*].field"
+                                    .formatted(path.getPath(), JsonKey.SINGLE_LINE));
+                }
+                if (values.isEmpty()) {
+                    // an array that holds no element for this document, the column is null for every record
+                    LOG.warn("The index [{}] matches no element in the document, the column is null for every record",
+                            path.getPath());
+                    columns.add(null);
+                    continue;
+                }
+                if (values.stream().allMatch(Objects::isNull)) {
+                    LOG.warn("The index [{}] matches only null values in the document", path.getPath());
+                }
+                if (recordNum < 0) {
+                    counterPath = path;
+                    recordNum = values.size();
+                }
+                else if (recordNum != values.size()) {
+                    // an element of one array would end up in the record of another element
+                    throw AddaxException.asAddaxException(CONFIG_ERROR,
+                            "The index [%s] matches %d elements, but the index [%s] matches %d, when `%s` is false every index must match the same number of elements"
+                                    .formatted(counterPath.getPath(), recordNum, path.getPath(), values.size(),
+                                            JsonKey.SINGLE_LINE));
+                }
+                columns.add(values);
             }
-            catch (Exception e) {
-                throw new IllegalArgumentException(
-                        "Type cast error, cannot cast %s to DATE".formatted(value));
+            if (!hasDocumentColumn) {
+                throw AddaxException.asAddaxException(CONFIG_ERROR,
+                        "No column reads a json array, when `%s` is false at least one index must do so, otherwise the number of records is unknown"
+                                .formatted(JsonKey.SINGLE_LINE));
             }
-        }
+            if (recordNum < 0) {
+                // every index matched no element, the caller warns about the file holding no record
+                recordNum = 0;
+            }
 
-        private void transportOneRecord(RecordSender recordSender, List<Column> sourceLine)
-        {
-            Record record = recordSender.createRecord();
-            for (Column eachValue : sourceLine) {
-                record.addColumn(eachValue);
+            for (int i = 0; i < recordNum; i++) {
+                Record record = recordSender.createRecord();
+                for (int j = 0; j < columnPlans.size(); j++) {
+                    ColumnPlan plan = columnPlans.get(j);
+                    if (plan.constant() != null) {
+                        record.addColumn(plan.constant());
+                    }
+                    else {
+                        List<?> values = columns.get(j);
+                        record.addColumn(toColumn(plan, values == null ? null : values.get(i)));
+                    }
+                }
+                recordSender.sendToWriter(record);
             }
-            recordSender.sendToWriter(record);
+            return recordNum;
         }
 
         @Override
@@ -324,123 +460,53 @@ public class JsonReader
             //
         }
 
+        /**
+         * Open a source file, honoring the configured compression type and falling back to the
+         * compression detected from the content when none is configured.
+         *
+         * @param fileName the file to open
+         * @return a reader over the decompressed content
+         * @throws IOException if the file cannot be opened or read
+         */
+        private BufferedReader openReader(String fileName)
+                throws IOException
+        {
+            if (StringUtils.isBlank(compress)) {
+                return FileHelper.readCompressFile(fileName, encoding, Constant.DEFAULT_BUFFER_SIZE);
+            }
+            InputStream input = new BufferedInputStream(Files.newInputStream(Paths.get(fileName)));
+            try {
+                return StorageReaderUtil.createBufferedReader(input, compress, encoding, Constant.DEFAULT_BUFFER_SIZE);
+            }
+            catch (CompressorException e) {
+                input.close();
+                throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
+                        "The compress algorithm [" + compress + "] is unsupported yet", e);
+            }
+        }
+
         @Override
         public void startRead(RecordSender recordSender)
         {
             LOG.debug("begin to read source files...");
-            FileInputStream fileInputStream;
-            BufferedReader reader = null;
             for (String fileName : this.sourceFiles) {
                 LOG.info("reading file : [{}]", fileName);
-                try {
-                    fileInputStream = new FileInputStream(fileName);
-                }
-                catch (FileNotFoundException e) {
-                    // warn: the socket file can not be read, it may affect the transmission of all files, the user needs to ensure it by himself
-                    String message = String.format("The file %s not found", fileName);
-                    LOG.error(message);
-                    throw AddaxException.asAddaxException(CONFIG_ERROR, message);
-                }
-                try {
-                    if (compressType != null) {
-                        if ("zip".equalsIgnoreCase(compressType)) {
-                            ZipCycleInputStream zis = new ZipCycleInputStream(fileInputStream);
-                            reader = new BufferedReader(new InputStreamReader(zis, encoding), Constant.DEFAULT_BUFFER_SIZE);
-                        }
-                        else {
-                            BufferedInputStream bis = new BufferedInputStream(fileInputStream);
-                            CompressorInputStream input = new CompressorStreamFactory().createCompressorInputStream(bis);
-                            reader = new BufferedReader(new InputStreamReader(input, encoding), Constant.DEFAULT_BUFFER_SIZE);
-                        }
-                    }
-                    else {
-                        reader = new BufferedReader(new InputStreamReader(fileInputStream, encoding), Constant.DEFAULT_BUFFER_SIZE);
+                try (BufferedReader reader = openReader(fileName)) {
+                    long recordNum = singleLine
+                            ? parseJsonLines(reader, recordSender)
+                            : parseJsonDocument(reader, recordSender);
+                    if (recordNum == 0) {
+                        // an empty file and an index that matches nothing look the same here
+                        LOG.warn("No record was read from the file [{}], check that it holds data and that the indexes match its content",
+                                fileName);
                     }
                 }
-                catch (CompressorException | UnsupportedEncodingException e) {
-                    throw AddaxException.asAddaxException(IO_ERROR, e);
+                catch (IOException e) {
+                    throw AddaxException.asAddaxException(IO_ERROR,
+                            "Failed to read the file " + fileName, e);
                 }
-                if (multiline) {
-                    multilineJsonParse(reader, recordSender);
-                } else {
-                    singleJsonParse(reader, recordSender);
-                }
-                IOUtils.closeQuietly(reader, null);
             }
             LOG.debug("end reading source files...");
-        }
-
-        /**
-         * parse JSON Lines file
-         * each line is a json object
-         *
-         * @param reader {@link BufferedReader}
-         * @param recordSender {@link RecordSender}
-         */
-        private void multilineJsonParse(BufferedReader reader, RecordSender recordSender)
-        {
-            // read the content
-            String jsonLine;
-            try {
-                jsonLine = reader.readLine();
-                while (jsonLine != null) {
-                    List<Column> sourceLine = parseFromJson(jsonLine);
-                    transportOneRecord(recordSender, sourceLine);
-                    recordSender.flush();
-                    jsonLine = reader.readLine();
-                }
-            }
-            catch (IOException e) {
-                throw AddaxException.asAddaxException(IO_ERROR, e);
-            }
-        }
-
-        private void singleJsonParse(BufferedReader reader, RecordSender recordSender)
-        {
-            StringBuilder jsonBuffer = new StringBuilder();
-            String line;
-            try {
-                while ((line = reader.readLine()) != null) {
-                    jsonBuffer.append(line);
-                }
-            }
-            catch (IOException e) {
-                throw AddaxException.asAddaxException(IO_ERROR, e);
-            }
-
-            DocumentContext ctx = parse.parse(jsonBuffer.toString());
-            List<List<String>> jsonColumns = new ArrayList<>();
-            List<Column> sourceLine = new ArrayList<>();
-            int recordNum = -1;
-            List<String> placeHolder =  Collections.emptyList();
-            for (Configuration col: columns) {
-                if (col.getString(Key.VALUE) == null) {
-                    if (recordNum < 0) {
-                        List<String> jsonColumn = ctx.read(col.getString(Key.INDEX));
-                        recordNum = jsonColumn.size();
-                        jsonColumns.add(jsonColumn);
-                    } else {
-                        jsonColumns.add(ctx.read(col.getString(Key.INDEX)));
-                    }
-                } else {
-                    // the column use constant, mark it
-                    jsonColumns.add(placeHolder);
-                }
-            }
-            for (int i =0 ;i < recordNum; i++) {
-                for (int j=0; j < columns.size(); j++) {
-                    Configuration column = columns.get(j);
-                    if (jsonColumns.get(j).isEmpty()) {
-                        // use constant value
-                        sourceLine.add(getColumn(column.getString(Key.TYPE), column.getString(Key.VALUE), column.getString(Key.FORMAT)));
-                    } else {
-                        sourceLine.add(getColumn(column.getString(Key.TYPE), String.valueOf(jsonColumns.get(j).get(i)), column.getString(Key.FORMAT)));
-                    }
-                }
-                transportOneRecord(recordSender, sourceLine);
-                recordSender.flush();
-                sourceLine.clear();
-            }
         }
     }
 }

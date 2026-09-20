@@ -151,16 +151,19 @@ public final class StorageReaderUtil
 
     /**
      * Create a BufferedReader with appropriate compression handling.
+     * <p>
+     * A blank compress reads the stream as is, the caller has to detect the compression type itself
+     * in that case (see {@code FileHelper.readCompressFile}).
      *
      * @param inputStream the input stream
-     * @param compress compression type
+     * @param compress compression type, gzip/bz2 are accepted as aliases of gz/bzip2
      * @param encoding character encoding
      * @param bufferSize buffer size for the reader
      * @return BufferedReader with compression support
      * @throws IOException if stream creation fails
      * @throws CompressorException if compression is not supported
      */
-    private static BufferedReader createBufferedReader(InputStream inputStream, String compress,
+    public static BufferedReader createBufferedReader(InputStream inputStream, String compress,
             String encoding, int bufferSize)
             throws IOException, CompressorException
     {
