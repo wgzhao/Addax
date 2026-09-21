@@ -10,8 +10,12 @@ MOTO_PORT="${E2E_MOTO_PORT:-5111}"
 BUCKET="addax-e2e-s3"
 
 if ! command -v "$MOTO_PYTHON" >/dev/null 2>&1 ||
-        ! "$MOTO_PYTHON" -c 'import moto' >/dev/null 2>&1; then
-    echo "220_s3reader_objects: $MOTO_PYTHON cannot import moto" >&2
+        ! "$MOTO_PYTHON" -c 'import moto' 2>"$E2E_CASE_WORK/moto-import.err"; then
+    echo "s3reader case: $MOTO_PYTHON cannot import moto" >&2
+    # The reason matters: a module that is installed but fails to import (an incompatible
+    # dependency, a path that is not on sys.path) is a different problem from one that is
+    # not installed at all, and swallowing it here hides which of the two it is.
+    cat "$E2E_CASE_WORK/moto-import.err" >&2
     echo "  install it with: pip install 'moto[server]'" >&2
     echo "  or point E2E_MOTO_PYTHON at an interpreter that has it" >&2
     exit 77

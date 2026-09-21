@@ -92,14 +92,21 @@ jobs:
 
       # The object store case reads from moto, a python S3 test double, in place of a
       # container. Without it that case skips itself instead of failing, so this step is
-      # what decides whether its assertions run here at all.
+      # what decides whether its assertions run here at all. It installs into a virtualenv
+      # and names it, which is the setup the case is verified with locally: a `--user`
+      # install lands in a site-packages the interpreter of the run step did not see.
       - name: Install the S3 test double
-        run: python3 -m pip install 'moto[server]'
+        run: |
+          python3 -m venv /tmp/moto-venv
+          /tmp/moto-venv/bin/pip install --quiet 'moto[server]'
+          /tmp/moto-venv/bin/python -c 'import moto; print("moto", moto.__version__)'
 
       - name: Start databases
         run: e2e/start-db.sh --dbs mysql,postgres
 
       - name: Run E2E cases
+        env:
+          E2E_MOTO_PYTHON: /tmp/moto-venv/bin/python
         run: e2e/run.sh --dbs mysql,postgres ${{ github.event.inputs.cases || '' }}
 
       # The suite writes a summary table to $GITHUB_STEP_SUMMARY as well; this is the
