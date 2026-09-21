@@ -49,6 +49,9 @@ public class S3Writer
     {
         private static final Logger LOG = LoggerFactory.getLogger(Job.class);
 
+        /** One delete request carries this many keys at most, a longer list has to be batched. */
+        private static final int MAX_DELETE_KEYS = 1000;
+
         private Configuration writerSliceConfig = null;
         private S3Client s3Client = null;
 
@@ -110,11 +113,13 @@ public class S3Writer
             String object = this.writerSliceConfig.getString(S3Key.OBJECT);
             String bucket = this.writerSliceConfig.getString(S3Key.BUCKET);
             String objectName = object;
-            String objectSuffix = null;
-            // if the object has a suffix, it should separate the object name
-            if (object.contains(".")) {
-                objectName = object.split("\\.", -1)[0];
-                objectSuffix = "." + object.split("\\.", -1)[1];
+            String objectSuffix = "";
+            // the suffix is what follows the last dot of the name, so `report.2024.csv` keeps its
+            // extension instead of turning into `report_<uuid>.2024`
+            int suffixAt = suffixIndex(object);
+            if (suffixAt > 0) {
+                objectName = object.substring(0, suffixAt);
+                objectSuffix = object.substring(suffixAt);
             }
             Set<String> allObjects = new HashSet<>();
             for (S3Object obj : listObjects(bucket, object)) {
@@ -152,9 +157,10 @@ public class S3Writer
         private List<S3Object> listObjects(String bucket, String objectName)
         {
             String suffix = null;
-            if (objectName.contains(".")) {
-                suffix = "." + objectName.split("\\.", -1)[1];
-                objectName = objectName.split("\\.", -1)[0];
+            int suffixAt = suffixIndex(objectName);
+            if (suffixAt > 0) {
+                suffix = objectName.substring(suffixAt);
+                objectName = objectName.substring(0, suffixAt);
             }
             ListObjectsV2Request listObjects = ListObjectsV2Request
                     .builder()
@@ -162,19 +168,32 @@ public class S3Writer
                     .prefix(objectName)
                     .build();
 
-            ListObjectsV2Response res = s3Client.listObjectsV2(listObjects);
-
-            List<S3Object> objects = res.contents();
             List<S3Object> result = new ArrayList<>();
-            for (S3Object obj : objects) {
-                if (suffix == null) {
-                    result.add(obj);
-                }
-                else if (obj.key().endsWith(suffix)) {
-                    result.add(obj);
+            // every page: a bucket returns 1000 keys at a time, and a check against the first page
+            // alone misses the conflict of the thousandth and first object
+            for (ListObjectsV2Response res : s3Client.listObjectsV2Paginator(listObjects)) {
+                for (S3Object obj : res.contents()) {
+                    if (suffix == null || obj.key().endsWith(suffix)) {
+                        result.add(obj);
+                    }
                 }
             }
             return result;
+        }
+
+        /**
+         * The position of the dot that separates the suffix of an object name, or -1 when the name
+         * has none. A dot in a directory name is not a suffix, and the last dot is the one that
+         * counts: S3 keys are flat, but a key written as {@code data/report.2024.csv} is meant to
+         * keep the name it was given.
+         *
+         * @param object the object name
+         * @return the position of the dot, -1 when there is no suffix
+         */
+        private static int suffixIndex(String object)
+        {
+            int dot = object.lastIndexOf('.');
+            return dot > object.lastIndexOf('/') ? dot : -1;
         }
 
         /**
@@ -186,9 +205,10 @@ public class S3Writer
         private void deleteBucketObjects(String bucket, String objectName)
         {
             List<S3Object> objects = listObjects(bucket, objectName);
-            ArrayList<ObjectIdentifier> toDelete = new ArrayList<>();
-            if (!objects.isEmpty()) {
-                for (S3Object obj : objects) {
+            // a delete request carries at most 1000 keys, a longer list has to be sent in batches
+            for (int i = 0; i < objects.size(); i += MAX_DELETE_KEYS) {
+                List<ObjectIdentifier> toDelete = new ArrayList<>();
+                for (S3Object obj : objects.subList(i, Math.min(i + MAX_DELETE_KEYS, objects.size()))) {
                     toDelete.add(ObjectIdentifier.builder().key(obj.key()).build());
                 }
                 try {
