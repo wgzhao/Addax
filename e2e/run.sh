@@ -99,6 +99,17 @@ select_cases() { # prints one case directory per line
     done
 }
 
+# Whether any case of the selection asks for a database, which is what decides if a
+# container runtime is needed at all. Reads the file select_cases wrote, so it sees the
+# selection rather than the globs.
+selected_cases_need_db() { # case_list_file
+    local dir
+    while IFS= read -r dir; do
+        [ -n "$(read_case_env "$dir" DBS)" ] && return 0
+    done <"$1"
+    return 1
+}
+
 # --- running one case --------------------------------------------------------
 
 verify_case() { # case_dir
@@ -170,7 +181,13 @@ DBS=...); a directory without it is not a case."
     done
 
     if [ -f "$case_dir/setup.sh" ]; then
-        ( . "$case_dir/setup.sh" ) || die "setup.sh failed"
+        local setup_rc=0
+        ( . "$case_dir/setup.sh" ) || setup_rc=$?
+        # 77 is how a case says it cannot run here: an optional dependency (the S3 test
+        # double, for one) is missing. A missing optional dependency is not a failure of
+        # the change under test, so the case is skipped rather than failed.
+        [ "$setup_rc" -eq 77 ] && return 77
+        [ "$setup_rc" -eq 0 ] || die "setup.sh failed"
     fi
 
     build_addax_params
@@ -205,12 +222,6 @@ set -a
 . "${SCRIPT_DIR}/db.env"
 set +a
 
-# After db.env (which supplies the container names) and before any JDBC URL is
-# built: the container runtime reaches its databases at the container's own
-# address rather than through a published port.
-rt_detect
-rt_apply_endpoints
-
 ADDAX_HOME="$(resolve_addax_home)" || die "no Addax distribution found.
 Build one first:
   mvn -B -T 1C clean package -DskipTests -Dgpg.skip=true
@@ -221,12 +232,6 @@ export ADDAX_HOME
 
 mkdir -p "$E2E_WORK_DIR"
 
-for db in $DB_FILTER; do
-    db_container "$db" >/dev/null || die "--dbs lists an unknown database: $db"
-    db_ready "$db" || die "$db is not reachable. Start the databases first:
-  ./e2e/start-db.sh --dbs ${DB_FILTER// /,}"
-done
-
 CASE_LIST_FILE="${E2E_WORK_DIR}/cases.txt"
 select_cases >"$CASE_LIST_FILE"
 
@@ -234,8 +239,27 @@ if [ ! -s "$CASE_LIST_FILE" ]; then
     die "no cases selected (globs: ${CASE_GLOBS[*]:-<none>}, dbs: ${DB_FILTER:-<any>})"
 fi
 
+# The container runtime is only needed for the cases that ask for a database: the file and
+# object store cases run against nothing but the distribution, and a machine without Docker
+# can run those. A run that selects database cases takes the path it always took.
+if selected_cases_need_db "$CASE_LIST_FILE"; then
+    # After db.env (which supplies the container names) and before any JDBC URL is
+    # built: the container runtime reaches its databases at the container's own
+    # address rather than through a published port.
+    rt_detect
+    rt_apply_endpoints
+
+    for db in $DB_FILTER; do
+        db_container "$db" >/dev/null || die "--dbs lists an unknown database: $db"
+        db_ready "$db" || die "$db is not reachable. Start the databases first:
+  ./e2e/start-db.sh --dbs ${DB_FILTER// /,}"
+    done
+else
+    log "no selected case needs a database, the container runtime stays unused"
+fi
+
 log "ADDAX_HOME: $ADDAX_HOME"
-log "runtime:    $E2E_RUNTIME"
+log "runtime:    ${E2E_RUNTIME:-none}"
 log "work dir:   $E2E_WORK_DIR"
 
 # The case list is read from fd 3, not fd 0: anything a case runs (a database client,
@@ -246,14 +270,20 @@ while IFS= read -r case_dir <&3; do
     expected_fail="$(read_case_env "$case_dir" EXPECTED_FAIL)"
     start=$SECONDS
     result=PASS
-    if ! ( run_case "$case_dir" ); then
+    rc=0
+    ( run_case "$case_dir" ) || rc=$?
+    if [ "$rc" -eq 77 ]; then
+        result=SKIP
+    elif [ "$rc" -ne 0 ]; then
         if [ -n "$expected_fail" ]; then result=XFAIL; else result=FAIL; fi
     elif [ -n "$expected_fail" ]; then
         result=XPASS
     fi
     elapsed=$((SECONDS - start))
 
-    if [ "$result" = XFAIL ]; then
+    if [ "$result" = SKIP ]; then
+        log "  SKIP: a dependency of this case is missing here (see the log above for which one)"
+    elif [ "$result" = XFAIL ]; then
         log "  XFAIL (known defect): ${expected_fail}"
     elif [ "$result" = XPASS ]; then
         log "  XPASS: this case is marked EXPECTED_FAIL but passed -- the defect is fixed,"

@@ -74,6 +74,10 @@ build_addax_params() {
     append_param postgres_jdbc_url "$(db_jdbc_url postgres)"
 
     append_param e2e_out_dir "$E2E_CASE_OUT"
+
+    # The S3 test double the object store cases run against. Its port is the same variable
+    # the case setup starts it on, so the job and the server cannot drift apart.
+    append_param s3_endpoint "http://127.0.0.1:${E2E_MOTO_PORT:-5111}"
 }
 
 # Run one job file. The job path is a positional argument: `-job x.json` is NOT

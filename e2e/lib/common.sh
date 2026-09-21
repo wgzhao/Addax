@@ -80,7 +80,7 @@ record_result() { # name, result, seconds, verify
 }
 
 print_summary() {
-    local total=${#CASE_NAMES[@]} passed=0 failed=0 xfailed=0 xpassed=0 i name
+    local total=${#CASE_NAMES[@]} passed=0 failed=0 xfailed=0 xpassed=0 skipped=0 i name
 
     if [ "$total" -eq 0 ]; then
         log "no cases ran"
@@ -94,6 +94,7 @@ print_summary() {
             PASS) passed=$((passed + 1)) ;;
             XFAIL) xfailed=$((xfailed + 1)) ;;
             XPASS) xpassed=$((xpassed + 1)) ;;
+            SKIP) skipped=$((skipped + 1)) ;;
             *) failed=$((failed + 1)) ;;
         esac
         name="${CASE_NAMES[$i]}"
@@ -103,12 +104,13 @@ print_summary() {
     done
     printf '%s\n' '-------------------------------------------------------------------------'
     printf '%d run, %d passed, %d failed' "$total" "$passed" "$failed"
+    [ "$skipped" -gt 0 ] && printf ', %d skipped (a dependency is missing)' "$skipped"
     [ "$xfailed" -gt 0 ] && printf ', %d expected-failure' "$xfailed"
     [ "$xpassed" -gt 0 ] && printf ', %d unexpected-pass' "$xpassed"
     printf '\n'
 
     if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
-        write_step_summary "$total" "$passed" "$failed" "$xfailed" "$xpassed"
+        write_step_summary "$total" "$passed" "$failed" "$xfailed" "$xpassed" "$skipped"
     fi
 
     # A case that starts passing while still marked as an expected failure is a
@@ -118,7 +120,7 @@ print_summary() {
 
 # The E2E job is not a required check, so the step summary is the main way a
 # reviewer notices a red case without opening the log.
-write_step_summary() { # total, passed, failed, xfailed, xpassed
+write_step_summary() { # total, passed, failed, xfailed, xpassed, skipped
     {
         printf '## Addax E2E\n\n'
         if [ "$3" -eq 0 ] && [ "$5" -eq 0 ]; then
@@ -134,6 +136,10 @@ write_step_summary() { # total, passed, failed, xfailed, xpassed
         if [ "$5" -gt 0 ]; then
             printf '**%d** case(s) marked as an expected failure now PASS. Remove the\n' "$5"
             printf '`EXPECTED_FAIL` marker from `case.env` so the fix is protected.\n\n'
+        fi
+        if [ "${6:-0}" -gt 0 ]; then
+            printf '**%d** case(s) were skipped because a dependency of theirs is missing here.\n' "$6"
+            printf 'The S3 case needs `moto[server]`; see the Requirements section of `e2e/README.md`.\n\n'
         fi
         printf '| Case | Verify | Time | Result |\n|---|---|---|---|\n'
         local i
