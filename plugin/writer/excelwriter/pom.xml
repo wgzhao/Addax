@@ -39,9 +39,23 @@
             <artifactId>addax-core</artifactId>
         </dependency>
 
+        <!-- imported directly by the writer, so it is declared instead of relying on poi-ooxml -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+        </dependency>
+
+        <!-- poi logs through the log4j api, this routes it to the slf4j backend addax already runs -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
+            <artifactId>log4j-to-slf4j</artifactId>
+            <exclusions>
+                <!-- the slf4j api comes from the addax classpath, a second copy would split the backend -->
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
