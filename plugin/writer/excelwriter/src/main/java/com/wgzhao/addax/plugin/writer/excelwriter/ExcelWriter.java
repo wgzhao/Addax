@@ -164,6 +164,14 @@ public class ExcelWriter
                 //name of the zip entry holding sheet data, e.g. /xl/worksheets/sheet1.xml
                 String sheetRef = sheet.getPackagePart().getPartName().getName().substring(1);
 
+                // set date format, before the template is written: the style is defined in the
+                // template's styles part, so a style created afterwards leaves the s= attribute the
+                // date cells carry pointing at an index the package does not define
+                CellStyle dateStyle = workbook.createCellStyle();
+                CreationHelper createHelper = workbook.getCreationHelper();
+                dateStyle.setDataFormat(createHelper.createDataFormat().getFormat(DEFAULT_DATE_FORMAT));
+                int dateStyleIndex = dateStyle.getIndex();
+
                 Path template = writeTemplate(workbook);
                 // The temp file sits next to the target so the finished file can replace the old one in
                 // one step. Its name is built here and not by createTempFile, which would make the file
@@ -173,7 +181,7 @@ public class ExcelWriter
                 try {
                     try (OutputStream out = Files.newOutputStream(tmp, StandardOpenOption.CREATE_NEW,
                             StandardOpenOption.WRITE)) {
-                        writeWorkbook(template, sheetRef, out, workbook, lineReceiver);
+                        writeWorkbook(template, sheetRef, out, dateStyleIndex, lineReceiver);
                     }
                     keepPermissions(targetFile, tmp);
                     replace(tmp, targetFile);
@@ -213,7 +221,7 @@ public class ExcelWriter
          * @param out the stream to write the result to
          */
         private void writeWorkbook(Path template, String sheetEntry, OutputStream out,
-                XSSFWorkbook workbook, RecordReceiver lineReceiver)
+                int dateStyleIndex, RecordReceiver lineReceiver)
                 throws IOException
         {
             try (ZipFile zip = ZipFile.builder().setPath(template).get();
@@ -233,7 +241,7 @@ public class ExcelWriter
                 zos.putArchiveEntry(new ZipArchiveEntry(sheetEntry));
                 // only flush: closing the writer would close the zip entry stream as well
                 java.io.Writer writer = new OutputStreamWriter(zos, StandardCharsets.UTF_8);
-                fillData(writer, lineReceiver, workbook);
+                fillData(writer, lineReceiver, dateStyleIndex);
                 writer.flush();
                 zos.closeArchiveEntry();
             }
@@ -282,7 +290,7 @@ public class ExcelWriter
             }
         }
 
-        private void fillData(java.io.Writer writer, RecordReceiver lineReceiver, XSSFWorkbook workbook)
+        private void fillData(java.io.Writer writer, RecordReceiver lineReceiver, int dateStyleIndex)
                 throws IOException
         {
             SpreadsheetWriter sw = new SpreadsheetWriter(writer);
@@ -297,11 +305,6 @@ public class ExcelWriter
                 }
                 sw.endRow();
             }
-            // set date format
-            CellStyle dateStyle = workbook.createCellStyle();
-            CreationHelper createHelper = workbook.getCreationHelper();
-            dateStyle.setDataFormat(createHelper.createDataFormat().getFormat(DEFAULT_DATE_FORMAT));
-            int dateStyleIndex = dateStyle.getIndex();
             // one calendar for every date cell, a fresh one per cell is pure garbage
             Calendar calendar = LocaleUtil.getLocaleCalendar();
             Record record;
@@ -315,6 +318,7 @@ public class ExcelWriter
                         continue;
                     }
                     switch (column.getType()) {
+                        // the long is widened to the double Excel stores, so a value above 2^53 rounds
                         case INT, LONG -> sw.createCell(i, column.asLong());
                         case DOUBLE -> writeDouble(sw, i, column);
                         case BOOL -> sw.createCell(i, Boolean.TRUE.equals(column.asBoolean()));
