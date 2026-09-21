@@ -49,6 +49,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -126,8 +127,17 @@ public final class StorageReaderUtil
 
         int bufferSize = readerSliceConfig.getInt(Key.BUFFER_SIZE, Constant.DEFAULT_BUFFER_SIZE);
 
+        // A stream that starts with a compression magic is not text: reading it as text hands the
+        // job a record of binary noise and reports success. The stream says what it is, so the job
+        // does not have to name the algorithm; an explicit compress still wins.
+        InputStream source = inputStream;
+        if (StringUtils.isBlank(compress)) {
+            source = new BufferedInputStream(inputStream, bufferSize);
+            compress = detectCompress(source, fileName);
+        }
+
         // Process with compression support
-        try (BufferedReader reader = createBufferedReader(inputStream, compress, encoding, bufferSize)) {
+        try (BufferedReader reader = createBufferedReader(source, compress, encoding, bufferSize)) {
             doReadFromStream(reader, fileName, readerSliceConfig, recordSender, taskPluginCollector);
         }
         catch (UnsupportedEncodingException uee) {
@@ -150,10 +160,44 @@ public final class StorageReaderUtil
     }
 
     /**
+     * Detect the compression of a stream from its leading bytes, falling back to what the file name
+     * ends with for the algorithms the magic does not name (lzo, for example). Mirrors the detection
+     * {@code FileHelper.readCompressFile} does for the files that are read from a local disk.
+     *
+     * @param inputStream the stream to look at, it must support mark and reset
+     * @param fileName the name of the file, used when the bytes say nothing
+     * @return the name of the compression, "none" when the stream is not compressed
+     */
+    private static String detectCompress(InputStream inputStream, String fileName)
+    {
+        try {
+            String detected = CompressorStreamFactory.detect(inputStream);
+            LOG.info("The file [{}] is compressed with [{}], read from its first bytes", fileName, detected);
+            return detected;
+        }
+        catch (CompressorException e) {
+            // the magic of these two is not known to commons-compress, the name is all there is
+            String name = StringUtils.defaultString(fileName).toLowerCase(Locale.ROOT);
+            String byName = null;
+            if (name.endsWith(".zip")) {
+                byName = COMPRESS_ZIP;
+            }
+            else if (name.endsWith(".lzo") || name.endsWith(".lzop")) {
+                byName = COMPRESS_LZO;
+            }
+            if (byName != null) {
+                LOG.info("The file [{}] is compressed with [{}], read from its name", fileName, byName);
+                return byName;
+            }
+            return COMPRESS_NONE;
+        }
+    }
+
+    /**
      * Create a BufferedReader with appropriate compression handling.
      * <p>
      * A blank compress reads the stream as is, the caller has to detect the compression type itself
-     * in that case (see {@code FileHelper.readCompressFile}).
+     * in that case (see {@link #detectCompress(InputStream, String)}).
      *
      * @param inputStream the input stream
      * @param compress compression type, gzip/bz2 are accepted as aliases of gz/bzip2
