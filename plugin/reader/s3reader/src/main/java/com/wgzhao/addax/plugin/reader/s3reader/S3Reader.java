@@ -42,6 +42,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
@@ -77,6 +78,15 @@ public class S3Reader
             readerOriginConfig.getNecessaryValue(S3Key.ACCESS_KEY, REQUIRED_VALUE);
             this.bucket = readerOriginConfig.getNecessaryValue(S3Key.BUCKET, REQUIRED_VALUE);
             readerOriginConfig.getNecessaryValue(S3Key.OBJECT, REQUIRED_VALUE);
+
+            // Every reader of this kind hands its input to the CSV parser. The key belongs to the
+            // writer side, so a job that sets it to json or parquet would otherwise have its data
+            // parsed as CSV without a word about it.
+            String fileFormat = readerOriginConfig.getString(S3Key.FILE_FORMAT, null);
+            if (fileFormat != null && !"csv".equalsIgnoreCase(fileFormat) && !"text".equalsIgnoreCase(fileFormat)) {
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                        String.format("The file format [%s] is not supported, this reader reads csv and text", fileFormat));
+            }
 
             // Encoding, fieldDelimiter and column layout are shared with every other file
             // reader; keeping a private copy here let the three validations drift apart.
@@ -154,22 +164,15 @@ public class S3Reader
                     .prefix(prefix)
                     .build();
 
-            ListObjectsV2Response listObjectsV2Response;
             List<String> remoteObjects = new ArrayList<>();
-            do {
-                listObjectsV2Response = client.listObjectsV2(listObjectsV2Request);
-
-                for (S3Object s3Object : listObjectsV2Response.contents()) {
+            // the paginator walks every page, a bucket returns 1000 keys at a time
+            for (ListObjectsV2Response response : client.listObjectsV2Paginator(listObjectsV2Request)) {
+                for (S3Object s3Object : response.contents()) {
                     if (compiledPattern.matcher(s3Object.key()).matches()) {
                         remoteObjects.add(s3Object.key());
                     }
                 }
-
-                listObjectsV2Request = listObjectsV2Request.toBuilder()
-                        .continuationToken(listObjectsV2Response.nextContinuationToken())
-                        .build();
             }
-            while (listObjectsV2Response.isTruncated());
 
             return remoteObjects;
         }

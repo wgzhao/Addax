@@ -32,9 +32,18 @@ import java.net.URISyntaxException;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 
-/** S3 Util. */
-public class S3Util
+/**
+ * S3 Util.
+ *
+ * <p>The writer carries a copy of this class, since each plugin is packaged on its own. Keep the
+ * two in step.
+ */
+public final class S3Util
 {
+    private S3Util()
+    {
+    }
+
     /** Inits3client. */
     public static S3Client initS3Client(Configuration conf) {
         String regionStr = conf.getString(S3Key.REGION);
