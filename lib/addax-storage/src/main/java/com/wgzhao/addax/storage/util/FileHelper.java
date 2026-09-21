@@ -296,13 +296,17 @@ public final class FileHelper
 
         try {
             Path path = Paths.get(wildcardPath);
-            Path dir = path.getParent();
-            String globPattern = path.getFileName().toString();
+            // A pattern without a directory part names the file in the working directory, the way a
+            // shell reads it: getParent() is null for "*.csv" and the listing used to come back
+            // empty with only an error in the log.
+            Path dir = path.toAbsolutePath().getParent();
+            Path fileName = path.getFileName();
 
-            if (dir == null) {
-                LOG.error("Invalid wildcard path (no parent directory): {}", wildcardPath);
+            if (dir == null || fileName == null) {
+                LOG.error("Invalid wildcard path (no directory or no pattern): {}", wildcardPath);
                 return result;
             }
+            String globPattern = fileName.toString();
 
             if (!Files.exists(dir)) {
                 LOG.warn("Directory does not exist: {}", dir);
