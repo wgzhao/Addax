@@ -90,6 +90,12 @@ jobs:
           mvn -B -V -T 1 package -Pdistribution
           ls -d target/addax-*/
 
+      # The object store case reads from moto, a python S3 test double, in place of a
+      # container. Without it that case skips itself instead of failing, so this step is
+      # what decides whether its assertions run here at all.
+      - name: Install the S3 test double
+        run: python3 -m pip install 'moto[server]'
+
       - name: Start databases
         run: e2e/start-db.sh --dbs mysql,postgres
 

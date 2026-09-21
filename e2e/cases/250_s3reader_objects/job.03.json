@@ -1,0 +1,47 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 1
+      },
+      "errorLimit": {
+        "record": 0
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "s3reader",
+          "parameter": {
+            "endpoint": "${s3_endpoint}",
+            "region": "us-east-1",
+            "accessId": "e2e",
+            "accessKey": "e2e",
+            "pathStyleAccessEnabled": true,
+            "bucket": "addax-e2e-s3",
+            "object": [
+              "data/gz.csv.gz",
+              "other/plain.csv"
+            ],
+            "column": [
+              "*"
+            ],
+            "fieldDelimiter": ","
+          }
+        },
+        "writer": {
+          "name": "txtfilewriter",
+          "parameter": {
+            "path": "${e2e_out_dir}",
+            "fileName": "mixed",
+            "fileFormat": "csv",
+            "writeMode": "truncate",
+            "fieldDelimiter": ",",
+            "nullFormat": "<null>",
+            "encoding": "UTF-8"
+          }
+        }
+      }
+    ]
+  }
+}

@@ -15,7 +15,13 @@ handling and exit codes.
 
 - JDK 17 on `PATH` (the launcher enforces it)
 - A built distribution: `target/addax-<version>/`
-- A container runtime: Docker, or Apple's `container` on macOS
+- A container runtime: Docker, or Apple's `container` on macOS — only for the cases that
+  read or write a database. A selection of file and object store cases runs without one.
+- Python with `moto[server]` for the S3 case (`pip install 'moto[server]'`); that case
+  asks to be skipped when the interpreter cannot import it, and `E2E_MOTO_PYTHON` points
+  the case at a different interpreter (a virtualenv, usually). It starts the test double
+  on `E2E_MOTO_PORT` (5111 by default) when nothing is listening there yet and leaves it
+  running, so consecutive runs reuse it.
 
 ## Quick start
 
@@ -86,7 +92,7 @@ Adding a case means adding a directory under `cases/`. Nothing else needs editin
 |---|---|---|
 | `case.env` | yes | `DBS="mysql postgres"` (which databases are needed), `SRC_DB`, `DST_DB` |
 | `job.json` or `job.NN.json` | yes | one job, or several executed in `sort -V` order (round-trip cases need two) |
-| `setup.sh` | no | runs after the fixture reset, before the first job. Sourced, so it sees `$E2E_CASE_OUT`, `$CASE_DIR` |
+| `setup.sh` | no | runs after the fixture reset, before the first job. Sourced, so it sees `$E2E_CASE_OUT`, `$CASE_DIR`. Exiting 77 asks the runner to skip the case (an optional dependency is missing) instead of failing it |
 | `verify.sh` | no* | sourced on top of `lib/*.sh`; non-zero means the case failed |
 | `verify.<db>.sql` | no* | declarative: run against `<db>`, compared with a golden file |
 | `expect.txt` / `expect.<db>.txt` | no | the golden file |
@@ -261,6 +267,7 @@ In CI the whole work directory is uploaded as the `e2e-logs` artifact on failure
 | 150_postgresql_datetime_tz | postgresqlreader | postgresqlwriter | same, run with a JVM zone 8 hours from UTC |
 | 160_mysql_datetime_to_txt | mysqlreader | txtfilewriter | writer-level `dateFormat` rendering |
 | 170_mysql_datetime_to_postgresql | mysqlreader | postgresqlwriter | the same values across dialects |
+| 250_s3reader_objects | s3reader | txtfilewriter | object patterns (literal `.` and `+`), duplicate names, gzip detection, against moto |
 
 The fixture behind all of them is six rows carrying the values that readers and writers
 actually get wrong: CJK, an embedded delimiter and double quote, a backslash, leading
