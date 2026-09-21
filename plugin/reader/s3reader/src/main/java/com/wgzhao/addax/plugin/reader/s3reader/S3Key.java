@@ -22,8 +22,12 @@ package com.wgzhao.addax.plugin.reader.s3reader;
 import com.wgzhao.addax.core.base.Key;
 
 /** S3 Key configuration keys. */
-public class S3Key extends Key
+public final class S3Key extends Key
 {
+    private S3Key()
+    {
+    }
+
     /** Region. */
     public static final String REGION = "region";
 
