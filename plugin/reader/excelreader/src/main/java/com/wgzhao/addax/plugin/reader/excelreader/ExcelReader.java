@@ -31,10 +31,14 @@ import com.wgzhao.addax.storage.util.FileHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
 /** Excel Reader. */
@@ -45,7 +49,6 @@ public class ExcelReader
     public static class Job
             extends Reader.Job
     {
-
         private static final Logger LOG = LoggerFactory.getLogger(Job.class);
 
         private Configuration originConfig = null;
@@ -55,19 +58,14 @@ public class ExcelReader
         public void init()
         {
             this.originConfig = this.getPluginJobConf();
-            // Compatible with the old version, path is a string before
-            String pathInString = this.originConfig.getNecessaryValue(Key.PATH, REQUIRED_VALUE);
-            List<String> path;
-            if (!pathInString.startsWith("[") && !pathInString.endsWith("]")) {
-                path = new ArrayList<>();
-                path.add(pathInString);
+            // the path is either one string or a list of them, the string form came first
+            Object pathValue = this.originConfig.get(Key.PATH);
+            if (pathValue == null || String.valueOf(pathValue).isBlank()) {
+                throw AddaxException.asAddaxException(REQUIRED_VALUE, "The required item 'path' is not found");
             }
-            else {
-                path = this.originConfig.getList(Key.PATH, String.class);
-                if (null == path || path.isEmpty()) {
-                    throw AddaxException.asAddaxException(REQUIRED_VALUE, "the path is required");
-                }
-            }
+            List<String> path = pathValue instanceof List<?> list
+                    ? list.stream().map(String::valueOf).toList()
+                    : List.of(String.valueOf(pathValue));
 
             this.sourceFiles = FileHelper.buildSourceTargets(path);
             if (sourceFiles.isEmpty()) {
@@ -109,21 +107,30 @@ public class ExcelReader
         private static final Logger LOG = LoggerFactory.getLogger(Task.class);
 
         private List<String> sourceFiles;
-        private boolean header = false;
-        private int skipRows = 0;
+        private ExcelHelper.Options options;
 
         @Override
         public void init()
         {
             Configuration readerSliceConfig = this.getPluginJobConf();
             this.sourceFiles = readerSliceConfig.getList(Key.SOURCE_FILES, String.class);
-            this.header = readerSliceConfig.getBool("header", false);
-            if (this.header) {
+            boolean header = readerSliceConfig.getBool(Key.HEADER, false);
+            int skipRows = readerSliceConfig.getInt("skipRows", 0);
+            boolean trim = readerSliceConfig.getBool("trim", true);
+            String sheetName = readerSliceConfig.getString("sheetName", null);
+            int sheetIndex = readerSliceConfig.getInt("sheetIndex", 0);
+            if (sheetName != null && sheetName.isBlank()) {
+                sheetName = null;
+            }
+            if (sheetName == null && sheetIndex < 0) {
+                throw AddaxException.asAddaxException(CONFIG_ERROR, "sheetIndex must not be negative");
+            }
+            this.options = new ExcelHelper.Options(header, skipRows, trim, sheetName, sheetIndex);
+            if (header) {
                 LOG.info("The first row is skipped as a table header");
             }
-            this.skipRows = readerSliceConfig.getInt("skipRows", 0);
-            if (this.skipRows > 0) {
-                LOG.info("The first {} rows is skipped", this.skipRows);
+            if (skipRows > 0) {
+                LOG.info("The first {} rows are skipped", skipRows);
             }
         }
 
@@ -137,15 +144,23 @@ public class ExcelReader
         public void startRead(RecordSender recordSender)
         {
             for (String file : sourceFiles) {
-                LOG.info("begin read file {}", file);
-                ExcelHelper excelHelper = new ExcelHelper(header, skipRows);
-                excelHelper.open(file);
-                Record record = excelHelper.readLine(recordSender.createRecord());
-                while (record != null) {
-                    recordSender.sendToWriter(record);
-                    record = excelHelper.readLine(recordSender.createRecord());
+                Path path = Path.of(file);
+                try {
+                    // a directory beside the workbooks may hold anything, only a file that starts
+                    // with a workbook magic is worth opening
+                    if (!Files.isRegularFile(path) || !ExcelHelper.isExcel(path)) {
+                        LOG.warn("Skip {}, it is not an Excel file", file);
+                        continue;
+                    }
+                    LOG.info("Begin to read file {}", file);
+                    try (ExcelHelper helper = ExcelHelper.open(path, options)) {
+                        helper.read(recordSender::createRecord, recordSender::sendToWriter);
+                    }
                 }
-                excelHelper.close();
+                catch (IOException e) {
+                    throw AddaxException.asAddaxException(IO_ERROR,
+                            "Failed to read " + file + ": " + e.getMessage(), e);
+                }
             }
         }
     }

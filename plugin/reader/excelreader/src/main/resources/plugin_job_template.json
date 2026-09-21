@@ -3,6 +3,9 @@
   "parameter": {
     "path": [],
     "header": false,
-    "skipRows": 0
+    "skipRows": 0,
+    "trim": true,
+    "sheetIndex": 0,
+    "sheetName": ""
   }
 }
