@@ -24,6 +24,7 @@ import com.wgzhao.addax.core.plugin.RecordSender;
 import com.wgzhao.addax.core.spi.Reader;
 import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.storage.reader.StorageReaderUtil;
+import com.wgzhao.addax.storage.util.FileHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -33,11 +34,15 @@ import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
@@ -94,7 +99,6 @@ public class S3Reader
             LOG.debug("split() begin...");
             List<Configuration> readerSplitConfigs = new ArrayList<>();
 
-            // 将每个单独的 object 作为一个 slice
             List<String> objects = parseOriginObjects(readerOriginConfig.getList(S3Key.OBJECT, String.class));
             if (objects.isEmpty()) {
                 throw AddaxException.asAddaxException(
@@ -105,42 +109,45 @@ public class S3Reader
                                 this.readerOriginConfig.get(S3Key.BUCKET)));
             }
 
-            for (String object : objects) {
+            // one task per object would build a client per object; grouping them the way the file
+            // readers group their files keeps one client per task and leaves the parallelism to
+            // the channel number
+            int splitNumber = Math.min(objects.size(), Math.max(adviceNumber, 1));
+            for (List<String> group : FileHelper.splitSourceFiles(objects, splitNumber)) {
                 Configuration splitConfig = this.readerOriginConfig.clone();
-                splitConfig.set(S3Key.OBJECT, object);
+                splitConfig.set(S3Key.OBJECT, group);
                 readerSplitConfigs.add(splitConfig);
-                LOG.info("S3 object to be read {}", object);
+                LOG.info("The objects to be read in one task: {}", group);
             }
             LOG.debug("split() ok and end...");
             return readerSplitConfigs;
         }
 
+        /** The objects to read, with every pattern replaced by the keys it matches. */
         private List<String> parseOriginObjects(List<String> originObjects)
         {
-            List<String> parsedObjects = new ArrayList<>();
-            for (String object : originObjects) {
-                if (object.indexOf('*') > -1 || object.indexOf('?') > -1) {
-                    List<String> remoteObjects = listObjectsWithPattern(object);
-                    parsedObjects.addAll(remoteObjects);
-                }
-                else {
-                    parsedObjects.add(object);
-                }
-            }
-            return parsedObjects;
+            return originObjects.stream()
+                    .flatMap(object -> isPattern(object)
+                            ? listObjectsWithPattern(object).stream()
+                            : Stream.of(object))
+                    // an exact name next to a pattern that covers it names the same object twice,
+                    // and reading it twice would duplicate its records in the result
+                    .distinct()
+                    .sorted()
+                    .toList();
+        }
+
+        private static boolean isPattern(String object)
+        {
+            return object.indexOf('*') > -1 || object.indexOf('?') > -1;
         }
 
         private List<String> listObjectsWithPattern(String pattern)
         {
-            // Extract the prefix from the pattern up to the first wildcard character
-            int firstWildcardIndex = Math.min(
-                    pattern.indexOf('*') == -1 ? pattern.length() : pattern.indexOf('*'),
-                    pattern.indexOf('?') == -1 ? pattern.length() : pattern.indexOf('?')
-            );
-            String prefix = pattern.substring(0, firstWildcardIndex);
-            // Convert the pattern to a regex
-            String regex = pattern.replace("?", ".{1}").replace("*", ".*");
-            Pattern compiledPattern = Pattern.compile(regex);
+            // S3 lists by a literal prefix only, the part before the first wildcard narrows the
+            // listing down
+            String prefix = pattern.substring(0, firstWildcard(pattern));
+            Pattern compiledPattern = toRegex(pattern);
 
             ListObjectsV2Request listObjectsV2Request = ListObjectsV2Request.builder()
                     .bucket(bucket)
@@ -166,6 +173,43 @@ public class S3Reader
 
             return remoteObjects;
         }
+
+        /** The position of the first wildcard, the length of the pattern when it has none. */
+        private static int firstWildcard(String pattern)
+        {
+            for (int i = 0; i < pattern.length(); i++) {
+                char ch = pattern.charAt(i);
+                if (ch == '*' || ch == '?') {
+                    return i;
+                }
+            }
+            return pattern.length();
+        }
+
+        /**
+         * The regular expression matching the keys of a pattern. Only {@code *} and {@code ?} are
+         * wildcards, everything else is a literal part of an object key: a dot, a plus sign or a
+         * bracket in a name must not be read as a regular expression, and a bracket that never
+         * closes would not even compile.
+         *
+         * @param pattern the object pattern
+         * @return the expression the keys are matched against
+         */
+        private static Pattern toRegex(String pattern)
+        {
+            StringBuilder regex = new StringBuilder(pattern.length() * 2);
+            int literalStart = 0;
+            for (int i = 0; i < pattern.length(); i++) {
+                char ch = pattern.charAt(i);
+                if (ch != '*' && ch != '?') {
+                    continue;
+                }
+                regex.append(Pattern.quote(pattern.substring(literalStart, i)));
+                regex.append(ch == '*' ? ".*" : ".");
+                literalStart = i + 1;
+            }
+            return Pattern.compile(regex.append(Pattern.quote(pattern.substring(literalStart))).toString());
+        }
     }
 
     /** Task. */
@@ -180,22 +224,35 @@ public class S3Reader
         public void startRead(RecordSender recordSender)
         {
             LOG.debug("Begin to start reading");
-            String object = readerSliceConfig.getString(S3Key.OBJECT);
-
-            GetObjectRequest s3Object = GetObjectRequest.builder()
-                    .bucket(readerSliceConfig.getString(S3Key.BUCKET))
-                    .key(object)
-                    .build();
+            List<String> objects = readerSliceConfig.getList(S3Key.OBJECT, String.class);
+            String bucketName = readerSliceConfig.getString(S3Key.BUCKET);
+            // one client for every object of the task: a client per object would repeat the
+            // connection pool and the TLS handshake for each of them
             try (S3Client client = S3Util.initS3Client(readerSliceConfig)) {
-                InputStream objectStream = client.getObject(s3Object);
-                StorageReaderUtil.readFromStream(objectStream, object,
-                        this.readerSliceConfig, recordSender,
-                        this.getTaskPluginCollector());
-                recordSender.flush();
+                for (String object : objects) {
+                    LOG.info("Begin to read object {}", object);
+                    GetObjectRequest request = GetObjectRequest.builder()
+                            .bucket(bucketName)
+                            .key(object)
+                            .build();
+                    try (InputStream objectStream = client.getObject(request)) {
+                        StorageReaderUtil.readFromStream(objectStream, object,
+                                this.readerSliceConfig, recordSender,
+                                this.getTaskPluginCollector());
+                    }
+                    catch (NoSuchKeyException e) {
+                        // the object was listed for this task and is gone now, an incomplete result
+                        // is worse than a job that says so
+                        throw AddaxException.asAddaxException(CONFIG_ERROR,
+                                String.format("The object '%s' does not exist in bucket '%s'", object, bucketName));
+                    }
+                    catch (IOException e) {
+                        throw AddaxException.asAddaxException(IO_ERROR,
+                                String.format("Failed to read the object '%s': %s", object, e.getMessage()), e);
+                    }
+                }
             }
-            catch (NoSuchKeyException e) {
-                LOG.warn("The object {} does not exists", object);
-            }
+            recordSender.flush();
         }
 
         @Override

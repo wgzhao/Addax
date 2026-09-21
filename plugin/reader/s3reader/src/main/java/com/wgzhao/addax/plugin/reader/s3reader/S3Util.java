@@ -25,8 +25,10 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.S3ClientBuilder;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 
@@ -40,18 +42,46 @@ public class S3Util
         String accessId = conf.getString(S3Key.ACCESS_ID);
         String accessKey = conf.getString(S3Key.ACCESS_KEY);
         boolean pathStyleAccessEnabled = conf.getBool(S3Key.PATH_STYLE_ACCESS_ENABLED, false);
+        String endpoint = conf.getString(S3Key.ENDPOINT);
 
         try {
             AwsBasicCredentials awsCreds = AwsBasicCredentials.create(accessId, accessKey);
-            return S3Client.builder()
+            S3ClientBuilder builder = S3Client.builder()
                     .credentialsProvider(StaticCredentialsProvider.create(awsCreds))
                     .region(region)
-                    .endpointOverride(URI.create(conf.getString(S3Key.ENDPOINT)))
-                    .forcePathStyle(pathStyleAccessEnabled)
-                    .build();
+                    .forcePathStyle(pathStyleAccessEnabled);
+            // the endpoint is optional: with the region alone the client resolves the AWS endpoint
+            // itself, an S3 compatible service has to name its own
+            if (endpoint != null && !endpoint.isBlank()) {
+                builder.endpointOverride(endpointUri(endpoint));
+            }
+            return builder.build();
         } catch (IllegalArgumentException e) {
             throw AddaxException.asAddaxException(
                     ILLEGAL_VALUE, e.getMessage());
         }
+    }
+
+    /**
+     * The endpoint of the service as an URI. An endpoint without a scheme cannot be reached, and
+     * the client would only fail later with it, so it is rejected here.
+     *
+     * @param endpoint the configured endpoint
+     * @return the endpoint as an URI
+     */
+    private static URI endpointUri(String endpoint) {
+        URI uri;
+        try {
+            uri = new URI(endpoint);
+        }
+        catch (URISyntaxException e) {
+            throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                    String.format("The endpoint [%s] is not a valid URI", endpoint), e);
+        }
+        if (uri.getScheme() == null) {
+            throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                    String.format("The endpoint [%s] needs a scheme, for example https://%s", endpoint, endpoint));
+        }
+        return uri;
     }
 }
