@@ -1,0 +1,35 @@
+{
+  "job": {
+    "setting": {
+      "speed": { "channel": 1 },
+      "errorLimit": { "record": 0 }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "hdfsreader",
+          "parameter": {
+            "defaultFS": "file:///",
+            "path": "${e2e_out_dir}/parquet",
+            "fileType": "PARQUET",
+            "encoding": "UTF-8",
+            "column": [
+              "*"
+            ]
+          }
+        },
+        "writer": {
+          "name": "txtfilewriter",
+          "parameter": {
+            "path": "${e2e_out_dir}/txt",
+            "fileName": "from_parquet_star.csv",
+            "fileFormat": "csv",
+            "writeMode": "truncate",
+            "fieldDelimiter": "|",
+            "encoding": "UTF-8"
+          }
+        }
+      }
+    ]
+  }
+}

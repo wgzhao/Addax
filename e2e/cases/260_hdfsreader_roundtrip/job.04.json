@@ -1,0 +1,46 @@
+{
+  "job": {
+    "setting": {
+      "speed": { "channel": 1 },
+      "errorLimit": { "record": 0 }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "hdfsreader",
+          "parameter": {
+            "defaultFS": "file:///",
+            "path": "${e2e_out_dir}/orc",
+            "fileType": "ORC",
+            "encoding": "UTF-8",
+            "column": [
+              { "index": 0, "type": "bigint" },
+              { "index": 1, "type": "integer" },
+              { "index": 2, "type": "tinyint" },
+              { "index": 3, "type": "smallint" },
+              { "index": 4, "type": "string" },
+              { "index": 5, "type": "varchar(20)" },
+              { "index": 6, "type": "decimal(12,3)" },
+              { "index": 7, "type": "boolean" },
+              { "index": 8, "type": "date" },
+              { "index": 9, "type": "timestamp" },
+              { "index": 10, "type": "array<string>" },
+              { "index": 11, "type": "map<string,int>" }
+            ]
+          }
+        },
+        "writer": {
+          "name": "txtfilewriter",
+          "parameter": {
+            "path": "${e2e_out_dir}/txt",
+            "fileName": "from_orc.csv",
+            "fileFormat": "csv",
+            "writeMode": "truncate",
+            "fieldDelimiter": "|",
+            "encoding": "UTF-8"
+          }
+        }
+      }
+    ]
+  }
+}
