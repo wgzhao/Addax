@@ -25,13 +25,13 @@ import com.wgzhao.addax.core.plugin.RecordSender;
 import com.wgzhao.addax.core.spi.Reader;
 import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.storage.reader.StorageReaderUtil;
-import com.wgzhao.addax.storage.util.FileHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
@@ -50,7 +50,7 @@ public class HdfsReader
         private static final Logger LOG = LoggerFactory.getLogger(Job.class);
 
         private Configuration readerOriginConfig = null;
-        private HashSet<String> sourceFiles;
+        private Set<String> sourceFiles;
         private String specifiedFileType = null;
         private DFSUtil dfsUtil = null;
         private List<String> path = null;
@@ -71,25 +71,28 @@ public class HdfsReader
         {
             readerOriginConfig.getNecessaryValue(Key.DEFAULT_FS, CONFIG_ERROR);
 
-            // path check
-            String pathInString = readerOriginConfig.getNecessaryValue(Key.PATH, REQUIRED_VALUE);
-            if (!pathInString.startsWith("[") && !pathInString.endsWith("]")) {
-                path = List.of(pathInString);
+            // path check: the configuration may hold one path as a plain string or a list of them.
+            // Which one it is has to be read from the value itself: asking for a list while the
+            // configuration holds a string threw a ClassCastException, and a single path that
+            // happens to end with a closing bracket was sent down that path.
+            Object configuredPath = readerOriginConfig.get(Key.PATH);
+            if (configuredPath == null) {
+                throw AddaxException.asAddaxException(REQUIRED_VALUE, "The item path is required.");
             }
-            else {
-                path = readerOriginConfig.getList(Key.PATH, String.class);
-                if (null == path || path.isEmpty()) {
-                    throw AddaxException.asAddaxException(REQUIRED_VALUE, "The item path is required.");
-                }
-                for (String eachPath : path) {
-                    if (!eachPath.startsWith("/")) {
-                        throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                                "The item path [%s] should be a absolute path.".formatted(eachPath));
-                    }
+            path = configuredPath instanceof List<?>
+                    ? readerOriginConfig.getList(Key.PATH, String.class)
+                    : List.of(readerOriginConfig.getNecessaryValue(Key.PATH, REQUIRED_VALUE));
+            if (path.isEmpty()) {
+                throw AddaxException.asAddaxException(REQUIRED_VALUE, "The item path is required.");
+            }
+            for (String eachPath : path) {
+                if (!eachPath.startsWith("/")) {
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                            "The item path [%s] should be a absolute path.".formatted(eachPath));
                 }
             }
 
-            specifiedFileType = readerOriginConfig.getNecessaryValue(Key.FILE_TYPE, REQUIRED_VALUE).toUpperCase();
+            specifiedFileType = readerOriginConfig.getNecessaryValue(Key.FILE_TYPE, REQUIRED_VALUE).toUpperCase(Locale.ROOT);
             if (!HdfsConstant.SUPPORT_FILE_TYPE.contains(specifiedFileType)) {
                 throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
                         "The file type only supports " + HdfsConstant.SUPPORT_FILE_TYPE + " but not " + specifiedFileType);
@@ -118,8 +121,8 @@ public class HdfsReader
         public void prepare()
         {
             LOG.info("prepare(), start to getAllFiles...");
-            this.sourceFiles = (HashSet<String>) dfsUtil.getAllFiles(path, specifiedFileType);
-            LOG.info("It will reading #{} file(s), including [{}}.", sourceFiles.size(), sourceFiles);
+            this.sourceFiles = dfsUtil.getAllFiles(path, specifiedFileType);
+            LOG.info("It will read {} file(s): {}.", sourceFiles.size(), sourceFiles);
         }
 
         @Override
@@ -127,18 +130,18 @@ public class HdfsReader
         {
 
             LOG.info("split() begin...");
-            List<Configuration> readerSplitConfigs = new ArrayList<>();
-            int splitNumber = sourceFiles.size();
-            if (0 == splitNumber) {
+            if (sourceFiles.isEmpty()) {
                 throw AddaxException.asAddaxException(EXECUTE_FAIL,
                         "Can not find any file in path : [" + readerOriginConfig.getString(Key.PATH) + "]");
-
             }
 
-            List<List<String>> splitSourceFiles = FileHelper.splitSourceFiles(new ArrayList<>(sourceFiles), splitNumber);
-            for (List<String> files : splitSourceFiles) {
+            // one task per file: a file is the smallest unit this reader can divide the work into,
+            // the parallelism of the job comes from the number of files rather than from the
+            // advice of the engine
+            List<Configuration> readerSplitConfigs = new ArrayList<>(sourceFiles.size());
+            for (String sourceFile : sourceFiles) {
                 Configuration splitConfig = readerOriginConfig.clone();
-                splitConfig.set(HdfsConstant.SOURCE_FILES, files);
+                splitConfig.set(HdfsConstant.SOURCE_FILES, List.of(sourceFile));
                 readerSplitConfigs.add(splitConfig);
             }
 
@@ -175,7 +178,7 @@ public class HdfsReader
 
             this.taskConfig = getPluginJobConf();
             this.sourceFiles = taskConfig.getList(HdfsConstant.SOURCE_FILES, String.class);
-            this.specifiedFileType = taskConfig.getNecessaryValue(Key.FILE_TYPE, REQUIRED_VALUE);
+            this.specifiedFileType = taskConfig.getNecessaryValue(Key.FILE_TYPE, REQUIRED_VALUE).toUpperCase(Locale.ROOT);
             this.dfsUtil = new DFSUtil(taskConfig);
         }
 
@@ -194,7 +197,7 @@ public class HdfsReader
             for (var sourceFile : this.sourceFiles) {
                 LOG.info("Reading file: {}", sourceFile);
 
-                switch (specifiedFileType.toUpperCase()) {
+                switch (specifiedFileType) {
                     case HdfsConstant.TEXT, HdfsConstant.CSV -> {
                         var inputStream = dfsUtil.getInputStream(sourceFile);
                         StorageReaderUtil.readFromStream(inputStream, sourceFile, taskConfig,
@@ -204,14 +207,12 @@ public class HdfsReader
                             dfsUtil.orcFileStartRead(sourceFile, recordSender, getTaskPluginCollector());
                     case HdfsConstant.SEQ ->
                             dfsUtil.sequenceFileStartRead(sourceFile, taskConfig, recordSender, getTaskPluginCollector());
-                    case HdfsConstant.RC ->
-                            dfsUtil.rcFileStartRead(sourceFile, recordSender, getTaskPluginCollector());
                     case HdfsConstant.PARQUET ->
                             dfsUtil.parquetFileStartRead(sourceFile, recordSender, getTaskPluginCollector());
                     default -> throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
                             """
                             The specifiedFileType: [%s] is unsupported.
-                            HdfsReader only support TEXT, CSV, ORC, SEQUENCE, RC, PARQUET now.
+                            HdfsReader only support TEXT, CSV, ORC, SEQUENCE, PARQUET now.
                             """.formatted(specifiedFileType));
                 }
 

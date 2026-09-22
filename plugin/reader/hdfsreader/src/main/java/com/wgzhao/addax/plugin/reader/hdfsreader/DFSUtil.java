@@ -163,7 +163,7 @@ public class DFSUtil
         if (f.isFile()) {
             String filePath = f.getPath().toString();
             if (f.getLen() > 0) {
-                addSourceFileByType(filePath);
+                addSourceFileByType(f);
             }
             else {
                 LOG.warn("It will ignore file [{}] because it is empty.", filePath);
@@ -230,11 +230,12 @@ public class DFSUtil
     /**
      * Adds the source file to the list if its type matches the specified file type.
      *
-     * @param filePath the path of the file to be added
+     * @param status the status of the file to be added
      */
-    private void addSourceFileByType(String filePath)
+    private void addSourceFileByType(FileStatus status)
     {
-        boolean isMatchedFileType = FileTypeUtils.checkHdfsFileType(hadoopConf, filePath, this.specifiedFileType);
+        String filePath = status.getPath().toString();
+        boolean isMatchedFileType = FileTypeUtils.checkHdfsFileType(hadoopConf, status, this.specifiedFileType);
 
         if (isMatchedFileType) {
             LOG.info("The file [{}] format is [{}], add it to source files list.", filePath, this.specifiedFileType);
@@ -309,18 +310,6 @@ public class DFSUtil
             LOG.error(message);
             throw AddaxException.asAddaxException(EXECUTE_FAIL, message, e);
         }
-    }
-
-    /**
-     * Reads data from an RCFile and sends it to the RecordSender.
-     *
-     * @param sourceRcFilePath the path to the RCFile to read
-     * @param recordSender the RecordSender to send the read records to
-     * @param taskPluginCollector the TaskPluginCollector for collecting task-related metrics and errors
-     */
-    public void rcFileStartRead(String sourceRcFilePath, RecordSender recordSender, TaskPluginCollector taskPluginCollector)
-    {
-        throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE, "The rc-file is not support longer");
     }
 
     /** Orcfilestartread. */
