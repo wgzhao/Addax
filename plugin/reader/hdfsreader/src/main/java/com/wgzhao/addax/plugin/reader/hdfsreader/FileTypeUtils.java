@@ -20,20 +20,17 @@
 package com.wgzhao.addax.plugin.reader.hdfsreader;
 
 import com.wgzhao.addax.core.exception.AddaxException;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.Text;
-import org.apache.parquet.example.data.Group;
-import org.apache.parquet.hadoop.ParquetReader;
-import org.apache.parquet.hadoop.example.GroupReadSupport;
+import org.apache.orc.OrcFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Locale;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
 
@@ -42,157 +39,143 @@ public class FileTypeUtils
 {
     private static final Logger LOG = LoggerFactory.getLogger(FileTypeUtils.class);
 
-    private static boolean isSequenceFile(Path filepath, FSDataInputStream in)
+    /** The four bytes every sequence file and every parquet file starts with. */
+    private static final byte[] PARQUET_MAGIC = {'P', 'A', 'R', '1'};
+    private static final byte[] SEQUENCE_MAGIC = {'S', 'E', 'Q'};
+    /** The magic of an ORC file, written as the first bytes and as the tail of the postscript. */
+    private static final byte[] ORC_MAGIC = OrcFile.MAGIC.getBytes(StandardCharsets.US_ASCII);
+
+    private FileTypeUtils() {}
+
+    private static boolean isSequenceFile(FileStatus status, FSDataInputStream in)
     {
-        final byte[] seqMagic = {(byte) 'S', (byte) 'E', (byte) 'Q'};
-        byte[] magic = new byte[seqMagic.length];
+        byte[] magic = new byte[SEQUENCE_MAGIC.length];
         try {
             in.seek(0);
             in.readFully(magic);
-            return Arrays.equals(magic, seqMagic);
+            return Arrays.equals(magic, SEQUENCE_MAGIC);
         }
         catch (IOException e) {
-            LOG.info("The file [{}] is not Sequence file.", filepath);
+            LOG.info("The file [{}] is not Sequence file.", status.getPath());
         }
         return false;
     }
 
-    private static boolean isParquetFile(Path file)
+    /**
+     * A parquet file starts with the {@code PAR1} magic and ends with the length of its footer
+     * followed by the same magic.
+     * <p>
+     * The check used to build a reader and read its first record, which opened the file a second
+     * time with a default configuration - ignoring the {@code hadoopConfig} and the Kerberos
+     * settings of the job - cost a record decode per file, and called a valid parquet file that
+     * holds no record a file of another format.
+     *
+     * @param status the file to look at
+     * @param in the open stream of the file
+     * @return true when the file is a parquet file
+     */
+    private static boolean isParquetFile(FileStatus status, FSDataInputStream in)
     {
-        GroupReadSupport readSupport = new GroupReadSupport();
-        ParquetReader.Builder<Group> reader = ParquetReader.builder(readSupport, file);
-        try (ParquetReader<Group> build = reader.build()) {
-            return build.read() != null;
-        }
-        catch (IOException e) {
-            LOG.info("The file [{}] is not parquet file.", file);
-        }
-        return false;
-    }
-
-    private static boolean isRCFile(org.apache.hadoop.conf.Configuration hadoopConf, String filepath, FSDataInputStream in)
-    {
-
-        // The first version of RCFile used the sequence file header.
-        final byte[] originalMagic = {(byte) 'S', (byte) 'E', (byte) 'Q'};
-        // The 'magic' bytes at the beginning of the RCFile
-        final byte[] rcMagic = {(byte) 'R', (byte) 'C', (byte) 'F'};
-        // the version that was included with the original magic, which is mapped
-        // into ORIGINAL_VERSION
-        final byte ORIGINAL_MAGIC_VERSION_WITH_METADATA = 6;
-        // All the versions should be place in this list.
-        final int ORIGINAL_VERSION = 0;  // version with SEQ
-        // version with RCF
-        // final int NEW_MAGIC_VERSION = 1
-        // final int CURRENT_VERSION = NEW_MAGIC_VERSION
-        final int CURRENT_VERSION = 1;
-        byte version;
-
-        byte[] magic = new byte[rcMagic.length];
         try {
+            byte[] magic = new byte[PARQUET_MAGIC.length];
             in.seek(0);
             in.readFully(magic);
-
-            if (Arrays.equals(magic, originalMagic)) {
-                if (in.readByte() != ORIGINAL_MAGIC_VERSION_WITH_METADATA) {
-                    return false;
-                }
-                version = ORIGINAL_VERSION;
+            // the file has to hold the magic at both ends, which also rejects a short file
+            if (!Arrays.equals(magic, PARQUET_MAGIC) || status.getLen() < 2L * magic.length) {
+                return false;
             }
-            else {
-                if (!Arrays.equals(magic, rcMagic)) {
-                    return false;
-                }
-
-                // Set 'version'
-                version = in.readByte();
-                if (version > CURRENT_VERSION) {
-                    return false;
-                }
-            }
-
-//            boolean decompress = in.readBoolean(); // is compressed?
-            if (version == ORIGINAL_VERSION) {
-                // is block-compressed? it should be always false.
-                boolean blkCompressed = in.readBoolean();
-                return !blkCompressed;
-            }
-            return true;
+            in.seek(status.getLen() - magic.length);
+            in.readFully(magic);
+            return Arrays.equals(magic, PARQUET_MAGIC);
         }
         catch (IOException e) {
-            LOG.info("The file [{}] is not RC file.", filepath);
+            LOG.info("The file [{}] is not parquet file.", status.getPath());
         }
         return false;
     }
 
-    private static boolean isORCFile(Path file, FileSystem fs, FSDataInputStream in)
+    /**
+     * Whether the bytes at the given offset of the file are the given magic.
+     *
+     * @param bytes the bytes of the file
+     * @param offset the offset to look at
+     * @param magic the magic to compare with
+     * @return true when the bytes match
+     */
+    private static boolean magicAt(byte[] bytes, int offset, byte[] magic)
+    {
+        return offset >= 0 && offset + magic.length <= bytes.length
+                && Arrays.equals(bytes, offset, offset + magic.length, magic, 0, magic.length);
+    }
+
+    private static boolean isORCFile(FileStatus status, FSDataInputStream in)
     {
         final int DIRECTORY_SIZE_GUESS = 16 * 1024;
         try {
             // figure out the size of the file using the option or filesystem
-            long size = fs.getFileStatus(file).getLen();
+            long size = status.getLen();
 
             //read last bytes into buffer to get PostScript
             int readSize = (int) Math.min(size, DIRECTORY_SIZE_GUESS);
+            byte[] buffer = new byte[readSize];
             in.seek(size - readSize);
-            ByteBuffer buffer = ByteBuffer.allocate(readSize);
-            in.readFully(buffer.array(), buffer.arrayOffset() + buffer.position(),
-                    buffer.remaining());
+            in.readFully(buffer);
 
             //read the PostScript
             //get length of PostScript
-            int psLen = buffer.get(readSize - 1) & 0xff;
-            String orcMagic = org.apache.orc.OrcFile.MAGIC;
-            int len = orcMagic.length();
-            if (psLen < len + 1) {
+            int psLen = buffer[readSize - 1] & 0xff;
+            if (psLen < ORC_MAGIC.length + 1) {
                 return false;
             }
-            int offset = buffer.arrayOffset() + buffer.position() + buffer.limit() - 1
-                    - len;
-            byte[] array = buffer.array();
             // now look for the magic string at the end of the postscript.
-            if (Text.decode(array, offset, len).equals(orcMagic)) {
+            if (magicAt(buffer, readSize - 1 - ORC_MAGIC.length, ORC_MAGIC)) {
                 return true;
             }
-            else {
-                // If it isn't there, this may be the 0.11.0 version of ORC.
-                // Read the first 3 bytes of the file to check for the header
-                in.seek(0);
-                byte[] header = new byte[len];
-                in.readFully(header, 0, len);
-                // if it isn't there, this isn't an ORC file
-                if (Text.decode(header, 0, len).equals(orcMagic)) {
-                    return true;
-                }
-            }
+            // If it isn't there, this may be the 0.11.0 version of ORC.
+            // Read the first 3 bytes of the file to check for the header
+            in.seek(0);
+            byte[] header = new byte[ORC_MAGIC.length];
+            in.readFully(header);
+            // if it isn't there, this isn't an ORC file
+            return Arrays.equals(header, ORC_MAGIC);
         }
         catch (IOException e) {
-            LOG.info("The file [{}] is not ORC file.", file);
+            LOG.info("The file [{}] is not ORC file.", status.getPath());
         }
         return false;
     }
 
-    /** Checkhdfsfiletype. */
-    public static boolean checkHdfsFileType(org.apache.hadoop.conf.Configuration hadoopConf, String filepath, String specifiedFileType)
+    /**
+     * Whether a file holds the file type the job asked for.
+     *
+     * @param hadoopConf the configuration of the job
+     * @param status the file to check
+     * @param specifiedFileType the configured file type
+     * @return true when the file matches the configured type
+     */
+    public static boolean checkHdfsFileType(org.apache.hadoop.conf.Configuration hadoopConf, FileStatus status, String specifiedFileType)
     {
-        var file = new Path(filepath);
+        String fileType = specifiedFileType.toUpperCase(Locale.ROOT);
+        // a text file carries nothing that names its format, every file is a candidate
+        if (HdfsConstant.CSV.equals(fileType) || HdfsConstant.TEXT.equals(fileType)) {
+            return true;
+        }
 
-        try (var fs = FileSystem.get(hadoopConf);
-             var in = fs.open(file)) {
-            return switch (specifiedFileType.toUpperCase()) {
-                case HdfsConstant.ORC -> isORCFile(file, fs, in);
-                case HdfsConstant.RC -> isRCFile(hadoopConf, filepath, in);
-                case HdfsConstant.SEQ -> isSequenceFile(file, in);
-                case HdfsConstant.PARQUET -> isParquetFile(file);
-                case HdfsConstant.CSV, HdfsConstant.TEXT -> true;
+        try (var in = FileSystem.get(hadoopConf).open(status.getPath())) {
+            // the file system is cached per JVM and shared with every task of the job, closing it
+            // here closed it for the other holders as well
+            return switch (fileType) {
+                case HdfsConstant.ORC -> isORCFile(status, in);
+                case HdfsConstant.SEQ -> isSequenceFile(status, in);
+                case HdfsConstant.PARQUET -> isParquetFile(status, in);
                 default -> false;
             };
         }
         catch (Exception e) {
             var message = """
                     Can not get the file format for [%s], it only supports [%s].
-                    """.formatted(filepath, HdfsConstant.SUPPORT_FILE_TYPE);
-            LOG.error(message);
+                    """.formatted(status.getPath(), HdfsConstant.SUPPORT_FILE_TYPE);
+            LOG.error(message, e);
             throw AddaxException.asAddaxException(EXECUTE_FAIL, message, e);
         }
     }

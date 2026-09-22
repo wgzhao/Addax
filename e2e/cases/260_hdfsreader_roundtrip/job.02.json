@@ -1,0 +1,62 @@
+{
+  "job": {
+    "setting": {
+      "speed": { "channel": 1 },
+      "errorLimit": { "record": 0 }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "streamreader",
+          "parameter": {
+            "sliceRecordCount": 3,
+            "column": [
+              { "incr": "1000", "type": "long" },
+              { "value": 42, "type": "long" },
+              { "value": 7, "type": "long" },
+              { "value": 300, "type": "long" },
+              { "value": "hello", "type": "string" },
+              { "value": "short", "type": "string" },
+              { "value": "12.345", "type": "string" },
+              { "value": true, "type": "bool" },
+              { "value": "1970-01-01", "type": "date", "dateFormat": "yyyy-MM-dd" },
+              {
+                "value": "1969-12-31 23:59:59",
+                "type": "date",
+                "dateFormat": "yyyy-MM-dd HH:mm:ss"
+              },
+              { "value": "['a','b']", "type": "string" },
+              { "value": "{'x':1,'y':2}", "type": "string" }
+            ]
+          }
+        },
+        "writer": {
+          "name": "hdfswriter",
+          "parameter": {
+            "defaultFS": "file:///",
+            "path": "${e2e_out_dir}/orc",
+            "fileName": "roundtrip",
+            "fileType": "ORC",
+            "compress": "NONE",
+            "writeMode": "overwrite",
+            "skipTrash": true,
+            "column": [
+              { "name": "id", "type": "bigint" },
+              { "name": "qty", "type": "int" },
+              { "name": "tiny", "type": "tinyint" },
+              { "name": "small", "type": "smallint" },
+              { "name": "name", "type": "string" },
+              { "name": "code", "type": "varchar(20)" },
+              { "name": "amount", "type": "decimal(12,3)" },
+              { "name": "active", "type": "boolean" },
+              { "name": "d", "type": "date" },
+              { "name": "ts", "type": "timestamp" },
+              { "name": "tags", "type": "array<string>" },
+              { "name": "attrs", "type": "map<string,int>" }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

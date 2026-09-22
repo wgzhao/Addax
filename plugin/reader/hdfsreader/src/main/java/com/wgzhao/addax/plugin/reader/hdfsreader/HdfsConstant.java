@@ -21,7 +21,6 @@ package com.wgzhao.addax.plugin.reader.hdfsreader;
 
 import com.wgzhao.addax.core.base.Constant;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -41,16 +40,19 @@ public class HdfsConstant
     public static final String CSV = "CSV";
     /** Seq. */
     public static final String SEQ = "SEQ";
-    /** Rc. */
-    public static final String RC = "RC";
     /** Parquet. */
     public static final String PARQUET = "PARQUET";
     /** Hdfs default key. */
     public static final String HDFS_DEFAULT_KEY = "fs.defaultFS";
     /** Hadoop security authentication key. */
     public static final String HADOOP_SECURITY_AUTHENTICATION_KEY = "hadoop.security.authentication";
+    /**
+     * The file types this reader can read. The rc-file is not one of them: its reader left with
+     * the hive-exec dependency, and a job that still names it has to hear about it while the job
+     * configuration is validated instead of after the listing, when the task starts to read.
+     */
     protected static final List<String> SUPPORT_FILE_TYPE =
-            Arrays.asList(HdfsConstant.CSV, HdfsConstant.ORC, HdfsConstant.RC, HdfsConstant.SEQ, HdfsConstant.TEXT, HdfsConstant.PARQUET);
+            List.of(HdfsConstant.CSV, HdfsConstant.ORC, HdfsConstant.SEQ, HdfsConstant.TEXT, HdfsConstant.PARQUET);
 
     private HdfsConstant() {}
 }

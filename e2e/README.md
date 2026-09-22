@@ -268,6 +268,7 @@ In CI the whole work directory is uploaded as the `e2e-logs` artifact on failure
 | 160_mysql_datetime_to_txt | mysqlreader | txtfilewriter | writer-level `dateFormat` rendering |
 | 170_mysql_datetime_to_postgresql | mysqlreader | postgresqlwriter | the same values across dialects |
 | 250_s3reader_objects | s3reader | txtfilewriter | object patterns (literal `.` and `+`), duplicate names, gzip detection, against moto |
+| 260_hdfsreader_roundtrip | streamreader + hdfsreader | hdfswriter | parquet and ORC round-trip on `file:///`: decimal, date, timestamp, boolean, array, map, type aliases, `column: ["*"]` |
 
 The fixture behind all of them is six rows carrying the values that readers and writers
 actually get wrong: CJK, an embedded delimiter and double quote, a backslash, leading
