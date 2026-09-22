@@ -171,8 +171,8 @@ public class CommonRdbmsReader
         // Calendar is not thread-safe while reader tasks run in parallel, so each
         // thread converts timestamps with its own instance of the default timezone
         private static final ThreadLocal<Calendar> CALENDAR_INSTANCE = ThreadLocal.withInitial(Calendar::getInstance);
-        // compared against every BIGINT UNSIGNED cell, so it must not be re-allocated per row
-        private static final BigInteger BIGINT_LONG_MAX = BigInteger.valueOf(Long.MAX_VALUE);
+        // the longest decimal a signed long can need; anything shorter cannot overflow
+        private static final int LONG_MAX_DIGITS = 19;
 
         private final DataBaseType dataBaseType;
         private final int taskGroupId;
@@ -194,7 +194,6 @@ public class CommonRdbmsReader
         private boolean localTimeProbeFailed;
         private boolean localTimeFallbackWarned;
         private int[] cachedColTypes;
-        private boolean[] cachedSigned;
         private int[] cachedScales;
         private int[] cachedPrecisions;
         private String[] cachedTypeNames;
@@ -348,10 +347,7 @@ public class CommonRdbmsReader
         protected Column createColumn(ResultSet rs, ResultSetMetaData metaData, int i)
                 throws SQLException, UnsupportedEncodingException
         {
-            if (cachedMetaData != metaData) {
-                cacheColumnMetaData(metaData);
-            }
-            int colType = cachedColTypes[i];
+            int colType = columnType(metaData, i);
             switch (colType) {
                 case Types.CHAR:
                 case Types.NCHAR:
@@ -374,21 +370,21 @@ public class CommonRdbmsReader
                 case Types.TINYINT:
                 case Types.INTEGER:
                     return new LongColumn(rs.getString(i));
-                case Types.BIGINT:
-                    if (!cachedSigned[i]) {
-                        // BIGINT UNSIGNED may exceed Long.MAX_VALUE (9223372036854775807);
-                        // store as StringColumn to preserve full precision
-                        String raw = rs.getString(i);
-                        if (raw != null) {
-                            BigInteger bi = new BigInteger(raw);
-                            if (bi.compareTo(BIGINT_LONG_MAX) > 0) {
-                                return new StringColumn(raw);
-                            }
-                            return new LongColumn(bi);
-                        }
+                case Types.BIGINT: {
+                    String raw = rs.getString(i);
+                    if (raw == null) {
                         return new LongColumn((String) null);
                     }
-                    return new LongColumn(rs.getString(i));
+                    if (raw.length() < LONG_MAX_DIGITS) {
+                        return new LongColumn(raw);
+                    }
+                    // A BIGINT UNSIGNED cell may exceed Long.MAX_VALUE (9223372036854775807) and has to
+                    // keep its full precision as a string. Decide that from the value itself: asking
+                    // ResultSetMetaData#isSigned instead would make the reader depend on an optional
+                    // driver call, and Hive answers it with "Method not supported" for every column.
+                    BigInteger bi = new BigInteger(raw);
+                    return bi.bitLength() < Long.SIZE ? new LongColumn(bi) : new StringColumn(raw);
+                }
                 case Types.NUMERIC:
                 case Types.DECIMAL:
                 case Types.FLOAT:
@@ -476,6 +472,26 @@ public class CommonRdbmsReader
         }
 
         /**
+         * Returns the SQL type of a column and fills the per-ResultSet metadata cache on first use.
+         * Reader plugins that override createColumn should call this instead of
+         * ResultSetMetaData#getColumnType, which some drivers resolve from the type name on every
+         * call, so that the type is resolved once per ResultSet rather than once per cell.
+         *
+         * @param metaData The result set meta data
+         * @param columnIndex The 1-based column index
+         * @return The java.sql.Types constant of the column
+         * @throws SQLException If the driver cannot report the column type
+         */
+        protected int columnType(ResultSetMetaData metaData, int columnIndex)
+                throws SQLException
+        {
+            if (cachedMetaData != metaData) {
+                cacheColumnMetaData(metaData);
+            }
+            return cachedColTypes[columnIndex];
+        }
+
+        /**
          * Materializes the row-invariant column metadata of a ResultSet once, so that the
          * per-row conversion loop never polls ResultSetMetaData for every cell.
          */
@@ -484,26 +500,67 @@ public class CommonRdbmsReader
         {
             int columnCount = metaData.getColumnCount();
             int[] colTypes = new int[columnCount + 1];
-            boolean[] signed = new boolean[columnCount + 1];
             int[] scales = new int[columnCount + 1];
             int[] precisions = new int[columnCount + 1];
             String[] typeNames = new String[columnCount + 1];
             String[] columnNames = new String[columnCount + 1];
             for (int i = 1; i <= columnCount; i++) {
                 colTypes[i] = metaData.getColumnType(i);
-                signed[i] = metaData.isSigned(i);
-                scales[i] = metaData.getScale(i);
-                precisions[i] = metaData.getPrecision(i);
-                typeNames[i] = metaData.getColumnTypeName(i);
-                columnNames[i] = metaData.getColumnName(i);
+                // Everything past the column type is optional in JDBC: drivers may reject it
+                // (Hive throws "Method not supported", and NPEs on a decimal without type
+                // qualifiers) or report nonsense. A rejection must degrade one column, not turn
+                // every row of the query into a dirty record.
+                scales[i] = optionalInt(metaData, i, "scale", ResultSetMetaData::getScale, 0);
+                precisions[i] = optionalInt(metaData, i, "precision", ResultSetMetaData::getPrecision, 0);
+                typeNames[i] = optionalString(metaData, i, "type name", ResultSetMetaData::getColumnTypeName);
+                columnNames[i] = optionalString(metaData, i, "column name", ResultSetMetaData::getColumnName);
             }
             this.cachedMetaData = metaData;
             this.cachedColTypes = colTypes;
-            this.cachedSigned = signed;
             this.cachedScales = scales;
             this.cachedPrecisions = precisions;
             this.cachedTypeNames = typeNames;
             this.cachedColumnNames = columnNames;
+        }
+
+        /** A ResultSetMetaData accessor that takes a column index. */
+        @FunctionalInterface
+        private interface MetadataInt
+        {
+            int get(ResultSetMetaData metaData, int columnIndex) throws SQLException;
+        }
+
+        /** A ResultSetMetaData accessor that takes a column index and returns a String. */
+        @FunctionalInterface
+        private interface MetadataString
+        {
+            String get(ResultSetMetaData metaData, int columnIndex) throws SQLException;
+        }
+
+        private int optionalInt(ResultSetMetaData metaData, int columnIndex, String what,
+                MetadataInt accessor, int fallback)
+        {
+            try {
+                return accessor.get(metaData, columnIndex);
+            }
+            catch (SQLException | RuntimeException e) {
+                LOG.debug("The JDBC driver cannot report the {} of column {} ({}), using {}",
+                        what, columnIndex, e.getMessage(), fallback);
+                return fallback;
+            }
+        }
+
+        private String optionalString(ResultSetMetaData metaData, int columnIndex, String what,
+                MetadataString accessor)
+        {
+            try {
+                return accessor.get(metaData, columnIndex);
+            }
+            catch (SQLException | RuntimeException e) {
+                LOG.debug("The JDBC driver cannot report the {} of column {} ({})",
+                        what, columnIndex, e.getMessage());
+                return null;
+            }
         }
 
         /**
