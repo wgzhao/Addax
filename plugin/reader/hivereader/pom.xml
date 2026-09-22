@@ -33,10 +33,6 @@
     <description>Apache Hive reader plugin for Addax</description>
     <packaging>jar</packaging>
 
-    <properties>
-        <hive.version>2.1.1</hive.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>com.wgzhao.addax</groupId>
@@ -48,12 +44,26 @@
             <artifactId>addax-rdbms</artifactId>
         </dependency>
 
+        <!-- hadoop-common gets its XML parser, commons-configuration2 and shaded guava from
+             the parent pom's managed exclusions, but Configuration#loadResource needs the
+             parser (woodstox) to read core-site.xml, hive-site.xml or hdfs-site.xml; without
+             it even new Configuration() dies with
+             NoClassDefFoundError: com/ctc/wstx/io/InputBootstrapper -->
+        <dependency>
+            <groupId>com.fasterxml.woodstox</groupId>
+            <artifactId>woodstox-core</artifactId>
+        </dependency>
+
+        <!-- HiveConnection reads connection properties with commons-lang 2.x StringUtils -->
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
             <version>2.6</version>
         </dependency>
 
+        <!-- ZooKeeperHiveClientHelper is the only client class that talks to curator, and
+             Utils loads it for every URL, not just serviceDiscoveryMode=zooKeeper ones.
+             curator-recipes is not referenced by any hive client class. -->
         <dependency>
             <groupId>org.apache.curator</groupId>
             <artifactId>curator-framework</artifactId>
@@ -61,26 +71,15 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.curator</groupId>
-            <artifactId>curator-recipes</artifactId>
-            <version>${curator.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-common</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>*</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
+        <!-- HiveConf pulls org.apache.hadoop.mapred.JobConf in, so the client cannot build
+             one (HiveConnection does, for the hiveconf/hivevar URL parameters) without this -->
         <dependency>
-            <groupId>org.apache.hadoop.thirdparty</groupId>
-            <artifactId>hadoop-shaded-protobuf_3_25</artifactId>
-            <version>1.5.0</version>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-mapreduce-client-core</artifactId>
         </dependency>
 
         <dependency>
@@ -138,6 +137,44 @@
         <dependency>
             <groupId>org.apache.hive</groupId>
             <artifactId>hive-service-rpc</artifactId>
+            <version>${hive.version}</version>
+            <scope>runtime</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- KerberosSaslHelper builds the SASL transport for auth=KERBEROS out of
+             HadoopThriftAuthBridge, and the transport itself wraps TFilterTransport,
+             so both are needed before a secure connection is even attempted -->
+        <dependency>
+            <groupId>org.apache.hive</groupId>
+            <artifactId>hive-standalone-metastore</artifactId>
+            <version>${hive.version}</version>
+            <scope>runtime</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- the Hive 3 value types a JDBC result set hands back (HiveDecimal,
+             HiveIntervalDayTime) live here, not in hive-common -->
+        <dependency>
+            <groupId>org.apache.hive</groupId>
+            <artifactId>hive-storage-api</artifactId>
+        </dependency>
+
+        <!-- the shims live under their own groupId, and hive-shims is an empty
+             aggregator artifact in Hive 3; TFilterTransport is in the common jar -->
+        <dependency>
+            <groupId>org.apache.hive.shims</groupId>
+            <artifactId>hive-shims-common</artifactId>
             <version>${hive.version}</version>
             <scope>runtime</scope>
             <exclusions>

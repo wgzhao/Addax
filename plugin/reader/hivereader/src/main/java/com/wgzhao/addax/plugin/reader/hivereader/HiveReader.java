@@ -47,6 +47,7 @@ import static com.wgzhao.addax.core.base.Key.FETCH_SIZE;
 import static com.wgzhao.addax.core.base.Key.HAVE_KERBEROS;
 import static com.wgzhao.addax.core.base.Key.KERBEROS_KEYTAB_FILE_PATH;
 import static com.wgzhao.addax.core.base.Key.KERBEROS_PRINCIPAL;
+import static com.wgzhao.addax.core.base.Key.SPLIT_PK;
 
 /** Hive Reader. */
 public class HiveReader
@@ -91,6 +92,16 @@ public class HiveReader
         @Override
         public List<Configuration> split(int adviceNumber)
         {
+            // A split key means range queries. Hive has no indexes, so every range reads the whole
+            // table (and plans a new job for it) instead of seeking into one, which is the opposite
+            // of what the option buys on a row store. Say so once instead of silently multiplying
+            // the scan cost by the channel count.
+            if (StringUtils.isNotBlank(originalConfig.getString(SPLIT_PK, ""))) {
+                LOG.warn("splitPk is set for a Hive table: every channel runs its own range query, "
+                        + "and Hive scans the whole table for each one. Leave splitPk empty and let "
+                        + "HiveServer2 parallelize the single query, or slice the data with 'where' "
+                        + "instead.");
+            }
             return this.commonRdbmsReaderJob.split(originalConfig, adviceNumber);
         }
 
@@ -139,25 +150,35 @@ public class HiveReader
                 protected Column createColumn(ResultSet rs, ResultSetMetaData metaData, int i)
                         throws SQLException, UnsupportedEncodingException
                 {
-                    int columnType = metaData.getColumnType(i);
-                    if (columnType == Types.TIMESTAMP) {
-                        // hive HiveBaseResultSet#getTimestamp(String columnName, Calendar cal) not support
-                        return new TimestampColumn(rs.getTimestamp(i));
-                    }
-                    if (columnType  == Types.BINARY ||
-                            metaData.getColumnType(i)  == Types.VARBINARY) {
-                        try {
-                        return new BytesColumn(rs.getBytes(i));
-                        } catch (SQLException e) {
-                            // HiveBaseResultSet#getBytes(String columnName) not support
-                            return new BytesColumn(rs.getString(i).getBytes(StandardCharsets.UTF_8));
+                    // columnType() reads the type from the per-ResultSet cache: Hive resolves it by
+                    // lower-casing and matching the type name, which is too much work per cell
+                    switch (columnType(metaData, i)) {
+                        case Types.TIMESTAMP:
+                            // HiveBaseResultSet#getTimestamp(int, Calendar) throws "Method not supported"
+                            return new TimestampColumn(rs.getTimestamp(i));
+                        case Types.BINARY:
+                        case Types.VARBINARY:
+                        case Types.BLOB:
+                        case Types.LONGVARBINARY: {
+                            // HiveBaseResultSet#getBytes throws "Method not supported", and rebuilding the
+                            // bytes out of getString would round trip them through the platform charset.
+                            // getObject hands back the byte[] the server sent.
+                            Object value = rs.getObject(i);
+                            if (value == null) {
+                                return new BytesColumn((byte[]) null);
+                            }
+                            return new BytesColumn(value instanceof byte[] bytes
+                                    ? bytes : value.toString().getBytes(StandardCharsets.UTF_8));
                         }
+                        case Types.ARRAY:
+                        case Types.STRUCT:
+                        case Types.JAVA_OBJECT:
+                            // HiveBaseResultSet#getArray throws "Method not supported"; ARRAY, MAP and
+                            // STRUCT all arrive as the text form the server serialized them to
+                            return new StringColumn(rs.getString(i));
+                        default:
+                            return super.createColumn(rs, metaData, i);
                     }
-                    if (columnType == Types.ARRAY || columnType == Types.STRUCT || columnType == Types.JAVA_OBJECT) {
-                        // HiveBaseResultSet#getArray(String columnName) not support
-                        return new StringColumn( rs.getString(i));
-                    }
-                    return super.createColumn(rs, metaData, i);
                 }
             };
 
