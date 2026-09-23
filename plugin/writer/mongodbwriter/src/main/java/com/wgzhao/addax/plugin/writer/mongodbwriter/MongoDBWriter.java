@@ -20,10 +20,13 @@
 package com.wgzhao.addax.plugin.writer.mongodbwriter;
 
 import com.alibaba.fastjson2.JSON;
+import com.mongodb.MongoBulkWriteException;
 import com.mongodb.MongoException;
+import com.mongodb.bulk.BulkWriteError;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.BulkWriteOptions;
+import com.mongodb.client.model.InsertManyOptions;
 import com.mongodb.client.model.ReplaceOneModel;
 import com.mongodb.client.model.ReplaceOptions;
 import com.wgzhao.addax.core.base.Constant;
@@ -202,6 +205,11 @@ public class MongoDBWriter
             extends Writer.Task
     {
 
+        /** An unordered batch keeps the documents the server accepts, one rejected document stops no other. */
+        private static final InsertManyOptions UNORDERED_INSERT = new InsertManyOptions().ordered(false);
+        private static final BulkWriteOptions UNORDERED_BULK = new BulkWriteOptions().ordered(false);
+        private static final ReplaceOptions UPSERT = new ReplaceOptions().upsert(true);
+
         private MongoClient mongoClient;
 
         private String database = null;
@@ -308,8 +316,11 @@ public class MongoDBWriter
         }
 
         /**
-         * Write the buffered documents. A failed batch is retried one document at a time, so that
-         * a single rejected document does not fail the whole task.
+         * Write the buffered documents as one unordered batch. The server keeps every document it
+         * accepts and names the position of the ones it rejects, so a rejected document is reported
+         * by that position and nothing else is touched. Retrying the whole batch instead would
+         * report the documents that were written before the rejected one as failures and cost one
+         * round trip per document.
          */
         private void flush(MongoCollection<Document> collection)
         {
@@ -317,42 +328,80 @@ public class MongoDBWriter
                 return;
             }
             try {
-                List<Document> dataList = new ArrayList<>(buffer.size());
-                for (Pending pending : buffer) {
-                    dataList.add(pending.data());
-                }
                 if (update) {
                     List<ReplaceOneModel<Document>> models = new ArrayList<>(buffer.size());
-                    for (Document data : dataList) {
-                        models.add(new ReplaceOneModel<>(buildUpdateQuery(data), data, new ReplaceOptions().upsert(true)));
+                    for (Pending pending : buffer) {
+                        models.add(new ReplaceOneModel<>(buildUpdateQuery(pending.data()), pending.data(), UPSERT));
                     }
-                    collection.bulkWrite(models, new BulkWriteOptions().ordered(false));
+                    collection.bulkWrite(models, UNORDERED_BULK);
                 }
                 else {
-                    collection.insertMany(dataList);
+                    List<Document> dataList = new ArrayList<>(buffer.size());
+                    for (Pending pending : buffer) {
+                        dataList.add(pending.data());
+                    }
+                    collection.insertMany(dataList, UNORDERED_INSERT);
                 }
             }
+            catch (MongoBulkWriteException e) {
+                collectRejected(e);
+            }
             catch (MongoException e) {
+                // a failure below the write protocol leaves it unknown which documents of the batch
+                // arrived, so they are written one at a time to lose as little as possible
                 LOG.warn("Failed to write a batch of [{}] documents, try to write them one at a time. reason: {}",
                         buffer.size(), e.getMessage());
-                for (Pending pending : buffer) {
-                    try {
-                        if (update) {
-                            collection.replaceOne(buildUpdateQuery(pending.data()), pending.data(),
-                                    new ReplaceOptions().upsert(true));
-                        }
-                        else {
-                            collection.insertOne(pending.data());
-                        }
-                    }
-                    catch (MongoException ex) {
-                        LOG.debug("Failed to write one document: {}", ex.getMessage());
-                        super.getTaskPluginCollector().collectDirtyRecord(pending.record(), ex);
-                    }
-                }
+                writeOneByOne(collection);
             }
             finally {
                 buffer.clear();
+            }
+        }
+
+        /**
+         * Report the documents a batch write rejected as dirty records. Their position within the
+         * batch is the position in the buffer, the driver keeps the index of the original request.
+         */
+        private void collectRejected(MongoBulkWriteException e)
+        {
+            List<BulkWriteError> errors = e.getWriteErrors();
+            if (!errors.isEmpty()) {
+                LOG.warn("MongoDB rejected [{}] of [{}] documents of a batch, they are collected as dirty records",
+                        errors.size(), buffer.size());
+            }
+            for (BulkWriteError error : errors) {
+                int index = error.getIndex();
+                if (index < 0 || index >= buffer.size()) {
+                    // the driver named a position outside of the batch, the document cannot be identified
+                    LOG.error("MongoDB rejected a document at position [{}] of a batch of [{}] documents: {}",
+                            index, buffer.size(), error.getMessage());
+                    continue;
+                }
+                super.getTaskPluginCollector().collectDirtyRecord(buffer.get(index).record(),
+                        String.format("MongoDB rejected the document, code [%d]: %s", error.getCode(), error.getMessage()));
+            }
+            if (e.getWriteConcernError() != null) {
+                LOG.error("The write concern was not met for a batch of [{}] documents: {}",
+                        buffer.size(), e.getWriteConcernError().getMessage());
+            }
+        }
+
+        /** Write the buffered documents one by one, collecting each document the server rejects. */
+        private void writeOneByOne(MongoCollection<Document> collection)
+        {
+            for (Pending pending : buffer) {
+                try {
+                    if (update) {
+                        collection.replaceOne(buildUpdateQuery(pending.data()), pending.data(), UPSERT);
+                    }
+                    else {
+                        collection.insertOne(pending.data());
+                    }
+                }
+                catch (MongoException ex) {
+                    LOG.debug("Failed to write one document: {}", ex.getMessage());
+                    super.getTaskPluginCollector().collectDirtyRecord(pending.record(), ex);
+                }
             }
         }
 
