@@ -1,0 +1,33 @@
+{
+  "job": {
+    "setting": {
+      "speed": { "channel": 1 },
+      "errorLimit": { "record": 0 }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "txtfilereader",
+          "parameter": {
+            "path": ["${e2e_case_work}/in.txt"],
+            "encoding": "UTF-8",
+            "fieldDelimiter": "\t",
+            "nullFormat": "\\N",
+            "column": [{ "index": 0, "type": "string" }, { "index": 1, "type": "string" }]
+          }
+        },
+        "writer": {
+          "name": "elasticsearchwriter",
+          "parameter": {
+            "endpoint": "${es_endpoint}",
+            "index": "addax_e2e_esw_generated",
+            "cleanup": true,
+            "settings": { "index": { "number_of_shards": 1, "number_of_replicas": 0 } },
+            "batchSize": 3,
+            "column": [{ "name": "pk", "type": "id" }, { "name": "value", "type": "keyword" }]
+          }
+        }
+      }
+    ]
+  }
+}

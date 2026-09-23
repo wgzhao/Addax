@@ -75,6 +75,10 @@ build_addax_params() {
 
     append_param e2e_out_dir "$E2E_CASE_OUT"
 
+    # Where a case keeps its own files: a fixture a setup script wrote, for the cases whose
+    # source is neither a database nor a test double.
+    append_param e2e_case_work "$E2E_CASE_WORK"
+
     # The S3 test double the object store cases run against. Its port is the same variable
     # the case setup starts it on, so the job and the server cannot drift apart.
     append_param s3_endpoint "http://127.0.0.1:${E2E_MOTO_PORT:-5111}"
