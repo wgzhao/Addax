@@ -97,11 +97,11 @@ public final class MongoUtil
             return Document.parse(json);
         }
         catch (JsonParseException | BsonInvalidOperationException e) {
-            throw AddaxException.asAddaxException(ILLEGAL_VALUE, String.format(
-                    "Invalid filter in the [%s] parameter: %s. The filter is read as extended JSON, not as "
-                            + "JavaScript, so a date is written as {\"$date\": \"2026-09-20T00:00:00+08:00\"} "
-                            + "or as {\"$date\": 1789833600000}",
-                    parameter, StringUtils.removeEnd(e.getMessage(), ".")));
+            // a text block keeps the extended JSON examples readable, their quotes need no escaping
+            throw AddaxException.asAddaxException(ILLEGAL_VALUE, """
+                    Invalid filter in the [%s] parameter: %s. The filter is read as extended JSON, not as \
+                    JavaScript, so a date is written as {"$date": "2026-09-20T00:00:00+08:00"} or as \
+                    {"$date": 1789833600000}""".formatted(parameter, StringUtils.removeEnd(e.getMessage(), ".")));
         }
     }
 }
