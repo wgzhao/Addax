@@ -43,6 +43,7 @@
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
+            <version>${gson.version}</version>
         </dependency>
 
         <dependency>
@@ -55,9 +56,11 @@
             <artifactId>jest-common</artifactId>
         </dependency>
 
+        <!-- jest declares httpclient but the parent pom excludes it from jest; without this
+             the client cannot build a connection manager at all -->
         <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
         </dependency>
 
     </dependencies>

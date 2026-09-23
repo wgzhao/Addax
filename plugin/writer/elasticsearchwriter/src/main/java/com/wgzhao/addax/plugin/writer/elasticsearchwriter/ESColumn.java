@@ -35,8 +35,8 @@ public class ESColumn
 
     private Boolean array;
 
-    /** Sets the timezone. */
-    public void setTimeZone(String timezone)
+    /** Sets the timezone. The name has to match the getter, the column travels through json. */
+    public void setTimezone(String timezone)
     {
         this.timezone = timezone;
     }

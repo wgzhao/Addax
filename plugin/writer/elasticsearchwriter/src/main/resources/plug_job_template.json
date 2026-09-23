@@ -42,7 +42,7 @@
       {
         "name": "col_text",
         "type": "text",
-        "analyzer": "ik_max_word"
+        "analyzer": "standard"
       },
       {
         "name": "col_geo_point",

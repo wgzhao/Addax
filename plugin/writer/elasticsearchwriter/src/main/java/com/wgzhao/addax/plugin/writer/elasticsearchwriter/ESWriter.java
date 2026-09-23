@@ -33,14 +33,19 @@ import io.searchbox.client.JestResult;
 import io.searchbox.core.Bulk;
 import io.searchbox.core.BulkResult;
 import io.searchbox.core.Index;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -57,6 +62,9 @@ public class ESWriter
         extends Writer
 {
     private static final String WRITE_COLUMNS = "write_columns";
+
+    /** The shape joda-time used to render, and the one elasticsearch's default parser reads. */
+    private static final DateTimeFormatter ISO_DATE_TIME = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
     /** Job. */
     public static class Job
@@ -85,20 +93,19 @@ public class ESWriter
                     ESKey.isDiscovery(conf));
 
             String indexName = ESKey.getIndexName(conf);
-            String typeName = ESKey.getTypeName(conf);
             boolean dynamic = ESKey.getDynamic(conf);
-            String mappings = genMappings(typeName);
+            String mappings = genMappings();
             String settings = JSON.toJSONString(
                     ESKey.getSettings(conf)
             );
-            log.info("index:[{}], type:[{}], mappings:[{}]", indexName, typeName, mappings);
+            log.info("index:[{}], mappings:[{}]", indexName, mappings);
 
             try {
                 boolean isIndicesExists = esClient.indicesExists(indexName);
                 if (ESKey.isCleanup(this.conf) && isIndicesExists) {
                     esClient.deleteIndex(indexName);
                 }
-                if (!esClient.createIndex(indexName, typeName, mappings, settings, dynamic)) {
+                if (!esClient.createIndex(indexName, mappings, settings, dynamic)) {
                     throw new IOException("create index or mapping failed");
                 }
             }
@@ -108,9 +115,15 @@ public class ESWriter
             esClient.closeJestClient();
         }
 
-        private String genMappings(String typeName)
+        /**
+         * Builds the mappings of the index from the column configuration.
+         *
+         * <p>Elasticsearch 7.0 removed the mapping type, so this is a plain
+         * {@code {"properties": {...}}} body, for the create request as well as for the one
+         * that puts the mappings of an index that is already there.
+         */
+        private String genMappings()
         {
-            String mappings;
             Map<String, Object> propMap = new HashMap<>();
             List<ESColumn> columnList = new ArrayList<>();
 
@@ -168,15 +181,19 @@ public class ESWriter
                             field.put("analyzer", jo.getString("analyzer"));
                             // https://www.elastic.co/guide/en/elasticsearch/reference/current/tune-for-disk-usage.html
                             field.put("norms", jo.getBoolean("norms"));
-                            field.put("index_options", jo.getBoolean("index_options"));
+                            field.put("index_options", jo.getString("index_options"));
                             break;
                         case DATE:
-                            columnItem.setTimeZone(jo.getString("timezone"));
+                            columnItem.setTimezone(jo.getString("timezone"));
                             columnItem.setFormat(jo.getString("format"));
                             break;
                         case GEO_SHAPE:
-                            field.put("tree", jo.getString("tree"));
-                            field.put("precision", jo.getString("precision"));
+                            if (jo.containsKey("tree") || jo.containsKey("precision")) {
+                                // both were part of the quadtree implementation that
+                                // elasticsearch 6 replaced with a BKD tree, and the mapping is
+                                // rejected when they are still configured
+                                log.warn("column[{}]: tree and precision are not supported by elasticsearch 6 and later, ignoring them", colName);
+                            }
                             break;
                         default:
                             break;
@@ -190,18 +207,10 @@ public class ESWriter
 
             log.info(JSON.toJSONString(columnList));
 
-            Map<String, Object> rootMappings = new HashMap<>();
-            Map<String, Object> typeMappings = new HashMap<>();
-            typeMappings.put("properties", propMap);
-            rootMappings.put(typeName, typeMappings);
+            Map<String, Object> mappings = new HashMap<>();
+            mappings.put("properties", propMap);
 
-            mappings = JSON.toJSONString(rootMappings);
-
-            if (mappings == null || mappings.isEmpty()) {
-                throw AddaxException.asAddaxException(REQUIRED_VALUE, "must have mappings");
-            }
-
-            return mappings;
+            return JSON.toJSONString(mappings);
         }
 
         @Override
@@ -258,15 +267,15 @@ public class ESWriter
         private int trySize;
         private int batchSize;
         private String index;
-        private String type;
         private String splitter;
+        private boolean recordShapeChecked;
+        private boolean missingIdLogged;
 
         @Override
         public void init()
         {
             this.conf = super.getPluginJobConf();
             index = ESKey.getIndexName(conf);
-            type = ESKey.getTypeName(conf);
 
             trySize = ESKey.getTrySize(conf);
             batchSize = ESKey.getBatchSize(conf);
@@ -303,6 +312,7 @@ public class ESWriter
             Record record;
             long total = 0;
             while ((record = recordReceiver.getFromReader()) != null) {
+                checkRecordShape(record);
                 writerBuffer.add(record);
                 if (writerBuffer.size() >= this.batchSize) {
                     total += doBatchInsert(writerBuffer);
@@ -321,22 +331,60 @@ public class ESWriter
             esClient.closeJestClient();
         }
 
+        /**
+         * Renders a date column as the ISO-8601 text elasticsearch parses without a format in
+         * the mapping (its default is date_optional_time).
+         *
+         * <p>The millisecond part is always written: the values this used to produce with
+         * joda-time carried it, and a downstream consumer may match on it.
+         */
+        /**
+         * The columns of the writer are matched to the record by position, so a record of a
+         * different width is a mistake in the job rather than something to write: without this
+         * it surfaced as an IndexOutOfBoundsException in the middle of a batch, or as columns
+         * that silently stayed empty.
+         */
+        private void checkRecordShape(Record record)
+        {
+            if (recordShapeChecked) {
+                return;
+            }
+            recordShapeChecked = true;
+            if (record.getColumnNumber() != columnList.size()) {
+                throw AddaxException.asAddaxException(CONFIG_ERROR, String.format(
+                        "the writer is configured with %d columns but the record has %d: the column list of the writer must match the columns of the reader",
+                        columnList.size(), record.getColumnNumber()));
+            }
+        }
+
         private String getDateStr(ESColumn esColumn, Column column)
         {
-            DateTime date;
-            DateTimeZone dtz = DateTimeZone.getDefault();
-            if (esColumn.getTimezone() != null) {
-                // http://www.joda.org/joda-time/timezones.html
-                dtz = DateTimeZone.forID(esColumn.getTimezone());
-            }
+            ZoneId zone = esColumn.getTimezone() != null
+                    ? ZoneId.of(esColumn.getTimezone())
+                    : ZoneId.systemDefault();
             if (column.getType() != Column.Type.DATE && esColumn.getFormat() != null) {
-                DateTimeFormatter formatter = DateTimeFormat.forPattern(esColumn.getFormat());
-                date = formatter.withZone(dtz).parseDateTime(column.asString());
-                return date.toString();
+                TemporalAccessor parsed = DateTimeFormatter.ofPattern(esColumn.getFormat()).parse(column.asString());
+                ZonedDateTime date;
+                if (parsed.isSupported(ChronoField.INSTANT_SECONDS)) {
+                    // the format carried an offset or a zone of its own
+                    date = ZonedDateTime.from(parsed);
+                }
+                else {
+                    // a pattern may leave the time out ("yyyy-MM-dd"), and one that leaves the
+                    // date out is read as the epoch day, the way a partial pattern used to be
+                    // filled in
+                    LocalDate day = parsed.isSupported(ChronoField.EPOCH_DAY)
+                            ? LocalDate.from(parsed)
+                            : LocalDate.ofEpochDay(0);
+                    LocalTime time = parsed.isSupported(ChronoField.NANO_OF_DAY)
+                            ? LocalTime.from(parsed)
+                            : LocalTime.MIDNIGHT;
+                    date = LocalDateTime.of(day, time).atZone(zone);
+                }
+                return date.format(ISO_DATE_TIME);
             }
             else if (column.getType() == Column.Type.DATE) {
-                date = new DateTime(column.asLong(), dtz);
-                return date.toString();
+                return Instant.ofEpochMilli(column.asLong()).atZone(zone).format(ISO_DATE_TIME);
             }
             else {
                 return column.asString();
@@ -346,7 +394,7 @@ public class ESWriter
         private long doBatchInsert(final List<Record> writerBuffer)
         {
             Map<String, Object> data;
-            final Bulk.Builder bulkAction = new Bulk.Builder().defaultIndex(this.index).defaultType(this.type);
+            final Bulk.Builder bulkAction = new Bulk.Builder().defaultIndex(this.index);
             for (Record record : writerBuffer) {
                 data = new HashMap<>();
                 StringBuilder id = new StringBuilder();
@@ -374,7 +422,16 @@ public class ESWriter
                     else {
                         switch (columnType) {
                             case ID:
-                                id.append(record.getColumn(i).asString());
+                                String idValue = record.getColumn(i).asString();
+                                if (idValue == null) {
+                                    if (!missingIdLogged) {
+                                        missingIdLogged = true;
+                                        log.warn("column[{}] is empty for a record, elasticsearch generates the id for it", columnName);
+                                    }
+                                }
+                                else {
+                                    id.append(idValue);
+                                }
                                 break;
                             case DATE:
                                 try {
@@ -396,6 +453,10 @@ public class ESWriter
                                 data.put(columnName, column.asBoolean());
                                 break;
                             case BYTE:
+                                // the byte type is an integer of 8 bits, and a byte[] would
+                                // reach elasticsearch base64 encoded
+                                data.put(columnName, column.asLong());
+                                break;
                             case BINARY:
                                 data.put(columnName, column.asBytes());
                                 break;
@@ -422,8 +483,10 @@ public class ESWriter
                     }
                 }
 
-                if (id.capacity() == 0) {
-                    //id = UUID.randomUUID().toString()
+                if (id.length() == 0) {
+                    // no id column, or no value in it: elasticsearch generates the id. A null
+                    // primary key used to be written as the literal id "null" -- every such
+                    // document landed on that one id and overwrote the previous one.
                     bulkAction.addAction(new Index.Builder(data).build());
                 }
                 else {
@@ -438,7 +501,7 @@ public class ESWriter
                     public Integer call()
                             throws Exception
                     {
-                        JestResult jestResult = esClient.bulkInsert(bulkAction, 1);
+                        JestResult jestResult = esClient.bulkInsert(bulkAction);
                         if (jestResult.isSucceeded()) {
                             return writerBuffer.size();
                         }
@@ -474,7 +537,7 @@ public class ESWriter
                             Integer status = esClient.getStatus(jestResult);
                             if (status == 429) {
                                 //TOO_MANY_REQUESTS
-                                log.warn("server response too many requests, so auto reduce speed");
+                                log.warn("elasticsearch is overloaded ({}), the batch is sent again", status);
                             }
                             throw AddaxException.asAddaxException(EXECUTE_FAIL, jestResult.getErrorMessage());
                         }
