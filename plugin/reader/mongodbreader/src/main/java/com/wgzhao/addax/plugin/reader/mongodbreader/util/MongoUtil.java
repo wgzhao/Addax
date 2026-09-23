@@ -39,6 +39,19 @@ import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 public final class MongoUtil
 {
 
+    /** The lower bound of the first slice, unbounded. */
+    public static final String MIN_BOUND = "min";
+
+    /** The upper bound of the last slice, unbounded. */
+    public static final String MAX_BOUND = "max";
+
+    /**
+     * One task reads a single cursor on a client of its own, so a pool larger than a couple of
+     * connections only multiplies the sockets the server has to accept: with one client per task,
+     * the driver default of 100 would allow a hundred connections per task.
+     */
+    private static final int MAX_POOL_SIZE = 4;
+
     private MongoUtil() {}
 
     /** Initmongoclient. */
@@ -70,7 +83,33 @@ public final class MongoUtil
             // which would require percent-encoding
             builder.credential(MongoCredential.createCredential(userName, database, password.toCharArray()));
         }
+        builder.applyToConnectionPoolSettings(pool -> pool.maxSize(MAX_POOL_SIZE));
         return MongoClients.create(builder.build());
+    }
+
+    /**
+     * Encode a slice bound as extended JSON text.
+     *
+     * A slice configuration travels from the split of the job to the task through the framework,
+     * which serializes it to JSON and parses it back. A bound whose type JSON does not have would
+     * come back as a value of another type, and a comparison against a key of a different type
+     * matches nothing at all, so the bound keeps its type in its own extended JSON text.
+     *
+     * @param value the key of a split point, never null
+     * @return the extended JSON text of the value
+     */
+    public static String encodeBound(Object value)
+    {
+        return new Document("bound", value).toJson();
+    }
+
+    /**
+     * @param encoded the extended JSON text produced by {@link #encodeBound(Object)}
+     * @return the value with the type it had in the collection
+     */
+    public static Object decodeBound(String encoded)
+    {
+        return Document.parse(encoded).get("bound");
     }
 
     /**

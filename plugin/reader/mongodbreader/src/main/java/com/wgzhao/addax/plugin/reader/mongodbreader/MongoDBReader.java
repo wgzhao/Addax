@@ -37,7 +37,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.bson.BsonDocument;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,12 +77,7 @@ public class MongoDBReader
             this.originalConfig = getPluginJobConf();
             // the credentials are optional, a MongoDB without access control needs none
             String userName = originalConfig.getString(USERNAME);
-            String password = originalConfig.getString(PASSWORD);
-            if (password != null && password.startsWith(Constant.ENC_PASSWORD_PREFIX)) {
-                // encrypted password, need to decrypt
-                password = EncryptUtil.decrypt(password.substring(Constant.ENC_PASSWORD_PREFIX.length(), password.length() - 1));
-                originalConfig.set(Key.PASSWORD, password);
-            }
+            String password = decryptPassword(originalConfig.getString(PASSWORD));
             Configuration connConf = originalConfig.getConfiguration(CONNECTION);
             String database = connConf.getNecessaryValue(DATABASE, REQUIRED_VALUE);
             String authDb = connConf.getString(KeyConstant.MONGO_AUTH_DB, database);
@@ -107,6 +101,19 @@ public class MongoDBReader
         }
     }
 
+    /**
+     * @param password the configured password, possibly an encrypted one
+     * @return the password in clear text
+     */
+    private static String decryptPassword(String password)
+    {
+        if (password == null || !password.startsWith(Constant.ENC_PASSWORD_PREFIX)) {
+            return password;
+        }
+        // the encrypted form is wrapped as ${enc:...}, the cipher text is what the braces hold
+        return EncryptUtil.decrypt(password.substring(Constant.ENC_PASSWORD_PREFIX.length(), password.length() - 1));
+    }
+
     /** Task. */
     public static class Task
             extends Reader.Task
@@ -119,9 +126,9 @@ public class MongoDBReader
 
         private Document userFilter = null;
 
-        private Object lowerBound = null;
-        private Object upperBound = null;
-        private boolean isObjectId = true;
+        /** Both bounds are extended JSON texts or the {@code min} / {@code max} words for an open end. */
+        private String lowerBound = null;
+        private String upperBound = null;
         private int fetchSize;
 
         private MongoRowConverter rowConverter;
@@ -131,18 +138,13 @@ public class MongoDBReader
         {
             Configuration readerSliceConfig = getPluginJobConf();
             String userName = readerSliceConfig.getString(USERNAME);
-            String password = readerSliceConfig.getString(PASSWORD);
-            if (password != null && password.startsWith(Constant.ENC_PASSWORD_PREFIX)) {
-                // encrypted password, need to decrypt
-                password = EncryptUtil.decrypt(password.substring(Constant.ENC_PASSWORD_PREFIX.length(), password.length() - 1));
-            }
+            String password = decryptPassword(readerSliceConfig.getString(PASSWORD));
             this.fetchSize = readerSliceConfig.getInt(FETCH_SIZE, DEFAULT_FETCH_SIZE);
             this.userFilter = MongoUtil.parseFilter(readerSliceConfig.get(KeyConstant.MONGO_QUERY),
                     KeyConstant.MONGO_QUERY);
             this.rowConverter = new MongoRowConverter(parseColumns(readerSliceConfig));
-            this.lowerBound = readerSliceConfig.get(KeyConstant.LOWER_BOUND);
-            this.upperBound = readerSliceConfig.get(KeyConstant.UPPER_BOUND);
-            this.isObjectId = readerSliceConfig.getBool(KeyConstant.IS_OBJECT_ID);
+            this.lowerBound = readerSliceConfig.getString(KeyConstant.LOWER_BOUND);
+            this.upperBound = readerSliceConfig.getString(KeyConstant.UPPER_BOUND);
 
             Configuration connConf = readerSliceConfig.getConfiguration(CONNECTION);
             this.database = connConf.getString(DATABASE);
@@ -177,7 +179,9 @@ public class MongoDBReader
         {
             MongoCollection<BsonDocument> bsonCollection = mongoClient.getDatabase(database)
                     .getCollection(this.collection, BsonDocument.class);
-            FindIterable<BsonDocument> documents = bsonCollection.find(buildQueryFilter()).batchSize(fetchSize);
+            FindIterable<BsonDocument> documents = bsonCollection.find(buildQueryFilter()).batchSize(fetchSize)
+                    // a batch handed to a slow writer can idle past the server side cursor timeout
+                    .noCursorTimeout(true);
             Bson projection = rowConverter.projection();
             if (projection != null) {
                 // read only the configured fields, the constants need no field at all
@@ -213,17 +217,20 @@ public class MongoDBReader
             }
 
             Document filter = new Document();
-            if ("min".equals(lowerBound)) {
-                if (!"max".equals(upperBound)) {
-                    filter.append(KeyConstant.MONGO_PRIMARY_ID, new Document("$lt", toBound(upperBound)));
+            if (MongoUtil.MIN_BOUND.equals(lowerBound)) {
+                if (!MongoUtil.MAX_BOUND.equals(upperBound)) {
+                    filter.append(KeyConstant.MONGO_PRIMARY_ID,
+                            new Document("$lt", MongoUtil.decodeBound(upperBound)));
                 }
             }
-            else if ("max".equals(upperBound)) {
-                filter.append(KeyConstant.MONGO_PRIMARY_ID, new Document("$gte", toBound(lowerBound)));
+            else if (MongoUtil.MAX_BOUND.equals(upperBound)) {
+                filter.append(KeyConstant.MONGO_PRIMARY_ID,
+                        new Document("$gte", MongoUtil.decodeBound(lowerBound)));
             }
             else {
                 filter.append(KeyConstant.MONGO_PRIMARY_ID,
-                        new Document("$gte", toBound(lowerBound)).append("$lt", toBound(upperBound)));
+                        new Document("$gte", MongoUtil.decodeBound(lowerBound))
+                                .append("$lt", MongoUtil.decodeBound(upperBound)));
             }
 
             if (userFilter != null && !userFilter.isEmpty()) {
@@ -231,12 +238,6 @@ public class MongoDBReader
             }
 
             return filter;
-        }
-
-        private Object toBound(Object bound)
-        {
-            // the bounds of an ObjectId primary key travel as hex strings
-            return isObjectId && bound instanceof String text ? new ObjectId(text) : bound;
         }
     }
 }

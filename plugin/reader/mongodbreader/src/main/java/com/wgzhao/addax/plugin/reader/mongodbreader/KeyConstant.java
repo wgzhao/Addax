@@ -40,8 +40,6 @@ public class KeyConstant
     public static final String LOWER_BOUND = "lowerBound";
     /** Upper bound. */
     public static final String UPPER_BOUND = "upperBound";
-    /** Is object id. */
-    public static final String IS_OBJECT_ID = "isObjectId";
 
     /** Mongo primary id. */
     public static final String MONGO_PRIMARY_ID = "_id";
