@@ -421,6 +421,7 @@ public class MongoDBWriter
         private Document processRecord(Record record)
         {
             try {
+                Document data;
                 if (this.wildcardMode) {
                     String json = record.getColumn(0).asString();
                     // an empty column means an empty document, which is not worth inserting
@@ -428,13 +429,15 @@ public class MongoDBWriter
                         return null;
                     }
                     // the driver's extended JSON parser restores ObjectId, Date and so on
-                    return Document.parse(json);
+                    data = Document.parse(json);
                 }
-
-                Document data = new Document();
-                for (int i = 0; i < record.getColumnNumber(); i++) {
-                    processColumn(record.getColumn(i), getColumnPlan(i), data);
+                else {
+                    data = new Document();
+                    for (int i = 0; i < record.getColumnNumber(); i++) {
+                        processColumn(record.getColumn(i), getColumnPlan(i), data);
+                    }
                 }
+                // a whole document carries its own keys, so the check belongs to both paths
                 if (update && getNestedValue(data, updateKeyPath) == null) {
                     // the query of such a record would be {key: null}, which matches every document
                     // where the field is missing or null, and the upsert would overwrite the first of them
