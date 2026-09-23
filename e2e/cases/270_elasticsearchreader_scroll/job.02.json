@@ -1,0 +1,42 @@
+{
+  "job": {
+    "setting": {
+      "speed": { "channel": 1 },
+      "errorLimit": { "record": 0 }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "elasticsearchreader",
+          "parameter": {
+            "endpoint": "${es_endpoint}",
+            "index": "addax_e2e_es",
+            "searchType": "dfs_query_then_fetch",
+            "scroll": "1m",
+            "filter": "active == true and qty > 0",
+            "search": [
+              {
+                "query": { "match_all": {} },
+                "size": 3,
+                "sort": ["_doc"]
+              }
+            ],
+            "column": ["id", "name", "qty", "price", "active", "tags", "big_neg", "big_int", "meta"]
+          }
+        },
+        "writer": {
+          "name": "txtfilewriter",
+          "parameter": {
+            "path": "${e2e_out_dir}",
+            "fileName": "filtered",
+            "fileFormat": "csv",
+            "writeMode": "truncate",
+            "fieldDelimiter": ",",
+            "nullFormat": "<null>",
+            "encoding": "UTF-8"
+          }
+        }
+      }
+    ]
+  }
+}

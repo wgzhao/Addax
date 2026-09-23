@@ -1,0 +1,20 @@
+1,alice,0,1.5,true,"[""a"",""b""]",-3000000000,<null>,"{""origin"":""beijing""}"
+10,filler-10,10,10.5,true,"[""t10""]",-10,<null>,<null>
+11,filler-11,11,11.5,false,"[""t11""]",-11,<null>,<null>
+12,filler-12,12,12.5,true,"[""t12""]",-12,<null>,<null>
+13,filler-13,13,13.5,false,"[""t13""]",-13,<null>,<null>
+14,filler-14,14,14.5,true,"[""t14""]",-14,<null>,<null>
+15,filler-15,15,15.5,false,"[""t15""]",-15,<null>,<null>
+16,filler-16,16,16.5,true,"[""t16""]",-16,<null>,<null>
+17,filler-17,17,17.5,false,"[""t17""]",-17,<null>,<null>
+18,filler-18,18,18.5,true,"[""t18""]",-18,<null>,<null>
+19,filler-19,19,19.5,false,"[""t19""]",-19,<null>,<null>
+2," 空间 ",2147483647,0.0,false,"[""中文"",""a,b""]",2147483648,<null>,"{""origin"":""shanghai""}"
+20,filler-20,20,20.5,true,"[""t20""]",-20,<null>,<null>
+21,filler-21,21,21.5,false,"[""t21""]",-21,<null>,<null>
+3,,-2147483648,0.0,true,[],-2147483648,<null>,<null>
+4,"quote""and\back",1,5904.744,true,"[""x""]",9223372036854775807,<null>,"{""origin"":""c,d""}"
+5,null-fields,<null>,<null>,<null>,<null>,<null>,<null>,<null>
+6,beyond-long,<null>,<null>,<null>,<null>,<null>,123456789012345678901234567890,<null>
+8,filler-08,8,8.5,true,"[""t8""]",-8,<null>,<null>
+9,filler-09,9,9.5,false,"[""t9""]",-9,<null>,<null>

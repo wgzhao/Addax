@@ -78,6 +78,11 @@ build_addax_params() {
     # The S3 test double the object store cases run against. Its port is the same variable
     # the case setup starts it on, so the job and the server cannot drift apart.
     append_param s3_endpoint "http://127.0.0.1:${E2E_MOTO_PORT:-5111}"
+
+    # The elasticsearch cluster the case reads from. There is no throwaway cluster in this
+    # suite, so it is whatever E2E_ES_ENDPOINT points at (the same variable setup.sh checks
+    # the case's reachability with, and the one the README documents).
+    append_param es_endpoint "${E2E_ES_ENDPOINT:-http://127.0.0.1:9200}"
 }
 
 # Run one job file. The job path is a positional argument: `-job x.json` is NOT
@@ -124,6 +129,17 @@ run_addax_job() { # job_file, log_dir
     base="$(basename "$job" .json)"
     out="$logdir/${base}.console.log"
 
+    # CASE_JVM_ARGS is passed as one -j argument and expanded by addax.sh inside `sh -c`,
+    # so a case must put its whole option string there (spaces and all). The elasticsearch
+    # case uses it to switch off the JVM proxy: a machine behind a system proxy would
+    # otherwise route the job's HTTP requests through it.
+    #
+    # Only when a case asks for it: -j replaces the launcher's own default JVM options.
+    # The ${a[@]+...} form is what keeps an empty array from tripping `set -u`, which
+    # bash 3.2 (macOS /bin/bash) treats as an unbound variable.
+    local jvm_args=()
+    [ -n "${CASE_JVM_ARGS:-}" ] && jvm_args=(-j "$CASE_JVM_ARGS")
+
     # TZ pins the JVM default timezone, which is what decides the wall clock for
     # every timestamp the RDBMS path handles (the reader converts through
     # Calendar.getInstance(), the drivers render in the connection's zone) and which
@@ -136,13 +152,13 @@ run_addax_job() { # job_file, log_dir
     # change while the rendered wall clock does not.
     local tz="${CASE_TZ:-UTC}"
 
-    log "  addax.sh ${base}  (TZ=${tz})"
+    log "  addax.sh ${base}  (TZ=${tz}${CASE_JVM_ARGS:+  JVM=${CASE_JVM_ARGS}})"
     if command -v timeout >/dev/null 2>&1; then
         TZ="$tz" timeout "${E2E_JOB_TIMEOUT:-600}" "$ADDAX_HOME/bin/addax.sh" \
-            -p"$ADDAX_PARAMS" -l "$logdir" -L info "$job" >"$out" 2>&1 || rc=$?
+            ${jvm_args[@]+"${jvm_args[@]}"} -p"$ADDAX_PARAMS" -l "$logdir" -L info "$job" >"$out" 2>&1 || rc=$?
     else
         TZ="$tz" "$ADDAX_HOME/bin/addax.sh" \
-            -p"$ADDAX_PARAMS" -l "$logdir" -L info "$job" >"$out" 2>&1 || rc=$?
+            ${jvm_args[@]+"${jvm_args[@]}"} -p"$ADDAX_PARAMS" -l "$logdir" -L info "$job" >"$out" 2>&1 || rc=$?
     fi
 
     if [ "$rc" -ne 0 ]; then
