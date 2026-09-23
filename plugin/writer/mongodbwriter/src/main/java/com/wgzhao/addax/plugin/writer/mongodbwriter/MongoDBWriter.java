@@ -284,7 +284,13 @@ public class MongoDBWriter
         private void parseWriteMode(Configuration writerSliceConfig)
         {
             String writeMode = writerSliceConfig.getString(WRITE_MODE, "insert");
+            if ("insert".equalsIgnoreCase(writeMode)) {
+                return;
+            }
             if (!writeMode.startsWith("update")) {
+                // anything else used to be taken as an insert without saying so
+                LOG.warn("Unsupported writeMode [{}], the documents are inserted, only [insert] and [update(field)] are understood",
+                        writeMode);
                 return;
             }
             int begin = writeMode.indexOf('(');
