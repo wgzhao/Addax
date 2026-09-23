@@ -210,6 +210,7 @@ public class MongoDBWriter
         private boolean wildcardMode = false;
         private List<ColumnPlan> columnPlans = null;
         private boolean update = false;
+        private String updateKey = null;
         private String[] updateKeyPath = null;
 
         /** Buffered documents together with their source records, so a failed write can be reported as a dirty record. */
@@ -285,8 +286,8 @@ public class MongoDBWriter
                         "When specifying the mode is update, you MUST both specify the field to be updated, for example update(unique_id)");
             }
             this.update = true;
-            String updateKey = writeMode.substring(begin + 1, end).trim();
-            this.updateKeyPath = ColumnPlan.splitPath(updateKey);
+            this.updateKey = writeMode.substring(begin + 1, end).trim();
+            this.updateKeyPath = ColumnPlan.splitPath(this.updateKey);
         }
 
         @Override
@@ -378,6 +379,13 @@ public class MongoDBWriter
                 Document data = new Document();
                 for (int i = 0; i < record.getColumnNumber(); i++) {
                     processColumn(record.getColumn(i), getColumnPlan(i), data);
+                }
+                if (update && getNestedValue(data, updateKeyPath) == null) {
+                    // the query of such a record would be {key: null}, which matches every document
+                    // where the field is missing or null, and the upsert would overwrite the first of them
+                    throw new IllegalArgumentException(String.format(
+                            "The record carries no value at the update key [%s], it does not name the document to replace",
+                            updateKey));
                 }
                 return data;
             }
