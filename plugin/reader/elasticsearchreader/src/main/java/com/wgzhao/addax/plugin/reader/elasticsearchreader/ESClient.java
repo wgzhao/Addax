@@ -89,7 +89,11 @@ public class ESClient
 
         if (!user.isEmpty() && !passwd.isEmpty()) {
             httpClientConfig.defaultCredentials(user, passwd);
-            httpClientConfig.setPreemptiveAuth(new HttpHost(endpoint));
+            // HttpHost.create parses scheme, host and port out of the endpoint. The plain
+            // HttpHost(String) constructor keeps the whole url as the host name, and the
+            // credentials are then cached under a host the requests never match, so the
+            // client falls back to answering a 401 challenge instead of authenticating up front.
+            httpClientConfig.setPreemptiveAuth(HttpHost.create(endpoint));
         }
 
         factory.setHttpClientConfig(httpClientConfig.build());
@@ -97,25 +101,26 @@ public class ESClient
         jestClient = factory.getObject();
     }
 
-    /** Indicesexists. */
-    public boolean indicesExists(String indexName)
+    /**
+     * Fails unless the index can be read.
+     *
+     * <p>Only a 404 means the index is missing. Everything else (the cluster refuses the
+     * credentials, a proxy answers instead of elasticsearch, the node is unreachable) is
+     * reported as it came back: telling the user the index does not exist when the request
+     * never reached the cluster sends them looking in the wrong place.
+     */
+    public void checkIndexExists(String indexName)
             throws Exception
     {
-        boolean isIndicesExists = false;
         JestResult rst = jestClient.execute(new IndicesExists.Builder(indexName).build());
         if (rst.isSucceeded()) {
-            return true;
+            return;
         }
-        else {
-            switch (rst.getResponseCode()) {
-                case 404:
-                    return false;
-                case 401:
-                default:
-                    log.warn(rst.getErrorMessage());
-                    return false;
-            }
+        if (rst.getResponseCode() == 404) {
+            throw new IOException(String.format("index[%s] not exist", indexName));
         }
+        throw new IOException(String.format("cannot read index[%s]: code:%s, msg:%s",
+                indexName, rst.getResponseCode(), rst.getErrorMessage()));
     }
 
     /** Search. */

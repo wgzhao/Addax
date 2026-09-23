@@ -30,6 +30,7 @@ import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -66,51 +67,65 @@ public class MapTypeAdapter
     public Object read(JsonReader in)
             throws IOException
     {
-        JsonToken token = in.peek();
-        switch (token) {
-            case BEGIN_ARRAY:
-                List<Object> list = new ArrayList<>();
-                in.beginArray();
-                while (in.hasNext()) {
-                    list.add(read(in));
-                }
-                in.endArray();
-                return list;
-
-            case BEGIN_OBJECT:
-                Map<String, Object> map = new LinkedTreeMap<>();
-                in.beginObject();
-                while (in.hasNext()) {
-                    map.put(in.nextName(), read(in));
-                }
-                in.endObject();
-                return map;
-
-            case STRING:
-                return in.nextString();
-
-            case NUMBER:
-                //改写数字的处理逻辑，将数字值分为整型与浮点型
-                String numberStr = in.nextString();
-                if (numberStr.contains(".") || numberStr.contains("e")
-                        || numberStr.contains("E")) {
-                    return Double.parseDouble(numberStr);
-                }
-                long value = Long.parseLong(numberStr);
-                if (value <= Integer.MAX_VALUE) {
-                    return (int) value;
-                }
-                return value;
-
-            case BOOLEAN:
-                return in.nextBoolean();
-
-            case NULL:
+        return switch (in.peek()) {
+            case BEGIN_ARRAY -> readArray(in);
+            case BEGIN_OBJECT -> readObject(in);
+            case STRING -> in.nextString();
+            case NUMBER -> readNumber(in.nextString());
+            case BOOLEAN -> in.nextBoolean();
+            case NULL -> {
                 in.nextNull();
-                return null;
+                yield null;
+            }
+            default -> throw new IllegalStateException("unexpected token");
+        };
+    }
 
-            default:
-                throw new IllegalStateException();
+    private List<Object> readArray(JsonReader in)
+            throws IOException
+    {
+        List<Object> list = new ArrayList<>();
+        in.beginArray();
+        while (in.hasNext()) {
+            list.add(read(in));
+        }
+        in.endArray();
+        return list;
+    }
+
+    private Map<String, Object> readObject(JsonReader in)
+            throws IOException
+    {
+        Map<String, Object> map = new LinkedTreeMap<>();
+        in.beginObject();
+        while (in.hasNext()) {
+            map.put(in.nextName(), read(in));
+        }
+        in.endObject();
+        return map;
+    }
+
+    /**
+     * Numbers are classified as integral or floating point. Elasticsearch keeps the original
+     * text of a document, so a value can be an integer beyond the range of a long (a field
+     * mapped as double or scaled_float, or one that is not mapped at all); such a value is
+     * kept as a BigDecimal instead of failing the whole read with a NumberFormatException.
+     */
+    private static Object readNumber(String numberStr)
+    {
+        if (numberStr.indexOf('.') >= 0 || numberStr.indexOf('e') >= 0 || numberStr.indexOf('E') >= 0) {
+            return Double.parseDouble(numberStr);
+        }
+        try {
+            long value = Long.parseLong(numberStr);
+            // both bounds matter: casting a long below Integer.MIN_VALUE truncates silently
+            if (value >= Integer.MIN_VALUE && value <= Integer.MAX_VALUE) {
+                return (int) value;
+            }
+            return value;
+        }
+        catch (NumberFormatException e) {
+            return new BigDecimal(numberStr);
         }
     }
 
