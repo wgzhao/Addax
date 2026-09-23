@@ -28,6 +28,16 @@ updates:
       # Migrating them is a plugin rewrite, not a dependency update
       - dependency-name: "com.datastax.cassandra:cassandra-driver-core"
         versions: ["4.x"]
+      # Hive 4 republished hive-standalone-metastore as a pom aggregator and moved its
+      # classes into hive-standalone-metastore-common/-client/-server, so bumping the
+      # shared hive.version no longer resolves for the hivereader plugin, which needs the
+      # Hive 3 KerberosSaslHelper/HadoopThriftAuthBridge layout (see #1617). The reader was
+      # also just taught to talk to a Hive 3 metastore (#1615), so moving to a Hive 4
+      # client is a migration with a test against the target server, not a version bump
+      - dependency-name: "org.apache.hive:*"
+        versions: ["4.x"]
+      - dependency-name: "org.apache.hive.shims:*"
+        versions: ["4.x"]
   # Maintain dependencies for GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
