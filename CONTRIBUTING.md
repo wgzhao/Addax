@@ -24,11 +24,13 @@ expected from contributors and committers in at least equal proportion to their 
   branch before submitting your pull request. If it doesn't merge cleanly with
   master you may be asked to rebase your changes.
 
-- Test Cases are expected for all bug fixes and new features.
+- Verify your change locally and paste the result of that verification into the pull
+  request. The project has no unit test suite: testing is done by hand against a real
+  data source, and a reviewer should be able to see what was run and what came out.
 
 - Make sure your code follows the [code style guidelines](https://github.com/wgzhao/addax#code-style).
 
-- Ensure that each commit is correct independently (i.e., each commit should compile and pass tests).
+- Ensure that each commit is correct independently (i.e., each commit should compile on its own).
       When possible, the size of the commit should be reduced for ease of review, while still ensuring
       that it is independently correct.
 
