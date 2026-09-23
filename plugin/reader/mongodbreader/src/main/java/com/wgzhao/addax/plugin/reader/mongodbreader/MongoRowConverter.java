@@ -20,6 +20,7 @@
 package com.wgzhao.addax.plugin.reader.mongodbreader;
 
 import com.wgzhao.addax.core.element.BoolColumn;
+import com.wgzhao.addax.core.element.BytesColumn;
 import com.wgzhao.addax.core.element.Column;
 import com.wgzhao.addax.core.element.DateColumn;
 import com.wgzhao.addax.core.element.DoubleColumn;
@@ -33,8 +34,9 @@ import org.bson.conversions.Bson;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.function.Supplier;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -51,16 +53,34 @@ public class MongoRowConverter
 
     private final List<ColumnPlan> plans;
 
+    /** The field paths to read, see {@link #projection()}. */
+    private final List<String> projectionPaths;
+
     private final boolean wildcard;
 
     public MongoRowConverter(List<String> columns)
     {
         List<ColumnPlan> resolved = new ArrayList<>(columns.size());
+        Set<String> fields = new LinkedHashSet<>();
         for (String column : columns) {
-            resolved.add(ColumnPlan.of(column));
+            ColumnPlan plan = ColumnPlan.of(column);
+            resolved.add(plan);
+            if (!plan.isConstant()) {
+                fields.add(plan.name());
+            }
         }
         this.plans = List.copyOf(resolved);
         this.wildcard = this.plans.size() == 1 && "*".equals(this.plans.get(0).name());
+
+        List<String> paths = new ArrayList<>(fields.size());
+        for (String field : fields) {
+            // the server rejects a projection of a field together with a field below it, and
+            // reading the wider one already covers the narrower, whatever order they came in
+            if (fields.stream().noneMatch(other -> field.startsWith(other + "."))) {
+                paths.add(field);
+            }
+        }
+        this.projectionPaths = List.copyOf(paths);
     }
 
     /**
@@ -72,16 +92,18 @@ public class MongoRowConverter
             return null;
         }
         BsonDocument projection = new BsonDocument();
-        boolean hasField = false;
-        for (ColumnPlan plan : plans) {
-            if (!plan.isConstant()) {
-                projection.put(plan.path()[0], new BsonInt32(1));
-                hasField = true;
-            }
+        for (String path : projectionPaths) {
+            projection.put(path, new BsonInt32(1));
         }
-        if (!hasField) {
+        if (projection.isEmpty()) {
             // an empty projection would return every field, name one to keep the transfer minimal
             projection.put(KeyConstant.MONGO_PRIMARY_ID, new BsonInt32(1));
+            return projection;
+        }
+        if (projectionPaths.stream().noneMatch(path -> path.equals(KeyConstant.MONGO_PRIMARY_ID)
+                || path.startsWith(KeyConstant.MONGO_PRIMARY_ID + '.'))) {
+            // an inclusion projection carries _id along, drop it when it is not read
+            projection.put(KeyConstant.MONGO_PRIMARY_ID, new BsonInt32(0));
         }
         return projection;
     }
@@ -114,11 +136,15 @@ public class MongoRowConverter
             case DECIMAL128 -> new StringColumn(value.asDecimal128().getValue().toString());
             case BOOLEAN -> new BoolColumn(value.asBoolean().getValue());
             case DATE_TIME -> new DateColumn(new Date(value.asDateTime().getValue()));
+            // a document is read as its extended JSON, the same text the wildcard column yields
             case DOCUMENT -> new StringColumn(value.asDocument().toJson());
             case OBJECT_ID -> new StringColumn(value.asObjectId().getValue().toHexString());
             case STRING -> new StringColumn(value.asString().getValue());
+            case BINARY -> new BytesColumn(value.asBinary().getData());
             case ARRAY -> new StringColumn(toJson(value));
-            default -> new StringColumn(value.toString());
+            // a timestamp, a regular expression or a minkey has no addax counterpart,
+            // its extended JSON keeps the value readable and parseable
+            default -> new StringColumn(toJson(value));
         };
     }
 
@@ -140,20 +166,19 @@ public class MongoRowConverter
      * A configured column resolved once: either a constant appended to every record, or a field
      * of the document addressed by a pre-split dotted path.
      */
-    private record ColumnPlan(String name, String[] path, Supplier<Column> constant)
+    private record ColumnPlan(String name, String[] path, Column constant)
     {
         static ColumnPlan of(String column)
         {
             // a quoted column is the documented way to append a constant string,
             // and a numeric column is appended as a number
             if (column.length() >= 2 && column.startsWith("'") && column.endsWith("'")) {
-                String value = column.substring(1, column.length() - 1);
-                return new ColumnPlan(column, null, () -> new StringColumn(value));
+                return new ColumnPlan(column, null, new StringColumn(column.substring(1, column.length() - 1)));
             }
             if (NUMBER_CONSTANT.matcher(column).matches()) {
                 return new ColumnPlan(column, null, column.contains(".")
-                        ? () -> new DoubleColumn(Double.parseDouble(column))
-                        : () -> new LongColumn(Long.parseLong(column)));
+                        ? new DoubleColumn(Double.parseDouble(column))
+                        : new LongColumn(Long.parseLong(column)));
             }
             return new ColumnPlan(column, column.contains(".") ? column.split("\\.") : new String[] {column}, null);
         }
@@ -166,7 +191,8 @@ public class MongoRowConverter
         Column toColumn(BsonDocument document)
         {
             if (constant != null) {
-                return constant.get();
+                // a column is never written to, one instance can back every record
+                return constant;
             }
             BsonValue value = get(document);
             return value == null ? new StringColumn() : MongoRowConverter.toColumn(value);
@@ -182,11 +208,11 @@ public class MongoRowConverter
                 if (!current.isDocument()) {
                     return null;
                 }
-                BsonDocument currentDocument = current.asDocument();
-                if (!currentDocument.containsKey(key)) {
+                // an absent key reads as null, a key holding a bson null reads as BsonNull
+                current = current.asDocument().get(key);
+                if (current == null) {
                     return null;
                 }
-                current = currentDocument.get(key);
             }
             // an absent field and a null value are both read as an empty column
             return current.isNull() ? null : current;
