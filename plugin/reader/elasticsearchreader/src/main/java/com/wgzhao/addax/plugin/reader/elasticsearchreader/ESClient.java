@@ -127,14 +127,13 @@ public class ESClient
     public SearchResult search(String query,
             SearchType searchType,
             String index,
-            String type,
             String scroll,
             Map<String, Object> headers,
             List<String> columns)
             throws IOException
     {
         // Log query for debugging to compare with curl body
-        log.debug("es search index={}, type={}, query={}", index, type, query);
+        log.debug("es search index={}, query={}", index, query);
         // Always search by index -> /{index}/_search. Types are deprecated in ES 7+ and
         // using a type in the path can result in no matches. Avoid adding type to the path.
         Search.Builder searchBuilder = new Search.Builder(query)

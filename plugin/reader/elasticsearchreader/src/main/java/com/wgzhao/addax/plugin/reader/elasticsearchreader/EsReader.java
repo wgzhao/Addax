@@ -97,8 +97,7 @@ public class EsReader
                     false);
 
             String indexName = ESKey.getIndexName(conf);
-            String typeName = ESKey.getTypeName(conf);
-            log.info("index:[{}], type:[{}]", indexName, typeName);
+            log.info("index:[{}]", indexName);
             try {
                 esClient.checkIndexExists(indexName);
             }
@@ -119,8 +118,8 @@ public class EsReader
         {
             // every query of the search array becomes a task. Check it here: a job without a
             // task fails later with "the number of tasks divided by the reader's job cannot be
-            // less than or equal to zero", which says nothing about what is missing. The type
-            // matters too, a single query object is not an array of queries.
+            // less than or equal to zero", which says nothing about what is missing. The shape
+            // matters too, a single query body is not an array of them.
             Object raw = conf.get(ESKey.SEARCH_KEY);
             if (raw == null) {
                 throw AddaxException.asAddaxException(REQUIRED_VALUE,
@@ -167,7 +166,6 @@ public class EsReader
         Gson gson = null;
         private Configuration conf;
         private String index;
-        private String type;
         private SearchType searchType;
         private Map<String, Object> headers;
         private String query;
@@ -197,7 +195,6 @@ public class EsReader
             this.esClient = new ESClient();
             this.gson = new GsonBuilder().registerTypeAdapterFactory(MapTypeAdapter.FACTORY).create();
             this.index = ESKey.getIndexName(conf);
-            this.type = ESKey.getTypeName(conf);
             this.searchType = ESKey.getSearchType(conf);
             this.headers = ESKey.getHeaders(conf);
             this.scroll = ESKey.getScroll(conf);
@@ -280,7 +277,7 @@ public class EsReader
             queryPerfRecord.start();
             JestResult page;
             try {
-                page = esClient.search(query, searchType, index, type, scroll, headers, column);
+                page = esClient.search(query, searchType, index, scroll, headers, column);
             }
             catch (Exception e) {
                 throw AddaxException.asAddaxException(EXECUTE_FAIL, e);
