@@ -83,6 +83,9 @@ public final class HttpKey
     // upper bound of the paged requests, 0 means no limit
     /** Max pages. */
     public static final String MAX_PAGES = "maxPages";
+    // number of pages requested ahead of the one being processed
+    /** Prefetch pages. */
+    public static final String PREFETCH_PAGES = "prefetchPages";
     // verify the TLS certificate and the hostname of https endpoints, disabled by default
     /** Ssl verify. */
     public static final String SSL_VERIFY = "sslVerify";
