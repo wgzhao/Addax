@@ -84,6 +84,10 @@ public class ESClient
                 .connTimeout(30000)
                 .readTimeout(readTimeout)
                 .maxTotalConnection(200)
+                // apache httpclient caps a route at 2 connections of its own, which would keep
+                // a task from having more than two bulk requests in flight however large
+                // parallelBulk is
+                .defaultMaxTotalConnectionPerRoute(200)
                 .requestCompressionEnabled(compression)
                 .discoveryEnabled(discovery)
                 .discoveryFrequency(5L, TimeUnit.MINUTES);

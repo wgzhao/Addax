@@ -46,11 +46,17 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
@@ -266,6 +272,7 @@ public class ESWriter
 
         private int trySize;
         private int batchSize;
+        private int parallelBulk;
         private String index;
         private String splitter;
         private boolean recordShapeChecked;
@@ -279,6 +286,19 @@ public class ESWriter
 
             trySize = ESKey.getTrySize(conf);
             batchSize = ESKey.getBatchSize(conf);
+            parallelBulk = ESKey.getParallelBulk(conf);
+            if (parallelBulk < 1) {
+                throw AddaxException.asAddaxException(CONFIG_ERROR,
+                        String.format("parallelBulk must be at least 1, but is %d", parallelBulk));
+            }
+            if (parallelBulk > 1 && !ESKey.isMultiThread(conf)) {
+                log.warn("the client is configured single threaded (multiThread=false), the bulk requests of "
+                        + "parallelBulk={} are sent one after the other", parallelBulk);
+            }
+            if (parallelBulk > 32) {
+                log.warn("parallelBulk={} keeps up to {} batches of {} records in memory",
+                        parallelBulk, parallelBulk, batchSize);
+            }
             splitter = ESKey.getSplitter(conf);
             columnList = JSON.parseObject(this.conf.getString(WRITE_COLUMNS), new TypeReference<List<ESColumn>>()
             {
@@ -308,27 +328,76 @@ public class ESWriter
         @Override
         public void startWrite(RecordReceiver recordReceiver)
         {
+            // A full batch is handed to a worker and its result is collected once parallelBulk
+            // batches are in flight: the round trip of one bulk then overlaps with the records
+            // of the next, which is what a task otherwise waits for. With parallelBulk=1 this
+            // is the loop that writes one batch and waits for it.
+            //
+            // The batches are applied in the order they are sent only while parallelBulk is 1:
+            // two records carrying the same primary key in different batches may reach the
+            // index in either order.
+            ExecutorService workers = Executors.newFixedThreadPool(parallelBulk, runnable -> {
+                Thread thread = new Thread(runnable, "es-bulk-" + index);
+                thread.setDaemon(true);
+                return thread;
+            });
+            Deque<Future<Long>> inFlight = new ArrayDeque<>();
             List<Record> writerBuffer = new ArrayList<>(this.batchSize);
-            Record record;
             long total = 0;
-            while ((record = recordReceiver.getFromReader()) != null) {
-                checkRecordShape(record);
-                writerBuffer.add(record);
-                if (writerBuffer.size() >= this.batchSize) {
-                    total += doBatchInsert(writerBuffer);
-                    writerBuffer.clear();
+            try {
+                Record record;
+                while ((record = recordReceiver.getFromReader()) != null) {
+                    checkRecordShape(record);
+                    writerBuffer.add(record);
+                    if (writerBuffer.size() >= this.batchSize) {
+                        inFlight.add(submit(workers, writerBuffer));
+                        writerBuffer = new ArrayList<>(this.batchSize);
+                        if (inFlight.size() >= parallelBulk) {
+                            total += await(inFlight.poll());
+                        }
+                    }
+                }
+
+                if (!writerBuffer.isEmpty()) {
+                    inFlight.add(submit(workers, writerBuffer));
+                }
+                while (!inFlight.isEmpty()) {
+                    total += await(inFlight.poll());
                 }
             }
-
-            if (!writerBuffer.isEmpty()) {
-                total += doBatchInsert(writerBuffer);
-                writerBuffer.clear();
+            finally {
+                workers.shutdownNow();
             }
 
             String msg = String.format("task end, write size :%d", total);
             getTaskPluginCollector().collectMessage("writeSize", String.valueOf(total));
             log.info(msg);
             esClient.closeJestClient();
+        }
+
+        /**
+         * Hands one batch to a worker. The batch belongs to the worker from here on: the
+         * caller starts a new list rather than clearing this one.
+         */
+        private Future<Long> submit(ExecutorService workers, List<Record> batch)
+        {
+            final List<Record> toWrite = batch;
+            return workers.submit(() -> doBatchInsert(toWrite));
+        }
+
+        private static long await(Future<Long> pending)
+        {
+            try {
+                return pending.get();
+            }
+            catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw AddaxException.asAddaxException(EXECUTE_FAIL, "interrupted while writing a batch", e);
+            }
+            catch (ExecutionException e) {
+                Throwable cause = e.getCause() == null ? e : e.getCause();
+                throw AddaxException.asAddaxException(EXECUTE_FAIL, cause);
+            }
         }
 
         /**

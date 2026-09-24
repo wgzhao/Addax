@@ -40,7 +40,8 @@ python3 - "$ES_ENDPOINT" <<'PY' || exit 1
 import sys, urllib.error, urllib.request
 urllib.request.install_opener(urllib.request.build_opener(urllib.request.ProxyHandler({})))
 endpoint = sys.argv[1].rstrip("/")
-for index in ("addax_e2e_esw_types", "addax_e2e_esw_generated", "addax_e2e_esw_dynamic"):
+for index in ("addax_e2e_esw_types", "addax_e2e_esw_generated", "addax_e2e_esw_dynamic",
+              "addax_e2e_esw_parallel"):
     req = urllib.request.Request(endpoint + "/" + index, method="DELETE")
     try:
         urllib.request.urlopen(req, timeout=10).read()

@@ -59,6 +59,12 @@ public final class ESKey
         return conf.getInt("batchSize", 1000);
     }
 
+    /** Returns the number of bulk requests one task may have in flight. */
+    public static int getParallelBulk(Configuration conf)
+    {
+        return conf.getInt("parallelBulk", 1);
+    }
+
     /** Returns the trysize. */
     public static int getTrySize(Configuration conf)
     {
