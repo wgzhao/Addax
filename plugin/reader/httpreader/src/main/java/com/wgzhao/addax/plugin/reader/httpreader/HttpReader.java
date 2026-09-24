@@ -52,14 +52,17 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Deque;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -160,6 +163,7 @@ public class HttpReader
         private static final String DEFAULT_TOKEN_HEADER = "Authorization";
         private static final String DEFAULT_TOKEN_PREFIX = "Bearer ";
         private static final String DEFAULT_METHOD = "GET";
+        private static final int DEFAULT_PREFETCH_PAGES = 1;
         /** Headers the http client refuses to set from user code, see HttpRequest.Builder#header. */
         private static final Set<String> RESTRICTED_HEADERS = Set.of("connection", "content-length", "expect", "host", "upgrade");
 
@@ -181,6 +185,7 @@ public class HttpReader
         private boolean sslVerify;
         private boolean isPage;
         private int maxPages;
+        private int prefetchPages;
         private PageConfig pageConfig;
         private boolean wildcard;
         private List<Column> columns;
@@ -206,6 +211,15 @@ public class HttpReader
             this.sslVerify = conf.getBool(HttpKey.SSL_VERIFY, false);
             this.isPage = conf.getBool(HttpKey.IS_PAGE, false);
             this.maxPages = conf.getInt(HttpKey.MAX_PAGES, 0);
+            this.prefetchPages = conf.getInt(HttpKey.PREFETCH_PAGES, DEFAULT_PREFETCH_PAGES);
+            if (maxPages < 0) {
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                        "The parameter [%s] must not be negative".formatted(HttpKey.MAX_PAGES));
+            }
+            if (prefetchPages < 1) {
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                        "The parameter [%s] must be greater than 0".formatted(HttpKey.PREFETCH_PAGES));
+            }
             this.pageConfig = resolvePageConfig(conf);
             resolveAuth(conf);
             resolveProxyConf(conf);
@@ -529,53 +543,114 @@ public class HttpReader
 
         private void readOnce(RecordSender recordSender)
         {
-            sendPage(executeRequest(baseUri, method, requestParams, headers, true), recordSender);
+            URI requestUri = buildRequestUri(baseUri, method, requestParams);
+            sendPage(await(requestUri, dispatch(requestUri, method, requestParams, headers, true)), recordSender);
         }
 
         private void processPagedRequest(RecordSender recordSender)
         {
             int pageSize = pageConfig.initialSize();
-            int pageIndex = pageConfig.initialIndex();
+            PagePipeline pipeline = new PagePipeline(pageConfig.initialIndex());
             int pages = 0;
             int records = 0;
             String previousBody = null;
             int previousCount = -1;
 
-            while (true) {
-                if (maxPages > 0 && pages >= maxPages) {
-                    LOG.warn("Stop paging at the configured [{}]={}; raise it to read the remaining pages", HttpKey.MAX_PAGES, maxPages);
-                    break;
-                }
+            try {
+                while (true) {
+                    PendingPage page = pipeline.poll();
+                    if (page == null) {
+                        if (pipeline.limitReached()) {
+                            LOG.warn("Stop paging at the configured [{}]={}; raise it to read the remaining pages", HttpKey.MAX_PAGES, maxPages);
+                        }
+                        break;
+                    }
 
-                String body = fetchPage(pageIndex, pageSize);
-                pages++;
+                    pages++;
+                    String body = await(page.requestUri(), page.response());
+                    // keep the network busy while this page is parsed and written, otherwise the round
+                    // trip of every single page is spent waiting
+                    pipeline.fill();
 
-                // an endpoint that ignores the paging parameters answers with the same full page forever,
-                // the already read records would be written again and again
-                if (body.equals(previousBody) && previousCount >= pageSize) {
-                    LOG.warn("Page {} returned exactly the same payload as page {}, the endpoint is probably ignoring the paging parameters; stop paging after {} record(s)", pageIndex, pageIndex - 1, records);
-                    break;
-                }
+                    // an endpoint that ignores the paging parameters answers with the same full page forever,
+                    // the already read records would be written again and again
+                    if (body.equals(previousBody) && previousCount >= pageSize) {
+                        LOG.warn("Page {} returned exactly the same payload as page {}, the endpoint is probably ignoring the paging parameters; stop paging after {} record(s)", page.pageIndex(), page.pageIndex() - 1, records);
+                        break;
+                    }
 
-                int count = sendPage(body, recordSender);
-                records += count;
-                if (count < pageSize) {
-                    break;
+                    int count = sendPage(body, recordSender);
+                    records += count;
+                    if (count < pageSize) {
+                        break;
+                    }
+                    previousBody = body;
+                    previousCount = count;
                 }
-                previousBody = body;
-                previousCount = count;
-                pageIndex++;
+            }
+            finally {
+                pipeline.cancel();
             }
 
             LOG.info("Paging finished: {} page(s), {} record(s)", pages, records);
         }
 
-        private String fetchPage(int pageIndex, int pageSize)
+        /** A page that is being requested, the response is read when the pipeline hands it out. */
+        private record PendingPage(int pageIndex, URI requestUri, CompletableFuture<HttpResponse<String>> response)
+        {
+        }
+
+        /**
+         * Requests the following pages while the current one is parsed and written, so that the round trip
+         * of a page is not spent waiting. The responses are handed out in the order the pages were
+         * requested, and the ones that are left over when the read ends are cancelled.
+         */
+        private final class PagePipeline
+        {
+            private final Deque<PendingPage> inFlight = new ArrayDeque<>();
+            private int nextPageIndex;
+            private int requested;
+
+            PagePipeline(int firstPageIndex)
+            {
+                this.nextPageIndex = firstPageIndex;
+                fill();
+            }
+
+            void fill()
+            {
+                while (inFlight.size() < prefetchPages && (maxPages == 0 || requested < maxPages)) {
+                    inFlight.add(startPage(nextPageIndex++));
+                    requested++;
+                }
+            }
+
+            PendingPage poll()
+            {
+                return inFlight.poll();
+            }
+
+            boolean limitReached()
+            {
+                return maxPages > 0 && requested >= maxPages;
+            }
+
+            void cancel()
+            {
+                for (PendingPage page : inFlight) {
+                    page.response().cancel(true);
+                }
+                inFlight.clear();
+            }
+        }
+
+        private PendingPage startPage(int pageIndex)
         {
             Map<String, Object> params = new LinkedHashMap<>(requestParams);
-            params.put(pageConfig.sizeKey(), pageSize);
+            params.put(pageConfig.sizeKey(), pageConfig.initialSize());
             params.put(pageConfig.indexKey(), pageIndex);
-            return executeRequest(baseUri, method, params, headers, true);
+            URI requestUri = buildRequestUri(baseUri, method, params);
+            return new PendingPage(pageIndex, requestUri, dispatch(requestUri, method, params, headers, true));
         }
 
         private String fetchToken()
@@ -700,10 +775,10 @@ public class HttpReader
 
         // ------------------------------------------------------------------ http
 
-        private String executeRequest(URI targetUri, String requestMethod, Map<String, ?> requestParams,
+        /** Send one request without waiting for it, so that the following page can be requested in parallel. */
+        private CompletableFuture<HttpResponse<String>> dispatch(URI requestUri, String requestMethod, Map<String, ?> requestParams,
                 Map<String, String> requestHeaders, boolean withAuth)
         {
-            URI requestUri = buildUri(targetUri, "GET".equals(requestMethod) ? requestParams : Map.of());
             HttpRequest.Builder requestBuilder = HttpRequest.newBuilder().uri(requestUri);
             requestHeaders.forEach(requestBuilder::header);
 
@@ -734,11 +809,23 @@ public class HttpReader
             if (LOG.isInfoEnabled()) {
                 LOG.info("Requesting: {}", requestUri);
             }
+            return httpClient.sendAsync(requestBuilder.build(), HttpResponse.BodyHandlers.ofString(charset));
+        }
 
-            // the timeout is applied to the whole exchange: the one of HttpRequest only covers the
-            // response headers, a server that stalls the body would otherwise hold the task forever
-            CompletableFuture<HttpResponse<String>> pending = httpClient.sendAsync(requestBuilder.build(),
-                    HttpResponse.BodyHandlers.ofString(charset));
+        private String executeRequest(URI targetUri, String requestMethod, Map<String, ?> requestParams,
+                Map<String, String> requestHeaders, boolean withAuth)
+        {
+            URI requestUri = buildRequestUri(targetUri, requestMethod, requestParams);
+            return await(requestUri, dispatch(requestUri, requestMethod, requestParams, requestHeaders, withAuth));
+        }
+
+        /**
+         * Wait for a dispatched request and return its body. The timeout is applied to the whole exchange:
+         * the one of {@link HttpRequest} only covers the response headers, a server that stalls the body
+         * would otherwise hold the task forever.
+         */
+        private String await(URI requestUri, CompletableFuture<HttpResponse<String>> pending)
+        {
             try {
                 return checkStatus(requestUri, pending.get(timeoutSec, TimeUnit.SECONDS));
             }
@@ -757,6 +844,10 @@ public class HttpReader
             catch (ExecutionException e) {
                 throw AddaxException.asAddaxException(RUNTIME_ERROR,
                         "HTTP request to %s failed: %s".formatted(requestUri, rootMessage(e.getCause())));
+            }
+            catch (CancellationException e) {
+                throw AddaxException.asAddaxException(RUNTIME_ERROR,
+                        "HTTP request to %s was cancelled".formatted(requestUri));
             }
         }
 
@@ -782,9 +873,15 @@ public class HttpReader
             return response.body();
         }
 
+        /** GET carries the parameters in the query string, POST in the request body. */
+        private static URI buildRequestUri(URI target, String requestMethod, Map<String, ?> requestParams)
+        {
+            return buildUri(target, "GET".equals(requestMethod) ? requestParams : Map.of());
+        }
+
         /**
          * Append the request parameters to the query string of the target URI, keeping the query
-         * string the user configured. GET reads them from the query string, POST from the body.
+         * string the user configured.
          */
         private static URI buildUri(URI target, Map<String, ?> requestParams)
         {
