@@ -22,10 +22,11 @@ handling and exit codes.
   the case at a different interpreter (a virtualenv, usually). It starts the test double
   on `E2E_MOTO_PORT` (5111 by default) when nothing is listening there yet and leaves it
   running, so consecutive runs reuse it.
-- An Elasticsearch cluster for the elasticsearchreader case, at `E2E_ES_ENDPOINT`
-  (`http://127.0.0.1:9200` by default). There is no throwaway cluster in this suite: the
-  case seeds an index of its own into whatever the variable points at, and skips when
-  nothing answers there. Seeding needs `python3`, standard library only.
+- An Elasticsearch cluster (7.0 or later) for the two elasticsearch cases, at
+  `E2E_ES_ENDPOINT` (`http://127.0.0.1:9200` by default). There is no throwaway cluster in
+  this suite: the reader case seeds an index of its own into whatever the variable points
+  at, the writer case writes into indices of its own, and both skip when nothing answers
+  there. They need `python3`, standard library only.
 
 ## Quick start
 
@@ -277,6 +278,7 @@ In CI the whole work directory is uploaded as the `e2e-logs` artifact on failure
 | 250_s3reader_objects | s3reader | txtfilewriter | object patterns (literal `.` and `+`), duplicate names, gzip detection, against moto |
 | 260_hdfsreader_roundtrip | streamreader + hdfsreader | hdfswriter | parquet and ORC round-trip on `file:///`: decimal, date, timestamp, boolean, array, map, type aliases, `column: ["*"]` |
 | 270_elasticsearchreader_scroll | elasticsearchreader | txtfilewriter | scroll paging (`batchSize` and a `size` in the search body), `filter`, a document read exactly once, number handling at the long and Integer bounds, a number beyond the long range |
+| 280_elasticsearchwriter_types | streamreader + txtfilereader | elasticsearchwriter | index created with its mappings, every field type, a `pk` column as the document id, a record without one, `dynamic`, `alias`, a `geo_shape` without tree/precision |
 
 The fixture behind all of them is six rows carrying the values that readers and writers
 actually get wrong: CJK, an embedded delimiter and double quote, a backslash, leading

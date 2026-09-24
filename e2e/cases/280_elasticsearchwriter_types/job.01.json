@@ -1,0 +1,69 @@
+{
+  "job": {
+    "setting": {
+      "speed": { "channel": 1 },
+      "errorLimit": { "record": 0 }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "streamreader",
+          "parameter": {
+            "sliceRecordCount": 3,
+            "column": [
+              { "incr": "1", "type": "long" },
+              { "value": "关键词, with comma", "type": "string" },
+              { "value": "the quick brown fox", "type": "string" },
+              { "value": 9007199254740993, "type": "long" },
+              { "value": 2147483647, "type": "long" },
+              { "value": 32767, "type": "long" },
+              { "value": 127, "type": "long" },
+              { "value": 1.5, "type": "double" },
+              { "value": "2.25", "type": "string" },
+              { "value": true, "type": "bool" },
+              { "value": "2020-01-02 03:04:05", "type": "date", "dateFormat": "yyyy-MM-dd HH:mm:ss" },
+              { "value": "2021-06-07", "type": "string" },
+              { "value": "1,2,3", "type": "string" },
+              { "value": "{\"lat\":39.9,\"lon\":116.4}", "type": "string" },
+              { "value": "[{\"sku\":\"s1\"},{\"sku\":\"s2\"}]", "type": "string" },
+              { "value": "39.9,116.4", "type": "string" },
+              { "value": "{\"type\":\"Point\",\"coordinates\":[116.4,39.9]}", "type": "string" }
+            ]
+          }
+        },
+        "writer": {
+          "name": "elasticsearchwriter",
+          "parameter": {
+            "endpoint": "${es_endpoint}",
+            "index": "addax_e2e_esw_types",
+            "cleanup": true,
+            "alias": "addax_e2e_types_alias",
+            "aliasMode": "exclusive",
+            "settings": { "index": { "number_of_shards": 1, "number_of_replicas": 0 } },
+            "batchSize": 2,
+            "splitter": ",",
+            "column": [
+              { "name": "pk", "type": "id" },
+              { "name": "col_keyword", "type": "keyword" },
+              { "name": "col_text", "type": "text", "analyzer": "standard", "norms": true, "index_options": "offsets" },
+              { "name": "col_long", "type": "long" },
+              { "name": "col_integer", "type": "integer" },
+              { "name": "col_short", "type": "short" },
+              { "name": "col_byte", "type": "byte" },
+              { "name": "col_double", "type": "double" },
+              { "name": "col_float", "type": "float" },
+              { "name": "col_boolean", "type": "boolean" },
+              { "name": "col_date", "type": "date", "format": "yyyy-MM-dd HH:mm:ss" },
+              { "name": "col_date_str", "type": "date", "format": "yyyy-MM-dd", "timezone": "Asia/Shanghai" },
+              { "name": "col_int_array", "type": "integer", "array": true },
+              { "name": "col_object", "type": "object" },
+              { "name": "col_nested", "type": "nested" },
+              { "name": "col_geo_point", "type": "geo_point" },
+              { "name": "col_geo_shape", "type": "geo_shape", "tree": "quadtree", "precision": "10m" }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

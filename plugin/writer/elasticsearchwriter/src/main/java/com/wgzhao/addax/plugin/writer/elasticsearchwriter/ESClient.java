@@ -47,7 +47,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * Created by xiongfeng.bxf on 17/2/8.
@@ -75,8 +77,9 @@ public class ESClient
     {
 
         JestClientFactory factory = new JestClientFactory();
+        List<String> endpoints = Arrays.asList(endpoint.split(","));
         HttpClientConfig.Builder httpClientConfig = new HttpClientConfig
-                .Builder(Arrays.asList(endpoint.split(",")))
+                .Builder(endpoints)
                 .multiThreaded(multiThread)
                 .connTimeout(30000)
                 .readTimeout(readTimeout)
@@ -86,7 +89,15 @@ public class ESClient
                 .discoveryFrequency(5L, TimeUnit.MINUTES);
 
         if (!("".equals(user) || "".equals(passwd))) {
-            httpClientConfig.setPreemptiveAuth(new HttpHost(endpoint)).defaultCredentials(user, passwd);
+            // HttpHost.create parses scheme, host and port out of the endpoint. The plain
+            // HttpHost(String) constructor keeps the whole url as the host name, and the
+            // credentials are then cached under a host the requests never match, so the
+            // client falls back to answering a 401 challenge instead of authenticating up front.
+            Set<HttpHost> hosts = endpoints.stream()
+                    .map(String::trim)
+                    .map(HttpHost::create)
+                    .collect(Collectors.toSet());
+            httpClientConfig.defaultCredentials(user, passwd).preemptiveAuthTargetHosts(hosts);
         }
 
         factory.setHttpClientConfig(httpClientConfig.build());
@@ -94,27 +105,26 @@ public class ESClient
         jestClient = factory.getObject();
     }
 
-    /** Indicesexists. */
+    /**
+     * Whether the index exists.
+     *
+     * <p>Only a 404 answers that question. Anything else (the credentials are refused, the
+     * node is unreachable, a proxy answers instead) is raised: reporting "does not exist"
+     * for it makes the writer try to create an index it cannot reach, and the error the
+     * user gets names the wrong problem.
+     */
     public boolean indicesExists(String indexName)
             throws Exception
     {
-        boolean isIndicesExists = false;
         JestResult rst = jestClient.execute(new IndicesExists.Builder(indexName).build());
         if (rst.isSucceeded()) {
-            isIndicesExists = true;
+            return true;
         }
-        else {
-            switch (rst.getResponseCode()) {
-                case 404:
-                    break;
-                case 401:
-                    // 无权访问
-                default:
-                    log.warn(rst.getErrorMessage());
-                    break;
-            }
+        if (rst.getResponseCode() == 404) {
+            return false;
         }
-        return isIndicesExists;
+        throw new IOException(String.format("cannot read index[%s]: code:%s, msg:%s",
+                indexName, rst.getResponseCode(), rst.getErrorMessage()));
     }
 
     /** Deleteindex. */
@@ -132,58 +142,55 @@ public class ESClient
         return true;
     }
 
-    /** Createindex. */
-    public boolean createIndex(String indexName, String typeName,
-            Object mappings, String settings, boolean dynamic)
+    /**
+     * Creates the index with its settings and mappings, and applies the mappings to an index
+     * that is already there.
+     *
+     * <p>Elasticsearch 7.0 removed the mapping type: the index is created with its settings
+     * and mappings in one request, and later mappings are put at {@code /{index}/_mapping}
+     * (the type argument of the Jest actions stays empty, which is what makes them build
+     * that path).
+     */
+    public boolean createIndex(String indexName, String mappings, String settings, boolean dynamic)
             throws Exception
     {
         JestResult rst;
         if (!indicesExists(indexName)) {
             log.info("create index {}", indexName);
-            rst = jestClient.execute(
-                    new CreateIndex.Builder(indexName)
-                            .settings(settings)
-                            .setParameter("master_timeout", "5m")
-                            .build()
-            );
-            //index_already_exists_exception
+            CreateIndex.Builder create = new CreateIndex.Builder(indexName)
+                    .settings(settings)
+                    .setParameter("master_timeout", "5m");
+            if (!dynamic) {
+                create.mappings(mappings);
+            }
+            rst = jestClient.execute(create.build());
             if (!rst.isSucceeded()) {
-                if (getStatus(rst) == 400) {
+                if (isAlreadyExists(rst)) {
                     log.info("index [{}] already exists", indexName);
                     return true;
                 }
-                else {
-                    log.error(rst.getErrorMessage());
-                    return false;
-                }
+                // a rejected settings or mappings body used to be reported as "already
+                // exists", and the job then wrote into an index elasticsearch created on the
+                // first document, with the mappings of the job silently dropped
+                throw new IOException(String.format("cannot create index[%s]: %s", indexName, describe(rst)));
             }
-            else {
-                log.info("create [{}] index success", indexName);
-            }
-        }
-
-        int idx = 0;
-        while (idx < 5) {
-            if (indicesExists(indexName)) {
-                break;
-            }
-            Thread.sleep(2000);
-            idx++;
-        }
-        if (idx >= 5) {
-            return false;
+            log.info("create [{}] index success", indexName);
+            return true;
         }
 
         if (dynamic) {
-            log.info("ignore mappings");
+            log.info("index [{}] exists, the mappings of the job are ignored (dynamic)", indexName);
             return true;
         }
-        log.info("create mappings for {} {}", indexName, mappings);
-        rst = jestClient.execute(new PutMapping.Builder(indexName, typeName, mappings)
+        log.info("put mappings for {} {}", indexName, mappings);
+        rst = jestClient.execute(new PutMapping.Builder(indexName, null, mappings)
                 .setParameter("master_timeout", "5m").build());
         if (!rst.isSucceeded()) {
             if (getStatus(rst) == 400) {
-                log.info("index [{}] mappings already exists", indexName);
+                // a field of an existing index cannot be redefined: the mapping of the job
+                // does not fully apply, and the writes that the difference breaks are the ones
+                // elasticsearch rejects, one document at a time
+                log.warn("the mappings of index [{}] do not apply: {}", indexName, describe(rst));
             }
             else {
                 log.error(rst.getErrorMessage());
@@ -206,6 +213,35 @@ public class ESClient
             log.warn(rst.getErrorMessage());
         }
         return rst;
+    }
+
+    /** Whether elasticsearch refused the request because the index is already there. */
+    private static boolean isAlreadyExists(JestResult rst)
+    {
+        JsonObject error = errorOf(rst);
+        return error != null && "resource_already_exists_exception".equals(error.get("type").getAsString());
+    }
+
+    /** The reason elasticsearch gives, response code included when there is no json body. */
+    private static String describe(JestResult rst)
+    {
+        JsonObject error = errorOf(rst);
+        if (error != null) {
+            JsonElement reason = error.get("reason");
+            return reason == null ? error.toString() : reason.getAsString();
+        }
+        String message = rst.getErrorMessage();
+        return message == null ? "code:" + rst.getResponseCode() : message;
+    }
+
+    private static JsonObject errorOf(JestResult rst)
+    {
+        JsonObject jsonObject = rst.getJsonObject();
+        if (jsonObject == null || !jsonObject.has("error")) {
+            return null;
+        }
+        JsonElement error = jsonObject.get("error");
+        return error.isJsonObject() ? error.getAsJsonObject() : null;
     }
 
     /** Returns the status. */
@@ -253,17 +289,23 @@ public class ESClient
         ModifyAliases modifyAliases = new ModifyAliases.Builder(addAliasMapping).addAlias(list).setParameter("master_timeout", "5m").build();
         rst = jestClient.execute(modifyAliases);
         if (!rst.isSucceeded()) {
-            log.error(rst.getErrorMessage());
+            // the alias is what a downstream reader switches on: a job that reports success
+            // while the alias still points at the previous index is worse than a failed job
+            throw new IOException(String.format("cannot point alias[%s] at index[%s]: %s",
+                    aliasName, indexName, describe(rst)));
         }
     }
 
-    /** Bulkinsert. */
-    public JestResult bulkInsert(Bulk.Builder bulk, int trySize)
+    /**
+     * Sends one bulk request.
+     *
+     * <p>The elasticsearch errors that are worth trying again (es_rejected_execution_exception,
+     * cluster_block_exception) come back as a result with a failure inside, the retry is the
+     * caller's.
+     */
+    public JestResult bulkInsert(Bulk.Builder bulk)
             throws Exception
     {
-        // es_rejected_execution_exception
-        // illegal_argument_exception
-        // cluster_block_exception
         JestResult rst;
         rst = jestClient.execute(bulk.build());
         if (!rst.isSucceeded()) {

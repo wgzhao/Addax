@@ -20,7 +20,6 @@
 package com.wgzhao.addax.plugin.writer.elasticsearchwriter;
 
 import com.wgzhao.addax.core.util.Configuration;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,27 +34,6 @@ public final class ESKey
     public static final String PRIMARY_KEY_COLUMN_NAME = "pk";
 
     private ESKey() {}
-
-    /** Returns the actiontype. */
-    public static ActionType getActionType(Configuration conf)
-    {
-        String actionType = conf.getString("actionType", "index");
-        if ("index".equals(actionType)) {
-            return ActionType.INDEX;
-        }
-        else if ("create".equals(actionType)) {
-            return ActionType.CREATE;
-        }
-        else if ("delete".equals(actionType)) {
-            return ActionType.DELETE;
-        }
-        else if ("update".equals(actionType)) {
-            return ActionType.UPDATE;
-        }
-        else {
-            return ActionType.UNKNOWN;
-        }
-    }
 
     /** Returns the endpoint. */
     public static String getEndpoint(Configuration conf)
@@ -123,16 +101,6 @@ public final class ESKey
         return conf.getNecessaryValue("index", REQUIRED_VALUE);
     }
 
-    /** Returns the typename. */
-    public static String getTypeName(Configuration conf)
-    {
-        String indexType = conf.getString("indexType");
-        if (StringUtils.isBlank(indexType)) {
-            indexType = conf.getString("type", getIndexName(conf));
-        }
-        return indexType;
-    }
-
     /** Checks whether the ignorewriteerror condition holds. */
     public static boolean isIgnoreWriteError(Configuration conf)
     {
@@ -143,12 +111,6 @@ public final class ESKey
     public static boolean isIgnoreParseError(Configuration conf)
     {
         return conf.getBool("ignoreParseError", true);
-    }
-
-    /** Checks whether the highspeedmode condition holds. */
-    public static boolean isHighSpeedMode(Configuration conf)
-    {
-        return "high speed".equals(conf.getString("mode", ""));
     }
 
     /** Returns the alias. */
@@ -182,13 +144,4 @@ public final class ESKey
         return conf.getBool("dynamic", false);
     }
 
-    /** Action Type configuration keys. */
-    public enum ActionType
-    {
-        UNKNOWN,
-        INDEX,
-        CREATE,
-        DELETE,
-        UPDATE
-    }
 }
