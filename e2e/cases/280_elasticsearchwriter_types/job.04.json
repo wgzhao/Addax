@@ -1,0 +1,31 @@
+{
+  "job": {
+    "setting": {
+      "speed": { "channel": 1 },
+      "errorLimit": { "record": 0 }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "streamreader",
+          "parameter": {
+            "sliceRecordCount": 500,
+            "column": [{ "incr": "1", "type": "long" }, { "value": "concurrent", "type": "string" }]
+          }
+        },
+        "writer": {
+          "name": "elasticsearchwriter",
+          "parameter": {
+            "endpoint": "${es_endpoint}",
+            "index": "addax_e2e_esw_parallel",
+            "cleanup": true,
+            "settings": { "index": { "number_of_shards": 1, "number_of_replicas": 0 } },
+            "batchSize": 50,
+            "parallelBulk": 4,
+            "column": [{ "name": "n", "type": "long" }, { "name": "k", "type": "keyword" }]
+          }
+        }
+      }
+    ]
+  }
+}

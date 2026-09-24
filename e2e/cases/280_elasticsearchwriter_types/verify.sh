@@ -17,6 +17,11 @@
 #
 # job.03 runs with `dynamic: true`: the writer sends no mappings and elasticsearch maps the
 # two fields itself.
+#
+# job.04 writes 500 records in batches of 50 with parallelBulk=4, so four batches are in
+# flight at a time and the batches are applied in an order other than the one they were read
+# in. The records carry no primary key value, so elasticsearch gives each document an id of
+# its own: a batch written twice, or one that never made it, shows up in the count.
 
 ES_ENDPOINT="${E2E_ES_ENDPOINT:-http://127.0.0.1:9200}"
 mkdir -p "$E2E_CASE_WORK/actual"
@@ -100,6 +105,12 @@ if "precision" in properties["col_geo_shape"] or "tree" in properties["col_geo_s
 aliases = get("/_cat/aliases/addax_e2e_types_alias?format=json")
 if not any(a["index"] == "addax_e2e_esw_types" for a in aliases):
     fail("the alias does not point at addax_e2e_esw_types: %s" % aliases)
+
+parallel = search("addax_e2e_esw_parallel")
+values = sorted(int(doc["_source"]["n"]) for doc in parallel)
+if len(parallel) != 500 or values != list(range(1, 501)):
+    fail("the 500 records of the concurrent job came out as %d documents (%d distinct values): "
+         "a batch was written twice or lost" % (len(parallel), len(set(values))))
 
 documents = search("addax_e2e_esw_generated")
 if len(documents) != 4:
