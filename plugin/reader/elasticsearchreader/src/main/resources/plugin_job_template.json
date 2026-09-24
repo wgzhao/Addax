@@ -5,7 +5,6 @@
     "accessId": "",
     "accesskey": "",
     "index": "test-1",
-    "type": "default",
     "searchType": "dfs_query_then_fetch",
     "headers": {},
     "scroll": "3m",

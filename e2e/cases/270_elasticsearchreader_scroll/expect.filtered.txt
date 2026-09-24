@@ -1,0 +1,8 @@
+10,filler-10,10,10.5,true,"[""t10""]",-10,<null>,<null>
+12,filler-12,12,12.5,true,"[""t12""]",-12,<null>,<null>
+14,filler-14,14,14.5,true,"[""t14""]",-14,<null>,<null>
+16,filler-16,16,16.5,true,"[""t16""]",-16,<null>,<null>
+18,filler-18,18,18.5,true,"[""t18""]",-18,<null>,<null>
+20,filler-20,20,20.5,true,"[""t20""]",-20,<null>,<null>
+4,"quote""and\back",1,5904.744,true,"[""x""]",9223372036854775807,<null>,"{""origin"":""c,d""}"
+8,filler-08,8,8.5,true,"[""t8""]",-8,<null>,<null>

@@ -21,7 +21,6 @@ package com.wgzhao.addax.plugin.reader.elasticsearchreader;
 
 import com.wgzhao.addax.core.util.Configuration;
 import io.searchbox.params.SearchType;
-import org.apache.commons.lang3.StringUtils;
 import com.google.gson.Gson;
 
 import java.util.HashMap;
@@ -69,22 +68,10 @@ public final class ESKey
         return conf.getInt("batchSize", 1000);
     }
 
-    /** Returns the trysize. */
-    public static int getTrySize(Configuration conf)
-    {
-        return conf.getInt("trySize", 30);
-    }
-
     /** Returns the timeout. */
     public static int getTimeout(Configuration conf)
     {
         return conf.getInt("timeout", 60) * 1000;
-    }
-
-    /** Checks whether the cleanup condition holds. */
-    public static boolean isCleanup(Configuration conf)
-    {
-        return conf.getBool("cleanup", false);
     }
 
     /** Checks whether the discovery condition holds. */
@@ -109,16 +96,6 @@ public final class ESKey
     public static String getIndexName(Configuration conf)
     {
         return conf.getNecessaryValue("index",  CONFIG_ERROR);
-    }
-
-    /** Returns the typename. */
-    public static String getTypeName(Configuration conf)
-    {
-        String indexType = conf.getString("indexType");
-        if (StringUtils.isBlank(indexType)) {
-            indexType = conf.getString("type", getIndexName(conf));
-        }
-        return indexType;
     }
 
     /** Returns the headers. */
