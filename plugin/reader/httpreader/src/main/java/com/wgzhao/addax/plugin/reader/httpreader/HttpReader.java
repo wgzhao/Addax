@@ -23,7 +23,7 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.JSONPath;
-import com.alibaba.fastjson2.JSONWriter;
+import com.wgzhao.addax.core.element.Record;
 import com.wgzhao.addax.core.element.StringColumn;
 import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.plugin.RecordSender;
@@ -38,21 +38,32 @@ import java.net.ProxySelector;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.StandardCharsets;
+import java.nio.charset.UnsupportedCharsetException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
@@ -71,7 +82,7 @@ import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 public class HttpReader
         extends Reader
 {
-    // Use record for page configuration
+    /** The paging parameter names, the first page index and the number of records per page. */
     private record PageConfig(String sizeKey, String indexKey, int initialSize, int initialIndex)
     {
         static PageConfig defaultConfig()
@@ -81,11 +92,34 @@ public class HttpReader
         }
     }
 
-    // Auth endpoint configuration used to fetch token before reading business data.
-    private record AuthConfig(URI uri, String method, Map<String, String> requestParams,
-                              Map<String, Object> headers, String resultKey,
+    /** Auth endpoint configuration used to fetch token before reading business data. */
+    private record AuthConfig(URI uri, String method, Map<String, Object> requestParams,
+                              Map<String, String> headers, String resultKey,
                               String tokenHeader, String tokenPrefix)
     {
+    }
+
+    /**
+     * One output column. A column is either a literal key, used by the wildcard mode where the keys
+     * come from the response itself and may contain characters that JSONPath reads as syntax, or a
+     * precompiled JSONPath expression from the column list.
+     */
+    private record Column(String name, JSONPath path)
+    {
+        static Column ofLiteral(String name)
+        {
+            return new Column(name, null);
+        }
+
+        static Column ofPath(String expression)
+        {
+            return new Column(expression, JSONPath.of(expression));
+        }
+
+        Object extract(JSONObject row)
+        {
+            return path == null ? row.get(name) : path.eval(row);
+        }
     }
 
     /** Job. */
@@ -125,166 +159,58 @@ public class HttpReader
         private static final int DEFAULT_TIMEOUT_SEC = 60;
         private static final String DEFAULT_TOKEN_HEADER = "Authorization";
         private static final String DEFAULT_TOKEN_PREFIX = "Bearer ";
+        private static final String DEFAULT_METHOD = "GET";
+        /** Headers the http client refuses to set from user code, see HttpRequest.Builder#header. */
+        private static final Set<String> RESTRICTED_HEADERS = Set.of("connection", "content-length", "expect", "host", "upgrade");
 
-        private Configuration readerSliceConfig = null;
+        // everything below is resolved once in init() and only read afterwards
         private URI baseUri;
-        private final Map<String, String> queryParams = new HashMap<>();
-        private String username;
-        private String password;
+        private String method;
+        private String resultKey;
+        private Map<String, Object> requestParams;
+        private Map<String, String> headers;
+        private Charset charset;
+        private int timeoutSec;
+        private String basicAuthHeader;
         private String token;
+        private String tokenHeader;
+        private String tokenPrefix;
         private InetSocketAddress proxyAddress;
         private String proxyUsername;
         private String proxyPassword;
-        private String method;
-        private HttpClient httpClient;
-        private int timeout;
+        private boolean sslVerify;
+        private boolean isPage;
+        private int maxPages;
+        private PageConfig pageConfig;
+        private boolean wildcard;
+        private List<Column> columns;
         private AuthConfig authConfig;
+        private HttpClient httpClient;
 
         @Override
         public void init()
         {
-            this.readerSliceConfig = this.getPluginJobConf();
-            this.username = readerSliceConfig.getString(HttpKey.USERNAME, null);
-            this.password = readerSliceConfig.getString(HttpKey.PASSWORD, null);
-            this.token = readerSliceConfig.getString(HttpKey.TOKEN, null);
-            this.method = readerSliceConfig.getString(HttpKey.METHOD, "get");
-            this.timeout = readerSliceConfig.getInt(HttpKey.TIMEOUT_SEC, DEFAULT_TIMEOUT_SEC);
-            Configuration conn = readerSliceConfig.getConfiguration(HttpKey.CONNECTION);
-            this.baseUri = URI.create(conn.getString(HttpKey.URL));
-
-            Configuration authConf = readerSliceConfig.getConfiguration(HttpKey.AUTH_CONFIG);
-            if (authConf != null) {
-                this.authConfig = parseAuthConfig(authConf);
+            Configuration conf = this.getPluginJobConf();
+            this.method = conf.getString(HttpKey.METHOD, DEFAULT_METHOD).toUpperCase(Locale.ROOT);
+            if (!"GET".equals(method) && !"POST".equals(method)) {
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                        "The parameter [%s] only supports GET and POST, but got [%s]".formatted(HttpKey.METHOD, method));
             }
-
-            if (conn.getString(HttpKey.PROXY, null) != null) {
-                setProxy(conn.getConfiguration(HttpKey.PROXY));
-            }
-
-            Map<String, Object> requestParams = readerSliceConfig.getMap(HttpKey.REQUEST_PARAMETERS, new HashMap<>());
-            requestParams.forEach((k, v) -> queryParams.put(k, v.toString()));
-
+            this.timeoutSec = conf.getInt(HttpKey.TIMEOUT_SEC, DEFAULT_TIMEOUT_SEC);
+            this.charset = resolveCharset(conf);
+            this.resultKey = conf.getString(HttpKey.RESULT_KEY, "");
+            this.baseUri = resolveUri(conf.getNecessaryValue(HttpKey.CONNECTION + "." + HttpKey.URL, REQUIRED_VALUE), HttpKey.URL);
+            this.requestParams = new LinkedHashMap<>(conf.getMap(HttpKey.REQUEST_PARAMETERS, new LinkedHashMap<>()));
+            this.headers = toStringMap(conf.getMap(HttpKey.HEADERS, new LinkedHashMap<>()));
+            validateHeaders(this.headers);
+            this.sslVerify = conf.getBool(HttpKey.SSL_VERIFY, false);
+            this.isPage = conf.getBool(HttpKey.IS_PAGE, false);
+            this.maxPages = conf.getInt(HttpKey.MAX_PAGES, 0);
+            this.pageConfig = resolvePageConfig(conf);
+            resolveAuth(conf);
+            resolveProxyConf(conf);
+            resolveColumns(conf);
             initHttpClient();
-        }
-
-        private URI buildUri()
-        {
-            return buildUri(baseUri, method, queryParams);
-        }
-
-        private AuthConfig parseAuthConfig(Configuration authConf)
-        {
-            String authUrl = authConf.getString(HttpKey.URL, null);
-            if (authUrl == null || authUrl.isBlank()) {
-                throw AddaxException.asAddaxException(REQUIRED_VALUE,
-                        "The parameter [authConfig.url] is required when authConfig is configured");
-            }
-
-            String authMethod = authConf.getString(HttpKey.METHOD, "POST");
-            Map<String, String> authParams = new HashMap<>();
-            authConf.getMap(HttpKey.REQUEST_PARAMETERS, new HashMap<>())
-                    .forEach((k, v) -> authParams.put(k, String.valueOf(v)));
-
-            String resultKey = authConf.getString(HttpKey.RESULT_KEY, "token");
-            String tokenHeader = authConf.getString(HttpKey.TOKEN_HEADER, DEFAULT_TOKEN_HEADER);
-            String tokenPrefix = authConf.getString(HttpKey.TOKEN_PREFIX, DEFAULT_TOKEN_PREFIX);
-
-            return new AuthConfig(
-                    URI.create(authUrl),
-                    authMethod,
-                    authParams,
-                    authConf.getMap(HttpKey.HEADERS, new HashMap<>()),
-                    resultKey,
-                    tokenHeader,
-                    tokenPrefix
-            );
-        }
-
-        private URI buildUri(URI targetUri, String requestMethod, Map<String, String> requestParams)
-        {
-            StringBuilder uriBuilder = new StringBuilder();
-            uriBuilder.append(targetUri.getScheme()).append("://")
-                    .append(targetUri.getAuthority())
-                    .append(targetUri.getPath() == null ? "" : targetUri.getPath());
-
-            if ("GET".equalsIgnoreCase(requestMethod)) {
-                Map<String, String> allParams = new HashMap<>();
-                if (targetUri.getQuery() != null) {
-                    for (String param : targetUri.getQuery().split("&")) {
-                        String[] parts = param.split("=", 2);
-                        if (parts.length == 2) {
-                            allParams.put(parts[0], parts[1]);
-                        }
-                    }
-                }
-                allParams.putAll(requestParams);
-
-                if (!allParams.isEmpty()) {
-                    uriBuilder.append('?');
-                    allParams.forEach((k, v) -> {
-                        if (uriBuilder.charAt(uriBuilder.length() - 1) != '?') {
-                            uriBuilder.append('&');
-                        }
-                        uriBuilder.append(k).append('=').append(v);
-                    });
-                }
-            }
-
-            return URI.create(uriBuilder.toString());
-        }
-
-        private void initHttpClient()
-        {
-            HttpClient.Builder builder = HttpClient.newBuilder()
-                    .connectTimeout(Duration.ofSeconds(timeout));
-
-            // Configure proxy if needed
-            if (proxyAddress != null) {
-                builder.proxy(ProxySelector.of(proxyAddress));
-                if (proxyUsername != null && proxyPassword != null) {
-                    builder.authenticator(new Authenticator()
-                    {
-                        @Override
-                        protected PasswordAuthentication getPasswordAuthentication()
-                        {
-                            return new PasswordAuthentication(proxyUsername, proxyPassword.toCharArray());
-                        }
-                    });
-                }
-            }
-
-            // Configure SSL for HTTPS
-            if (Objects.equals(baseUri.getScheme(), "https")) {
-                try {
-
-                    // 配置 SSL 参数以禁用主机名验证
-                    SSLParameters sslParameters = new SSLParameters();
-                    sslParameters.setEndpointIdentificationAlgorithm("");
-
-                    builder.sslContext(createInsecureSslContext())
-                            .sslParameters(sslParameters);
-
-                    LOG.warn("SSL certificate verification and hostname verification are disabled. This is not recommended for production use.");
-                }
-                catch (Exception e) {
-                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                            "Failed to initialize SSL context: " + e.getMessage());
-                }
-            }
-
-            httpClient = builder.build();
-        }
-
-        private SSLContext createInsecureSslContext()
-                throws NoSuchAlgorithmException, KeyManagementException
-        {
-            TrustManager[] trustAllCerts = new TrustManager[] {
-                    new InsecureTrustManager()
-            };
-
-            SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
-            return sslContext;
         }
 
         @Override
@@ -297,72 +223,372 @@ public class HttpReader
         public void startRead(RecordSender recordSender)
         {
             if (authConfig != null) {
-                this.token = fetchTokenFromAuthConfig();
-                LOG.info("Token fetched successfully from authConfig.");
+                this.token = fetchToken();
+                LOG.info("Token fetched from the authConfig endpoint");
             }
 
-            var isPage = readerSliceConfig.getBool(HttpKey.IS_PAGE, false);
             if (isPage) {
                 processPagedRequest(recordSender);
             }
             else {
-                getRecords(recordSender);
+                readOnce(recordSender);
             }
         }
 
-        private void processPagedRequest(RecordSender recordSender)
-        {
-            var pageConfig = getPageConfig();
-            var pageSize = pageConfig.initialSize();
-            var pageIndex = pageConfig.initialIndex();
+        // ------------------------------------------------------------------ config
 
-            queryParams.put(pageConfig.sizeKey(), String.valueOf(pageSize));
-            while (true) {
-                queryParams.put(pageConfig.indexKey(), String.valueOf(pageIndex));
-                var realPageSize = getRecords(recordSender);
-                if (realPageSize < pageSize) {
-                    break;
+        private static Charset resolveCharset(Configuration conf)
+        {
+            String encoding = conf.getString(HttpKey.ENCODING, StandardCharsets.UTF_8.name());
+            try {
+                return Charset.forName(encoding);
+            }
+            catch (IllegalCharsetNameException | UnsupportedCharsetException e) {
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE, "Unsupported encoding [%s]".formatted(encoding));
+            }
+        }
+
+        private static URI resolveUri(String value, String key)
+        {
+            URI uri;
+            try {
+                uri = new URI(value);
+            }
+            catch (URISyntaxException e) {
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                        "The parameter [%s] is not a valid URI: %s".formatted(key, e.getMessage()));
+            }
+
+            if (uri.getHost() == null || (!"http".equalsIgnoreCase(uri.getScheme()) && !"https".equalsIgnoreCase(uri.getScheme()))) {
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                        "The parameter [%s] must be an absolute http(s) URL, but got [%s]".formatted(key, value));
+            }
+            return uri;
+        }
+
+        private static Map<String, String> toStringMap(Map<String, Object> source)
+        {
+            Map<String, String> result = new LinkedHashMap<>(source.size());
+            source.forEach((k, v) -> result.put(k, v == null ? "" : String.valueOf(v)));
+            return result;
+        }
+
+        private static void validateHeaders(Map<String, String> headers)
+        {
+            for (String name : headers.keySet()) {
+                if (RESTRICTED_HEADERS.contains(name.toLowerCase(Locale.ROOT))) {
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                            "The header [%s] cannot be set by the http client, remove it from [%s]".formatted(name, HttpKey.HEADERS));
                 }
-                pageIndex++;
             }
         }
 
-        private PageConfig getPageConfig()
+        private void resolveAuth(Configuration conf)
         {
-            var pageParams = readerSliceConfig.getConfiguration(HttpKey.PAGE_PARAMS);
+            this.tokenHeader = DEFAULT_TOKEN_HEADER;
+            this.tokenPrefix = DEFAULT_TOKEN_PREFIX;
+
+            Configuration authConf = conf.getConfiguration(HttpKey.AUTH_CONFIG);
+            if (authConf == null) {
+                this.token = conf.getString(HttpKey.TOKEN, null);
+                String username = conf.getString(HttpKey.USERNAME, null);
+                String password = conf.getString(HttpKey.PASSWORD, null);
+                if ((username == null) != (password == null)) {
+                    throw AddaxException.asAddaxException(REQUIRED_VALUE,
+                            "The parameters [%s] and [%s] must be configured together".formatted(HttpKey.USERNAME, HttpKey.PASSWORD));
+                }
+                if (username != null) {
+                    // the credentials are fixed for the whole task, so the header is built once
+                    this.basicAuthHeader = "Basic " + Base64.getEncoder()
+                            .encodeToString((username + ":" + password).getBytes(StandardCharsets.UTF_8));
+                }
+                return;
+            }
+
+            String authUrl = authConf.getString(HttpKey.URL, null);
+            if (authUrl == null || authUrl.isBlank()) {
+                throw AddaxException.asAddaxException(REQUIRED_VALUE,
+                        "The parameter [authConfig.%s] is required when authConfig is configured".formatted(HttpKey.URL));
+            }
+            String authMethod = authConf.getString(HttpKey.METHOD, "POST").toUpperCase(Locale.ROOT);
+            if (!"GET".equals(authMethod) && !"POST".equals(authMethod)) {
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                        "The parameter [authConfig.%s] only supports GET and POST, but got [%s]".formatted(HttpKey.METHOD, authMethod));
+            }
+
+            Map<String, String> authHeaders = toStringMap(authConf.getMap(HttpKey.HEADERS, new LinkedHashMap<>()));
+            validateHeaders(authHeaders);
+
+            this.authConfig = new AuthConfig(
+                    resolveUri(authUrl, "authConfig." + HttpKey.URL),
+                    authMethod,
+                    new LinkedHashMap<>(authConf.getMap(HttpKey.REQUEST_PARAMETERS, new LinkedHashMap<>())),
+                    authHeaders,
+                    authConf.getString(HttpKey.RESULT_KEY, "token"),
+                    authConf.getString(HttpKey.TOKEN_HEADER, DEFAULT_TOKEN_HEADER),
+                    authConf.getString(HttpKey.TOKEN_PREFIX, DEFAULT_TOKEN_PREFIX));
+            this.tokenHeader = authConfig.tokenHeader();
+            this.tokenPrefix = authConfig.tokenPrefix() == null ? "" : authConfig.tokenPrefix();
+        }
+
+        private void resolveProxyConf(Configuration conf)
+        {
+            Configuration conn = conf.getConfiguration(HttpKey.CONNECTION);
+            if (conn == null || conn.getString(HttpKey.PROXY, null) == null) {
+                return;
+            }
+
+            Configuration proxyConf = conn.getConfiguration(HttpKey.PROXY);
+            String host = proxyConf.getString(HttpKey.HOST, null);
+            if (host == null || host.isBlank()) {
+                throw AddaxException.asAddaxException(REQUIRED_VALUE,
+                        "The parameter [connection.proxy.%s] is required when proxy is configured".formatted(HttpKey.HOST));
+            }
+            if (host.toLowerCase(Locale.ROOT).startsWith("socks")) {
+                // the JDK http client cannot tunnel through a SOCKS proxy, it would talk plain HTTP to it
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                        "A SOCKS proxy is not supported by the http client, use an http proxy instead, but got [%s]".formatted(host));
+            }
+            URI proxyUri = resolveUri(host.contains("://") ? host : "http://" + host, "connection.proxy." + HttpKey.HOST);
+            if (proxyUri.getPort() < 0) {
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                        "The parameter [connection.proxy.%s] must include the port, e.g. http://127.0.0.1:3128".formatted(HttpKey.HOST));
+            }
+            this.proxyAddress = new InetSocketAddress(proxyUri.getHost(), proxyUri.getPort());
+
+            String auth = proxyConf.getString(HttpKey.AUTH, null);
+            if (auth == null) {
+                return;
+            }
+            String[] parts = auth.split(":", 2);
+            if (parts.length < 2 || parts[0].isEmpty()) {
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                        "The parameter [connection.proxy.%s] must be in the form of username:password".formatted(HttpKey.AUTH));
+            }
+            this.proxyUsername = parts[0];
+            this.proxyPassword = parts[1];
+        }
+
+        private void resolveColumns(Configuration conf)
+        {
+            List<String> configured;
+            try {
+                configured = conf.getList(HttpKey.COLUMN, String.class);
+            }
+            catch (ClassCastException e) {
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                        "The parameter [%s] must be a list of strings".formatted(HttpKey.COLUMN));
+            }
+            if (configured.isEmpty()) {
+                throw AddaxException.asAddaxException(REQUIRED_VALUE, "The parameter [%s] is required".formatted(HttpKey.COLUMN));
+            }
+
+            this.wildcard = configured.size() == 1 && "*".equals(configured.get(0));
+            if (wildcard) {
+                this.columns = List.of();
+                return;
+            }
+
+            List<Column> resolved = new ArrayList<>(configured.size());
+            for (String expression : configured) {
+                if (expression == null || expression.isBlank()) {
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                            "The parameter [%s] must not contain an empty key".formatted(HttpKey.COLUMN));
+                }
+                try {
+                    // parsing the expressions once takes the JSONPath parse out of the per-record path
+                    resolved.add(Column.ofPath(expression));
+                }
+                catch (RuntimeException e) {
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                            "Invalid column expression [%s]: %s".formatted(expression, e.getMessage()));
+                }
+            }
+            this.columns = List.copyOf(resolved);
+        }
+
+        private PageConfig resolvePageConfig(Configuration conf)
+        {
+            if (!isPage) {
+                return PageConfig.defaultConfig();
+            }
+
+            Configuration pageParams = conf.getConfiguration(HttpKey.PAGE_PARAMS);
             if (pageParams == null) {
                 return PageConfig.defaultConfig();
             }
 
-            var indexConfig = pageParams.getString(HttpKey.PAGE_INDEX) != null ?
-                    pageParams.getMap(HttpKey.PAGE_INDEX) : Map.of();
-            var sizeConfig = pageParams.getString(HttpKey.PAGE_SIZE) != null ?
-                    pageParams.getMap(HttpKey.PAGE_SIZE) : Map.of();
+            int pageSize = pageValue(pageParams, HttpKey.PAGE_SIZE, DEFAULT_PAGE_SIZE);
+            int pageIndex = pageValue(pageParams, HttpKey.PAGE_INDEX, DEFAULT_PAGE_INDEX);
+            if (pageSize < 1) {
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                        "The parameter [%s.%s.value] must be greater than 0".formatted(HttpKey.PAGE_PARAMS, HttpKey.PAGE_SIZE));
+            }
+            if (pageIndex < 0) {
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                        "The parameter [%s.%s.value] must not be negative".formatted(HttpKey.PAGE_PARAMS, HttpKey.PAGE_INDEX));
+            }
 
             return new PageConfig(
-                    (String) sizeConfig.getOrDefault("key", HttpKey.PAGE_SIZE),
-                    (String) indexConfig.getOrDefault("key", HttpKey.PAGE_INDEX),
-                    Integer.parseInt(sizeConfig.getOrDefault("value", DEFAULT_PAGE_SIZE).toString()),
-                    Integer.parseInt(indexConfig.getOrDefault("value", DEFAULT_PAGE_INDEX).toString())
-            );
+                    pageKey(pageParams, HttpKey.PAGE_SIZE, HttpKey.PAGE_SIZE),
+                    pageKey(pageParams, HttpKey.PAGE_INDEX, HttpKey.PAGE_INDEX),
+                    pageSize,
+                    pageIndex);
         }
 
-        private String fetchTokenFromAuthConfig()
+        /**
+         * The pageParams sections are objects of the form {@code {"pageSize": {"key": "size", "value": 100}}};
+         * a section that is not an object is a configuration mistake worth reporting precisely.
+         */
+        private static Configuration pageSection(Configuration pageParams, String section)
         {
-            String responseBody = executeRequest(
-                    authConfig.uri(),
-                    authConfig.method(),
-                    authConfig.requestParams(),
-                    authConfig.headers(),
-                    false
-            );
+            Object raw = pageParams.get(section);
+            if (raw == null) {
+                return null;
+            }
+            if (!(raw instanceof Map)) {
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                        "The parameter [%s.%s] must be an object holding [key] and [value], e.g. {\"key\": \"%s\", \"value\": 100}, but got [%s]"
+                                .formatted(HttpKey.PAGE_PARAMS, section, section, raw));
+            }
+            return Configuration.from((Map<String, Object>) raw);
+        }
 
-            Object authPayload = JSON.parse(responseBody);
+        private static String pageKey(Configuration pageParams, String section, String defaultValue)
+        {
+            Configuration sectionConf = pageSection(pageParams, section);
+            Object key = sectionConf == null ? null : sectionConf.get("key");
+            return key == null || String.valueOf(key).isBlank() ? defaultValue : String.valueOf(key);
+        }
+
+        private static int pageValue(Configuration pageParams, String section, int defaultValue)
+        {
+            Configuration sectionConf = pageSection(pageParams, section);
+            Object value = sectionConf == null ? null : sectionConf.get("value");
+            return value == null ? defaultValue : parsePageInt(value, section);
+        }
+
+        private static int parsePageInt(Object value, String section)
+        {
+            try {
+                return Integer.parseInt(String.valueOf(value).trim());
+            }
+            catch (NumberFormatException e) {
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                        "The parameter [%s.%s.value] must be an integer, but got [%s]".formatted(HttpKey.PAGE_PARAMS, section, value));
+            }
+        }
+
+        private void initHttpClient()
+        {
+            HttpClient.Builder builder = HttpClient.newBuilder()
+                    .connectTimeout(Duration.ofSeconds(timeoutSec));
+
+            if (proxyAddress != null) {
+                builder.proxy(ProxySelector.of(proxyAddress));
+                if (proxyUsername != null) {
+                    builder.authenticator(new ProxyAuthenticator(proxyUsername, proxyPassword));
+                }
+            }
+
+            if (!sslVerify && (isHttps(baseUri) || (authConfig != null && isHttps(authConfig.uri())))) {
+                try {
+                    // note: an empty identification algorithm turns the hostname check off
+                    SSLParameters sslParameters = new SSLParameters();
+                    sslParameters.setEndpointIdentificationAlgorithm("");
+                    builder.sslContext(createInsecureSslContext()).sslParameters(sslParameters);
+                }
+                catch (NoSuchAlgorithmException | KeyManagementException e) {
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                            "Failed to initialize the SSL context: " + e.getMessage());
+                }
+                LOG.warn("TLS certificate and hostname verification are disabled, set [{}]=true to enable them", HttpKey.SSL_VERIFY);
+            }
+
+            httpClient = builder.build();
+        }
+
+        private static boolean isHttps(URI uri)
+        {
+            return uri != null && "https".equalsIgnoreCase(uri.getScheme());
+        }
+
+        private SSLContext createInsecureSslContext()
+                throws NoSuchAlgorithmException, KeyManagementException
+        {
+            TrustManager[] trustAllCerts = new TrustManager[] {
+                    new InsecureTrustManager()
+            };
+
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(null, trustAllCerts, new SecureRandom());
+            return sslContext;
+        }
+
+        // ------------------------------------------------------------------ reading
+
+        private void readOnce(RecordSender recordSender)
+        {
+            sendPage(executeRequest(baseUri, method, requestParams, headers, true), recordSender);
+        }
+
+        private void processPagedRequest(RecordSender recordSender)
+        {
+            int pageSize = pageConfig.initialSize();
+            int pageIndex = pageConfig.initialIndex();
+            int pages = 0;
+            int records = 0;
+            String previousBody = null;
+            int previousCount = -1;
+
+            while (true) {
+                if (maxPages > 0 && pages >= maxPages) {
+                    LOG.warn("Stop paging at the configured [{}]={}; raise it to read the remaining pages", HttpKey.MAX_PAGES, maxPages);
+                    break;
+                }
+
+                String body = fetchPage(pageIndex, pageSize);
+                pages++;
+
+                // an endpoint that ignores the paging parameters answers with the same full page forever,
+                // the already read records would be written again and again
+                if (body.equals(previousBody) && previousCount >= pageSize) {
+                    LOG.warn("Page {} returned exactly the same payload as page {}, the endpoint is probably ignoring the paging parameters; stop paging after {} record(s)", pageIndex, pageIndex - 1, records);
+                    break;
+                }
+
+                int count = sendPage(body, recordSender);
+                records += count;
+                if (count < pageSize) {
+                    break;
+                }
+                previousBody = body;
+                previousCount = count;
+                pageIndex++;
+            }
+
+            LOG.info("Paging finished: {} page(s), {} record(s)", pages, records);
+        }
+
+        private String fetchPage(int pageIndex, int pageSize)
+        {
+            Map<String, Object> params = new LinkedHashMap<>(requestParams);
+            params.put(pageConfig.sizeKey(), pageSize);
+            params.put(pageConfig.indexKey(), pageIndex);
+            return executeRequest(baseUri, method, params, headers, true);
+        }
+
+        private String fetchToken()
+        {
+            String body = executeRequest(authConfig.uri(), authConfig.method(),
+                    authConfig.requestParams(), authConfig.headers(), false);
+            Object payload = JSON.parse(body);
+            if (payload == null) {
+                throw AddaxException.asAddaxException(RUNTIME_ERROR, "The authConfig endpoint returned an empty response body");
+            }
+
             String resultPath = authConfig.resultKey();
-            Object tokenValue = resultPath.startsWith("$")
-                    ? JSONPath.eval(authPayload, resultPath)
-                    : JSONPath.eval(authPayload, "$." + resultPath);
-
+            Object tokenValue = extractByPath(payload, resultPath);
             if (tokenValue == null || tokenValue.toString().isBlank()) {
                 throw AddaxException.asAddaxException(RUNTIME_ERROR,
                         "Failed to fetch token from authConfig. Result key '%s' not found or empty".formatted(resultPath));
@@ -370,139 +596,275 @@ public class HttpReader
             return tokenValue.toString();
         }
 
-        private String executeRequest()
+        /**
+         * Parse a response body and send every record in it to the writer.
+         *
+         * @return the number of records the body held
+         */
+        private int sendPage(String body, RecordSender recordSender)
         {
-            return executeRequest(
-                    baseUri,
-                    method,
-                    queryParams,
-                    readerSliceConfig.getMap(HttpKey.HEADERS, new HashMap<>()),
-                    true
-            );
-        }
-
-        private String executeRequest(URI targetUri, String requestMethod, Map<String, String> requestParams,
-                Map<String, Object> headers, boolean withAuth)
-        {
-            var charset = Charset.forName(readerSliceConfig.getString(HttpKey.ENCODING, StandardCharsets.UTF_8.name()));
-            URI requestUri = buildUri(targetUri, requestMethod, requestParams);
-            HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
-                    .uri(requestUri)
-                    .timeout(Duration.ofMinutes(2));
-            // Add headers
-            headers.forEach((k, v) -> requestBuilder.header(k, v.toString()));
-
-            // Add authentication
-            if (withAuth && username != null && password != null) {
-                String auth = Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
-                requestBuilder.setHeader("Authorization", "Basic " + auth);
-            }
-            if (withAuth && token != null) {
-                String tokenHeader = authConfig == null ? DEFAULT_TOKEN_HEADER : authConfig.tokenHeader();
-                String tokenPrefix = authConfig == null ? DEFAULT_TOKEN_PREFIX : authConfig.tokenPrefix();
-                requestBuilder.setHeader(tokenHeader, (tokenPrefix == null ? "" : tokenPrefix) + token);
-            }
-
-            // Set method and handle body for POST
-            String jsonBody;
-            if ("POST".equalsIgnoreCase(requestMethod)) {
-                if (requestParams.containsKey("")) {
-                    // maybe just one parameter, like ["123","456"], or [1,2,3], or "123,456"
-                    jsonBody = requestParams.get("").trim();
-                }
-                else {
-                    jsonBody = JSON.toJSONString(requestParams);
-                }
-                requestBuilder.header("Content-Type", "application/json");
-                requestBuilder.POST(HttpRequest.BodyPublishers.ofString(jsonBody));
-            }
-            else if ("GET".equalsIgnoreCase(requestMethod)) {
-                requestBuilder.GET();
-            }
-            else {
-                throw new IllegalArgumentException("Unsupported HTTP method: " + requestMethod);
-            }
-
-            try {
-                HttpResponse<String> response = httpClient.send(requestBuilder.build(),
-                        HttpResponse.BodyHandlers.ofString(charset));
-                if (response.statusCode() >= 400) {
-                    throw new IOException("HTTP request failed with status code: " + response.statusCode());
-                }
-                return response.body();
-            }
-            catch (InterruptedException e) {
-                throw AddaxException.asAddaxException(RUNTIME_ERROR, "HTTP request was interrupted: %s".formatted(e.getMessage()));
-            }
-            catch (IOException e) {
-                throw AddaxException.asAddaxException(RUNTIME_ERROR, "HTTP request failed: %s".formatted(e.getMessage()));
-            }
-        }
-
-        private int getRecords(RecordSender recordSender)
-        {
-            LOG.info("Requesting: {}", buildUri());
-            String body = executeRequest();
-            var resultKey = readerSliceConfig.getString(HttpKey.RESULT_KEY, "");
-            var jsonData = resultKey.isEmpty() ?
-                    JSON.parse(body) :
-                    JSONPath.eval(JSON.parse(body), "$." + resultKey);
-            JSONArray jsonArray = null;
-            if (jsonData instanceof JSONArray) {
-                jsonArray = JSON.parseArray(JSONObject.toJSONString(jsonData, JSONWriter.Feature.WriteMapNullValue));
-            }
-            else if (jsonData instanceof JSONObject) {
-                jsonArray = new JSONArray();
-                jsonArray.add(jsonData);
-            }
-
-            if (jsonArray == null || jsonArray.isEmpty()) {
+            JSONArray jsonArray = extractArray(body);
+            if (jsonArray.isEmpty()) {
                 return 0;
             }
 
-            var columns = readerSliceConfig.getList(HttpKey.COLUMN, String.class);
-            if (columns == null || columns.isEmpty()) {
-                throw AddaxException.asAddaxException(REQUIRED_VALUE,
-                        "The parameter [%s] is required".formatted(HttpKey.COLUMN));
-            }
-
-            // Handle column extraction
-            if (columns.size() == 1 && "*".equals(columns.get(0))) {
-                columns = new ArrayList<>(jsonArray.getJSONObject(0).keySet());
-            }
-            return processJsonArray(jsonArray, columns, recordSender);
-        }
-
-        private int processJsonArray(JSONArray jsonArray, List<String> columns, RecordSender recordSender)
-        {
+            List<Column> pageColumns = wildcard ? wildcardColumns(jsonArray) : columns;
             for (int i = 0; i < jsonArray.size(); i++) {
-                var record = recordSender.createRecord();
-                var jsonObject = jsonArray.getJSONObject(i);
+                Object element = jsonArray.get(i);
+                if (!(element instanceof JSONObject row)) {
+                    throw AddaxException.asAddaxException(RUNTIME_ERROR,
+                            "Element %d of the response array is [%s], but a JSON object is required".formatted(i, describe(element)));
+                }
 
-                columns.forEach(column -> {
-                    var value = JSONPath.eval(jsonObject, column);
-                    record.addColumn(new StringColumn(value != null ? value.toString() : null));
-                });
-
+                Record record = recordSender.createRecord();
+                for (Column column : pageColumns) {
+                    Object value = column.extract(row);
+                    record.addColumn(new StringColumn(value == null ? null : value.toString()));
+                }
                 recordSender.sendToWriter(record);
             }
             return jsonArray.size();
         }
 
-        private void setProxy(Configuration proxyConf)
+        private JSONArray extractArray(String body)
         {
-            try {
-                URI host = new URI(proxyConf.getString(HttpKey.HOST));
-                this.proxyAddress = new InetSocketAddress(host.getHost(), host.getPort());
+            Object parsed = JSON.parse(body);
+            if (parsed == null) {
+                throw AddaxException.asAddaxException(RUNTIME_ERROR, "The response body is empty, no record can be extracted");
+            }
 
-                if (proxyConf.getString(HttpKey.AUTH, null) != null) {
-                    String[] auth = proxyConf.getString(HttpKey.AUTH).split(":");
-                    this.proxyUsername = auth[0];
-                    this.proxyPassword = auth[1];
+            Object jsonData = resultKey.isEmpty() ? parsed : extractByPath(parsed, resultKey);
+            if (jsonData instanceof JSONArray array) {
+                return array;
+            }
+            if (jsonData instanceof JSONObject object) {
+                JSONArray array = new JSONArray(1);
+                array.add(object);
+                return array;
+            }
+            if (jsonData == null) {
+                throw AddaxException.asAddaxException(RUNTIME_ERROR,
+                        "The result key [%s] does not exist in the response".formatted(resultKey));
+            }
+            throw AddaxException.asAddaxException(RUNTIME_ERROR,
+                    "The result key [%s] points to [%s], but a JSON object or array is required".formatted(resultKey, describe(jsonData)));
+        }
+
+        /**
+         * The wildcard column list is the union of the keys of every record in the page, in first seen
+         * order. Taking the keys of the first record only would silently drop the fields the first
+         * record happens to miss.
+         */
+        private List<Column> wildcardColumns(JSONArray jsonArray)
+        {
+            Set<String> keys = new LinkedHashSet<>();
+            Set<String> extraKeys = new LinkedHashSet<>();
+            Set<String> firstKeys = null;
+
+            for (int i = 0; i < jsonArray.size(); i++) {
+                Object element = jsonArray.get(i);
+                if (!(element instanceof JSONObject row)) {
+                    throw AddaxException.asAddaxException(RUNTIME_ERROR,
+                            "The parameter [column] is [*], which requires every element of the response array to be a JSON object, "
+                                    + "but element %d is [%s]".formatted(i, describe(element)));
+                }
+                if (i == 0) {
+                    firstKeys = row.keySet();
+                }
+                else {
+                    for (String key : row.keySet()) {
+                        if (!firstKeys.contains(key)) {
+                            extraKeys.add(key);
+                        }
+                    }
+                }
+                keys.addAll(row.keySet());
+            }
+
+            if (!extraKeys.isEmpty()) {
+                LOG.warn("The records of this page do not share the same set of keys; the union {} is used and a value missing from a record is written as NULL. Keys absent from the first record: {}",
+                        keys, extraKeys);
+            }
+
+            List<Column> resolved = new ArrayList<>(keys.size());
+            for (String key : keys) {
+                resolved.add(Column.ofLiteral(key));
+            }
+            return resolved;
+        }
+
+        private static String describe(Object value)
+        {
+            return value == null ? "null" : value.getClass().getSimpleName();
+        }
+
+        // ------------------------------------------------------------------ http
+
+        private String executeRequest(URI targetUri, String requestMethod, Map<String, ?> requestParams,
+                Map<String, String> requestHeaders, boolean withAuth)
+        {
+            URI requestUri = buildUri(targetUri, "GET".equals(requestMethod) ? requestParams : Map.of());
+            HttpRequest.Builder requestBuilder = HttpRequest.newBuilder().uri(requestUri);
+            requestHeaders.forEach(requestBuilder::header);
+
+            if (withAuth) {
+                if (basicAuthHeader != null) {
+                    requestBuilder.setHeader("Authorization", basicAuthHeader);
+                }
+                if (token != null) {
+                    requestBuilder.setHeader(tokenHeader, tokenPrefix + token);
                 }
             }
-            catch (URISyntaxException e) {
-                throw AddaxException.asAddaxException(ILLEGAL_VALUE, e.getMessage());
+
+            switch (requestMethod) {
+                case "GET" -> requestBuilder.GET();
+                case "POST" -> {
+                    // a single empty key carries a raw request body: ["123", "456"], [1, 2, 3] or "123,456"
+                    Object rawBody = requestParams.get("");
+                    String jsonBody = rawBody != null ? String.valueOf(rawBody).trim() : JSON.toJSONString(requestParams);
+                    if (requestHeaders.keySet().stream().noneMatch(k -> "Content-Type".equalsIgnoreCase(k))) {
+                        requestBuilder.setHeader("Content-Type", "application/json");
+                    }
+                    requestBuilder.POST(HttpRequest.BodyPublishers.ofString(jsonBody, StandardCharsets.UTF_8));
+                }
+                default -> throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                        "Unsupported HTTP method: " + requestMethod);
+            }
+
+            if (LOG.isInfoEnabled()) {
+                LOG.info("Requesting: {}", requestUri);
+            }
+
+            // the timeout is applied to the whole exchange: the one of HttpRequest only covers the
+            // response headers, a server that stalls the body would otherwise hold the task forever
+            CompletableFuture<HttpResponse<String>> pending = httpClient.sendAsync(requestBuilder.build(),
+                    HttpResponse.BodyHandlers.ofString(charset));
+            try {
+                return checkStatus(requestUri, pending.get(timeoutSec, TimeUnit.SECONDS));
+            }
+            catch (TimeoutException e) {
+                pending.cancel(true);
+                throw AddaxException.asAddaxException(RUNTIME_ERROR,
+                        "HTTP request to %s did not complete within %d second(s)".formatted(requestUri, timeoutSec));
+            }
+            catch (InterruptedException e) {
+                pending.cancel(true);
+                // keep the shutdown signal visible to the framework
+                Thread.currentThread().interrupt();
+                throw AddaxException.asAddaxException(RUNTIME_ERROR,
+                        "HTTP request to %s was interrupted".formatted(requestUri));
+            }
+            catch (ExecutionException e) {
+                throw AddaxException.asAddaxException(RUNTIME_ERROR,
+                        "HTTP request to %s failed: %s".formatted(requestUri, rootMessage(e.getCause())));
+            }
+        }
+
+        private static String rootMessage(Throwable cause)
+        {
+            if (cause == null) {
+                return "unknown error";
+            }
+            return cause.getMessage() == null ? cause.getClass().getSimpleName() : cause.getMessage();
+        }
+
+        private static String checkStatus(URI requestUri, HttpResponse<String> response)
+        {
+            int status = response.statusCode();
+            if (status < 200 || status >= 300) {
+                // redirects are not followed, so a 3xx means the data was not read at all
+                String location = response.headers().firstValue("Location")
+                        .map(value -> ", Location: " + value)
+                        .orElse("");
+                throw AddaxException.asAddaxException(RUNTIME_ERROR,
+                        "The request to %s failed with status code %d%s".formatted(requestUri, status, location));
+            }
+            return response.body();
+        }
+
+        /**
+         * Append the request parameters to the query string of the target URI, keeping the query
+         * string the user configured. GET reads them from the query string, POST from the body.
+         */
+        private static URI buildUri(URI target, Map<String, ?> requestParams)
+        {
+            List<String> pairs = new ArrayList<>();
+            if (target.getRawQuery() != null) {
+                for (String pair : target.getRawQuery().split("&")) {
+                    if (pair.isEmpty()) {
+                        continue;
+                    }
+                    // a request parameter of the same name replaces the one configured in the url
+                    String name = decode(pair.split("=", 2)[0]);
+                    if (name.isEmpty() || requestParams.containsKey(name)) {
+                        continue;
+                    }
+                    pairs.add(pair);
+                }
+            }
+            for (Map.Entry<String, ?> entry : requestParams.entrySet()) {
+                if (entry.getKey().isEmpty()) {
+                    // the empty key is the raw body placeholder, it is not a real parameter
+                    continue;
+                }
+                pairs.add(encode(entry.getKey()) + '=' + encode(String.valueOf(entry.getValue())));
+            }
+
+            StringBuilder uri = new StringBuilder()
+                    .append(target.getScheme()).append("://")
+                    .append(target.getRawAuthority())
+                    .append(target.getRawPath() == null ? "" : target.getRawPath());
+            if (!pairs.isEmpty()) {
+                uri.append('?').append(String.join("&", pairs));
+            }
+            return URI.create(uri.toString());
+        }
+
+        /** Character set of an url that is already percent-encoded; the '+' of a form body means a space. */
+        private static String decode(String value)
+        {
+            try {
+                return URLDecoder.decode(value, StandardCharsets.UTF_8);
+            }
+            catch (IllegalArgumentException e) {
+                return value;
+            }
+        }
+
+        private static String encode(String value)
+        {
+            // URLEncoder encodes for form bodies, where a space is '+'; '%20' stays unambiguous in a query string
+            return URLEncoder.encode(value, StandardCharsets.UTF_8).replace("+", "%20");
+        }
+
+        private static Object extractByPath(Object root, String path)
+        {
+            return JSONPath.eval(root, path.startsWith("$") ? path : "$." + path);
+        }
+
+        /**
+         * The http client shares one Authenticator between proxy challenges and server challenges,
+         * so answering everything with the proxy credentials would leak them to the endpoint.
+         */
+        private static final class ProxyAuthenticator
+                extends Authenticator
+        {
+            private final String username;
+            private final String password;
+
+            ProxyAuthenticator(String username, String password)
+            {
+                this.username = username;
+                this.password = password;
+            }
+
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication()
+            {
+                if (getRequestorType() != RequestorType.PROXY) {
+                    return null;
+                }
+                return new PasswordAuthentication(username, password.toCharArray());
             }
         }
 

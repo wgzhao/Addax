@@ -80,4 +80,10 @@ public final class HttpKey
     public static final String PAGE_SIZE = "pageSize";
     /** Page index. */
     public static final String PAGE_INDEX = "pageIndex";
+    // upper bound of the paged requests, 0 means no limit
+    /** Max pages. */
+    public static final String MAX_PAGES = "maxPages";
+    // verify the TLS certificate and the hostname of https endpoints, disabled by default
+    /** Ssl verify. */
+    public static final String SSL_VERIFY = "sslVerify";
 }
