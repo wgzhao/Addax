@@ -37,7 +37,7 @@
             "path": "${e2e_out_dir}/orc",
             "fileName": "roundtrip",
             "fileType": "ORC",
-            "compress": "NONE",
+            "compress": "LZ4",
             "writeMode": "overwrite",
             "skipTrash": true,
             "column": [

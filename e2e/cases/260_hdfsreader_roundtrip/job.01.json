@@ -37,7 +37,7 @@
             "path": "${e2e_out_dir}/parquet",
             "fileName": "roundtrip",
             "fileType": "PARQUET",
-            "compress": "NONE",
+            "compress": "ZSTD",
             "writeMode": "overwrite",
             "skipTrash": true,
             "column": [
