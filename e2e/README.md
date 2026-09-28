@@ -127,7 +127,10 @@ A case runs when every database it lists in `DBS` is covered by `--dbs`, so
   mints its own file name (`hdfswriter` always appends a timestamp), match it with a
   glob and assert the count. `assert_dir_matches` concatenates the parts in name order.
 - **Binary formats** -- parquet and ORC are read back with `hdfsreader` and landed as
-  csv, which is then compared. That also covers the reader.
+  csv, which is then compared. That also covers the reader. `compress` is deliberately
+  not `NONE`: parquet is written with ZSTD (zstd-jni) and ORC with LZ4 (aircompressor),
+  so the codec paths are on the tested route instead of being skipped, and the round
+  trip proves the reader decodes what the writer compressed.
 
 Golden files are deliberately small enough to review by eye in a pull request. That is
 the only thing standing between this suite and goldens that quietly encode a bug.

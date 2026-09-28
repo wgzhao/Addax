@@ -29,7 +29,7 @@
             "path": "${e2e_out_dir}/parquet",
             "fileName": "e2e_src",
             "fileType": "PARQUET",
-            "compress": "NONE",
+            "compress": "ZSTD",
             "writeMode": "overwrite",
             "skipTrash": true,
             "column": [
