@@ -32,6 +32,16 @@
     <description>Apache Iceberg writer plugin for Addax</description>
     <packaging>jar</packaging>
 
+    <properties>
+        <!-- iceberg brings its own parquet and orc, and the versions the root pom pins are older than
+             what iceberg-parquet/iceberg-orc require: parquet without the variant logical type fails in
+             ParquetSchemaUtil.convert, orc-core 1.9.5 ships next to the 1.9.8 nohive jar the ORC writers
+             are built against. Overriding the properties here keeps the rest of the repository on the
+             versions it was tested with -->
+        <parquet.version>1.17.1</parquet.version>
+        <orc.version>1.9.8</orc.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.wgzhao.addax</groupId>
@@ -42,6 +52,15 @@
             <groupId>com.wgzhao.addax</groupId>
             <artifactId>addax-storage</artifactId>
         </dependency>
+        <!-- jackson-core and jackson-databind below are pinned to jackson.version, so annotations has to
+             follow: reading iceberg table metadata builds an ObjectMapper, and its annotation
+             introspector cannot initialize against the 2.12.7 the hadoop BOM would otherwise resolve to -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson.annotations.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
@@ -767,6 +786,9 @@
             <groupId>org.apache.orc</groupId>
             <artifactId>orc-core</artifactId>
             <version>${orc.version}</version>
+            <!-- same coordinate as the jar iceberg-orc pulls in, so only one orc-core ships.
+                 The nohive variant is the one iceberg's ORC writers are compiled against -->
+            <classifier>nohive</classifier>
             <exclusions>
                 <exclusion>
                     <groupId>com.fasterxml.jackson.core</groupId>
