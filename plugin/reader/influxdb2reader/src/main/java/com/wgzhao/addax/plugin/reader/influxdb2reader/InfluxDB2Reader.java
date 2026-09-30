@@ -19,16 +19,20 @@
 
 package com.wgzhao.addax.plugin.reader.influxdb2reader;
 
+import com.influxdb.Cancellable;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.InfluxDBClientFactory;
-import com.influxdb.client.QueryApi;
-import com.influxdb.query.FluxColumn;
+import com.influxdb.client.InfluxDBClientOptions;
 import com.influxdb.query.FluxRecord;
 import com.influxdb.query.FluxTable;
+import com.wgzhao.addax.core.element.BoolColumn;
+import com.wgzhao.addax.core.element.BytesColumn;
+import com.wgzhao.addax.core.element.Column;
 import com.wgzhao.addax.core.element.DoubleColumn;
 import com.wgzhao.addax.core.element.LongColumn;
 import com.wgzhao.addax.core.element.Record;
 import com.wgzhao.addax.core.element.StringColumn;
+import com.wgzhao.addax.core.element.TimestampColumn;
 import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.plugin.RecordSender;
 import com.wgzhao.addax.core.spi.Reader;
@@ -36,35 +40,46 @@ import com.wgzhao.addax.core.util.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 import static com.wgzhao.addax.core.base.Key.COLUMN;
 import static com.wgzhao.addax.core.base.Key.CONNECTION;
-import static com.wgzhao.addax.core.base.Key.ENDPOINT;
-import static com.wgzhao.addax.core.base.Key.QUERY_SQL;
 import static com.wgzhao.addax.core.base.Key.TABLE;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
 /** Influx DB2 Reader. */
 public class InfluxDB2Reader
         extends Reader
 {
+    /**
+     * The field/tag keys live in the InfluxDB index, so the schema functions answer without
+     * scanning data. That keeps the column resolution independent from the time range.
+     */
+    private static final String SCHEMA_IMPORT = "import \"influxdata/influxdb/schema\"\n";
+
+    private static final String TIME_COLUMN = "_time";
+
+    private static final String MEASUREMENT_COLUMN = "_measurement";
+
+    private static final String VALUE_COLUMN = "_value";
 
     /** Job. */
     public static class Job
             extends Reader.Job
     {
-        private Configuration originalConfig = null;
-        private String endpoint;
-        private List<String> tables;
-        private String org;
-        private String bucket;
-        private String token;
-        private List<String> columns;
-        private List<String> range;
+        private Configuration originalConfig;
 
         @Override
         public void init()
@@ -75,144 +90,36 @@ public class InfluxDB2Reader
         @Override
         public void prepare()
         {
-            this.token = originalConfig.getNecessaryValue(InfluxDB2Key.TOKEN, REQUIRED_VALUE);
-            originalConfig.getNecessaryValue(InfluxDB2Key.RANGE, REQUIRED_VALUE);
-            this.range = originalConfig.getList(InfluxDB2Key.RANGE, String.class);
-            Configuration connConf = originalConfig.getConfiguration(CONNECTION);
-            this.endpoint = connConf.getNecessaryValue(InfluxDB2Key.ENDPOINT, REQUIRED_VALUE);
-            this.bucket = connConf.getNecessaryValue(InfluxDB2Key.BUCKET, REQUIRED_VALUE);
-            this.org = connConf.getNecessaryValue(InfluxDB2Key.ORG, REQUIRED_VALUE);
-            this.tables = connConf.getList(TABLE, String.class);
-            this.columns = originalConfig.getList(COLUMN, String.class);
+            this.originalConfig.getNecessaryValue(InfluxDB2Key.TOKEN, REQUIRED_VALUE);
 
-            this.originalConfig = dealColumns();
-        }
+            Configuration connConf = this.originalConfig.getConfiguration(CONNECTION);
+            if (connConf == null) {
+                throw AddaxException.asAddaxException(REQUIRED_VALUE, "The required item 'connection' is not found");
+            }
+            connConf.getNecessaryValue(InfluxDB2Key.ENDPOINT, REQUIRED_VALUE);
+            connConf.getNecessaryValue(InfluxDB2Key.BUCKET, REQUIRED_VALUE);
+            connConf.getNecessaryValue(InfluxDB2Key.ORG, REQUIRED_VALUE);
 
-        /** Dealcolumns. */
-        public Configuration dealColumns()
-        {
-            Configuration conf = this.originalConfig;
-            if (columns.size() == 1 && "*".equals(columns.get(0))) {
-                columns.clear();
+            // an unbounded flux query is rejected by the server, so a start time is mandatory
+            List<String> range = this.originalConfig.getList(InfluxDB2Key.RANGE, String.class);
+            if (range.isEmpty()) {
+                throw AddaxException.asAddaxException(REQUIRED_VALUE, "The required item 'range' is not found");
+            }
+            if (range.size() > 2 || range.stream().anyMatch(InfluxDB2Reader::isBlank)) {
+                throw AddaxException.asAddaxException(CONFIG_ERROR,
+                        "'range' must hold one or two non-blank strings, either [start] or [start, stop], but got " + range);
             }
 
-            String querySql = generalQueryQL();
-            // write query sql
-            conf.set(QUERY_SQL, querySql);
-
-            InfluxDBClient influxDBClient = InfluxDBClientFactory.create(endpoint, token.toCharArray(), org, bucket);
-            QueryApi queryApi = influxDBClient.getQueryApi();
-            // ONly get schema , so limit records to one
-            final List<FluxTable> fluxTables = queryApi.query(querySql + " |> limit(n:1) ");
-            if (fluxTables.isEmpty()) {
-                return conf;
+            Integer limit = this.originalConfig.getInt(InfluxDB2Key.LIMIT);
+            if (limit != null && limit <= 0) {
+                throw AddaxException.asAddaxException(CONFIG_ERROR, "'limit' must be a positive integer, but got " + limit);
             }
-            List<Map<String, String>> fluxColumns = new ArrayList<>();
-            List<FluxColumn> allColumns = fluxTables.get(0).getColumns();
-            List<String> labels = new ArrayList<>(allColumns.size());
-
-            allColumns.forEach(k -> labels.add(k.getLabel()));
-
-            if (columns.isEmpty()) {
-                // skip internal fields;
-                for (FluxColumn col : allColumns) {
-                    String label = col.getLabel();
-                    Map<String, String> map = new HashMap<>();
-                    if ((label.startsWith("_") && !"_time".equals(label)) || "result".equals(label) || "table".equals(label)) {
-                        continue;
-                    }
-                    map.put("name", label);
-                    map.put("type", col.getDataType());
-                    fluxColumns.add(map);
-                }
-            }
-            else {
-                for (String col : columns) {
-                    if (labels.contains(col)) {
-                        Map<String, String> map = new HashMap<>();
-                        FluxColumn k = allColumns.get(labels.indexOf(col));
-                        map.put("name", k.getLabel());
-                        map.put("type", k.getDataType());
-                        fluxColumns.add(map);
-                    }
-                    else {
-                        throw AddaxException.asAddaxException(REQUIRED_VALUE,
-                                "The column '" + col + "' you specified doest not exists");
-                    }
-                }
-            }
-            // write back columns info
-            conf.set(COLUMN, fluxColumns);
-
-            return conf;
-        }
-
-        private String generalQueryQL()
-        {
-            Configuration connConf = originalConfig.getConfiguration(CONNECTION);
-            String bucket = connConf.getString(InfluxDB2Key.BUCKET);
-            String startTime = null, endTime = null;
-            if (!range.isEmpty()) {
-                startTime = range.get(0);
-                if (range.size() == 2) {
-                    endTime = range.get(1);
-                }
-            }
-
-            StringBuilder queryBuilder = new StringBuilder();
-
-            queryBuilder.append("from(bucket:\"").append(bucket).append("\")\n");
-            if (startTime != null || endTime != null) {
-                boolean hasStart = false;
-                queryBuilder.append("  |> range(");
-                if (startTime != null) {
-                    queryBuilder.append("start: ").append(startTime);
-                    hasStart = true;
-                }
-                if (endTime != null) {
-                    if (hasStart) {
-                        queryBuilder.append(", stop: ").append(endTime);
-                    }
-                    else {
-                        queryBuilder.append("stop: ").append(endTime);
-                    }
-                }
-                queryBuilder.append(") \n");
-            }
-
-            if (tables != null && !tables.isEmpty()) {
-                queryBuilder.append("  |> filter(fn: (r) => ");
-                queryBuilder.append(" r._measurement ==\"").append(tables.get(0));
-                if (tables.size() > 1) {
-                    for (int i = 1; i < tables.size(); i++) {
-                        queryBuilder.append(" or r._measurement ==\"").append(tables.get(i));
-                    }
-                }
-                queryBuilder.append("\") \n");
-            }
-            if (! columns.isEmpty()) {
-                queryBuilder.append("  |> filter(fn: (r) => r._field ==\"").append(columns.get(0)).append("\" ");
-                if (columns.size() > 1) {
-                    for(int i=1; i<columns.size();i++) {
-                        queryBuilder.append(" or r._field == \"").append(columns.get(i)).append("\" ");
-                    }
-                }
-                queryBuilder.append(") \n");
-            }
-            // convert fields to columns
-            // refers https://docs.influxdata.com/influxdb/v2.0/query-data/flux/calculate-percentages/
-            queryBuilder.append("  |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n");
-
-            return queryBuilder.toString();
         }
 
         @Override
         public List<Configuration> split(int adviceNumber)
         {
-            Configuration readerSliceConfig = super.getPluginJobConf();
-            List<Configuration> splitConfigs = new ArrayList<>();
-            splitConfigs.add(readerSliceConfig);
-            return splitConfigs;
+            return List.of(super.getPluginJobConf());
         }
 
         @Override
@@ -233,77 +140,49 @@ public class InfluxDB2Reader
             extends Reader.Task
     {
         private static final Logger LOG = LoggerFactory.getLogger(Task.class);
+
         private String endpoint;
         private String token;
         private String org;
         private String bucket;
-        private String queryQL;
-
-        private List<Map> columns;
+        private List<String> measurements;
+        private List<String> range;
+        private List<String> columns;
+        private Integer limit;
 
         @Override
         public void init()
         {
             Configuration readerSliceConfig = super.getPluginJobConf();
             Configuration connConf = readerSliceConfig.getConfiguration(CONNECTION);
-            this.endpoint = connConf.getString(ENDPOINT);
-            this.token = readerSliceConfig.getString("token");
-            this.org = connConf.getString("org");
-            this.bucket = connConf.getString("bucket");
-            this.columns = readerSliceConfig.getList(COLUMN, Map.class);
-            this.queryQL = readerSliceConfig.getString(QUERY_SQL);
-            if (readerSliceConfig.getInt(InfluxDB2Key.LIMIT) != null) {
-                this.queryQL = this.queryQL + "  |> limit(n: " + readerSliceConfig.getInt(InfluxDB2Key.LIMIT) + " )";
-            }
-            LOG.info("query sql: \n{}", queryQL);
+            this.endpoint = connConf.getString(InfluxDB2Key.ENDPOINT);
+            this.bucket = connConf.getString(InfluxDB2Key.BUCKET);
+            this.org = connConf.getString(InfluxDB2Key.ORG);
+            this.token = readerSliceConfig.getString(InfluxDB2Key.TOKEN);
+            this.range = readerSliceConfig.getList(InfluxDB2Key.RANGE, String.class);
+            this.limit = readerSliceConfig.getInt(InfluxDB2Key.LIMIT);
+            this.measurements = new ArrayList<>(connConf.getList(TABLE, String.class));
+
+            // an empty column list means "every column", same as a single '*'
+            this.columns = readerSliceConfig.getList(COLUMN, String.class).stream()
+                    .filter(column -> !"*".equals(column) && !isBlank(column))
+                    .collect(Collectors.toCollection(ArrayList::new));
         }
 
         @Override
         public void startRead(RecordSender recordSender)
         {
-            InfluxDBClient influxDBClient = InfluxDBClientFactory.create(endpoint, token.toCharArray(), org, bucket);
-
-            QueryApi queryApi = influxDBClient.getQueryApi();
-
-            List<FluxTable> tables = queryApi.query(queryQL);
-            if (tables.isEmpty()) {
-                influxDBClient.close();
-                return;
-            }
-
-            for (FluxTable fluxTable : tables) {
-                List<FluxRecord> records = fluxTable.getRecords();
-                for (FluxRecord fluxRecord : records) {
-                    Record record = recordSender.createRecord();
-
-                    for (Map<String, String> column : columns) {
-                        Object v = fluxRecord.getValueByKey(column.get("name"));
-                        if (v == null) {
-                            record.addColumn(new StringColumn());
-                            continue;
-                        }
-
-                        switch (column.get("type")) {
-                            case "long":
-                            case "int":
-                                record.addColumn(new LongColumn((long) v));
-                                break;
-
-                            case "double":
-                            case "float":
-                                record.addColumn(new DoubleColumn((double) v));
-                                break;
-
-                            case "string":
-                            default:
-                                record.addColumn(new StringColumn(v.toString()));
-                                break;
-                        }
-                    }
-                    recordSender.sendToWriter(record);
+            try (InfluxDBClient influxDBClient = createClient()) {
+                Schema schema = resolveSchema(influxDBClient);
+                if (schema.measurements().isEmpty()) {
+                    LOG.warn("No measurement is available in bucket [{}], nothing to read", bucket);
+                    return;
                 }
+                List<String> projection = resolveProjection(schema);
+                String query = buildQuery(schema.measurements(), narrowDownFields(schema, projection));
+                LOG.info("flux query: \n{}", query);
+                read(influxDBClient, query, projection, recordSender);
             }
-            influxDBClient.close();
         }
 
         @Override
@@ -317,5 +196,244 @@ public class InfluxDB2Reader
         {
             //
         }
+
+        /**
+         * InfluxDB answers the schema questions from its index, therefore the columns are known
+         * before a single record is read and independent from the requested time range.
+         */
+        private Schema resolveSchema(InfluxDBClient influxDBClient)
+        {
+            List<String> target = this.measurements;
+            if (target.isEmpty()) {
+                target = distinctValues(influxDBClient, "schema.measurements(bucket: %s)".formatted(quote(bucket)));
+                LOG.info("No measurement is configured, reading all measurements of bucket [{}]: {}", bucket, target);
+            }
+
+            Set<String> tags = new LinkedHashSet<>();
+            Set<String> fields = new LinkedHashSet<>();
+            List<String> known = new ArrayList<>();
+            List<String> unknown = new ArrayList<>();
+            for (String measurement : target) {
+                List<String> fieldKeys = distinctValues(influxDBClient,
+                        "schema.measurementFieldKeys(bucket: %s, measurement: %s, start: 0)"
+                                .formatted(quote(bucket), quote(measurement)));
+                // the internal keys (_start, _stop, _field, _measurement) are reported for every
+                // measurement, missing ones included, so they cannot prove that it exists
+                List<String> tagKeys = distinctValues(influxDBClient,
+                        "schema.measurementTagKeys(bucket: %s, measurement: %s, start: 0)"
+                                .formatted(quote(bucket), quote(measurement))).stream()
+                        .filter(key -> !key.startsWith("_"))
+                        .toList();
+                // a measurement always holds at least one field, so an empty schema means "no such measurement"
+                if (fieldKeys.isEmpty() && tagKeys.isEmpty()) {
+                    unknown.add(measurement);
+                    continue;
+                }
+                known.add(measurement);
+                fields.addAll(fieldKeys);
+                tags.addAll(tagKeys);
+            }
+
+            if (!unknown.isEmpty()) {
+                String all = String.join(", ", distinctValues(influxDBClient,
+                        "schema.measurements(bucket: %s)".formatted(quote(bucket))));
+                throw AddaxException.asAddaxException(CONFIG_ERROR,
+                        "The measurement(s) %s do not exist in bucket [%s], available measurement(s): [%s]"
+                                .formatted(unknown, bucket, all));
+            }
+            return new Schema(List.copyOf(known), List.copyOf(tags), List.copyOf(fields));
+        }
+
+        /** Resolves the columns to send downstream, either every column or the requested ones. */
+        private List<String> resolveProjection(Schema schema)
+        {
+            if (columns.isEmpty()) {
+                List<String> all = new ArrayList<>();
+                // without the measurement itself the rows of different measurements cannot be told apart
+                if (schema.measurements().size() > 1) {
+                    all.add(MEASUREMENT_COLUMN);
+                }
+                all.add(TIME_COLUMN);
+                all.addAll(schema.tags());
+                all.addAll(schema.fields());
+                return all;
+            }
+
+            Set<String> available = new LinkedHashSet<>(List.of(TIME_COLUMN, MEASUREMENT_COLUMN, "_start", "_stop"));
+            available.addAll(schema.tags());
+            available.addAll(schema.fields());
+
+            List<String> missing = columns.stream().filter(column -> !available.contains(column)).toList();
+            if (!missing.isEmpty()) {
+                throw AddaxException.asAddaxException(CONFIG_ERROR,
+                        "The column(s) %s do not exist in measurement(s) %s, available column(s): %s"
+                                .formatted(missing, schema.measurements(), available));
+            }
+            return List.copyOf(new LinkedHashSet<>(columns));
+        }
+
+        /**
+         * The only chance to push the requested columns down to the server. Names that are not
+         * fields ({@code _time}, tags, ...) must stay out of the predicate, otherwise the query
+         * matches nothing.
+         */
+        private List<String> narrowDownFields(Schema schema, List<String> projection)
+        {
+            if (columns.isEmpty()) {
+                return List.of();
+            }
+            return projection.stream().filter(schema.fields()::contains).toList();
+        }
+
+        private String buildQuery(List<String> targetMeasurements, List<String> requestedFields)
+        {
+            List<String> stages = new ArrayList<>();
+            stages.add("from(bucket: %s)".formatted(quote(bucket)));
+            List<String> rangeArgs = new ArrayList<>();
+            rangeArgs.add("start: " + range.get(0));
+            if (range.size() == 2) {
+                rangeArgs.add("stop: " + range.get(1));
+            }
+            stages.add("  |> range(%s)".formatted(String.join(", ", rangeArgs)));
+            if (!targetMeasurements.isEmpty()) {
+                stages.add("  |> filter(fn: (r) => %s)".formatted(predicate("_measurement", targetMeasurements)));
+            }
+            if (!requestedFields.isEmpty()) {
+                stages.add("  |> filter(fn: (r) => %s)".formatted(predicate("_field", requestedFields)));
+            }
+            // pivoting turns the fields into columns, which is what a record-based reader needs
+            stages.add("  |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")");
+            if (limit != null) {
+                stages.add("  |> limit(n: %d)".formatted(limit));
+            }
+            return String.join("\n", stages);
+        }
+
+        /**
+         * Records are consumed as they arrive instead of materializing the whole result set,
+         * the blocking {@link RecordSender} keeps the OkHttp thread in step with the writer.
+         */
+        private void read(InfluxDBClient influxDBClient, String query, List<String> projection, RecordSender recordSender)
+        {
+            String[] names = projection.toArray(new String[0]);
+            CountDownLatch finished = new CountDownLatch(1);
+            AtomicReference<Throwable> failure = new AtomicReference<>();
+
+            BiConsumer<Cancellable, FluxRecord> onNext = (cancellable, fluxRecord) -> {
+                try {
+                    Record record = recordSender.createRecord();
+                    for (String name : names) {
+                        record.addColumn(toColumn(fluxRecord.getValueByKey(name)));
+                    }
+                    recordSender.sendToWriter(record);
+                }
+                catch (Throwable e) {
+                    failure.compareAndSet(null, e);
+                    cancellable.cancel();
+                    finished.countDown();
+                }
+            };
+
+            // the callbacks run on the OkHttp dispatcher, so a failure has to be handed back
+            // to the task thread instead of being thrown here where nobody observes it
+            influxDBClient.getQueryApi().query(query, onNext,
+                    throwable -> {
+                        failure.compareAndSet(null, throwable);
+                        finished.countDown();
+                    },
+                    finished::countDown);
+
+            try {
+                finished.await();
+            }
+            catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw AddaxException.asAddaxException(EXECUTE_FAIL, "Interrupted while reading from InfluxDB", e);
+            }
+
+            Throwable throwable = failure.get();
+            if (throwable instanceof AddaxException addaxException) {
+                throw addaxException;
+            }
+            if (throwable != null) {
+                throw AddaxException.asAddaxException(EXECUTE_FAIL, throwable);
+            }
+        }
+
+        private InfluxDBClient createClient()
+        {
+            InfluxDBClientOptions options = InfluxDBClientOptions.builder()
+                    .url(endpoint)
+                    .authenticateToken(token.toCharArray())
+                    .org(org)
+                    .build();
+            // the client asks for an identity encoded body unless gzip is turned on, but the
+            // annotated csv of a large read compresses by a wide margin
+            return InfluxDBClientFactory.create(options).enableGzip();
+        }
+    }
+
+    /** The columns available in the requested measurements. */
+    private record Schema(List<String> measurements, List<String> tags, List<String> fields)
+    {
+    }
+
+    private static List<String> distinctValues(InfluxDBClient influxDBClient, String query)
+    {
+        List<String> values = new ArrayList<>();
+        for (FluxTable table : influxDBClient.getQueryApi().query(SCHEMA_IMPORT + query)) {
+            for (FluxRecord record : table.getRecords()) {
+                Object value = record.getValueByKey(VALUE_COLUMN);
+                if (value != null) {
+                    values.add(value.toString());
+                }
+            }
+        }
+        return values;
+    }
+
+    /**
+     * The value type is only known for sure once a record arrives: the same field name can be
+     * a long in one measurement and a double in another, so the conversion follows the value
+     * instead of a type collected up front.
+     */
+    private static Column toColumn(Object value)
+    {
+        if (value == null) {
+            return new StringColumn();
+        }
+        if (value instanceof Boolean bool) {
+            return new BoolColumn(bool);
+        }
+        if (value instanceof Long number) {
+            return new LongColumn(number);
+        }
+        if (value instanceof Double number) {
+            return new DoubleColumn(number);
+        }
+        if (value instanceof Instant instant) {
+            return new TimestampColumn(Timestamp.from(instant));
+        }
+        if (value instanceof byte[] bytes) {
+            return new BytesColumn(bytes);
+        }
+        return new StringColumn(value.toString());
+    }
+
+    private static String predicate(String column, Collection<String> values)
+    {
+        return values.stream()
+                .map(value -> "r.%s == %s".formatted(column, quote(value)))
+                .collect(Collectors.joining(" or "));
+    }
+
+    private static String quote(String value)
+    {
+        return "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"") + "\"";
+    }
+
+    private static boolean isBlank(String value)
+    {
+        return value == null || value.isBlank();
     }
 }
