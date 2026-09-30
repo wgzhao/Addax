@@ -23,17 +23,21 @@ import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.util.Configuration;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.security.UserGroupInformation;
+import org.apache.iceberg.CatalogProperties;
 import org.apache.iceberg.catalog.Catalog;
 import org.apache.iceberg.hadoop.HadoopCatalog;
 import org.apache.iceberg.hive.HiveCatalog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import static com.wgzhao.addax.core.base.Key.KERBEROS_KEYTAB_FILE_PATH;
 import static com.wgzhao.addax.core.base.Key.KERBEROS_PRINCIPAL;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.LOGIN_ERROR;
 
 /** Iceberg Helper. */
@@ -59,72 +63,91 @@ public class IcebergHelper
         }
     }
 
+    /** Returns the table name, the reader and the writer share it. */
+    public static String getTableName(Configuration conf)
+    {
+        String tableName = conf.getString("tableName");
+        if (StringUtils.isBlank(tableName)) {
+            throw AddaxException.asAddaxException(CONFIG_ERROR, "tableName is not set");
+        }
+        return tableName.trim();
+    }
+
+    /** Closes the catalog, whatever the catalog type is. */
+    public static void closeCatalog(Catalog catalog)
+    {
+        // the catalog interface itself has no close, only its implementations do
+        if (catalog instanceof Closeable closeable) {
+            try {
+                closeable.close();
+            }
+            catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
     /** Returns the catalog. */
     public static Catalog getCatalog(Configuration conf)
             throws Exception
     {
-
         String catalogType = conf.getString("catalogType");
-        if (catalogType == null || catalogType.trim().isEmpty()) {
-            throw new RuntimeException("catalogType is not set");
+        if (StringUtils.isBlank(catalogType)) {
+            throw AddaxException.asAddaxException(CONFIG_ERROR, "catalogType is not set");
         }
         catalogType = catalogType.trim();
 
-        String warehouse = conf.getString("warehouse");
-        if (warehouse == null || warehouse.trim().isEmpty()) {
-            throw new RuntimeException("warehouse is not set");
+        String warehouse = StringUtils.trimToNull(conf.getString("warehouse"));
+        if (warehouse == null) {
+            throw AddaxException.asAddaxException(CONFIG_ERROR, "warehouse is not set");
         }
 
-        org.apache.hadoop.conf.Configuration hadoopConf = null;
+        // the default configuration reads core-site.xml from the classpath, which is what the job
+        // expects when it carries no hadoop settings of its own. Handing null to the catalogs used to
+        // fail while they resolved the warehouse
+        org.apache.hadoop.conf.Configuration hadoopConf = new org.apache.hadoop.conf.Configuration();
 
         if (conf.getConfiguration("hadoopConfig") != null) {
             Map<String, Object> hadoopConfig = conf.getMap("hadoopConfig");
-
-            hadoopConf = new org.apache.hadoop.conf.Configuration();
-
-            for (String key : hadoopConfig.keySet()) {
-                hadoopConf.set(key, (String) hadoopConfig.get(key));
+            for (Map.Entry<String, Object> entry : hadoopConfig.entrySet()) {
+                if (entry.getValue() != null) {
+                    // json lets a setting be a boolean or a number, hadoop takes only strings
+                    hadoopConf.set(entry.getKey(), String.valueOf(entry.getValue()));
+                }
             }
 
-            String authentication = (String) hadoopConfig.get("hadoop.security.authentication");
-
-            if ("kerberos".equals(authentication)) {
-                String kerberosKeytabFilePath = conf.getString(KERBEROS_KEYTAB_FILE_PATH);
-                if (kerberosKeytabFilePath == null || kerberosKeytabFilePath.trim().isEmpty()) {
-                    throw new RuntimeException("kerberosKeytabFilePath is not set");
-                }
-                else {
-                    kerberosKeytabFilePath = kerberosKeytabFilePath.trim();
+            Object authentication = hadoopConfig.get("hadoop.security.authentication");
+            if (authentication != null && "kerberos".equals(authentication.toString())) {
+                String kerberosKeytabFilePath = StringUtils.trimToNull(conf.getString(KERBEROS_KEYTAB_FILE_PATH));
+                if (kerberosKeytabFilePath == null) {
+                    throw AddaxException.asAddaxException(CONFIG_ERROR, "kerberosKeytabFilePath is not set");
                 }
 
-                String kerberosPrincipal = conf.getString(KERBEROS_PRINCIPAL);
-                if (kerberosPrincipal == null || kerberosPrincipal.trim().isEmpty()) {
-                    throw new RuntimeException("kerberosPrincipal is not set");
+                String kerberosPrincipal = StringUtils.trimToNull(conf.getString(KERBEROS_PRINCIPAL));
+                if (kerberosPrincipal == null) {
+                    throw AddaxException.asAddaxException(CONFIG_ERROR, "kerberosPrincipal is not set");
                 }
-                else {
-                    kerberosPrincipal = kerberosPrincipal.trim();
-                }
-                IcebergHelper.kerberosAuthentication(hadoopConf, kerberosPrincipal, kerberosKeytabFilePath);
+
+                kerberosAuthentication(hadoopConf, kerberosPrincipal, kerberosKeytabFilePath);
             }
         }
-        switch (catalogType) {
-            case "hadoop":
-                return new HadoopCatalog(hadoopConf, warehouse);
-            case "hive":
-                String uri = conf.getString("uri");
-                if (uri == null || uri.trim().isEmpty()) {
-                    throw new RuntimeException("uri is not set");
+
+        return switch (catalogType) {
+            case "hadoop" -> new HadoopCatalog(hadoopConf, warehouse);
+            case "hive" -> {
+                String uri = StringUtils.trimToNull(conf.getString("uri"));
+                if (uri == null) {
+                    throw AddaxException.asAddaxException(CONFIG_ERROR, "uri is not set");
                 }
                 HiveCatalog hiveCatalog = new HiveCatalog();
                 hiveCatalog.setConf(hadoopConf);
-                Map<String, String> properties = new HashMap<String, String>();
-                properties.put("warehouse", warehouse);
-                properties.put("uri", uri);
-
+                Map<String, String> properties = new HashMap<>();
+                properties.put(CatalogProperties.WAREHOUSE_LOCATION, warehouse);
+                properties.put(CatalogProperties.URI, uri);
                 hiveCatalog.initialize("hive", properties);
-                return hiveCatalog;
-        }
-
-        throw new RuntimeException("not support catalogType:" + catalogType);
+                yield hiveCatalog;
+            }
+            default -> throw AddaxException.asAddaxException(CONFIG_ERROR, "not support catalogType:" + catalogType);
+        };
     }
 }

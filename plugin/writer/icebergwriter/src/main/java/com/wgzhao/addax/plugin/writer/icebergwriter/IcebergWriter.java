@@ -20,12 +20,10 @@
 package com.wgzhao.addax.plugin.writer.icebergwriter;
 
 import com.alibaba.fastjson2.JSON;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.google.common.primitives.Ints;
 import com.wgzhao.addax.core.element.Column;
 import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.element.StringColumn;
+import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.plugin.RecordReceiver;
 import com.wgzhao.addax.core.spi.Writer;
 import com.wgzhao.addax.core.util.Configuration;
@@ -33,24 +31,19 @@ import org.apache.iceberg.AppendFiles;
 import org.apache.iceberg.DataFile;
 import org.apache.iceberg.FileFormat;
 import org.apache.iceberg.PartitionKey;
+import org.apache.iceberg.Schema;
 import org.apache.iceberg.Table;
 import org.apache.iceberg.TableProperties;
 import org.apache.iceberg.catalog.Catalog;
 import org.apache.iceberg.catalog.TableIdentifier;
 import org.apache.iceberg.data.GenericAppenderFactory;
 import org.apache.iceberg.data.GenericRecord;
-import org.apache.iceberg.data.orc.GenericOrcWriter;
-import org.apache.iceberg.data.parquet.GenericParquetWriter;
-import org.apache.iceberg.hadoop.HadoopCatalog;
-import org.apache.iceberg.hive.HiveCatalog;
-import org.apache.iceberg.io.DataWriter;
+import org.apache.iceberg.expressions.Expressions;
 import org.apache.iceberg.io.FileAppenderFactory;
-import org.apache.iceberg.io.OutputFile;
 import org.apache.iceberg.io.OutputFileFactory;
 import org.apache.iceberg.io.PartitionedFanoutWriter;
 import org.apache.iceberg.io.WriteResult;
-import org.apache.iceberg.orc.ORC;
-import org.apache.iceberg.parquet.Parquet;
+import org.apache.iceberg.types.Type;
 import org.apache.iceberg.types.TypeUtil;
 import org.apache.iceberg.types.Types;
 import org.apache.iceberg.util.PropertyUtil;
@@ -58,13 +51,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.RoundingMode;
+import java.nio.ByteBuffer;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
 
 /** Iceberg Writer. */
 public class IcebergWriter
@@ -90,10 +94,7 @@ public class IcebergWriter
                 throw new RuntimeException(e);
             }
 
-            tableName = this.conf.getString("tableName");
-            if (tableName == null || tableName.trim().isEmpty()) {
-                throw new RuntimeException("tableName is not set");
-            }
+            tableName = IcebergHelper.getTableName(conf);
         }
 
         @Override
@@ -101,7 +102,9 @@ public class IcebergWriter
         {
             List<Configuration> configurations = new ArrayList<>(mandatoryNumber);
             for (int i = 0; i < mandatoryNumber; i++) {
-                configurations.add(conf);
+                // every task gets its own copy, so a task that adjusts its configuration cannot
+                // change the configuration of the tasks next to it
+                configurations.add(conf.clone());
             }
             return configurations;
         }
@@ -112,26 +115,20 @@ public class IcebergWriter
             String writeMode = this.conf.getString("writeMode");
             if ("truncate".equalsIgnoreCase(writeMode)) {
                 Table table = catalog.loadTable(TableIdentifier.of(tableName.split("\\.")));
-                table.newDelete().deleteFromRowFilter(org.apache.iceberg.expressions.Expressions.alwaysTrue()).commit();
+                table.newDelete().deleteFromRowFilter(Expressions.alwaysTrue()).commit();
+                LOG.info("table [{}] is truncated", tableName);
+            }
+            else if (writeMode != null && !"append".equalsIgnoreCase(writeMode)) {
+                // only truncate and append exist: the writer always appends, and a job asking for
+                // something else would silently be an append
+                LOG.warn("writeMode [{}] is not supported by icebergwriter, the rows are appended", writeMode);
             }
         }
 
         @Override
         public void destroy()
         {
-            if (this.catalog != null) {
-                try {
-                    if (this.catalog instanceof HiveCatalog) {
-                        ((HiveCatalog) this.catalog).close();
-                    }
-                    if (this.catalog instanceof HadoopCatalog) {
-                        ((HadoopCatalog) this.catalog).close();
-                    }
-                }
-                catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
+            IcebergHelper.closeCatalog(catalog);
         }
     }
 
@@ -139,46 +136,69 @@ public class IcebergWriter
     public static class Task
             extends Writer.Task
     {
-
         private static final Logger log = LoggerFactory.getLogger(Task.class);
+
         private Catalog catalog = null;
-        private Integer batchSize = 1000;
+        private String tableName = null;
         private Table table = null;
-        private org.apache.iceberg.Schema schema = null;
-        private String fileFormat = "parquet";
-        private List<org.apache.iceberg.types.Types.NestedField> columnList = null;
+        private Schema schema = null;
+        private FileFormat fileFormat = FileFormat.PARQUET;
+        private FileAppenderFactory<org.apache.iceberg.data.Record> appenderFactory = null;
+        private OutputFileFactory outputFileFactory = null;
+        private PartitionKey partitionKey = null;
+        private long targetFileSize = 0;
+        private List<FieldBinding> bindings = null;
+        // the reader's column count is only known from the first record on, and the check for it is
+        // worth doing once: a column type this writer cannot write would otherwise be a dirty record
+        // for every single row
+        private boolean bindingsChecked = false;
 
         @Override
         public void startWrite(RecordReceiver recordReceiver)
         {
-
-            List<Record> writerBuffer = new ArrayList<>(this.batchSize);
-            Record record;
             long total = 0;
-            while ((record = recordReceiver.getFromReader()) != null) {
-                writerBuffer.add(record);
-                if (writerBuffer.size() >= this.batchSize) {
-                    total += doBatchInsert(writerBuffer);
-                    writerBuffer.clear();
+            PartitionedFanoutWriter<org.apache.iceberg.data.Record> writer = newPartitionedWriter();
+            try {
+                Record record;
+                while ((record = recordReceiver.getFromReader()) != null) {
+                    GenericRecord row = toGenericRecord(record);
+                    if (row == null) {
+                        // the row was collected as dirty, one of its columns could not be converted
+                        continue;
+                    }
+                    writer.write(row);
+                    total++;
+                }
+
+                // one commit for the whole task. A commit per batch leaves a file and a snapshot for
+                // every batch worth of rows, which is a fraction of the target file size, and a task
+                // that fails after a batch has already committed rows that a rerun writes again
+                WriteResult writeResult = writer.complete();
+                if (writeResult.dataFiles().length > 0) {
+                    // a task that wrote nothing (an empty reader, or every row dirty) has no file to
+                    // point at, and an empty snapshot is one a reader has to plan around for nothing
+                    AppendFiles appends = table.newAppend();
+                    for (DataFile dataFile : writeResult.dataFiles()) {
+                        appends.appendFile(dataFile);
+                    }
+                    appends.commit();
                 }
             }
-
-            if (!writerBuffer.isEmpty()) {
-                total += doBatchInsert(writerBuffer);
-                writerBuffer.clear();
+            catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            finally {
+                closeQuietly(writer);
             }
 
-            String msg = String.format("task end, write size :%d", total);
             getTaskPluginCollector().collectMessage("writeSize", String.valueOf(total));
-            log.info(msg);
+            log.info("task end, write size :{}", total);
         }
 
         @Override
         public void init()
         {
             Configuration conf = super.getPluginJobConf();
-
-            batchSize = conf.getInt("batchSize", 1000);
 
             try {
                 this.catalog = IcebergHelper.getCatalog(conf);
@@ -187,259 +207,301 @@ public class IcebergWriter
                 throw new RuntimeException(e);
             }
 
-            String tableName = conf.getString("tableName");
-            if (tableName == null || tableName.trim().isEmpty()) {
-                throw new RuntimeException("tableName is not set");
-            }
+            this.tableName = IcebergHelper.getTableName(conf);
+            this.table = catalog.loadTable(TableIdentifier.of(tableName.split("\\.")));
+            this.schema = table.schema();
+            this.bindings = buildBindings(schema);
+            this.fileFormat = resolveFileFormat(table);
+            this.targetFileSize = PropertyUtil.propertyAsLong(
+                    table.properties(),
+                    TableProperties.WRITE_TARGET_FILE_SIZE_BYTES,
+                    TableProperties.WRITE_TARGET_FILE_SIZE_BYTES_DEFAULT);
+            this.appenderFactory = newAppenderFactory(table);
+            // the ids only name the files iceberg writes, they are not part of the commit
+            this.outputFileFactory = OutputFileFactory.builderFor(table, getTaskGroupId(), getTaskId())
+                    .format(fileFormat)
+                    .build();
+            this.partitionKey = new PartitionKey(table.spec(), table.spec().schema());
 
-            table = catalog.loadTable(TableIdentifier.of(tableName.split("\\.")));
-            schema = table.schema();
-
-            fileFormat = table.properties().get("write.format.default");
-            log.info("fileFormat: {}", fileFormat);
-            if (fileFormat == null || fileFormat.trim().isEmpty()) {
-                fileFormat = "parquet";
-            }
-
-            columnList = schema.columns();
+            log.info("writing to table [{}] as {} with {} column(s)", tableName, fileFormat, bindings.size());
         }
 
         @Override
         public void destroy()
         {
-            if (this.catalog != null) {
+            IcebergHelper.closeCatalog(catalog);
+        }
+
+        private PartitionedFanoutWriter<org.apache.iceberg.data.Record> newPartitionedWriter()
+        {
+            return new PartitionedFanoutWriter<org.apache.iceberg.data.Record>(table.spec(), fileFormat, appenderFactory, outputFileFactory, table.io(), targetFileSize)
+            {
+                @Override
+                protected PartitionKey partition(org.apache.iceberg.data.Record record)
+                {
+                    // the key is filled in and handed back, which is what this writer expects: it copies
+                    // every key it keeps, so no row can end up in another partition's file
+                    partitionKey.partition(record);
+                    return partitionKey;
+                }
+            };
+        }
+
+        private GenericRecord toGenericRecord(Record record)
+        {
+            checkBindings(record.getColumnNumber());
+
+            GenericRecord row = GenericRecord.create(schema);
+            int columns = Math.min(record.getColumnNumber(), bindings.size());
+            for (int i = 0; i < columns; i++) {
+                Column column = record.getColumn(i);
+                if (column == null) {
+                    continue;
+                }
+                FieldBinding binding = bindings.get(i);
                 try {
-                    if (this.catalog instanceof HiveCatalog) {
-                        ((HiveCatalog) this.catalog).close();
-                    }
-                    if (this.catalog instanceof HadoopCatalog) {
-                        ((HadoopCatalog) this.catalog).close();
-                    }
+                    row.set(binding.position(), binding.converter().toValue(column));
                 }
                 catch (Exception e) {
-                    throw new RuntimeException(e);
+                    // a value the declared type cannot hold makes the row dirty instead of writing a
+                    // null where the source had a value
+                    getTaskPluginCollector().collectDirtyRecord(record, String.format(
+                            "failed to convert column [%s] to %s: %s", binding.name(), binding.type(), e));
+                    return null;
                 }
             }
+            return row;
         }
 
-        private long doBatchInsert(final List<Record> writerBuffer)
+        private void checkBindings(int recordColumns)
         {
-            ImmutableList.Builder<GenericRecord> builder = ImmutableList.builder();
-
-            for (Record record : writerBuffer) {
-                GenericRecord data = GenericRecord.create(schema);
-                for (int i = 0; i < record.getColumnNumber(); i++) {
-                    Column column = record.getColumn(i);
-                    if (column == null) {
-                        continue;
-                    }
-                    if (i >= columnList.size()) {
-                        throw new RuntimeException("columnList size is " + columnList.size() + ", but record column number is " + record.getColumnNumber());
-                    }
-                    Types.NestedField field = columnList.get(i);
-                    org.apache.iceberg.types.Type columnType = field.type();
-                    //如果是数组类型，那它传入的必是字符串类型
-                    if (columnType.isListType()) {
-                        if (null == column.asString()) {
-                            data.setField(field.name(), null);
-                        }
-                        else {
-                            String[] dataList = column.asString().split(",");
-                            data.setField(field.name(), Arrays.asList(dataList));
-                        }
-                    }
-                    else {
-                        switch (columnType.typeId()) {
-
-                            case DATE:
-                                try {
-                                    if (column.asLong() != null) {
-                                        data.setField(field.name(), column.asTimestamp().toLocalDateTime().toLocalDate());
-                                    }
-                                    else {
-                                        data.setField(field.name(), null);
-                                    }
-                                }
-                                catch (Exception e) {
-                                    getTaskPluginCollector().collectDirtyRecord(record, String.format("日期类型解析失败 [%s:%s] exception: %s", field.name(), column, e));
-                                }
-                                break;
-                            case TIME:
-                            case TIMESTAMP:
-                            case TIMESTAMP_NANO:
-                                try {
-                                    if (column.asLong() != null) {
-                                        data.setField(field.name(), column.asTimestamp().toLocalDateTime());
-                                    }
-                                    else {
-                                        data.setField(field.name(), null);
-                                    }
-                                }
-                                catch (Exception e) {
-                                    getTaskPluginCollector().collectDirtyRecord(record, String.format("时间类型解析失败 [%s:%s] exception: %s", field.name(), column, e));
-                                }
-                                break;
-                            case STRING:
-                                data.setField(field.name(), column.asString());
-                                break;
-                            case BOOLEAN:
-                                data.setField(field.name(), column.asBoolean());
-                                break;
-                            case FIXED:
-                            case BINARY:
-                                data.setField(field.name(), column.asBytes());
-                                break;
-                            case LONG:
-                                data.setField(field.name(), column.asLong());
-                                break;
-                            case INTEGER:
-                                data.setField(field.name(), column.asBigInteger() == null ? null : column.asBigInteger().intValue());
-                                break;
-                            case FLOAT:
-                                data.setField(field.name(), column.asDouble().floatValue());
-                                break;
-                            case DOUBLE:
-
-                                data.setField(field.name(), column.asDouble());
-                                break;
-                            case DECIMAL:
-                                if (column.asBigDecimal() != null) {
-                                    data.setField(field.name(), column.asBigDecimal());
-                                }
-                                else {
-                                    data.setField(field.name(), null);
-                                }
-                                break;
-                            case MAP:
-                                try {
-                                    data.setField(field.name(), JSON.parseObject(column.asString(), Map.class));
-                                }
-                                catch (Exception e) {
-                                    getTaskPluginCollector().collectDirtyRecord(record, String.format("MAP类型解析失败 [%s:%s] exception: %s", field.name(), column, e));
-                                }
-                                break;
-                            default:
-                                getTaskPluginCollector().collectDirtyRecord(record, "类型错误:不支持的类型:" + columnType + " " + field.name());
-                        }
-                    }
-                }
-
-                builder.add(data);
+            if (bindingsChecked) {
+                return;
             }
-            ImmutableList<GenericRecord> rows = builder.build();
+            bindingsChecked = true;
 
-            String filepath = table.location() + "/" + UUID.randomUUID();
-            OutputFile file = table.io().newOutputFile(filepath);
-
-            if (table.spec() == null) {
-                DataWriter<GenericRecord> dataWriter = null;
-
-                if ("parquet".equals(fileFormat)) {
-                    try {
-                        dataWriter = Parquet.writeData(file).overwrite().forTable(table).createWriterFunc(GenericParquetWriter::create).build();
-                    }
-                    catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-                else if ("orc".equals(fileFormat)) {
-
-                    try {
-                        dataWriter = ORC.writeData(file).overwrite().forTable(table).createWriterFunc(GenericOrcWriter::buildWriter).build();
-                    }
-                    catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-                else {
-                    throw new RuntimeException("not supported file format:" + fileFormat);
-                }
-
-                if (dataWriter != null) {
-                    dataWriter.write(rows);
-                }
-
-                if (dataWriter != null) {
-                    try {
-                        dataWriter.close();
-                    }
-                    catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-                DataFile dataFile = dataWriter.toDataFile();
-                table.newAppend().appendFile(dataFile).commit();
+            if (recordColumns > bindings.size()) {
+                throw AddaxException.asAddaxException(CONFIG_ERROR, String.format(
+                        "the reader produces %d column(s) but table [%s] has %d", recordColumns, tableName, bindings.size()));
             }
-            else {
-                Map<String, String> tableProps = Maps.newHashMap(table.properties());
-                long targetFileSize =
-                        PropertyUtil.propertyAsLong(
-                                tableProps,
-                                TableProperties.WRITE_TARGET_FILE_SIZE_BYTES,
-                                TableProperties.WRITE_TARGET_FILE_SIZE_BYTES_DEFAULT);
-
-                int partitionId = 1, taskId = 1;
-                FileFormat fileFormatIntance = FileFormat.PARQUET;
-                if ("orc".equals(fileFormat)) {
-                    fileFormatIntance = FileFormat.ORC;
-                }
-                Set<Integer> identifierFieldIds = table.schema().identifierFieldIds();
-                FileAppenderFactory<org.apache.iceberg.data.Record> appenderFactory;
-                if (identifierFieldIds == null || identifierFieldIds.isEmpty()) {
-                    appenderFactory =
-                            new GenericAppenderFactory(table.schema(), table.spec(), null, null, null)
-                                    .setAll(tableProps);
-                }
-                else {
-                    appenderFactory =
-                            new GenericAppenderFactory(
-                                    table.schema(),
-                                    table.spec(),
-                                    Ints.toArray(identifierFieldIds),
-                                    TypeUtil.select(table.schema(), Sets.newHashSet(identifierFieldIds)),
-                                    null)
-                                    .setAll(tableProps);
-                }
-                OutputFileFactory outputFileFactory = OutputFileFactory.builderFor(table, partitionId, taskId).format(fileFormatIntance).build();
-                final PartitionKey partitionKey = new PartitionKey(table.spec(), table.spec().schema());
-                // partitionedFanoutWriter will auto partitioned record and create the partitioned writer
-                PartitionedFanoutWriter<org.apache.iceberg.data.Record> partitionedFanoutWriter = new PartitionedFanoutWriter<org.apache.iceberg.data.Record>(table.spec(), fileFormatIntance, appenderFactory, outputFileFactory, table.io(), targetFileSize)
-                {
-                    @Override
-                    protected PartitionKey partition(org.apache.iceberg.data.Record record)
-                    {
-                        partitionKey.partition(record);
-                        return partitionKey;
-                    }
-                };
-
-                rows.forEach(
-                        row -> {
-                            try {
-                                partitionedFanoutWriter.write(row);
-                            }
-                            catch (IOException e) {
-                                throw new UncheckedIOException(e);
-                            }
-                        });
-                try {
-                    WriteResult writeResult = partitionedFanoutWriter.complete();
-
-                    AppendFiles appends = table.newAppend();
-                    Arrays.stream(writeResult.dataFiles()).forEach(appends::appendFile);
-                    appends.commit();
-                }
-                catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                try {
-                    partitionedFanoutWriter.close();
-                }
-                catch (IOException e) {
-                    throw new RuntimeException(e);
+            for (int i = 0; i < recordColumns; i++) {
+                FieldBinding binding = bindings.get(i);
+                if (binding.converter() == null) {
+                    throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE, String.format(
+                            "column [%s] of type %s is not supported by icebergwriter", binding.name(), binding.type()));
                 }
             }
-            return rows.size();
         }
+
+        private static List<FieldBinding> buildBindings(Schema schema)
+        {
+            // the reader and the table are matched by position: the record column at an index fills the
+            // table column at the same index, which is also the order GenericRecord keeps its values in
+            List<Types.NestedField> fields = schema.columns();
+            List<FieldBinding> bindings = new ArrayList<>(fields.size());
+            for (int i = 0; i < fields.size(); i++) {
+                Types.NestedField field = fields.get(i);
+                bindings.add(new FieldBinding(i, field.name(), field.type(), converterFor(field.type())));
+            }
+            return bindings;
+        }
+
+        private static ValueConverter converterFor(Type type)
+        {
+            if (type.isPrimitiveType()) {
+                return scalarConverter(type);
+            }
+            return switch (type.typeId()) {
+                case LIST -> listConverter((Types.ListType) type);
+                case MAP -> mapConverter((Types.MapType) type);
+                default -> null;
+            };
+        }
+
+        private static ValueConverter scalarConverter(Type type)
+        {
+            return switch (type.typeId()) {
+                case BOOLEAN -> Column::asBoolean;
+                case INTEGER -> IcebergWriter.Task::toInteger;
+                case LONG -> Column::asLong;
+                case FLOAT -> IcebergWriter.Task::toFloat;
+                case DOUBLE -> Column::asDouble;
+                case DATE -> IcebergWriter.Task::toDate;
+                case TIME -> IcebergWriter.Task::toTime;
+                case TIMESTAMP, TIMESTAMP_NANO -> IcebergWriter.Task::toTimestamp;
+                case STRING -> Column::asString;
+                case UUID -> IcebergWriter.Task::toUuid;
+                // fixed is written from a byte array, binary is written from a byte buffer
+                case FIXED -> Column::asBytes;
+                case BINARY -> IcebergWriter.Task::toBinary;
+                case DECIMAL -> column -> toDecimal(column, ((Types.DecimalType) type).scale());
+                default -> null;
+            };
+        }
+
+        private static ValueConverter listConverter(Types.ListType listType)
+        {
+            if (!listType.elementType().isPrimitiveType()) {
+                return null;
+            }
+            ValueConverter element = scalarConverter(listType.elementType());
+            if (element == null) {
+                return null;
+            }
+            return column -> {
+                String text = column.asString();
+                if (text == null) {
+                    return null;
+                }
+                if (text.isEmpty()) {
+                    return List.of();
+                }
+                // the input is the comma separated string this plugin has always taken
+                String[] tokens = text.split(",", -1);
+                List<Object> values = new ArrayList<>(tokens.length);
+                for (String token : tokens) {
+                    values.add(element.toValue(new StringColumn(token.trim())));
+                }
+                return values;
+            };
+        }
+
+        private static ValueConverter mapConverter(Types.MapType mapType)
+        {
+            if (!mapType.keyType().isPrimitiveType() || !mapType.valueType().isPrimitiveType()) {
+                return null;
+            }
+            ValueConverter key = scalarConverter(mapType.keyType());
+            ValueConverter value = scalarConverter(mapType.valueType());
+            if (key == null || value == null) {
+                return null;
+            }
+            return column -> {
+                String text = column.asString();
+                if (text == null) {
+                    return null;
+                }
+                if (text.isEmpty()) {
+                    return Map.of();
+                }
+                Map<String, Object> entries = JSON.parseObject(text);
+                if (entries == null) {
+                    return null;
+                }
+                Map<Object, Object> values = new LinkedHashMap<>(entries.size());
+                for (Map.Entry<String, Object> entry : entries.entrySet()) {
+                    values.put(key.toValue(new StringColumn(entry.getKey())), value.toValue(asColumn(entry.getValue())));
+                }
+                return values;
+            };
+        }
+
+        private static Integer toInteger(Column column)
+        {
+            BigInteger value = column.asBigInteger();
+            return value == null ? null : value.intValue();
+        }
+
+        private static Float toFloat(Column column)
+        {
+            Double value = column.asDouble();
+            return value == null ? null : value.floatValue();
+        }
+
+        private static LocalDate toDate(Column column)
+        {
+            return column.asLong() == null ? null : column.asTimestamp().toLocalDateTime().toLocalDate();
+        }
+
+        private static LocalTime toTime(Column column)
+        {
+            return column.asLong() == null ? null : column.asTimestamp().toLocalDateTime().toLocalTime();
+        }
+
+        private static LocalDateTime toTimestamp(Column column)
+        {
+            return column.asLong() == null ? null : column.asTimestamp().toLocalDateTime();
+        }
+
+        private static UUID toUuid(Column column)
+        {
+            String value = column.asString();
+            return value == null ? null : UUID.fromString(value.trim());
+        }
+
+        private static ByteBuffer toBinary(Column column)
+        {
+            byte[] value = column.asBytes();
+            return value == null ? null : ByteBuffer.wrap(value);
+        }
+
+        private static BigDecimal toDecimal(Column column, int scale)
+        {
+            BigDecimal value = column.asBigDecimal();
+            if (value == null) {
+                return null;
+            }
+            // iceberg refuses a decimal whose scale is not the one the column was declared with, and
+            // rounding a value into the declared scale would write something the source never had
+            return value.setScale(scale, RoundingMode.UNNECESSARY);
+        }
+
+        /** Wraps a value read from json so that the converters above can turn it into its declared type. */
+        private static Column asColumn(Object jsonValue)
+        {
+            return new StringColumn(jsonValue == null ? null : String.valueOf(jsonValue));
+        }
+
+        private static FileFormat resolveFileFormat(Table table)
+        {
+            String configured = table.properties().get(TableProperties.DEFAULT_FILE_FORMAT);
+            FileFormat format = configured == null || configured.isBlank()
+                    ? FileFormat.PARQUET
+                    : FileFormat.fromString(configured.trim());
+            if (format != FileFormat.PARQUET && format != FileFormat.ORC) {
+                throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE, String.format(
+                        "table property %s is [%s], icebergwriter writes parquet and orc only",
+                        TableProperties.DEFAULT_FILE_FORMAT, format));
+            }
+            return format;
+        }
+
+        private static FileAppenderFactory<org.apache.iceberg.data.Record> newAppenderFactory(Table table)
+        {
+            Map<String, String> tableProps = new HashMap<>(table.properties());
+            Set<Integer> identifierFieldIds = table.schema().identifierFieldIds();
+            if (identifierFieldIds == null || identifierFieldIds.isEmpty()) {
+                return new GenericAppenderFactory(table, table.schema(), table.spec(), tableProps, null, null);
+            }
+
+            int[] equalityFieldIds = new int[identifierFieldIds.size()];
+            int i = 0;
+            for (Integer fieldId : identifierFieldIds) {
+                equalityFieldIds[i++] = fieldId;
+            }
+            return new GenericAppenderFactory(table, table.schema(), table.spec(), tableProps, equalityFieldIds,
+                    TypeUtil.select(table.schema(), new HashSet<>(identifierFieldIds)));
+        }
+
+        private static void closeQuietly(PartitionedFanoutWriter<org.apache.iceberg.data.Record> writer)
+        {
+            try {
+                writer.close();
+            }
+            catch (IOException e) {
+                log.warn("failed to close the iceberg writer", e);
+            }
+        }
+
+        /** Turns one addax column into the value iceberg keeps for a field. */
+        @FunctionalInterface
+        private interface ValueConverter
+        {
+            /** Converts the column, a null return writes a null into the field. */
+            Object toValue(Column column);
+        }
+
+        /** A table column together with the record column it is filled from. */
+        private record FieldBinding(int position, String name, Type type, ValueConverter converter) {}
     }
 }
