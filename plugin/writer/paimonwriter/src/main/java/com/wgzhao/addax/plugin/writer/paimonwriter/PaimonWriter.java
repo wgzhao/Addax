@@ -22,34 +22,49 @@ package com.wgzhao.addax.plugin.writer.paimonwriter;
 import com.alibaba.fastjson2.JSON;
 import com.wgzhao.addax.core.element.Column;
 import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.plugin.RecordReceiver;
 import com.wgzhao.addax.core.spi.Writer;
 import com.wgzhao.addax.core.util.Configuration;
-import org.apache.hadoop.fs.FileSystem;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.paimon.CoreOptions;
 import org.apache.paimon.catalog.Catalog;
 import org.apache.paimon.catalog.CatalogContext;
 import org.apache.paimon.catalog.CatalogFactory;
 import org.apache.paimon.catalog.Identifier;
-import org.apache.paimon.data.*;
+import org.apache.paimon.data.BinaryString;
+import org.apache.paimon.data.Decimal;
+import org.apache.paimon.data.GenericArray;
+import org.apache.paimon.data.GenericMap;
+import org.apache.paimon.data.GenericRow;
+import org.apache.paimon.data.Timestamp;
 import org.apache.paimon.options.Options;
 import org.apache.paimon.table.Table;
 import org.apache.paimon.table.sink.BatchTableCommit;
 import org.apache.paimon.table.sink.BatchTableWrite;
 import org.apache.paimon.table.sink.BatchWriteBuilder;
 import org.apache.paimon.table.sink.CommitMessage;
+import org.apache.paimon.types.ArrayType;
 import org.apache.paimon.types.DataField;
 import org.apache.paimon.types.DataType;
-import org.apache.paimon.types.DataTypeRoot;
 import org.apache.paimon.types.DecimalType;
+import org.apache.paimon.types.MapType;
+import org.apache.paimon.types.RowType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.wgzhao.addax.core.base.Key.KERBEROS_KEYTAB_FILE_PATH;
 import static com.wgzhao.addax.core.base.Key.KERBEROS_PRINCIPAL;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 
 /** Paimon Writer. */
 public class PaimonWriter
@@ -60,8 +75,11 @@ public class PaimonWriter
             extends Writer.Job
     {
         private static final Logger LOG = LoggerFactory.getLogger(Job.class);
+        /** Write modes this writer honours, everything else is refused instead of appended. */
+        private static final Set<String> WRITE_MODES = Set.of("append", "insert", "truncate");
         private Configuration conf = null;
         private BatchWriteBuilder writeBuilder = null;
+        private String writeMode = null;
 
         @Override
         public void init()
@@ -71,15 +89,15 @@ public class PaimonWriter
             Options options = PaimonHelper.getOptions(this.conf);
             CatalogContext context = PaimonHelper.getCatalogContext(options);
 
-            if ("kerberos".equals(options.get("hadoop.security.authentication"))) {
+            if (PaimonHelper.isKerberos(options)) {
                 String kerberosKeytabFilePath = options.get(KERBEROS_KEYTAB_FILE_PATH);
                 String kerberosPrincipal = options.get(KERBEROS_PRINCIPAL);
                 try {
                     PaimonHelper.kerberosAuthentication(context.hadoopConf(), kerberosPrincipal, kerberosKeytabFilePath);
                     LOG.info("kerberos Authentication success");
-
-                    FileSystem fs = FileSystem.get(context.hadoopConf());
-                    fs.getStatus().getCapacity();
+                }
+                catch (AddaxException e) {
+                    throw e;
                 }
                 catch (Exception e) {
                     LOG.error("kerberos Authentication error", e);
@@ -93,8 +111,13 @@ public class PaimonWriter
                 Identifier identifier = Identifier.create(dbName, tableName);
 
                 Table table = catalog.getTable(identifier);
+                PaimonHelper.validateBucketMode(table);
+                this.writeMode = writeMode();
 
                 writeBuilder = table.newBatchWriteBuilder();
+            }
+            catch (AddaxException e) {
+                throw e;
             }
             catch (Exception e) {
                 LOG.error("init paimon error", e);
@@ -115,20 +138,28 @@ public class PaimonWriter
         @Override
         public void prepare()
         {
-            String writeMode = this.conf.getString("writeMode");
-            if ("truncate".equalsIgnoreCase(writeMode)) {
-                if (writeBuilder != null) {
-                    LOG.info("You specify truncate writeMode, begin to clean history data.");
-                    BatchTableCommit commit = writeBuilder.newCommit();
-                    try {
-                        commit.truncateTable();
-                    }
-                    catch (Exception e) {
-                        LOG.error("Failed to truncate table ", e);
-                        throw new RuntimeException(e);
-                    }
+            if ("truncate".equals(this.writeMode) && writeBuilder != null) {
+                LOG.info("You specify truncate writeMode, begin to clean history data.");
+                BatchTableCommit commit = writeBuilder.newCommit();
+                try {
+                    commit.truncateTable();
+                }
+                catch (Exception e) {
+                    LOG.error("Failed to truncate table ", e);
+                    throw new RuntimeException(e);
                 }
             }
+        }
+
+        /** The writeMode the job asked for, checked against the ones this writer honours. */
+        private String writeMode()
+        {
+            String writeMode = StringUtils.defaultIfBlank(this.conf.getString("writeMode"), "append").toLowerCase();
+            if (!WRITE_MODES.contains(writeMode)) {
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE, String.format(
+                        "writeMode [%s] is not supported, use one of %s", writeMode, WRITE_MODES));
+            }
+            return writeMode;
         }
 
         @Override
@@ -144,36 +175,56 @@ public class PaimonWriter
     {
 
         private static final Logger log = LoggerFactory.getLogger(Task.class);
+        /** Buffer one task may fill before it writes a data file, see {@link #boundedWriteBuffer}. */
+        private static final String DEFAULT_WRITE_BUFFER_SIZE = "64 mb";
         private BatchWriteBuilder writeBuilder = null;
-        private Integer batchSize = 1000;
-        private List<DataField> columnList = new ArrayList<>();
-        private List<DataType> typeList = new ArrayList<>();
-        private boolean isDynamicBucketMode;
-        private int bucketNum = 0;
+        private DataField[] columns = new DataField[0];
+        private DataType[] types = new DataType[0];
+        /** For reader column i the table column it feeds, or null when both are in the same order. */
+        private int[] projection = null;
 
         @Override
         public void startWrite(RecordReceiver recordReceiver)
         {
-
-            List<Record> writerBuffer = new ArrayList<>(this.batchSize);
-            Record record;
             long total = 0;
-            while ((record = recordReceiver.getFromReader()) != null) {
-                writerBuffer.add(record);
-                if (writerBuffer.size() >= this.batchSize) {
-                    total += doBatchInsert(writerBuffer);
-                    writerBuffer.clear();
+            // a BatchTableWrite accepts exactly one commit, so a task writes through a single
+            // writer and commits once: one snapshot per task instead of one per buffered batch
+            BatchTableWrite write = writeBuilder.newWrite();
+            try {
+                Record record;
+                while ((record = recordReceiver.getFromReader()) != null) {
+                    GenericRow data = convert(record);
+                    if (data == null) {
+                        // the record was collected as dirty, writing it would put a
+                        // half-filled row into the table
+                        continue;
+                    }
+                    // the bucket is left to Paimon, see PaimonHelper.validateBucketMode
+                    write.write(data);
+                    total++;
+                }
+
+                List<CommitMessage> messages = write.prepareCommit();
+                BatchTableCommit commit = writeBuilder.newCommit();
+                commit.commit(messages);
+
+                log.info("task end, write size :{}, commit messages :{}", total, messages.size());
+                getTaskPluginCollector().collectMessage("writeSize", String.valueOf(total));
+            }
+            catch (AddaxException e) {
+                throw e;
+            }
+            catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            finally {
+                try {
+                    write.close();
+                }
+                catch (Exception e) {
+                    log.warn("failed to close the paimon writer", e);
                 }
             }
-
-            if (!writerBuffer.isEmpty()) {
-                total += doBatchInsert(writerBuffer);
-                writerBuffer.clear();
-            }
-
-            String msg = String.format("task end, write size :%d", total);
-            getTaskPluginCollector().collectMessage("writeSize", String.valueOf(total));
-            log.info(msg);
         }
 
         @Override
@@ -181,17 +232,18 @@ public class PaimonWriter
         {
             Configuration conf = super.getPluginJobConf();
 
-            batchSize = conf.getInt("batchSize", 1000);
-
             Options options = PaimonHelper.getOptions(conf);
             CatalogContext context = PaimonHelper.getCatalogContext(options);
 
-            if ("kerberos".equals(options.get("hadoop.security.authentication"))) {
+            if (PaimonHelper.isKerberos(options)) {
                 String kerberosKeytabFilePath = options.get(KERBEROS_KEYTAB_FILE_PATH);
                 String kerberosPrincipal = options.get(KERBEROS_PRINCIPAL);
                 try {
                     PaimonHelper.kerberosAuthentication(context.hadoopConf(), kerberosPrincipal, kerberosKeytabFilePath);
                     log.info("kerberos Authentication success");
+                }
+                catch (AddaxException e) {
+                    throw e;
                 }
                 catch (Exception e) {
                     log.error("kerberos Authentication error", e);
@@ -206,23 +258,18 @@ public class PaimonWriter
                 Identifier identifier = Identifier.create(dbName, tableName);
 
                 Table table = catalog.getTable(identifier);
+                PaimonHelper.validateBucketMode(table);
+                table = boundedWriteBuffer(table, conf);
 
-                // check the table has dynamic bucket
-                Map<String, String> tableOptions = table.options();
-                String bucketMode = tableOptions.getOrDefault("bucket-mode", "dynamic");
-                this.isDynamicBucketMode = "dynamic".equalsIgnoreCase(bucketMode);
-                String bucketNumStr = tableOptions.getOrDefault("bucket", "32");
-                if (bucketNumStr != null && !bucketNumStr.isEmpty()) {
-                    try {
-                        this.bucketNum = Integer.parseInt(bucketNumStr);
-                    } catch (NumberFormatException e) {
-                        log.warn("Can not parse the bucket number: {}", bucketNumStr);
-                    }
-                }
+                RowType rowType = table.rowType();
+                columns = rowType.getFields().toArray(new DataField[0]);
+                types = rowType.getFieldTypes().toArray(new DataType[0]);
+                projection = projection(conf, tableName);
 
-                columnList = table.rowType().getFields();
-                typeList = table.rowType().getFieldTypes();
                 writeBuilder = table.newBatchWriteBuilder();
+            }
+            catch (AddaxException e) {
+                throw e;
             }
             catch (Exception e) {
                 log.error("init paimon error", e);
@@ -236,121 +283,205 @@ public class PaimonWriter
 
         }
 
-        private long doBatchInsert(final List<Record> writerBuffer)
+        /**
+         * Caps how much data one task buffers before it writes a data file.
+         * <p>
+         * A task keeps a single writer for its whole run, so it also holds that writer's
+         * buffer. Paimon defaults it to 256 mb per write, which is what all channels
+         * together would hold in the 1 GB heap the launcher gives the job by default.
+         * The job parameter, or an explicit table option, wins over the default here.
+         */
+        private Table boundedWriteBuffer(Table table, Configuration conf)
         {
-            BatchTableWrite write = writeBuilder.newWrite();
-            GenericRow data;
-            for (Record record : writerBuffer) {
-                data = new GenericRow(columnList.size());
-                StringBuilder id = new StringBuilder();
-                for (int i = 0; i < record.getColumnNumber(); i++) {
-                    Column column = record.getColumn(i);
-                    if (column == null) {
-                        continue;
-                    }
-                    if (i >= columnList.size()) {
-                        throw new RuntimeException("columnList size is " + columnList.size() + ", but record column number is " + record.getColumnNumber());
-                    }
-                    String columnName = columnList.get(i).name();
-                    DataType columnType = typeList.get(i);
-                    if (columnType.getTypeRoot().equals(DataTypeRoot.ARRAY)) {
-                        if (null == column.asString()) {
-                            data.setField(i, null);
-                        }
-                        else {
-                            String[] dataList = column.asString().split(",");
-                            data.setField(i, new GenericArray(dataList));
-                        }
-                    }
-                    else {
-                        switch (columnType.getTypeRoot()) {
+            String size = conf.getString("writeBufferSize");
+            if (StringUtils.isBlank(size) && !table.options().containsKey(CoreOptions.WRITE_BUFFER_SIZE.key())) {
+                size = DEFAULT_WRITE_BUFFER_SIZE;
+            }
+            if (StringUtils.isBlank(size)) {
+                return table;
+            }
+            log.info("write buffer size is {}", size);
+            return table.copy(Map.of(CoreOptions.WRITE_BUFFER_SIZE.key(), size));
+        }
 
-                            case DATE:
-                            case TIMESTAMP_WITH_LOCAL_TIME_ZONE:
-                            case TIMESTAMP_WITHOUT_TIME_ZONE:
-                                try {
-                                    if (column.asLong() != null) {
-                                        data.setField(i, Timestamp.fromSQLTimestamp(column.asTimestamp()));
-                                    }
-                                    else {
-                                        data.setField(i, null);
-                                    }
-                                }
-                                catch (Exception e) {
-                                    getTaskPluginCollector().collectDirtyRecord(record, String.format("时间类型解析失败 [%s:%s] exception: %s", columnName, column.toString(), e));
-                                }
-                                break;
-                            case CHAR:
-                            case VARCHAR:
-                                data.setField(i, BinaryString.fromString(column.asString()));
-                                break;
-                            case BOOLEAN:
-                                data.setField(i, column.asBoolean());
-                                break;
-                            case VARBINARY:
-                            case BINARY:
-                                data.setField(i, column.asBytes());
-                                break;
-                            case BIGINT:
-                                data.setField(i, column.asLong());
-                                break;
-                            case INTEGER:
-                            case SMALLINT:
-                            case TINYINT:
-                                data.setField(i, column.asBigInteger() == null ? null : column.asBigInteger().intValue());
-                                break;
-                            case FLOAT:
-                            case DOUBLE:
-
-                                data.setField(i, column.asDouble());
-                                break;
-                            case DECIMAL:
-                                if (column.asBigDecimal() != null) {
-                                    data.setField(i, Decimal.fromBigDecimal(column.asBigDecimal(), ((DecimalType) columnType).getPrecision(), ((DecimalType) columnType).getScale()));
-                                }
-                                else {
-                                    data.setField(i, null);
-                                }
-                                break;
-                            case MAP:
-                                try {
-                                    data.setField(i, new GenericMap(JSON.parseObject(column.asString(), Map.class)));
-                                }
-                                catch (Exception e) {
-                                    getTaskPluginCollector().collectDirtyRecord(record, "failed to parse the '" + column.asString() + "' to map: " + e);
-                                }
-                                break;
-                            default:
-                                getTaskPluginCollector().collectDirtyRecord(record, "The column type is not supported: " + columnType.getTypeRoot());
-                        }
-                    }
+        /**
+         * Reads the optional column list, which names the table columns in the order the reader
+         * produces them. Without it the two are taken to be in the same order.
+         *
+         * @return the table column each reader column feeds, or null for positional mapping
+         */
+        private int[] projection(Configuration conf, String tableName)
+        {
+            List<String> names = conf.getList("column", String.class);
+            if (names == null || names.isEmpty()) {
+                return null;
+            }
+            Map<String, Integer> byName = new HashMap<>();
+            for (int i = 0; i < columns.length; i++) {
+                byName.put(columns[i].name().toLowerCase(), i);
+            }
+            int[] mapping = new int[names.size()];
+            for (int i = 0; i < names.size(); i++) {
+                Integer target = byName.get(names.get(i).trim().toLowerCase());
+                if (target == null) {
+                    throw AddaxException.asAddaxException(CONFIG_ERROR, String.format(
+                            "column [%s] of the column list does not exist in table %s", names.get(i), tableName));
                 }
+                mapping[i] = target;
+            }
+            return mapping;
+        }
 
+        /**
+         * Converts a record into a Paimon row.
+         *
+         * @return the row, or null when a column could not be converted: such a record is
+         * reported as dirty and must not be written
+         */
+        private GenericRow convert(Record record)
+        {
+            int produced = record.getColumnNumber();
+            if (projection == null ? produced > columns.length : produced != projection.length) {
+                throw AddaxException.asAddaxException(CONFIG_ERROR, String.format(
+                        "the table has %d columns%s, but the reader produced %d: check that the reader "
+                                + "columns match the table schema",
+                        columns.length,
+                        projection == null ? "" : " and the column list names " + projection.length,
+                        produced));
+            }
+
+            GenericRow data = new GenericRow(columns.length);
+            for (int i = 0; i < produced; i++) {
+                Column column = record.getColumn(i);
+                if (column == null) {
+                    continue;
+                }
+                int target = projection == null ? i : projection[i];
                 try {
-                    if (isDynamicBucketMode) {
-                        int bucketId = Math.abs(data.hashCode() % bucketNum);
-                        write.write(data, bucketId);
-                    } else {
-                        write.write(data);
-                    }
+                    data.setField(target, toFieldValue(column, types[target]));
                 }
                 catch (Exception e) {
-                    throw new RuntimeException(e);
+                    getTaskPluginCollector().collectDirtyRecord(record, String.format(
+                            "failed to convert column [%s] to %s: %s", columns[target].name(), types[target], e));
+                    return null;
                 }
             }
+            return data;
+        }
 
-            List<CommitMessage> messages = null;
-            try {
-                messages = write.prepareCommit();
-                BatchTableCommit commit = writeBuilder.newCommit();
-                commit.commit(messages);
-
-                write.close();
-
-                return messages.size();
+        /** Converts a column to the object layout Paimon keeps in memory for that type. */
+        private Object toFieldValue(Column column, DataType type)
+        {
+            switch (type.getTypeRoot()) {
+                case CHAR:
+                case VARCHAR:
+                    return BinaryString.fromString(column.asString());
+                case BOOLEAN:
+                    return column.asBoolean();
+                case TINYINT:
+                    return column.asBigInteger() == null ? null : column.asBigInteger().byteValue();
+                case SMALLINT:
+                    return column.asBigInteger() == null ? null : column.asBigInteger().shortValue();
+                case INTEGER:
+                    return column.asBigInteger() == null ? null : column.asBigInteger().intValue();
+                case BIGINT:
+                    return column.asLong();
+                case FLOAT:
+                    return column.asDouble() == null ? null : column.asDouble().floatValue();
+                case DOUBLE:
+                    return column.asDouble();
+                case DECIMAL:
+                    if (column.asBigDecimal() == null) {
+                        return null;
+                    }
+                    DecimalType decimalType = (DecimalType) type;
+                    return Decimal.fromBigDecimal(column.asBigDecimal(),
+                            decimalType.getPrecision(), decimalType.getScale());
+                case DATE:
+                    // Paimon keeps DATE as an int holding days since epoch, not as a timestamp
+                    java.util.Date date = column.asDate();
+                    return date == null ? null : (int) new java.sql.Date(date.getTime()).toLocalDate().toEpochDay();
+                case TIMESTAMP_WITH_LOCAL_TIME_ZONE:
+                case TIMESTAMP_WITHOUT_TIME_ZONE:
+                    return Timestamp.fromSQLTimestamp(column.asTimestamp());
+                case VARBINARY:
+                case BINARY:
+                    return column.asBytes();
+                case ARRAY:
+                    return toArray(column.asString(), (ArrayType) type);
+                case MAP:
+                    return toMap(column.asString(), (MapType) type);
+                default:
+                    throw new UnsupportedOperationException("unsupported column type " + type);
             }
-            catch (Exception e) {
-                throw new RuntimeException(e);
+        }
+
+        private GenericArray toArray(String text, ArrayType type)
+        {
+            if (text == null) {
+                return null;
+            }
+            String[] parts = text.split(",");
+            Object[] elements = new Object[parts.length];
+            for (int i = 0; i < parts.length; i++) {
+                elements[i] = toElementValue(parts[i].trim(), type.getElementType());
+            }
+            return new GenericArray(elements);
+        }
+
+        private GenericMap toMap(String text, MapType type)
+        {
+            if (text == null) {
+                return null;
+            }
+            Map<Object, Object> entries = new LinkedHashMap<>();
+            Map<String, Object> raw = JSON.parseObject(text, Map.class);
+            for (Map.Entry<String, Object> entry : raw.entrySet()) {
+                entries.put(toElementValue(entry.getKey(), type.getKeyType()),
+                        toElementValue(entry.getValue(), type.getValueType()));
+            }
+            return new GenericMap(entries);
+        }
+
+        /**
+         * Converts one array element or one map key/value, both of which reach us as the
+         * text they had in the source record, into the object Paimon keeps in memory.
+         */
+        private Object toElementValue(Object value, DataType type)
+        {
+            if (value == null) {
+                return null;
+            }
+            String text = String.valueOf(value);
+            switch (type.getTypeRoot()) {
+                case CHAR:
+                case VARCHAR:
+                    return BinaryString.fromString(text);
+                case BOOLEAN:
+                    return Boolean.valueOf(text);
+                case TINYINT:
+                    return Byte.valueOf(text);
+                case SMALLINT:
+                    return Short.valueOf(text);
+                case INTEGER:
+                    return Integer.valueOf(text);
+                case BIGINT:
+                    return Long.valueOf(text);
+                case FLOAT:
+                    return Float.valueOf(text);
+                case DOUBLE:
+                    return Double.valueOf(text);
+                case DECIMAL:
+                    DecimalType decimalType = (DecimalType) type;
+                    return Decimal.fromBigDecimal(new BigDecimal(text),
+                            decimalType.getPrecision(), decimalType.getScale());
+                case DATE:
+                    return (int) java.sql.Date.valueOf(text).toLocalDate().toEpochDay();
+                case TIMESTAMP_WITH_LOCAL_TIME_ZONE:
+                case TIMESTAMP_WITHOUT_TIME_ZONE:
+                    return Timestamp.fromSQLTimestamp(java.sql.Timestamp.valueOf(text));
+                default:
+                    throw new UnsupportedOperationException("unsupported element type " + type);
             }
         }
     }
