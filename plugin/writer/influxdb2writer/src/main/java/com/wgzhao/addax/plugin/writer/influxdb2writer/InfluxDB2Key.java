@@ -33,6 +33,8 @@ public final class InfluxDB2Key
     public static final String TOKEN = "token";
     /** Tag. */
     public static final String TAG = "tag";
+    /** Tag columns. */
+    public static final String TAG_COLUMNS = "tagColumns";
     /** Interval. */
     public static final String INTERVAL = "interval";
 }
