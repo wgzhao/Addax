@@ -36,10 +36,10 @@ import org.apache.iceberg.Table;
 import org.apache.iceberg.TableProperties;
 import org.apache.iceberg.catalog.Catalog;
 import org.apache.iceberg.catalog.TableIdentifier;
-import org.apache.iceberg.data.GenericAppenderFactory;
+import org.apache.iceberg.data.GenericFileWriterFactory;
 import org.apache.iceberg.data.GenericRecord;
 import org.apache.iceberg.expressions.Expressions;
-import org.apache.iceberg.io.FileAppenderFactory;
+import org.apache.iceberg.io.FileWriterFactory;
 import org.apache.iceberg.io.OutputFileFactory;
 import org.apache.iceberg.io.PartitionedFanoutWriter;
 import org.apache.iceberg.io.WriteResult;
@@ -59,7 +59,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -143,7 +142,7 @@ public class IcebergWriter
         private Table table = null;
         private Schema schema = null;
         private FileFormat fileFormat = FileFormat.PARQUET;
-        private FileAppenderFactory<org.apache.iceberg.data.Record> appenderFactory = null;
+        private FileWriterFactory<org.apache.iceberg.data.Record> fileWriterFactory = null;
         private OutputFileFactory outputFileFactory = null;
         private PartitionKey partitionKey = null;
         private long targetFileSize = 0;
@@ -216,7 +215,7 @@ public class IcebergWriter
                     table.properties(),
                     TableProperties.WRITE_TARGET_FILE_SIZE_BYTES,
                     TableProperties.WRITE_TARGET_FILE_SIZE_BYTES_DEFAULT);
-            this.appenderFactory = newAppenderFactory(table);
+            this.fileWriterFactory = newFileWriterFactory(table, fileFormat);
             // the ids only name the files iceberg writes, they are not part of the commit
             this.outputFileFactory = OutputFileFactory.builderFor(table, getTaskGroupId(), getTaskId())
                     .format(fileFormat)
@@ -234,7 +233,7 @@ public class IcebergWriter
 
         private PartitionedFanoutWriter<org.apache.iceberg.data.Record> newPartitionedWriter()
         {
-            return new PartitionedFanoutWriter<org.apache.iceberg.data.Record>(table.spec(), fileFormat, appenderFactory, outputFileFactory, table.io(), targetFileSize)
+            return new PartitionedFanoutWriter<org.apache.iceberg.data.Record>(table.spec(), fileFormat, fileWriterFactory, outputFileFactory, table.io(), targetFileSize)
             {
                 @Override
                 protected PartitionKey partition(org.apache.iceberg.data.Record record)
@@ -466,21 +465,23 @@ public class IcebergWriter
             return format;
         }
 
-        private static FileAppenderFactory<org.apache.iceberg.data.Record> newAppenderFactory(Table table)
+        private static FileWriterFactory<org.apache.iceberg.data.Record> newFileWriterFactory(Table table, FileFormat fileFormat)
         {
-            Map<String, String> tableProps = new HashMap<>(table.properties());
+            GenericFileWriterFactory.Builder builder = new GenericFileWriterFactory.Builder(table)
+                    .dataFileFormat(fileFormat)
+                    .dataSchema(table.schema())
+                    .writerProperties(table.properties());
             Set<Integer> identifierFieldIds = table.schema().identifierFieldIds();
-            if (identifierFieldIds == null || identifierFieldIds.isEmpty()) {
-                return new GenericAppenderFactory(table, table.schema(), table.spec(), tableProps, null, null);
+            if (identifierFieldIds != null && !identifierFieldIds.isEmpty()) {
+                int[] equalityFieldIds = new int[identifierFieldIds.size()];
+                int i = 0;
+                for (Integer fieldId : identifierFieldIds) {
+                    equalityFieldIds[i++] = fieldId;
+                }
+                builder.equalityFieldIds(equalityFieldIds)
+                        .equalityDeleteRowSchema(TypeUtil.select(table.schema(), new HashSet<>(identifierFieldIds)));
             }
-
-            int[] equalityFieldIds = new int[identifierFieldIds.size()];
-            int i = 0;
-            for (Integer fieldId : identifierFieldIds) {
-                equalityFieldIds[i++] = fieldId;
-            }
-            return new GenericAppenderFactory(table, table.schema(), table.spec(), tableProps, equalityFieldIds,
-                    TypeUtil.select(table.schema(), new HashSet<>(identifierFieldIds)));
+            return builder.build();
         }
 
         private static void closeQuietly(PartitionedFanoutWriter<org.apache.iceberg.data.Record> writer)
