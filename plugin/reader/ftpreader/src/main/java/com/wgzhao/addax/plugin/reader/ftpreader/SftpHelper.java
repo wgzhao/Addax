@@ -27,7 +27,6 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.SftpException;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -163,51 +162,63 @@ public class SftpHelper
             }
 
             // Regular path handling
-            if (!isDirectory(directoryPath)) {
-                // Not a directory: it may still be a single file
-                try {
-                    channelSftp.lstat(directoryPath);
-                    sourceFiles.add(directoryPath);
-                    LOG.debug("Added file: {}", directoryPath);
-                }
-                catch (SftpException e) {
-                    LOG.warn("The path [{}] does not exist or is not readable, it is skipped", directoryPath);
-                }
+            if (isDirectory(directoryPath)) {
+                listDirectory(directoryPath, parentLevel, maxTraversalLevel);
                 return;
             }
 
-            // Ensure directory path ends with separator
-            String normalizedPath = directoryPath.endsWith(IOUtils.DIR_SEPARATOR + "") ?
-                    directoryPath : directoryPath + IOUtils.DIR_SEPARATOR;
-
-            Vector<LsEntry> vector = channelSftp.ls(directoryPath);
-            if (vector == null || vector.isEmpty()) {
-                LOG.info("No files found in directory: {}", directoryPath);
-                return;
+            // Not a directory: it may still be a single file
+            try {
+                channelSftp.lstat(directoryPath);
+                sourceFiles.add(directoryPath);
+                LOG.debug("Added file: {}", directoryPath);
             }
-
-            for (LsEntry entry : vector) {
-                String fileName = entry.getFilename();
-                // Skip current directory and parent directory entries
-                if (".".equals(fileName) || "..".equals(fileName)) {
-                    continue;
-                }
-
-                String fullPath = normalizedPath + fileName;
-                SftpATTRS attrs = entry.getAttrs();
-
-                if (attrs.isDir()) {
-                    // Recursively traverse subdirectories
-                    getListFiles(fullPath, parentLevel + 1, maxTraversalLevel);
-                }
-                else if (attrs.isReg()) {
-                    sourceFiles.add(fullPath);
-                    LOG.debug("Added file: {}", fullPath);
-                }
+            catch (SftpException e) {
+                LOG.warn("The path [{}] does not exist or is not readable, it is skipped", directoryPath);
             }
         }
         catch (SftpException e) {
             LOG.error("Failed to retrieve files from {}: {}", directoryPath, e.getMessage());
+        }
+    }
+
+    /**
+     * List one directory and recurse into its subdirectories. The caller must already know that
+     * the path is a directory, so that a directory found in a listing does not cost another
+     * round trip to be recognized.
+     */
+    private void listDirectory(String directoryPath, int parentLevel, int maxTraversalLevel)
+            throws SftpException
+    {
+        // sftp paths are always separated with '/', whatever the local platform uses
+        String normalizedPath = directoryPath.endsWith("/") ? directoryPath : directoryPath + "/";
+
+        Vector<LsEntry> vector = channelSftp.ls(directoryPath);
+        if (vector == null || vector.isEmpty()) {
+            LOG.info("No files found in directory: {}", directoryPath);
+            return;
+        }
+
+        for (LsEntry entry : vector) {
+            String fileName = entry.getFilename();
+            // Skip current directory and parent directory entries
+            if (".".equals(fileName) || "..".equals(fileName)) {
+                continue;
+            }
+
+            String fullPath = normalizedPath + fileName;
+            SftpATTRS attrs = entry.getAttrs();
+
+            if (attrs.isDir()) {
+                if (parentLevel + 1 <= maxTraversalLevel) {
+                    // Recursively traverse subdirectories
+                    listDirectory(fullPath, parentLevel + 1, maxTraversalLevel);
+                }
+            }
+            else if (attrs.isReg()) {
+                sourceFiles.add(fullPath);
+                LOG.debug("Added file: {}", fullPath);
+            }
         }
     }
 
