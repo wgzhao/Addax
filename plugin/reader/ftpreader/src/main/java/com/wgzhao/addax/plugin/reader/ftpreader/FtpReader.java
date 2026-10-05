@@ -133,11 +133,15 @@ public class FtpReader
                 if (null == path || path.isEmpty()) {
                     throw AddaxException.asAddaxException(REQUIRED_VALUE, "the path is required");
                 }
-                for (String eachPath : path) {
-                    if (!eachPath.startsWith("/")) {
-                        throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                                "The path must be an absolute path, please check the path configuration");
-                    }
+            }
+
+            // A relative path is resolved against the session's working directory, which the ftp
+            // helper moves while probing whether a path is a directory, so the same path can be
+            // listed and then read from two different places. Only absolute paths are unambiguous.
+            for (String eachPath : path) {
+                if (!eachPath.startsWith("/")) {
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                            "The path must be an absolute path, but the configured path is " + eachPath);
                 }
             }
 
