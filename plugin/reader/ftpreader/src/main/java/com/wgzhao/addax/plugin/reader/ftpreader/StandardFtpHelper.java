@@ -20,7 +20,6 @@
 package com.wgzhao.addax.plugin.reader.ftpreader;
 
 import com.wgzhao.addax.core.exception.AddaxException;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
@@ -160,49 +159,59 @@ public class StandardFtpHelper
             }
 
             // Regular path handling
-            if (!isDirectory(directoryPath)) {
-                // Not a directory: it may still be a single file, which a listing confirms
-                if (ftpClient.listFiles(directoryPath).length > 0) {
-                    sourceFiles.add(directoryPath);
-                    LOG.debug("Added file: {}", directoryPath);
-                }
-                else {
-                    LOG.warn("The path [{}] does not exist or is not readable, it is skipped", directoryPath);
-                }
+            if (isDirectory(directoryPath)) {
+                listDirectory(directoryPath, parentLevel, maxTraversalLevel);
                 return;
             }
 
-            // Ensure directory path ends with separator
-            String normalizedPath = directoryPath.endsWith(IOUtils.DIR_SEPARATOR + "") ?
-                    directoryPath : directoryPath + IOUtils.DIR_SEPARATOR;
-
-            FTPFile[] ftpFiles = ftpClient.listFiles(directoryPath);
-            if (ftpFiles == null || ftpFiles.length == 0) {
-                LOG.info("No files found in directory: {}", directoryPath);
-                return;
+            // Not a directory: it may still be a single file, which a listing confirms
+            if (ftpClient.listFiles(directoryPath).length > 0) {
+                sourceFiles.add(directoryPath);
+                LOG.debug("Added file: {}", directoryPath);
             }
-
-            for (FTPFile ftpFile : ftpFiles) {
-                String fileName = ftpFile.getName();
-                // Skip current directory and parent directory entries
-                if (".".equals(fileName) || "..".equals(fileName)) {
-                    continue;
-                }
-
-                String fullPath = normalizedPath + fileName;
-
-                if (ftpFile.isFile()) {
-                    sourceFiles.add(fullPath);
-                    LOG.debug("Added file: {}", fullPath);
-                }
-                else if (ftpFile.isDirectory()) {
-                    // Recursively traverse subdirectories
-                    getListFiles(fullPath, parentLevel + 1, maxTraversalLevel);
-                }
+            else {
+                LOG.warn("The path [{}] does not exist or is not readable, it is skipped", directoryPath);
             }
         }
         catch (IOException e) {
             LOG.error("Failed to retrieve files from {}: {}", directoryPath, e.getMessage());
+        }
+    }
+
+    /**
+     * List one directory and recurse into its subdirectories. The caller must already know that
+     * the path is a directory: checking that on ftp costs a CWD round trip which also moves the
+     * session's working directory, so entries that came out of a listing are not probed again.
+     */
+    private void listDirectory(String directoryPath, int parentLevel, int maxTraversalLevel)
+            throws IOException
+    {
+        // ftp paths are always separated with '/', whatever the local platform uses
+        String normalizedPath = directoryPath.endsWith("/") ? directoryPath : directoryPath + "/";
+
+        FTPFile[] ftpFiles = ftpClient.listFiles(directoryPath);
+        if (ftpFiles == null || ftpFiles.length == 0) {
+            LOG.info("No files found in directory: {}", directoryPath);
+            return;
+        }
+
+        for (FTPFile ftpFile : ftpFiles) {
+            String fileName = ftpFile.getName();
+            // Skip current directory and parent directory entries
+            if (".".equals(fileName) || "..".equals(fileName)) {
+                continue;
+            }
+
+            String fullPath = normalizedPath + fileName;
+
+            if (ftpFile.isFile()) {
+                sourceFiles.add(fullPath);
+                LOG.debug("Added file: {}", fullPath);
+            }
+            else if (ftpFile.isDirectory() && parentLevel + 1 <= maxTraversalLevel) {
+                // Recursively traverse subdirectories
+                listDirectory(fullPath, parentLevel + 1, maxTraversalLevel);
+            }
         }
     }
 
