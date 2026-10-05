@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
@@ -51,9 +50,16 @@ public class StandardFtpHelper
     {
         ftpClient = new FTPClient();
         try {
+            // The control connection's reader and writer are built while connecting, from the
+            // encoding that is set at that moment, so setting it afterwards leaves the commands
+            // on the default ISO-8859-1 and every non-ASCII path goes out as '?'
+            ftpClient.setControlEncoding(StandardCharsets.UTF_8.name());
+            // connectTimeout is read by connect() and the default timeout becomes the control
+            // socket's SO_TIMEOUT, so both have to be in place before the socket is opened
+            ftpClient.setConnectTimeout(timeout);
+            ftpClient.setDefaultTimeout(timeout);
             ftpClient.connect(host, port);
             ftpClient.login(username, password);
-            ftpClient.setConnectTimeout(timeout);
             ftpClient.setDataTimeout(Duration.ofMillis(timeout));
             if ("PASV".equals(connectMode)) {
                 ftpClient.enterRemotePassiveMode();
@@ -68,8 +74,6 @@ public class StandardFtpHelper
                 throw AddaxException.asAddaxException(CONNECT_ERROR,
                         "Failed to connect to the ftp server " + host);
             }
-            String fileEncoding = Charset.defaultCharset().displayName();
-            ftpClient.setControlEncoding(fileEncoding);
             // always use binary transfer model
             ftpClient.setFileType(BINARY_FILE_TYPE);
         }
@@ -89,6 +93,18 @@ public class StandardFtpHelper
             catch (IOException e) {
                 throw AddaxException.asAddaxException(IO_ERROR,
                         "Failed to close the connection", e);
+            }
+            finally {
+                // logout only ends the session, the control socket stays open until it is
+                // disconnected
+                if (ftpClient.isConnected()) {
+                    try {
+                        ftpClient.disconnect();
+                    }
+                    catch (IOException e) {
+                        LOG.error("Failed to close the connection", e);
+                    }
+                }
             }
         }
     }
@@ -182,8 +198,7 @@ public class StandardFtpHelper
     public InputStream getInputStream(String filePath)
     {
         try {
-            InputStream inputStream = ftpClient.retrieveFileStream(
-                    new String(filePath.getBytes(), StandardCharsets.ISO_8859_1));
+            InputStream inputStream = ftpClient.retrieveFileStream(filePath);
             if (inputStream == null) {
                 throw new IOException("Could not open stream for file: " + filePath);
             }

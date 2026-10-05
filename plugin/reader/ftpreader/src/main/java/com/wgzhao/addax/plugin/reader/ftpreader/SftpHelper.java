@@ -81,7 +81,8 @@ public class SftpHelper
             config.put("StrictHostKeyChecking", "no");
             session.setConfig(config);
             session.setTimeout(timeout);
-            session.connect();
+            // setTimeout only covers reads and writes, the tcp connect needs its own timeout
+            session.connect(timeout);
 
             channelSftp = (ChannelSftp) session.openChannel("sftp");
             channelSftp.connect();
