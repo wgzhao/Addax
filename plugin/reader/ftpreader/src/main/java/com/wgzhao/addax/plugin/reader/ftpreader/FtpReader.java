@@ -181,7 +181,7 @@ public class FtpReader
             this.sourceFiles = (HashSet<String>) ftpHelper.getAllFiles(path, 0, maxTraversalLevel);
             if (sourceFiles.isEmpty()) {
                 throw AddaxException.asAddaxException(CONFIG_ERROR,
-                        "Cannot find any file in path: " + path + ", assuring the path(s) exists and has right permission");
+                        "Cannot find any file in path: " + path + ", check that the path(s) exist and are readable");
             }
             LOG.info("{} file(s) to be read", this.sourceFiles.size());
         }

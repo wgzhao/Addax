@@ -134,20 +134,26 @@ public class SftpHelper
 
                 try {
                     if (!isDirectory(parentDir)) {
-                        LOG.warn("Parent directory does not exist: {}", parentDir);
+                        LOG.warn("The directory [{}] of the pattern [{}] does not exist or is not readable",
+                                parentDir, directoryPath);
                         return;
                     }
 
                     PathMatcher matcher = compileWildcard(filePattern);
                     Vector<LsEntry> vector = channelSftp.ls(parentDir);
+                    int matched = 0;
                     for (LsEntry entry : vector) {
                         String fileName = entry.getFilename();
                         if (!".".equals(fileName) && !"..".equals(fileName) &&
                                 !entry.getAttrs().isDir() && matcher.matches(Path.of(fileName))) {
                             String filePath = parentDir + "/" + fileName;
                             sourceFiles.add(filePath);
+                            matched++;
                             LOG.debug("Added file (wildcard match): {}", filePath);
                         }
+                    }
+                    if (matched == 0) {
+                        LOG.warn("No file under [{}] matches the pattern [{}]", parentDir, filePattern);
                     }
                 }
                 catch (SftpException e) {
@@ -158,14 +164,14 @@ public class SftpHelper
 
             // Regular path handling
             if (!isDirectory(directoryPath)) {
-                // Check if file exists
+                // Not a directory: it may still be a single file
                 try {
                     channelSftp.lstat(directoryPath);
                     sourceFiles.add(directoryPath);
                     LOG.debug("Added file: {}", directoryPath);
                 }
                 catch (SftpException e) {
-                    LOG.warn("File does not exist: {}", directoryPath);
+                    LOG.warn("The path [{}] does not exist or is not readable, it is skipped", directoryPath);
                 }
                 return;
             }
