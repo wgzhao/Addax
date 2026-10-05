@@ -33,6 +33,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.util.Properties;
 import java.util.Vector;
 
@@ -127,7 +129,7 @@ public class SftpHelper
         try {
             // Handle wildcard pattern in the path
             if (hasWildcard(directoryPath)) {
-                String parentDir = directoryPath.substring(0, directoryPath.lastIndexOf('/'));
+                String parentDir = parentDirOf(directoryPath);
                 String filePattern = directoryPath.substring(directoryPath.lastIndexOf('/') + 1);
 
                 try {
@@ -136,11 +138,12 @@ public class SftpHelper
                         return;
                     }
 
+                    PathMatcher matcher = compileWildcard(filePattern);
                     Vector<LsEntry> vector = channelSftp.ls(parentDir);
                     for (LsEntry entry : vector) {
                         String fileName = entry.getFilename();
                         if (!".".equals(fileName) && !"..".equals(fileName) &&
-                                !entry.getAttrs().isDir() && matchWildcard(filePattern, fileName)) {
+                                !entry.getAttrs().isDir() && matcher.matches(Path.of(fileName))) {
                             String filePath = parentDir + "/" + fileName;
                             sourceFiles.add(filePath);
                             LOG.debug("Added file (wildcard match): {}", filePath);
