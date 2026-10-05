@@ -46,8 +46,7 @@ public class StandardFtpHelper
     FTPClient ftpClient = null;
 
     @Override
-    public void loginFtpServer(String host, String username, String password, int port, String keyPath, String keyPass, int timeout,
-            String connectMode)
+    public void loginFtpServer(FtpConnection connection)
     {
         ftpClient = new FTPClient();
         try {
@@ -57,30 +56,30 @@ public class StandardFtpHelper
             ftpClient.setControlEncoding(StandardCharsets.UTF_8.name());
             // connectTimeout is read by connect() and the default timeout becomes the control
             // socket's SO_TIMEOUT, so both have to be in place before the socket is opened
-            ftpClient.setConnectTimeout(timeout);
-            ftpClient.setDefaultTimeout(timeout);
-            ftpClient.connect(host, port);
-            ftpClient.login(username, password);
-            ftpClient.setDataTimeout(Duration.ofMillis(timeout));
-            if ("PASV".equals(connectMode)) {
+            ftpClient.setConnectTimeout(connection.timeout());
+            ftpClient.setDefaultTimeout(connection.timeout());
+            ftpClient.connect(connection.host(), connection.port());
+            ftpClient.login(connection.username(), connection.password());
+            ftpClient.setDataTimeout(Duration.ofMillis(connection.timeout()));
+            if ("PASV".equals(connection.connectPattern())) {
                 ftpClient.enterRemotePassiveMode();
                 ftpClient.enterLocalPassiveMode();
             }
-            else if ("PORT".equals(connectMode)) {
+            else if ("PORT".equals(connection.connectPattern())) {
                 ftpClient.enterLocalActiveMode();
             }
             int reply = ftpClient.getReplyCode();
             if (!FTPReply.isPositiveCompletion(reply)) {
                 ftpClient.disconnect();
                 throw AddaxException.asAddaxException(CONNECT_ERROR,
-                        "Failed to connect to the ftp server " + host);
+                        "Failed to connect to the ftp server " + connection.host());
             }
             // always use binary transfer model
             ftpClient.setFileType(BINARY_FILE_TYPE);
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(CONNECT_ERROR,
-                    "Failed to connect to the ftp server " + host, e);
+                    "Failed to connect to the ftp server " + connection.host(), e);
         }
     }
 

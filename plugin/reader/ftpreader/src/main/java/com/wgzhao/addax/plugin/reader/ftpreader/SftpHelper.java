@@ -51,17 +51,16 @@ public class SftpHelper
     ChannelSftp channelSftp = null;
 
     @Override
-    public void loginFtpServer(String host, String username, String password, int port, String keyPath, String keyPass, int timeout,
-            String connectMode)
+    public void loginFtpServer(FtpConnection connection)
     {
         JSch jsch = new JSch(); // 创建JSch对象
-        if (keyPath != null) {
+        if (connection.keyPath() != null) {
             try {
-                if (keyPass != null) {
-                    jsch.addIdentity(keyPath, keyPass);
+                if (connection.keyPass() != null) {
+                    jsch.addIdentity(connection.keyPath(), connection.keyPass());
                 }
                 else {
-                    jsch.addIdentity(keyPath);
+                    jsch.addIdentity(connection.keyPath());
                 }
             }
             catch (JSchException e) {
@@ -69,28 +68,30 @@ public class SftpHelper
             }
         }
         try {
-            session = jsch.getSession(username, host, port);
+            session = jsch.getSession(connection.username(), connection.host(), connection.port());
             if (session == null) {
                 throw AddaxException.asAddaxException(CONNECT_ERROR,
-                        "Failed to connect server " + host + ":" + port + " with user " + username);
+                        "Failed to connect server " + connection.host() + ":" + connection.port()
+                                + " with user " + connection.username());
             }
 
-            if (!StringUtils.isBlank(password)) {
-                session.setPassword(password);
+            if (!StringUtils.isBlank(connection.password())) {
+                session.setPassword(connection.password());
             }
             Properties config = new Properties();
             config.put("StrictHostKeyChecking", "no");
             session.setConfig(config);
-            session.setTimeout(timeout);
+            session.setTimeout(connection.timeout());
             // setTimeout only covers reads and writes, the tcp connect needs its own timeout
-            session.connect(timeout);
+            session.connect(connection.timeout());
 
             channelSftp = (ChannelSftp) session.openChannel("sftp");
             channelSftp.connect();
         }
         catch (JSchException e) {
             throw AddaxException.asAddaxException(CONNECT_ERROR,
-                    "Failed to connect server " + host + ":" + port + " with user " + username, e
+                    "Failed to connect server " + connection.host() + ":" + connection.port()
+                            + " with user " + connection.username(), e
             );
         }
     }
