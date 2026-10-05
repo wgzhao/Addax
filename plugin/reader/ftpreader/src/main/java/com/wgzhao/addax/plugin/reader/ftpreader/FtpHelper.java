@@ -34,10 +34,13 @@ import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 /** Ftp Helper. */
 public abstract class FtpHelper
 {
-    protected final HashSet<String> sourceFiles = new HashSet<>();
+    protected final Set<String> sourceFiles = new HashSet<>();
 
-    /** Loginftpserver. */
-    public abstract void loginFtpServer(String host, String username, String password, int port, String keyPath, String keyPass, int timeout, String connectMode);
+    /**
+     * Log in to the ftp server.
+     * @param connection the connection settings
+     */
+    public abstract void loginFtpServer(FtpConnection connection);
 
     /** Logoutftpserver. */
     public abstract void logoutFtpServer();
