@@ -31,6 +31,8 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.time.Duration;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.CONNECT_ERROR;
@@ -131,7 +133,7 @@ public class StandardFtpHelper
         try {
             // Handle wildcard pattern in the path
             if (hasWildcard(directoryPath)) {
-                String parentDir = directoryPath.substring(0, directoryPath.lastIndexOf('/'));
+                String parentDir = parentDirOf(directoryPath);
                 String filePattern = directoryPath.substring(directoryPath.lastIndexOf('/') + 1);
 
                 if (!isDirectory(parentDir)) {
@@ -139,9 +141,10 @@ public class StandardFtpHelper
                     return;
                 }
 
+                PathMatcher matcher = compileWildcard(filePattern);
                 FTPFile[] ftpFiles = ftpClient.listFiles(parentDir);
                 for (FTPFile ftpFile : ftpFiles) {
-                    if (ftpFile.isFile() && matchWildcard(filePattern, ftpFile.getName())) {
+                    if (ftpFile.isFile() && matcher.matches(Path.of(ftpFile.getName()))) {
                         String filePath = parentDir + "/" + ftpFile.getName();
                         sourceFiles.add(filePath);
                         LOG.debug("Added file (wildcard match): {}", filePath);
