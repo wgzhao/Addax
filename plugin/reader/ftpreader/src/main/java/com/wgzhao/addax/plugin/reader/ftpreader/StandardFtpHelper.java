@@ -137,28 +137,37 @@ public class StandardFtpHelper
                 String filePattern = directoryPath.substring(directoryPath.lastIndexOf('/') + 1);
 
                 if (!isDirectory(parentDir)) {
-                    LOG.warn("Parent directory does not exist: {}", parentDir);
+                    LOG.warn("The directory [{}] of the pattern [{}] does not exist or is not readable",
+                            parentDir, directoryPath);
                     return;
                 }
 
                 PathMatcher matcher = compileWildcard(filePattern);
                 FTPFile[] ftpFiles = ftpClient.listFiles(parentDir);
+                int matched = 0;
                 for (FTPFile ftpFile : ftpFiles) {
                     if (ftpFile.isFile() && matcher.matches(Path.of(ftpFile.getName()))) {
                         String filePath = parentDir + "/" + ftpFile.getName();
                         sourceFiles.add(filePath);
+                        matched++;
                         LOG.debug("Added file (wildcard match): {}", filePath);
                     }
+                }
+                if (matched == 0) {
+                    LOG.warn("No file under [{}] matches the pattern [{}]", parentDir, filePattern);
                 }
                 return;
             }
 
             // Regular path handling
             if (!isDirectory(directoryPath)) {
-                // If it's a file and exists, add it directly
+                // Not a directory: it may still be a single file, which a listing confirms
                 if (ftpClient.listFiles(directoryPath).length > 0) {
                     sourceFiles.add(directoryPath);
                     LOG.debug("Added file: {}", directoryPath);
+                }
+                else {
+                    LOG.warn("The path [{}] does not exist or is not readable, it is skipped", directoryPath);
                 }
                 return;
             }
