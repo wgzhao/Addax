@@ -29,18 +29,20 @@ import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.SftpException;
 import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.plugin.writer.ftpwriter.FtpConnection;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 import java.util.Vector;
 
+import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
 import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.LOGIN_ERROR;
@@ -55,42 +57,41 @@ public class SftpHelperImpl
     private ChannelSftp channelSftp = null;
 
     @Override
-    public void loginFtpServer(String host, int port, String username, String password, String keyPath, String keyPass, int timeout)
+    public void loginFtpServer(FtpConnection connection)
     {
         JSch jsch = new JSch();
-        if (keyPath != null) {
+        if (connection.keyPath() != null) {
             try {
-                if (keyPass != null) {
-                    jsch.addIdentity(keyPath, keyPass);
+                if (connection.keyPass() != null) {
+                    jsch.addIdentity(connection.keyPath(), connection.keyPass().getBytes(StandardCharsets.UTF_8));
                 }
                 else {
-                    jsch.addIdentity(keyPath);
+                    jsch.addIdentity(connection.keyPath());
                 }
             }
             catch (JSchException e) {
-                throw AddaxException.asAddaxException(ILLEGAL_VALUE, "Failed to use private key", e);
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                        "Failed to load the private key " + connection.keyPath(), e);
             }
         }
         try {
-            this.session = jsch.getSession(username, host, port);
-            if (this.session == null) {
-                throw AddaxException.asAddaxException(LOGIN_ERROR,
-                        String.format("Failed to connect %s:%s via sftp protocol", host, port));
+            this.session = jsch.getSession(connection.username(), connection.host(), connection.port());
+            if (connection.password() != null) {
+                this.session.setPassword(connection.password().getBytes(StandardCharsets.UTF_8));
             }
-
-            this.session.setPassword(password);
             Properties config = new Properties();
             config.put("StrictHostKeyChecking", "no");
-            // config.put("PreferredAuthentications", "password");
             this.session.setConfig(config);
-            this.session.setTimeout(timeout);
-            this.session.connect();
-
+            this.session.setTimeout(connection.timeout());
+            this.session.connect(connection.timeout());
             this.channelSftp = (ChannelSftp) this.session.openChannel("sftp");
             this.channelSftp.connect();
         }
         catch (JSchException e) {
-            String message = String.format("Failed to connect %s:%s because: %s", host, port, e.getMessage());
+            // the session may already have connected when the channel failed, do not leak it
+            logoutFtpServer();
+            String message = String.format("Failed to connect %s:%s because: %s",
+                    connection.host(), connection.port(), e.getMessage());
             LOG.error(message);
             throw AddaxException.asAddaxException(LOGIN_ERROR, message, e);
         }
@@ -110,79 +111,25 @@ public class SftpHelperImpl
     }
 
     @Override
-    public void mkdir(String directoryPath)
-    {
-        boolean isDirExist = false;
-        try {
-            this.printWorkingDirectory();
-            SftpATTRS sftpATTRS = this.channelSftp.lstat(directoryPath);
-            isDirExist = sftpATTRS.isDir();
-        }
-        catch (SftpException e) {
-            if (e.getMessage().equalsIgnoreCase("no such file")) {
-                LOG.warn("The directory {} does not exists, try to create it", directoryPath);
-            }
-        }
-        if (!isDirExist) {
-            try {
-                // warn 检查mkdir -p
-                this.channelSftp.mkdir(directoryPath);
-            }
-            catch (SftpException e) {
-                LOG.error("IOException occurred while create folder {}, {}", directoryPath, e);
-                throw AddaxException.asAddaxException(IO_ERROR, e);
-            }
-        }
-    }
-
-    @Override
     public void mkDirRecursive(String directoryPath)
     {
-        boolean isDirExist = false;
+        SftpATTRS attrs = statOrNull(directoryPath);
+        if (attrs != null && (attrs.isDir() || attrs.isLink())) {
+            return;
+        }
+        StringBuilder dirPath = new StringBuilder();
+        dirPath.append(IOUtils.DIR_SEPARATOR_UNIX);
+        String[] dirSplit = StringUtils.split(directoryPath, IOUtils.DIR_SEPARATOR_UNIX);
         try {
-            this.printWorkingDirectory();
-            SftpATTRS sftpATTRS = this.channelSftp.lstat(directoryPath);
-            isDirExist = sftpATTRS.isDir();
+            for (String dirName : dirSplit) {
+                dirPath.append(dirName);
+                mkDirSingleHierarchy(dirPath.toString());
+                dirPath.append(IOUtils.DIR_SEPARATOR_UNIX);
+            }
         }
         catch (SftpException e) {
-            if (e.getMessage().equalsIgnoreCase("no such file")) {
-                LOG.warn("The directory {} does not exists, try to create it", directoryPath);
-            }
-        }
-        if (!isDirExist) {
-            StringBuilder dirPath = new StringBuilder();
-            dirPath.append(IOUtils.DIR_SEPARATOR_UNIX);
-            String[] dirSplit = StringUtils.split(directoryPath, IOUtils.DIR_SEPARATOR_UNIX);
-            try {
-                for (String dirName : dirSplit) {
-                    dirPath.append(dirName);
-                    mkDirSingleHierarchy(dirPath.toString());
-                    dirPath.append(IOUtils.DIR_SEPARATOR_UNIX);
-                }
-            }
-            catch (SftpException e) {
-                LOG.error("IOException occurred while create folder {}, {}", directoryPath, e);
-                throw AddaxException.asAddaxException(IO_ERROR, e);
-            }
-        }
-    }
-
-    /** Mkdirsinglehierarchy. */
-    public void mkDirSingleHierarchy(String directoryPath)
-            throws SftpException
-    {
-        boolean isDirExist = false;
-        try {
-            SftpATTRS sftpATTRS = this.channelSftp.lstat(directoryPath);
-            isDirExist = sftpATTRS.isDir();
-        }
-        catch (SftpException e) {
-            LOG.info("creating folder {}", directoryPath);
-            this.channelSftp.mkdir(directoryPath);
-        }
-        if (!isDirExist) {
-            LOG.info("creating folder {}", directoryPath);
-            this.channelSftp.mkdir(directoryPath);
+            throw AddaxException.asAddaxException(IO_ERROR,
+                    "Failed to create the directory " + directoryPath, e);
         }
     }
 
@@ -190,39 +137,31 @@ public class SftpHelperImpl
     public OutputStream getOutputStream(String filePath)
     {
         try {
-            this.printWorkingDirectory();
-            String parentDir = filePath.substring(0, StringUtils.lastIndexOf(filePath, IOUtils.DIR_SEPARATOR));
-            this.channelSftp.cd(parentDir);
-            this.printWorkingDirectory();
-            OutputStream writeOutputStream = this.channelSftp.put(filePath, ChannelSftp.APPEND);
+            // overwriting truncates a file the name already refers to; appending would
+            // concatenate whatever a previous run left behind
+            OutputStream writeOutputStream = this.channelSftp.put(filePath, ChannelSftp.OVERWRITE);
             if (null == writeOutputStream) {
-                throw AddaxException.asAddaxException(IO_ERROR, "failed to write file " + filePath);
+                throw AddaxException.asAddaxException(EXECUTE_FAIL,
+                        "Failed to open the file for writing: " + filePath);
             }
             return writeOutputStream;
         }
         catch (SftpException e) {
-            throw AddaxException.asAddaxException(IO_ERROR, "failed to write file " + filePath);
+            throw AddaxException.asAddaxException(IO_ERROR,
+                    "Failed to open the file for writing: " + filePath, e);
         }
     }
 
     @Override
-    public String getRemoteFileContent(String filePath)
+    public boolean exists(String filePath)
     {
-        try {
-            this.completePendingCommand();
-            this.printWorkingDirectory();
-            String parentDir = filePath.substring(0, StringUtils.lastIndexOf(filePath, IOUtils.DIR_SEPARATOR));
-            this.channelSftp.cd(parentDir);
-            this.printWorkingDirectory();
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream(22);
-            this.channelSftp.get(filePath, outputStream);
-            String result = outputStream.toString();
-            IOUtils.closeQuietly(outputStream, null);
-            return result;
-        }
-        catch (SftpException e) {
-            throw AddaxException.asAddaxException(IO_ERROR, "failed to write file " + filePath);
-        }
+        return statOrNull(filePath) != null;
+    }
+
+    @Override
+    public void completePendingCommand()
+    {
+        // sftp acknowledges each request in band, there is no reply left to read
     }
 
     @Override
@@ -230,20 +169,20 @@ public class SftpHelperImpl
     {
         Set<String> allFilesWithPointedPrefix = new HashSet<>();
         try {
-            this.printWorkingDirectory();
-            @SuppressWarnings("rawtypes")
-            Vector allFiles = this.channelSftp.ls(dir);
-            LOG.debug("list files: {}", JSON.toJSONString(allFiles, JSONWriter.Feature.UseSingleQuotes));
-            for (Object allFile : allFiles) {
-                LsEntry le = (LsEntry) allFile;
-                String strName = le.getFilename();
-                if (strName.startsWith(prefixFileName)) {
-                    allFilesWithPointedPrefix.add(strName);
+            Vector<LsEntry> allFiles = this.channelSftp.ls(dir);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("list files in {}: {}", dir, JSON.toJSONString(allFiles, JSONWriter.Feature.UseSingleQuotes));
+            }
+            for (LsEntry each : allFiles) {
+                // a sub directory whose name carries the prefix is no data file: deleting it or
+                // conflicting on it would only fail the job
+                if (!each.getAttrs().isDir() && each.getFilename().startsWith(prefixFileName)) {
+                    allFilesWithPointedPrefix.add(each.getFilename());
                 }
             }
         }
         catch (SftpException e) {
-            throw AddaxException.asAddaxException(IO_ERROR, "failed to list files in " + dir, e);
+            throw AddaxException.asAddaxException(IO_ERROR, "Failed to list the files in " + dir, e);
         }
         return allFilesWithPointedPrefix;
     }
@@ -253,7 +192,6 @@ public class SftpHelperImpl
     {
         String eachFile = null;
         try {
-            this.printWorkingDirectory();
             for (String each : filesToDelete) {
                 LOG.info("delete file {}", each);
                 eachFile = each;
@@ -261,23 +199,44 @@ public class SftpHelperImpl
             }
         }
         catch (SftpException e) {
-            throw AddaxException.asAddaxException(
-                    IO_ERROR, "failed to delete file " + eachFile, e);
+            throw AddaxException.asAddaxException(IO_ERROR, "Failed to delete file " + eachFile, e);
         }
     }
 
-    private void printWorkingDirectory()
+    /**
+     * Create one level of the directory tree, the parent level is expected to exist already.
+     *
+     * @param directoryPath the level to create
+     * @throws SftpException when the level cannot be created
+     */
+    private void mkDirSingleHierarchy(String directoryPath)
+            throws SftpException
+    {
+        SftpATTRS attrs = statOrNull(directoryPath);
+        if (attrs == null) {
+            LOG.info("creating folder {}", directoryPath);
+            this.channelSftp.mkdir(directoryPath);
+        }
+        else if (!attrs.isDir() && !attrs.isLink()) {
+            // a regular file blocks the path, mkdir would only answer with a bare "Failure"
+            throw new SftpException(ChannelSftp.SSH_FX_FAILURE,
+                    "the path " + directoryPath + " exists but is not a directory");
+        }
+    }
+
+    /**
+     * Stat a path.
+     *
+     * @param filePath the path to stat
+     * @return the attributes, or null when the path is not there
+     */
+    private SftpATTRS statOrNull(String filePath)
     {
         try {
-            LOG.info("current working directory {}", channelSftp.pwd());
+            return this.channelSftp.lstat(filePath);
         }
         catch (SftpException e) {
-            LOG.error("failed to print current working directory", e);
+            return null;
         }
-    }
-
-    @Override
-    public void completePendingCommand()
-    {
     }
 }
