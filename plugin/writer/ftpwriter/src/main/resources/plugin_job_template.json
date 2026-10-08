@@ -7,7 +7,7 @@
       "port": 21,
       "username": "xxx",
       "password": "xxx",
-      "timeout": "60000",
+      "timeout": 60000,
       "connectPattern": "PASV",
       "path": "/tmp/data/",
       "fileName": "test",

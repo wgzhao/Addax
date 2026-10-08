@@ -19,37 +19,67 @@
 
 package com.wgzhao.addax.plugin.writer.ftpwriter.util;
 
+import com.wgzhao.addax.plugin.writer.ftpwriter.FtpConnection;
+
 import java.io.OutputStream;
 import java.util.Set;
 
 /** IFtp Helper. */
 public interface IFtpHelper
 {
-
     /**
-     * @param host the host to connect to
-     * @param port the port to connect
-     * @param username username to connect
-     * @param password password for username
-     * @param keyPath private key, only for sftp protocol
-     * @param keyPass the passphrase of private key
-     * @param timeout to connect timeout microseconds
+     * Log in to the server.
+     *
+     * @param connection the connection settings
      */
-    void loginFtpServer(String host, int port, String username, String password, String keyPath, String keyPass, int timeout);
+    void loginFtpServer(FtpConnection connection);
 
+    /** Log out and close the connection, it is safe to call without a connection. */
     void logoutFtpServer();
 
-    void mkdir(String directoryPath);
-
+    /**
+     * Create the directory and every missing level above it.
+     *
+     * @param directoryPath the absolute directory path
+     */
     void mkDirRecursive(String directoryPath);
 
+    /**
+     * Open the file for writing, an existing file of that name is truncated.
+     *
+     * @param filePath the absolute file path
+     * @return the stream to write into
+     */
     OutputStream getOutputStream(String filePath);
 
-    String getRemoteFileContent(String filePath);
+    /**
+     * Read the server's confirmation of the last transfer. Ftp answers with a reply that has to
+     * be read before the connection may be used again, sftp transfers are acknowledged in band
+     * and this is a no-op there.
+     */
+    void completePendingCommand();
 
+    /**
+     * Whether the path exists on the server.
+     *
+     * @param filePath the absolute file path
+     * @return true when the path exists
+     */
+    boolean exists(String filePath);
+
+    /**
+     * List the names of the entries in the directory whose name starts with the prefix.
+     *
+     * @param dir the absolute directory path
+     * @param prefixFileName the name prefix to keep
+     * @return the matching names
+     */
     Set<String> getAllFilesInDir(String dir, String prefixFileName);
 
+    /**
+     * Delete the files.
+     *
+     * @param filesToDelete the absolute paths to delete
+     */
     void deleteFiles(Set<String> filesToDelete);
-
-    void completePendingCommand();
 }

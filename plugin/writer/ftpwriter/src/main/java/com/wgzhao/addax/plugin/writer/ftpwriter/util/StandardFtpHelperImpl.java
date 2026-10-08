@@ -22,6 +22,7 @@ package com.wgzhao.addax.plugin.writer.ftpwriter.util;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONWriter;
 import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.plugin.writer.ftpwriter.FtpConnection;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.ftp.FTPClient;
@@ -30,9 +31,9 @@ import org.apache.commons.net.ftp.FTPReply;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
@@ -48,80 +49,62 @@ public class StandardFtpHelperImpl
         implements IFtpHelper
 {
     private static final Logger LOG = LoggerFactory.getLogger(StandardFtpHelperImpl.class);
-    FTPClient ftpClient = null;
+
+    // the client is replaced on every login attempt, so a retry never reuses a half-open one
+    private FTPClient ftpClient;
 
     @Override
-    public void loginFtpServer(String host, int port, String username, String password, String keyPath, String keyPass, int timeout)
+    public void loginFtpServer(FtpConnection connection)
     {
         this.ftpClient = new FTPClient();
         try {
-            this.ftpClient.setControlEncoding("UTF-8");
-            this.ftpClient.setDefaultTimeout(timeout);
-            this.ftpClient.setConnectTimeout(timeout);
-            this.ftpClient.setDataTimeout(Duration.ofSeconds(timeout));
-
-            this.ftpClient.connect(host, port);
-            this.ftpClient.login(username, password);
-
-            this.ftpClient.enterRemotePassiveMode();
-            this.ftpClient.enterLocalPassiveMode();
-            // Always use binary transfer mode
-            this.ftpClient.setFileType(BINARY_FILE_TYPE);
+            // the control connection's reader and writer are built while connecting, from the
+            // encoding that is set at that moment, so it has to be in place before the socket opens
+            this.ftpClient.setControlEncoding(StandardCharsets.UTF_8.name());
+            this.ftpClient.setConnectTimeout(connection.timeout());
+            this.ftpClient.setDefaultTimeout(connection.timeout());
+            this.ftpClient.connect(connection.host(), connection.port());
+            this.ftpClient.login(connection.username(), connection.password());
+            // the timeout is configured in milliseconds, a Duration of seconds would let a
+            // stalled transfer hang for hours
+            this.ftpClient.setDataTimeout(Duration.ofMillis(connection.timeout()));
+            if ("PORT".equalsIgnoreCase(connection.connectPattern())) {
+                this.ftpClient.enterLocalActiveMode();
+            }
+            else {
+                this.ftpClient.enterLocalPassiveMode();
+            }
             int reply = this.ftpClient.getReplyCode();
             if (!FTPReply.isPositiveCompletion(reply)) {
-                this.ftpClient.disconnect();
-                throw AddaxException.asAddaxException(
-                        LOGIN_ERROR, "Failed to connect ftp server" );
+                throw new IOException("the server rejected the login with reply code " + reply);
             }
+            // always use binary transfer mode
+            this.ftpClient.setFileType(BINARY_FILE_TYPE);
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(
-                    LOGIN_ERROR, "Failed to connect the ftp server", e);
+            closeQuietly();
+            throw AddaxException.asAddaxException(LOGIN_ERROR, String.format(
+                    "Failed to connect the ftp server %s:%s", connection.host(), connection.port()), e);
         }
     }
 
     @Override
     public void logoutFtpServer()
     {
-        if (this.ftpClient.isConnected()) {
-            try {
-                this.ftpClient.logout();
-            }
-            catch (IOException e) {
-                throw AddaxException.asAddaxException(
-                        CONNECT_ERROR, "Failed to disconnect", e);
-            }
-            finally {
-                if (this.ftpClient.isConnected()) {
-                    try {
-                        this.ftpClient.disconnect();
-                    }
-                    catch (IOException e) {
-                        LOG.error("Failed to disconnect", e);
-                    }
-                }
-                this.ftpClient = null;
-            }
+        if (this.ftpClient == null) {
+            return;
         }
-    }
-
-    @Override
-    public void mkdir(String directoryPath)
-    {
         try {
-            this.printWorkingDirectory();
-            boolean isDirExist = this.ftpClient.changeWorkingDirectory(directoryPath);
-            if (!isDirExist) {
-                int replayCode = this.ftpClient.mkd(directoryPath);
-                if (replayCode != FTPReply.COMMAND_OK && replayCode != FTPReply.PATHNAME_CREATED) {
-                    throw AddaxException.asAddaxException(
-                            EXECUTE_FAIL,
-                            "Failed to create directory, please check the permission");
-                }
+            if (this.ftpClient.isConnected()) {
+                this.ftpClient.logout();
             }
         }
         catch (IOException e) {
-            throw AddaxException.asAddaxException(IO_ERROR, "Failed to create directory", e);
+            throw AddaxException.asAddaxException(CONNECT_ERROR, "Failed to close the connection", e);
+        }
+        finally {
+            // logout only ends the session, the control socket stays open until it is disconnected
+            closeQuietly();
         }
     }
 
@@ -137,65 +120,64 @@ public class StandardFtpHelperImpl
                 boolean mkdirSuccess = mkDirSingleHierarchy(dirPath.toString());
                 dirPath.append(IOUtils.DIR_SEPARATOR_UNIX);
                 if (!mkdirSuccess) {
-                    throw AddaxException.asAddaxException(EXECUTE_FAIL, "Failed to create directory");
+                    throw AddaxException.asAddaxException(EXECUTE_FAIL,
+                            "Failed to create the directory " + dirPath);
                 }
             }
         }
         catch (IOException e) {
-            throw AddaxException.asAddaxException(IO_ERROR, "Failed to create directory", e);
+            throw AddaxException.asAddaxException(IO_ERROR,
+                    "Failed to create the directory " + directoryPath, e);
         }
-    }
-
-    /** Mkdirsinglehierarchy. */
-    public boolean mkDirSingleHierarchy(String directoryPath)
-            throws IOException
-    {
-        boolean isDirExist = this.ftpClient
-                .changeWorkingDirectory(directoryPath);
-        if (!isDirExist) {
-            int replayCode = this.ftpClient.mkd(directoryPath);
-            return replayCode == FTPReply.COMMAND_OK || replayCode == FTPReply.PATHNAME_CREATED;
-        }
-        return true;
     }
 
     @Override
     public OutputStream getOutputStream(String filePath)
     {
         try {
-            this.printWorkingDirectory();
-            String parentDir = filePath.substring(0, StringUtils.lastIndexOf(filePath, IOUtils.DIR_SEPARATOR));
-            this.ftpClient.changeWorkingDirectory(parentDir);
-            this.printWorkingDirectory();
-            OutputStream writeOutputStream = this.ftpClient.appendFileStream(filePath);
+            // storing truncates a file the name already refers to; appending would concatenate
+            // whatever a previous run left behind
+            OutputStream writeOutputStream = this.ftpClient.storeFileStream(filePath);
             if (null == writeOutputStream) {
-                throw AddaxException.asAddaxException(EXECUTE_FAIL, "Failed to open file for writing");
+                throw AddaxException.asAddaxException(EXECUTE_FAIL,
+                        "Failed to open the file for writing: " + filePath);
             }
-
             return writeOutputStream;
         }
         catch (IOException e) {
-            throw AddaxException.asAddaxException(IO_ERROR, "Failed to open file for writing", e);
+            throw AddaxException.asAddaxException(IO_ERROR,
+                    "Failed to open the file for writing: " + filePath, e);
         }
     }
 
     @Override
-    public String getRemoteFileContent(String filePath)
+    public boolean exists(String filePath)
     {
         try {
-            this.completePendingCommand();
-            this.printWorkingDirectory();
-            String parentDir = filePath.substring(0, StringUtils.lastIndexOf(filePath, IOUtils.DIR_SEPARATOR));
-            this.ftpClient.changeWorkingDirectory(parentDir);
-            this.printWorkingDirectory();
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream(22);
-            this.ftpClient.retrieveFile(filePath, outputStream);
-            String result = outputStream.toString();
-            IOUtils.closeQuietly(outputStream, null);
-            return result;
+            // the ftp protocol has no stat command, and a listing of a path that is not there
+            // comes back as an empty listing instead of an error
+            return this.ftpClient.listFiles(filePath).length > 0;
         }
         catch (IOException e) {
-            throw AddaxException.asAddaxException(IO_ERROR, "Failed to get file content", e);
+            throw AddaxException.asAddaxException(IO_ERROR,
+                    "Failed to check whether the path exists: " + filePath, e);
+        }
+    }
+
+    @Override
+    public void completePendingCommand()
+    {
+        try {
+            // reading the transfer's reply keeps the control connection in sync; without it the
+            // next command reads this reply and the listing comes back empty, and a transfer the
+            // server rejected (quota, permission) would never be noticed
+            if (!this.ftpClient.completePendingCommand()) {
+                throw AddaxException.asAddaxException(EXECUTE_FAIL,
+                        "the server did not accept the upload, reply: " + this.ftpClient.getReplyString().trim());
+            }
+        }
+        catch (IOException e) {
+            throw AddaxException.asAddaxException(IO_ERROR, "Failed to read the transfer confirmation", e);
         }
     }
 
@@ -208,18 +190,20 @@ public class StandardFtpHelperImpl
             if (!isDirExist) {
                 throw AddaxException.asAddaxException(EXECUTE_FAIL, "the directory " + dir + " does not exist");
             }
-            this.printWorkingDirectory();
             FTPFile[] fs = this.ftpClient.listFiles(dir);
-            LOG.debug("list files in  {}", JSON.toJSONString(fs, JSONWriter.Feature.UseSingleQuotes));
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("list files in {}: {}", dir, JSON.toJSONString(fs, JSONWriter.Feature.UseSingleQuotes));
+            }
             for (FTPFile ff : fs) {
-                String strName = ff.getName();
-                if (strName.startsWith(prefixFileName)) {
-                    allFilesWithPointedPrefix.add(strName);
+                // a sub directory whose name carries the prefix is no data file: deleting it or
+                // conflicting on it would only fail the job
+                if (!ff.isDirectory() && ff.getName().startsWith(prefixFileName)) {
+                    allFilesWithPointedPrefix.add(ff.getName());
                 }
             }
         }
         catch (IOException e) {
-            throw AddaxException.asAddaxException(IO_ERROR, "Failed to change working directory", e);
+            throw AddaxException.asAddaxException(IO_ERROR, "Failed to list the files in " + dir, e);
         }
         return allFilesWithPointedPrefix;
     }
@@ -227,55 +211,49 @@ public class StandardFtpHelperImpl
     @Override
     public void deleteFiles(Set<String> filesToDelete)
     {
-        boolean deleteOk;
-        this.printWorkingDirectory();
         try {
             for (String each : filesToDelete) {
                 LOG.info("Try to delete file {}", each);
-                deleteOk = this.ftpClient.deleteFile(each);
-                if (!deleteOk) {
-                    throw AddaxException.asAddaxException(
-                            IO_ERROR,
-                            "Failed to delete file, please check the permission");
+                if (!this.ftpClient.deleteFile(each)) {
+                    throw AddaxException.asAddaxException(IO_ERROR,
+                            "Failed to delete file " + each + ", please check the permission");
                 }
             }
         }
         catch (IOException e) {
-            throw AddaxException.asAddaxException(
-                    IO_ERROR, "Failed to delete file", e);
+            throw AddaxException.asAddaxException(IO_ERROR, "Failed to delete file", e);
         }
     }
 
-    private void printWorkingDirectory()
+    /**
+     * Create one level of the directory tree.
+     *
+     * @param directoryPath the level to create
+     * @return true when the level exists afterwards
+     * @throws IOException when the server cannot be reached
+     */
+    private boolean mkDirSingleHierarchy(String directoryPath)
+            throws IOException
     {
-        try {
-            LOG.info("current working directory:{}", this.ftpClient.printWorkingDirectory());
+        boolean isDirExist = this.ftpClient.changeWorkingDirectory(directoryPath);
+        if (isDirExist) {
+            return true;
         }
-        catch (Exception e) {
-            LOG.warn("printWorkingDirectory error:{}", e.getMessage());
-        }
+        int replayCode = this.ftpClient.mkd(directoryPath);
+        return replayCode == FTPReply.COMMAND_OK || replayCode == FTPReply.PATHNAME_CREATED;
     }
 
-    @Override
-    public void completePendingCommand()
+    /** Close the control connection, whatever state it is in. */
+    private void closeQuietly()
     {
-        /*
-         * Q:After I perform a file transfer to the server,
-         * printWorkingDirectory() returns null. A:You need to call
-         * completePendingCommand() after transferring the file. wiki:
-         * http://wiki.apache.org/commons/Net/FrequentlyAskedQuestions
-         */
-        try {
-            boolean isOk = this.ftpClient.completePendingCommand();
-            if (!isOk) {
-                throw AddaxException.asAddaxException(
-                        EXECUTE_FAIL,
-                        "Failed to complete the pending command, please check the permission");
+        if (this.ftpClient != null && this.ftpClient.isConnected()) {
+            try {
+                this.ftpClient.disconnect();
+            }
+            catch (IOException e) {
+                LOG.error("Failed to close the connection", e);
             }
         }
-        catch (IOException e) {
-            throw AddaxException.asAddaxException(
-                    EXECUTE_FAIL, "Failed to complete the pending command", e);
-        }
+        this.ftpClient = null;
     }
 }

@@ -19,30 +19,19 @@
 
 package com.wgzhao.addax.plugin.writer.ftpwriter;
 
-import com.wgzhao.addax.core.base.Key;
-
-/** Ftp Key configuration keys. */
-public final class FtpKey extends Key
+/** The default values of the ftp connection settings. */
+public final class FtpConstant
 {
-    private FtpKey() {}
+    /** Default ftp port. */
+    public static final int DEFAULT_FTP_PORT = 21;
+    /** Default sftp port. */
+    public static final int DEFAULT_SFTP_PORT = 22;
+    /** Default connect and socket timeout in milliseconds. */
+    public static final int DEFAULT_TIMEOUT_MS = 60000;
+    /** Default ftp connect pattern. */
+    public static final String DEFAULT_FTP_CONNECT_PATTERN = "PASV";
+    /** Ssh private key used by sftp when no key path is configured. */
+    public static final String DEFAULT_PRIVATE_KEY = "~/.ssh/id_rsa";
 
-    /** Protocol. */
-    public static final String PROTOCOL = "protocol";
-    /** Host. */
-    public static final String HOST = "host";
-    /** Port. */
-    public static final String PORT = "port";
-    /** Connect, login and socket timeout in milliseconds. */
-    public static final String TIMEOUT = "timeout";
-    /** Connect pattern of the ftp protocol, PORT or PASV. */
-    public static final String CONNECT_PATTERN = "connectPattern";
-
-    /** Use key. */
-    public static final String USE_KEY = "useKey";
-    // ssh private key
-    /** Key path. */
-    public static final String KEY_PATH = "keyPath";
-    // ssh private key passphrase
-    /** Key pass. */
-    public static final String KEY_PASS = "keyPass";
+    private FtpConstant() {}
 }
