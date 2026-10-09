@@ -18,17 +18,25 @@
 package com.wgzhao.addax.server.manager;
 
 import com.wgzhao.addax.server.model.TaskInfo;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
-import java.util.Map;
 
 /**
  * Manages the lifecycle, status, and results of tasks.
- * Controls the maximum number of concurrent running tasks.
+ * Controls the maximum number of concurrent running tasks and bounds the number of
+ * finished tasks kept for later status queries.
  */
 public class TaskManager {
     private static final Map<String, TaskInfo> tasks = new ConcurrentHashMap<>();
     private static Semaphore semaphore = new Semaphore(30); // Default max concurrent tasks
+
+    // finished tasks are kept so that their status stays queryable after the run; without a
+    // bound a long living server accumulates them until it runs out of memory
+    private static volatile int maxRetainedTasks = 10000;
 
     /**
      * Set the maximum number of concurrent running tasks.
@@ -36,6 +44,14 @@ public class TaskManager {
      */
     public static void setMaxConcurrentTasks(int maxTasks) {
         semaphore = new Semaphore(maxTasks);
+    }
+
+    /**
+     * Set how many tasks are kept after they finish. Running tasks are never dropped.
+     * @param maxTasks maximum number of retained tasks
+     */
+    public static void setMaxRetainedTasks(int maxTasks) {
+        maxRetainedTasks = maxTasks;
     }
 
     /**
@@ -59,6 +75,7 @@ public class TaskManager {
      */
     public static void addTask(TaskInfo taskInfo) {
         tasks.put(taskInfo.taskId(), taskInfo);
+        dropOldestFinishedTasks();
     }
 
     /**
@@ -82,6 +99,23 @@ public class TaskManager {
      * @param error error message
      */
     public static void updateTask(String taskId, TaskInfo.Status status, String result, String error) {
-        tasks.computeIfPresent(taskId, (id, previous) -> new TaskInfo(id, status, result, error));
+        tasks.computeIfPresent(taskId, (id, previous) -> new TaskInfo(id, status, result, error, System.currentTimeMillis()));
+    }
+
+    /**
+     * Drop the oldest finished tasks while the map is over its bound. A status query of a
+     * dropped task answers "task not found" from then on.
+     */
+    private static void dropOldestFinishedTasks() {
+        int excess = tasks.size() - maxRetainedTasks;
+        if (excess <= 0) {
+            return;
+        }
+        List<TaskInfo> oldest = tasks.values().stream()
+                .filter(task -> task.status() != TaskInfo.Status.RUNNING)
+                .sorted(Comparator.comparingLong(TaskInfo::updatedAt))
+                .limit(excess)
+                .toList();
+        oldest.forEach(task -> tasks.remove(task.taskId(), task));
     }
 }

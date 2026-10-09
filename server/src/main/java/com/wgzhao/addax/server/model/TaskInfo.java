@@ -27,13 +27,16 @@ package com.wgzhao.addax.server.model;
  * @param status current status
  * @param result result message, {@code null} until the task has succeeded
  * @param error error message, {@code null} unless the task has failed
+ * @param updatedAt epoch milliseconds of this state, used to drop the oldest finished tasks
  */
-public record TaskInfo(String taskId, Status status, String result, String error)
+public record TaskInfo(String taskId, Status status, String result, String error, long updatedAt)
 {
     /** Task status. */
     public enum Status
     {
-        RUNNING, SUCCESS, FAILED
+        RUNNING, SUCCESS, FAILED,
+        /** The server stopped the job, either on request or after its timeout. */
+        CANCELLED
     }
 
     /**
@@ -44,6 +47,6 @@ public record TaskInfo(String taskId, Status status, String result, String error
      */
     public static TaskInfo running(String taskId)
     {
-        return new TaskInfo(taskId, Status.RUNNING, null, null);
+        return new TaskInfo(taskId, Status.RUNNING, null, null, System.currentTimeMillis());
     }
 }
