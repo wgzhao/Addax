@@ -58,7 +58,7 @@ public class TaskManager {
      * @param taskInfo task information
      */
     public static void addTask(TaskInfo taskInfo) {
-        tasks.put(taskInfo.getTaskId(), taskInfo);
+        tasks.put(taskInfo.taskId(), taskInfo);
     }
 
     /**
@@ -71,18 +71,17 @@ public class TaskManager {
     }
 
     /**
-     * Update the status and result of a task.
+     * Publish a new snapshot of a task.
+     *
+     * <p>The snapshot is replaced as a whole, so a concurrent status query cannot observe a
+     * partly updated task, such as SUCCESS without a result.
+     *
      * @param taskId task ID
      * @param status task status
      * @param result result string
      * @param error error message
      */
     public static void updateTask(String taskId, TaskInfo.Status status, String result, String error) {
-        TaskInfo info = tasks.get(taskId);
-        if (info != null) {
-            info.setStatus(status);
-            info.setResult(result);
-            info.setError(error);
-        }
+        tasks.computeIfPresent(taskId, (id, previous) -> new TaskInfo(id, status, result, error));
     }
 }

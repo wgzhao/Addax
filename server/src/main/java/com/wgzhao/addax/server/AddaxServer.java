@@ -199,19 +199,49 @@ public class AddaxServer
                 writeJsonResponse(exchange, 404, "{\"error\":\"task not found\"}");
                 return;
             }
-            String json = "{\"taskId\":\"" + escapeJson(info.getTaskId()) + "\"," +
-                    "\"status\":\"" + info.getStatus().name() + "\"," +
-                    "\"result\":\"" + escapeJson(info.getResult()) + "\"," +
-                    "\"error\":\"" + escapeJson(info.getError()) + "\"}";
+            String json = "{\"taskId\":\"" + escapeJson(info.taskId()) + "\"," +
+                    "\"status\":\"" + info.status().name() + "\"," +
+                    "\"result\":\"" + escapeJson(info.result()) + "\"," +
+                    "\"error\":\"" + escapeJson(info.error()) + "\"}";
             writeJsonResponse(exchange, 200, json);
         }
     }
 
+    /**
+     * Escape a string for use inside a JSON string literal.
+     *
+     * <p>Every character below U+0020 must be escaped, otherwise the response is not valid JSON
+     * for a strict parser (error messages may well contain tabs or other control characters).
+     *
+     * @param s string to escape, may be null
+     * @return escaped string, or an empty string for null
+     */
     static String escapeJson(String s)
     {
         if (s == null) {
             return "";
         }
-        return s.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "\\r");
+        StringBuilder escaped = new StringBuilder(s.length() + 16);
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            switch (c) {
+                case '"' -> escaped.append("\\\"");
+                case '\\' -> escaped.append("\\\\");
+                case '\b' -> escaped.append("\\b");
+                case '\f' -> escaped.append("\\f");
+                case '\n' -> escaped.append("\\n");
+                case '\r' -> escaped.append("\\r");
+                case '\t' -> escaped.append("\\t");
+                default -> {
+                    if (c < 0x20) {
+                        escaped.append(String.format("\\u%04x", (int) c));
+                    }
+                    else {
+                        escaped.append(c);
+                    }
+                }
+            }
+        }
+        return escaped.toString();
     }
 }
