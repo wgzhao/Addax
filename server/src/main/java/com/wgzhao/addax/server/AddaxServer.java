@@ -18,88 +18,151 @@
 package com.wgzhao.addax.server;
 
 import com.wgzhao.addax.server.manager.TaskManager;
-import com.wgzhao.addax.server.service.TaskService;
+import com.wgzhao.addax.server.model.SubmitResult;
 import com.wgzhao.addax.server.model.TaskInfo;
+import com.wgzhao.addax.server.service.TaskService;
 
-import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpServer;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintStream;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.URLDecoder;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.Map;
-import java.util.HashMap;
-import java.net.URLDecoder;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Minimal HTTP server using JDK HttpServer. Provides /api/submit and /api/status endpoints.
+ * Minimal HTTP server using JDK HttpServer. Provides /api/submit, /api/status and /api/cancel
+ * endpoints.
+ *
+ * <p>Every job runs in a JVM of its own, so the per job settings of the engine cannot leak
+ * between jobs and a job can be cancelled or crash without taking the server with it.
  */
 public class AddaxServer
 {
     private static final int DEFAULT_PORT = 10601;
     private static final int DEFAULT_PARALLEL = 30;
+    private static final int DEFAULT_MAX_TASKS = 10000;
+    private static final int DEFAULT_TASK_TIMEOUT = 0;
+
+    /** Reject request bodies above this size; a job configuration has no business being bigger. */
+    private static final int MAX_BODY_BYTES = 8 * 1024 * 1024;
+
+    private static final String JSON_SUFFIX = ".json";
+    private static final String YAML_SUFFIX = ".yaml";
 
     /**
-     * Main entry. Accepts optional args: {@code -p|--parallel &lt;n&gt;} and {@code --port &lt;port&gt;}.
+     * Main entry.
      *
-     * @param args command line arguments
+     * @param args command line arguments, see {@link #usage(PrintStream)}
      * @throws Exception on startup error
      */
     public static void main(String[] args)
             throws Exception
     {
-        int port = DEFAULT_PORT;
-        int parallel = DEFAULT_PARALLEL;
-
-        for (int i = 0; i < args.length; i++) {
-            switch (args[i]) {
-                case "-p":
-                case "--parallel":
-                    if (i + 1 < args.length) {
-                        try {
-                            parallel = Integer.parseInt(args[++i]);
-                        }
-                        catch (NumberFormatException ignored) {
-                        }
-                    }
-                    break;
-                case "--port":
-                    if (i + 1 < args.length) {
-                        try {
-                            port = Integer.parseInt(args[++i]);
-                        }
-                        catch (NumberFormatException ignored) {
-                        }
-                    }
-                    break;
-                default:
-                    // ignore
+        for (String arg : args) {
+            if ("-h".equals(arg) || "--help".equals(arg)) {
+                usage(System.out);
+                return;
             }
         }
 
-        TaskManager.setMaxConcurrentTasks(parallel);
-        ExecutorService executor = Executors.newCachedThreadPool();
-        TaskService taskService = new TaskService(executor);
+        Settings settings;
+        try {
+            settings = Settings.parse(args);
+        }
+        catch (IllegalArgumentException e) {
+            System.err.println(e.getMessage());
+            usage(System.err);
+            System.exit(2);
+            return;
+        }
 
-        HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
+        TaskManager.setMaxConcurrentTasks(settings.parallel());
+        TaskManager.setMaxRetainedTasks(settings.maxTasks());
+        // the number of running jobs is bounded by the limit of the TaskManager, so a fixed pool
+        // of the same size is enough and keeps the threads named
+        ExecutorService taskExecutor = Executors.newFixedThreadPool(settings.parallel(), namedThreads("addax-task-"));
+        TaskService taskService = new TaskService(taskExecutor, settings.taskTimeout());
+        Runtime.getRuntime().addShutdownHook(new Thread(taskService::destroyRunningTasks, "addax-shutdown"));
+
+        InetSocketAddress address = settings.bind() == null
+                ? new InetSocketAddress(settings.port())
+                : new InetSocketAddress(settings.bind(), settings.port());
+        HttpServer server = HttpServer.create(address, 0);
         server.createContext("/api/submit", new SubmitHandler(taskService));
         server.createContext("/api/status", new StatusHandler(taskService));
-        server.setExecutor(Executors.newFixedThreadPool(Math.max(2, parallel)));
+        server.createContext("/api/cancel", new CancelHandler(taskService));
+        server.setExecutor(Executors.newFixedThreadPool(Math.max(2, settings.parallel()), namedThreads("addax-http-")));
 
-        System.out.println("Starting Addax minimal HTTP server on port " + port + " with maxParallel=" + parallel);
+        System.out.println("Starting Addax minimal HTTP server on " + address + " with maxParallel=" + settings.parallel());
         server.start();
     }
 
+    private static void usage(PrintStream out)
+    {
+        out.println("""
+                Usage: AddaxServer [options]
+
+                  -p, --parallel <n>   maximum number of concurrently running tasks,
+                                       default 30 or $ADDAX_SERVER_PARALLEL
+                  --port <port>        port to listen on, default 10601
+                  --bind <address>     address to bind to, default all interfaces
+                  --max-tasks <n>      finished tasks kept for status queries, default 10000
+                  --task-timeout <n>   seconds a job may run before it is cancelled, default no limit
+                  -h, --help           show this help""");
+    }
+
+    private static ThreadFactory namedThreads(String prefix)
+    {
+        AtomicInteger sequence = new AtomicInteger();
+        return runnable -> new Thread(runnable, prefix + sequence.incrementAndGet());
+    }
+
+    private static int environmentInt(String name, int fallback)
+    {
+        String value = System.getenv(name);
+        if (value == null || value.isBlank()) {
+            return fallback;
+        }
+        try {
+            int number = Integer.parseInt(value.trim());
+            if (number < 1) {
+                throw new NumberFormatException();
+            }
+            return number;
+        }
+        catch (NumberFormatException e) {
+            throw new IllegalArgumentException(name + " must be a positive integer, got '" + value + "'");
+        }
+    }
+
+    /**
+     * Read the request body.
+     *
+     * @param exchange exchange to read the body of
+     * @return body decoded as UTF-8
+     * @throws BodyTooLargeException when the body is larger than {@link #MAX_BODY_BYTES}
+     * @throws IOException when the body cannot be read
+     */
     static String readRequestBody(HttpExchange exchange)
             throws IOException
     {
-        InputStream in = exchange.getRequestBody();
-        byte[] data = in.readAllBytes();
+        byte[] data = exchange.getRequestBody().readNBytes(MAX_BODY_BYTES + 1);
+        if (data.length > MAX_BODY_BYTES) {
+            throw new BodyTooLargeException("request body is larger than " + MAX_BODY_BYTES + " bytes");
+        }
         return new String(data, StandardCharsets.UTF_8);
     }
 
@@ -112,6 +175,21 @@ public class AddaxServer
         try (OutputStream os = exchange.getResponseBody()) {
             os.write(bytes);
         }
+    }
+
+    /**
+     * Reject a method the endpoint does not offer. RFC 7231 requires the answer to name the
+     * methods that are allowed.
+     *
+     * @param exchange exchange to answer
+     * @param allowed methods the endpoint allows
+     * @throws IOException when the response cannot be written
+     */
+    static void methodNotAllowed(HttpExchange exchange, String allowed)
+            throws IOException
+    {
+        exchange.getResponseHeaders().add("Allow", allowed);
+        exchange.sendResponseHeaders(405, -1);
     }
 
     static Map<String, String> parseQueryParams(String query)
@@ -136,6 +214,30 @@ public class AddaxServer
         return params;
     }
 
+    /**
+     * Pick the file name suffix of the staged job: core tells JSON and YAML apart by suffix, so
+     * the format has to be decided here. The content type of the request is authoritative, and a
+     * body that does not start like JSON is taken as YAML.
+     *
+     * @param contentType value of the Content-Type header, may be null
+     * @param body request body
+     * @return {@code .json} or {@code .yaml}
+     */
+    static String jobSuffix(String contentType, String body)
+    {
+        if (contentType != null) {
+            String type = contentType.toLowerCase(Locale.ROOT);
+            if (type.contains("yaml") || type.contains("yml")) {
+                return YAML_SUFFIX;
+            }
+            if (type.contains("json")) {
+                return JSON_SUFFIX;
+            }
+        }
+        String trimmed = body.stripLeading();
+        return !trimmed.isEmpty() && (trimmed.charAt(0) == '{' || trimmed.charAt(0) == '[') ? JSON_SUFFIX : YAML_SUFFIX;
+    }
+
     record SubmitHandler(TaskService taskService)
             implements HttpHandler
     {
@@ -144,22 +246,32 @@ public class AddaxServer
                 throws IOException
         {
             if (!"POST".equalsIgnoreCase(exchange.getRequestMethod())) {
-                exchange.sendResponseHeaders(405, -1);
+                methodNotAllowed(exchange, "POST");
                 return;
             }
-            String body = readRequestBody(exchange); // job JSON
+            String body;
+            try {
+                body = readRequestBody(exchange);
+            }
+            catch (BodyTooLargeException e) {
+                writeJsonResponse(exchange, 413, "{\"error\":\"" + escapeJson(e.getMessage()) + "\"}");
+                return;
+            }
             if (body.isEmpty()) {
                 writeJsonResponse(exchange, 400, "{\"error\":\"missing job JSON in request body\"}");
                 return;
             }
+            String suffix = jobSuffix(exchange.getRequestHeaders().getFirst("Content-Type"), body);
             Map<String, String> params = parseQueryParams(exchange.getRequestURI().getQuery());
             try {
-                String result = taskService.submitTask(body, params);
-                if (result.startsWith("ERROR:")) {
-                    writeJsonResponse(exchange, 429, "{\"error\":\"" + escapeJson(result) + "\"}");
+                SubmitResult result = taskService.submitTask(body, suffix, params);
+                if (result instanceof SubmitResult.Accepted accepted) {
+                    writeJsonResponse(exchange, 200, "{\"taskId\":\"" + escapeJson(accepted.taskId()) + "\"}");
                 }
-                else {
-                    writeJsonResponse(exchange, 200, "{\"taskId\":\"" + escapeJson(result) + "\"}");
+                else if (result instanceof SubmitResult.Rejected rejected) {
+                    boolean tooManyTasks = rejected.reason() == SubmitResult.Rejected.Reason.TOO_MANY_TASKS;
+                    writeJsonResponse(exchange, tooManyTasks ? 429 : 400,
+                            "{\"error\":\"" + escapeJson(rejected.message()) + "\"}");
                 }
             }
             catch (Exception e) {
@@ -176,21 +288,11 @@ public class AddaxServer
                 throws IOException
         {
             if (!"GET".equalsIgnoreCase(exchange.getRequestMethod())) {
-                exchange.sendResponseHeaders(405, -1);
+                methodNotAllowed(exchange, "GET");
                 return;
             }
-            String query = exchange.getRequestURI().getQuery();
-            String taskId = null;
-            if (query != null) {
-                for (String kv : query.split("&")) {
-                    String[] parts = kv.split("=", 2);
-                    if (parts.length == 2 && "taskId".equals(parts[0])) {
-                        taskId = parts[1];
-                        break;
-                    }
-                }
-            }
-            if (taskId == null) {
+            String taskId = parseQueryParams(exchange.getRequestURI().getQuery()).get("taskId");
+            if (taskId == null || taskId.isEmpty()) {
                 writeJsonResponse(exchange, 400, "{\"error\":\"missing taskId\"}");
                 return;
             }
@@ -199,19 +301,174 @@ public class AddaxServer
                 writeJsonResponse(exchange, 404, "{\"error\":\"task not found\"}");
                 return;
             }
-            String json = "{\"taskId\":\"" + escapeJson(info.getTaskId()) + "\"," +
-                    "\"status\":\"" + info.getStatus().name() + "\"," +
-                    "\"result\":\"" + escapeJson(info.getResult()) + "\"," +
-                    "\"error\":\"" + escapeJson(info.getError()) + "\"}";
+            String json = "{\"taskId\":\"" + escapeJson(info.taskId()) + "\"," +
+                    "\"status\":\"" + info.status().name() + "\"," +
+                    "\"result\":\"" + escapeJson(info.result()) + "\"," +
+                    "\"error\":\"" + escapeJson(info.error()) + "\"}";
             writeJsonResponse(exchange, 200, json);
         }
     }
 
+    record CancelHandler(TaskService taskService)
+            implements HttpHandler
+    {
+        @Override
+        public void handle(HttpExchange exchange)
+                throws IOException
+        {
+            if (!"POST".equalsIgnoreCase(exchange.getRequestMethod())) {
+                methodNotAllowed(exchange, "POST");
+                return;
+            }
+            String taskId = parseQueryParams(exchange.getRequestURI().getQuery()).get("taskId");
+            if (taskId == null || taskId.isEmpty()) {
+                writeJsonResponse(exchange, 400, "{\"error\":\"missing taskId\"}");
+                return;
+            }
+            switch (taskService.cancel(taskId)) {
+                case NOT_FOUND -> writeJsonResponse(exchange, 404, "{\"error\":\"task not found\"}");
+                case NOT_RUNNING -> writeJsonResponse(exchange, 409, "{\"error\":\"task is not running\"}");
+                case CANCELLED -> writeJsonResponse(exchange, 200,
+                        "{\"taskId\":\"" + escapeJson(taskId) + "\",\"status\":\"CANCELLED\"}");
+            }
+        }
+    }
+
+    /**
+     * Escape a string for use inside a JSON string literal.
+     *
+     * <p>Every character below U+0020 must be escaped, otherwise the response is not valid JSON
+     * for a strict parser (error messages may well contain tabs or other control characters).
+     *
+     * @param s string to escape, may be null
+     * @return escaped string, or an empty string for null
+     */
     static String escapeJson(String s)
     {
         if (s == null) {
             return "";
         }
-        return s.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "\\r");
+        StringBuilder escaped = new StringBuilder(s.length() + 16);
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            switch (c) {
+                case '"' -> escaped.append("\\\"");
+                case '\\' -> escaped.append("\\\\");
+                case '\b' -> escaped.append("\\b");
+                case '\f' -> escaped.append("\\f");
+                case '\n' -> escaped.append("\\n");
+                case '\r' -> escaped.append("\\r");
+                case '\t' -> escaped.append("\\t");
+                default -> {
+                    if (c < 0x20) {
+                        escaped.append(String.format("\\u%04x", (int) c));
+                    }
+                    else {
+                        escaped.append(c);
+                    }
+                }
+            }
+        }
+        return escaped.toString();
+    }
+
+    /** Startup settings. */
+    record Settings(int port, int parallel, int maxTasks, int taskTimeout, InetAddress bind)
+    {
+        /**
+         * Parse the command line, falling back to the environment and to the defaults.
+         *
+         * @param args command line arguments
+         * @return the settings to start with
+         * @throws IllegalArgumentException when an option is unknown, incomplete or out of range
+         */
+        static Settings parse(String[] args)
+        {
+            int port = DEFAULT_PORT;
+            int parallel = environmentInt("ADDAX_SERVER_PARALLEL", DEFAULT_PARALLEL);
+            int maxTasks = DEFAULT_MAX_TASKS;
+            int taskTimeout = DEFAULT_TASK_TIMEOUT;
+            InetAddress bind = null;
+
+            for (int i = 0; i < args.length; i++) {
+                String option = args[i];
+                switch (option) {
+                    case "-p", "--parallel" -> parallel = positive(valueOf(args, ++i, option), option);
+                    case "--port" -> port = inRange(valueOf(args, ++i, option), option, 1, 65535);
+                    case "--max-tasks" -> maxTasks = positive(valueOf(args, ++i, option), option);
+                    case "--task-timeout" -> taskTimeout = notNegative(valueOf(args, ++i, option), option);
+                    case "--bind" -> bind = address(valueOf(args, ++i, option), option);
+                    default -> throw new IllegalArgumentException("unknown option: " + option);
+                }
+            }
+            return new Settings(port, parallel, maxTasks, taskTimeout, bind);
+        }
+
+        private static String valueOf(String[] args, int index, String option)
+        {
+            if (index >= args.length) {
+                throw new IllegalArgumentException("missing value for " + option);
+            }
+            return args[index];
+        }
+
+        private static int number(String value, String option)
+        {
+            try {
+                return Integer.parseInt(value);
+            }
+            catch (NumberFormatException e) {
+                throw new IllegalArgumentException(option + " expects a number, got '" + value + "'");
+            }
+        }
+
+        private static int positive(String value, String option)
+        {
+            int number = number(value, option);
+            if (number < 1) {
+                throw new IllegalArgumentException(option + " must be at least 1, got " + number);
+            }
+            return number;
+        }
+
+        private static int notNegative(String value, String option)
+        {
+            int number = number(value, option);
+            if (number < 0) {
+                throw new IllegalArgumentException(option + " must not be negative, got " + number);
+            }
+            return number;
+        }
+
+        private static int inRange(String value, String option, int min, int max)
+        {
+            int number = number(value, option);
+            if (number < min || number > max) {
+                throw new IllegalArgumentException(option + " must be between " + min + " and " + max + ", got " + number);
+            }
+            return number;
+        }
+
+        private static InetAddress address(String value, String option)
+        {
+            try {
+                return InetAddress.getByName(value);
+            }
+            catch (UnknownHostException e) {
+                throw new IllegalArgumentException(option + " cannot be resolved: " + value);
+            }
+        }
+    }
+
+    /** Raised when a request body exceeds {@link #MAX_BODY_BYTES}. */
+    static class BodyTooLargeException
+            extends IOException
+    {
+        private static final long serialVersionUID = 1L;
+
+        BodyTooLargeException(String message)
+        {
+            super(message);
+        }
     }
 }

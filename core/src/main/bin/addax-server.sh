@@ -19,7 +19,8 @@
 #
 # addax-server.sh - start/stop the minimal Addax server (JDK HttpServer based)
 # Usage:
-#   addax-server.sh start [-p <parallel>] [--port <port>] [--daemon]
+#   addax-server.sh start [-p <parallel>] [--port <port>] [--bind <address>]
+#                         [--max-tasks <n>] [--daemon]
 #   addax-server.sh stop
 #
 
@@ -36,24 +37,53 @@ OUT_FILE="$ADDAX_HOME/addax-server.out"
 
 
 start_server() {
-  PARALLEL=30
+  # the server reads this variable itself as well; here it only has to survive the explicit
+  # -p below, which would otherwise override it
+  PARALLEL="${ADDAX_SERVER_PARALLEL:-30}"
   PORT=10601
   DAEMON=0
+  BIND=""
+  MAX_TASKS=""
+  EXTRA=()
   while [[ $# -gt 0 ]]; do
     case "$1" in
       -p|--parallel)
         PARALLEL="$2"; shift 2;;
       --port)
         PORT="$2"; shift 2;;
+      --bind)
+        BIND="$2"; shift 2;;
+      --max-tasks)
+        MAX_TASKS="$2"; shift 2;;
       --daemon)
         DAEMON=1; shift;;
       *)
-        shift;;
+        # let the server validate and report anything it does not know either
+        EXTRA+=("$1"); shift;;
     esac
   done
 
+  # without logback.configurationFile the logback defaults are used, which is a debug console
+  # dump; a long running server wants its log in a file under the addax home
+  PROPS=(-Djava.security.manager=allow
+         -Dfile.encoding=UTF-8
+         -Djava.security.egd=file:///dev/urandom
+         -Daddax.home="${ADDAX_HOME}"
+         -Dlogback.configurationFile="${ADDAX_HOME}/conf/logback.xml"
+         -Daddax.log="${ADDAX_HOME}/log"
+         -Dlog.file.name=addax-server.log
+         -Dloglevel="${LOG_LEVEL:-info}")
 
-  CMD=(java -server -Daddax.home=${ADDAX_HOME} -cp "lib/*" com.wgzhao.addax.server.AddaxServer --port "$PORT" -p "$PARALLEL")
+  # in daemon mode the log file is the only output worth keeping, so the console copy is
+  # turned off to keep addax-server.out small
+  if [[ $DAEMON -eq 1 ]]; then
+    PROPS+=(-Dconsole.enabled=false)
+  fi
+
+  CMD=(java -server ${JAVA_OPTS:-} "${PROPS[@]}" -cp "lib/*" com.wgzhao.addax.server.AddaxServer --port "$PORT" -p "$PARALLEL")
+  [[ -n "$BIND" ]] && CMD+=(--bind "$BIND")
+  [[ -n "$MAX_TASKS" ]] && CMD+=(--max-tasks "$MAX_TASKS")
+  CMD+=(${EXTRA[@]+"${EXTRA[@]}"})
 
   if [[ $DAEMON -eq 1 ]]; then
     nohup "${CMD[@]}" > "$OUT_FILE" 2>&1 &
@@ -90,7 +120,7 @@ case "${1:-}" in
     stop_server
     ;;
   *)
-    echo "Usage: $0 {start [-p <parallel>] [--port <port>] [--daemon] | stop}"
+    echo "Usage: $0 {start [-p <parallel>] [--port <port>] [--bind <address>] [--max-tasks <n>] [--daemon] | stop}"
     exit 1
     ;;
 esac
