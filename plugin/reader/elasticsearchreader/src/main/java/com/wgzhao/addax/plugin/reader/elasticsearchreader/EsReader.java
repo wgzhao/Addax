@@ -487,10 +487,14 @@ public class EsReader
             try {
                 value = Ognl.getValue(filterExpression, ognlContext, recordMap);
             }
-            catch (OgnlException e) {
+            // Ognl reports coercion failures as plain runtime exceptions, not as OgnlException
+            // (a string compared with a boolean throws NumberFormatException), and every failed
+            // evaluation keeps the record, so every exception is caught here.
+            catch (Exception e) {
                 if (!filterErrorLogged) {
                     filterErrorLogged = true;
-                    log.warn("filter[{}] cannot be evaluated, the affected records are kept: {}", filter, e.getMessage());
+                    log.warn("filter[{}] cannot be evaluated, the affected records are kept: {}: {}",
+                            filter, e.getClass().getSimpleName(), e.getMessage());
                 }
                 return true;
             }
