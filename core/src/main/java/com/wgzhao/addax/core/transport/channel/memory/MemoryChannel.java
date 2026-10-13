@@ -23,7 +23,6 @@ import com.wgzhao.addax.core.element.Record;
 import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.core.transport.channel.Channel;
-import com.wgzhao.addax.core.transport.record.TerminateRecord;
 
 import java.util.Collection;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -61,18 +60,6 @@ public class MemoryChannel
         lock = new ReentrantLock();
         notInsufficient = lock.newCondition();
         notEmpty = lock.newCondition();
-    }
-
-    @Override
-    public void close()
-    {
-        super.close();
-        try {
-            this.queue.put(TerminateRecord.get());
-        }
-        catch (InterruptedException ex) {
-            Thread.currentThread().interrupt();
-        }
     }
 
     @Override
@@ -158,23 +145,6 @@ public class MemoryChannel
             if (lock.isHeldByCurrentThread()) {
                 lock.unlock();
             }
-        }
-    }
-
-    @Override
-    protected Record doPull()
-    {
-        try {
-            long startTime = System.nanoTime();
-            Record r = this.queue.take();
-            // blocked waiting for the reader to fill the queue
-            waitReaderTime.addAndGet(System.nanoTime() - startTime);
-            memoryBytes.addAndGet(-r.getMemorySize());
-            return r;
-        }
-        catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new IllegalStateException(e);
         }
     }
 
