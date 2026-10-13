@@ -267,8 +267,7 @@ public class Communication
     }
 
     /**
-     * Merge state, priority: (Failed | Killed) &gt; Running &gt; Success
-     * Killing state only exists in Job's own state.
+     * Merge state, priority: Failed &gt; Running &gt; Success
      *
      * @param otherComm communication
      */
@@ -279,8 +278,7 @@ public class Communication
             return;
         }
 
-        if (this.state == State.FAILED || otherComm.getState() == State.FAILED
-                || this.state == State.KILLED || otherComm.getState() == State.KILLED) {
+        if (this.state == State.FAILED || otherComm.getState() == State.FAILED) {
             retState = State.FAILED;
         }
         else if (this.state.isRunning() || otherComm.state.isRunning()) {
@@ -292,7 +290,6 @@ public class Communication
 
     public synchronized boolean isFinished()
     {
-        return this.state == State.SUCCEEDED || this.state == State.FAILED
-                || this.state == State.KILLED;
+        return this.state == State.SUCCEEDED || this.state == State.FAILED;
     }
 }

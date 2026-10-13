@@ -24,11 +24,7 @@ package com.wgzhao.addax.core.meta;
  */
 public enum State
 {
-    SUBMITTING(10),
-    WAITING(20),
     RUNNING(30),
-    KILLING(40),
-    KILLED(50),
     FAILED(60),
     SUCCEEDED(70),
     ;
@@ -45,13 +41,8 @@ public enum State
         return this.value;
     }
 
-    public boolean isFinished()
-    {
-        return this == KILLED || this == FAILED || this == SUCCEEDED;
-    }
-
     public boolean isRunning()
     {
-        return !this.isFinished();
+        return this == RUNNING;
     }
 }

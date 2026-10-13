@@ -77,6 +77,10 @@ public class TaskGroupContainer
 
     private final TaskMonitor taskMonitor = TaskMonitor.getInstance();
 
+    // typed reference to the communicator; the inherited containerCommunicator field
+    // in AbstractContainer keeps pointing to the same instance
+    private final StandaloneTGContainerCommunicator taskGroupCommunicator;
+
     /**
      * Construct a TaskGroupContainer with the given configuration.
      *
@@ -86,16 +90,12 @@ public class TaskGroupContainer
     {
         super(configuration);
 
-        initCommunicator(configuration);
+        this.taskGroupCommunicator = new StandaloneTGContainerCommunicator(configuration);
+        super.setContainerCommunicator(this.taskGroupCommunicator);
 
         this.taskGroupId = this.configuration.getInt(CoreConstant.CORE_CONTAINER_TASK_GROUP_ID);
         this.channelClazz = this.configuration.getString(CoreConstant.CORE_TRANSPORT_CHANNEL_CLASS, MemoryChannel.class.getName());
         this.taskCollectorClass = this.configuration.getString(CoreConstant.CORE_STATISTICS_COLLECTOR_PLUGIN_TASK_CLASS, StdoutPluginCollector.class.getName());
-    }
-
-    private void initCommunicator(Configuration configuration)
-    {
-        super.setContainerCommunicator(new StandaloneTGContainerCommunicator(configuration));
     }
 
     public int getTaskGroupId()
@@ -132,7 +132,7 @@ public class TaskGroupContainer
         int taskCountInThisTaskGroup = taskConfigs.size();
         LOG.info("The taskGroupId=[{}] started [{}] channels for [{}] tasks.", this.taskGroupId, channelNumber, taskCountInThisTaskGroup);
 
-        this.containerCommunicator.registerCommunication(taskConfigs);
+        this.taskGroupCommunicator.registerCommunication(taskConfigs);
         // set up the taskId and task configuration map
         Map<Integer, Configuration> taskConfigMap = buildTaskConfigMap(taskConfigs);
         // the task queue for the task that has not been executed
@@ -150,7 +150,7 @@ public class TaskGroupContainer
         try {
         while (true) {
             boolean failedOrKilled = false;
-            Map<Integer, Communication> communicationMap = containerCommunicator.getCommunicationMap();
+            Map<Integer, Communication> communicationMap = taskGroupCommunicator.getCommunicationMap();
             for (Map.Entry<Integer, Communication> entry : communicationMap.entrySet()) {
                 Integer taskId = entry.getKey();
                 Communication taskCommunication = entry.getValue();
@@ -169,7 +169,7 @@ public class TaskGroupContainer
                     if (taskExecutor.supportFailOver() && taskExecutor.getAttemptCount() < taskMaxRetryTimes) {
                         taskExecutor.shutdown();
                         // reset the task status
-                        containerCommunicator.resetCommunication(taskId);
+                        taskGroupCommunicator.resetCommunication(taskId);
                         Configuration taskConfig = taskConfigMap.get(taskId);
                         taskQueue.add(taskConfig);
                     }
@@ -177,10 +177,6 @@ public class TaskGroupContainer
                         failedOrKilled = true;
                         break;
                     }
-                }
-                else if (taskCommunication.getState() == State.KILLED) {
-                    failedOrKilled = true;
-                    break;
                 }
                 else if (taskCommunication.getState() == State.SUCCEEDED) {
                     Long taskStartTime = taskStartTimeMap.get(taskId);
@@ -241,7 +237,7 @@ public class TaskGroupContainer
                 iterator.remove();
                 runTasks.add(taskExecutor);
 
-                taskMonitor.registerTask(taskId, this.containerCommunicator.getCommunication(taskId));
+                taskMonitor.registerTask(taskId, this.taskGroupCommunicator.getCommunication(taskId));
 
                 taskFailedExecutorMap.remove(taskId);
                 LOG.debug("TaskGroup[{}] TaskId[{}] AttemptCount[{}] has started",
@@ -249,7 +245,7 @@ public class TaskGroupContainer
             }
 
             // the task queue is empty, the executor has ended, and the collection status is success
-            if (taskQueue.isEmpty() && isAllTaskDone(runTasks) && containerCommunicator.collectState() == State.SUCCEEDED) {
+            if (taskQueue.isEmpty() && isAllTaskDone(runTasks) && taskGroupCommunicator.collectState() == State.SUCCEEDED) {
                 lastTaskGroupContainerCommunication = reportTaskGroupCommunication(lastTaskGroupContainerCommunication, taskCountInThisTaskGroup);
                 LOG.debug("The taskGroup[{}] has completed it's tasks.", this.taskGroupId);
                 break;
@@ -264,20 +260,20 @@ public class TaskGroupContainer
 
                 // for the running tasks, check every reportIntervalInMillSec
                 for (TaskExecutor taskExecutor : runTasks) {
-                    taskMonitor.report(taskExecutor.getTaskId(), this.containerCommunicator.getCommunication(taskExecutor.getTaskId()));
+                    taskMonitor.report(taskExecutor.getTaskId(), this.taskGroupCommunicator.getCommunication(taskExecutor.getTaskId()));
                 }
             }
             try {
                 TimeUnit.MILLISECONDS.sleep(sleepIntervalInMillSec);
             }
             catch (InterruptedException e) {
-                Communication nowTaskGroupContainerCommunication = this.containerCommunicator.collect();
+                Communication nowTaskGroupContainerCommunication = this.taskGroupCommunicator.collect();
 
                 if (nowTaskGroupContainerCommunication.getThrowable() == null) {
                     nowTaskGroupContainerCommunication.setThrowable(e);
                 }
                 nowTaskGroupContainerCommunication.setState(State.FAILED);
-                this.containerCommunicator.report(nowTaskGroupContainerCommunication);
+                this.taskGroupCommunicator.report(nowTaskGroupContainerCommunication);
                 throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
             }
         }
@@ -290,12 +286,12 @@ public class TaskGroupContainer
             // task-group communication RUNNING forever and hang the whole job; mark it
             // FAILED so the scheduler sees it within one collect cycle
             shutdownAll(runTasks, taskFailedExecutorMap);
-            Communication comm = this.containerCommunicator.collect();
+            Communication comm = this.taskGroupCommunicator.collect();
             if (comm.getThrowable() == null) {
                 comm.setThrowable(e);
             }
             comm.setState(State.FAILED);
-            this.containerCommunicator.report(comm);
+            this.taskGroupCommunicator.report(comm);
             throw e instanceof AddaxException
                     ? (AddaxException) e
                     : AddaxException.asAddaxException(RUNTIME_ERROR, e);
@@ -370,17 +366,17 @@ public class TaskGroupContainer
      */
     private Communication reportTaskGroupCommunication(Communication lastTaskGroupContainerCommunication, int taskCount)
     {
-        Communication nowTaskGroupContainerCommunication = this.containerCommunicator.collect();
+        Communication nowTaskGroupContainerCommunication = this.taskGroupCommunicator.collect();
         nowTaskGroupContainerCommunication.setTimestamp(System.currentTimeMillis());
         Communication reportCommunication = CommunicationTool.getReportCommunication(nowTaskGroupContainerCommunication,
                 lastTaskGroupContainerCommunication, taskCount);
-        this.containerCommunicator.report(reportCommunication);
+        this.taskGroupCommunicator.report(reportCommunication);
         return reportCommunication;
     }
 
     private void markCommunicationFailed(Integer taskId)
     {
-        Communication communication = containerCommunicator.getCommunication(taskId);
+        Communication communication = taskGroupCommunicator.getCommunication(taskId);
         communication.setState(State.FAILED);
     }
 
@@ -421,7 +417,7 @@ public class TaskGroupContainer
 
             // get the communication for the taskExecutor via taskId
             // then pass it to readerRunner and writerRunner, and pass it to channel for statistics
-            this.taskCommunication = containerCommunicator.getCommunication(taskId);
+            this.taskCommunication = taskGroupCommunicator.getCommunication(taskId);
             Validate.notNull(this.taskCommunication,
                     "Communication has not been registered for taskId:" + taskId);
             this.channel = ClassUtil.instantiate(channelClazz, Channel.class, configuration);

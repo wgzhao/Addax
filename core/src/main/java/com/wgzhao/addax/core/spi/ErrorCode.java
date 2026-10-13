@@ -40,13 +40,11 @@ public enum ErrorCode
     ENCODING_ERROR("3004", "Encoding error"),
 
     // Execution Errors
-    RETRY_FAIL("4001", "Retry failed"),
     EXECUTE_FAIL("4002", "Execution failed"),
     IO_ERROR("4003", "IO error"),
 
     // Runtime Errors
     RUNTIME_ERROR("5001", "Runtime error"),
-    HOOK_INTERNAL_ERROR("5002", "Hook internal error"),
     SHUT_DOWN_TASK("5003", "Task shutdown"),
     WAIT_TIME_EXCEED("5004", "Wait time exceeded"),
     TASK_HUNG_EXPIRED("5005", "Task hung expired"),

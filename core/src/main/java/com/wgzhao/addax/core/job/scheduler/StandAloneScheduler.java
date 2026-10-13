@@ -20,6 +20,8 @@
 package com.wgzhao.addax.core.job.scheduler;
 
 import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.taskgroup.TaskGroupContainer;
+import com.wgzhao.addax.core.taskgroup.runner.TaskGroupContainerRunner;
 import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.core.meta.State;
 import com.wgzhao.addax.core.statistics.communication.Communication;
@@ -32,19 +34,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
-/** Abstract Scheduler. */
-public abstract class AbstractScheduler
+/**
+ * The job scheduler: starts one thread per TaskGroupContainer and monitors the
+ * aggregated job communication until all tasks finish or an error occurs.
+ */
+public class StandAloneScheduler
 {
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractScheduler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StandAloneScheduler.class);
 
     private final AbstractContainerCommunicator containerCommunicator;
 
-    /** Abstractscheduler. */
-    public AbstractScheduler(AbstractContainerCommunicator containerCommunicator)
+    private ExecutorService taskGroupContainerExecutorService;
+
+    public StandAloneScheduler(AbstractContainerCommunicator containerCommunicator)
     {
         this.containerCommunicator = containerCommunicator;
     }
@@ -77,12 +85,8 @@ public abstract class AbstractScheduler
              * step 2: getReport info, then report it
              * step 3: errorLimit do check
              * step 4: dealSucceedStat();
-             * step 5: dealKillingStat();
-             * step 6: dealFailedStat();
-             * step 7: refresh last job stat, and then sleep for next while
-             *
-             * above steps, some ones should report info to DS
-             *
+             * step 5: dealFailedStat();
+             * step 6: refresh last job stat, and then sleep for next while
              */
             Communication nowJobContainerCommunication = this.containerCommunicator.collect();
             nowJobContainerCommunication.setTimestamp(System.currentTimeMillis());
@@ -110,7 +114,7 @@ public abstract class AbstractScheduler
             catch (Exception e) {
                 // shut down the task-group executor before propagating the breach,
                 // otherwise its non-daemon threads keep running in embedded use
-                dealFailedStat(this.containerCommunicator, e);
+                dealFailedStat(e);
             }
 
             State state = nowJobContainerCommunication.getState();
@@ -120,12 +124,7 @@ public abstract class AbstractScheduler
             }
 
             if (state == State.FAILED) {
-                dealFailedStat(this.containerCommunicator, nowJobContainerCommunication.getThrowable());
-            }
-
-            if (state == State.KILLING || state == State.KILLED) {
-                // Best-effort graceful shutdown when being killed
-                dealKillingStat(this.containerCommunicator, totalTasks);
+                dealFailedStat(nowJobContainerCommunication.getThrowable());
             }
 
             try {
@@ -135,16 +134,31 @@ public abstract class AbstractScheduler
                 // Restore interrupt status and exit as failed, shutting down task groups
                 Thread.currentThread().interrupt();
                 LOG.error("The scheduler thread was interrupted.", e);
-                dealFailedStat(this.containerCommunicator, e);
+                dealFailedStat(e);
             }
         }
     }
 
-    protected abstract void startAllTaskGroup(List<Configuration> configurations);
+    private void startAllTaskGroup(List<Configuration> configurations)
+    {
+        this.taskGroupContainerExecutorService = Executors
+                .newFixedThreadPool(configurations.size());
 
-    protected abstract void dealFailedStat(AbstractContainerCommunicator frameworkCollector, Throwable throwable);
+        for (Configuration taskGroupConfiguration : configurations) {
+            TaskGroupContainer taskGroupContainer = new TaskGroupContainer(taskGroupConfiguration);
+            TaskGroupContainerRunner taskGroupContainerRunner = new TaskGroupContainerRunner(taskGroupContainer);
+            this.taskGroupContainerExecutorService.execute(taskGroupContainerRunner);
+        }
 
-    protected abstract void dealKillingStat(AbstractContainerCommunicator frameworkCollector, int totalTasks);
+        this.taskGroupContainerExecutorService.shutdown();
+    }
+
+    private void dealFailedStat(Throwable throwable)
+    {
+        this.taskGroupContainerExecutorService.shutdownNow();
+        throw AddaxException.asAddaxException(
+                RUNTIME_ERROR, throwable);
+    }
 
     private int calculateTaskCount(List<Configuration> configurations)
     {

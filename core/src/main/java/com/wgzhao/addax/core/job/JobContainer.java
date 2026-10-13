@@ -33,8 +33,7 @@ import com.wgzhao.addax.core.util.StrUtil;
 import com.wgzhao.addax.core.AbstractContainer;
 import com.wgzhao.addax.core.Engine;
 import com.wgzhao.addax.core.container.util.JobAssignUtil;
-import com.wgzhao.addax.core.job.scheduler.AbstractScheduler;
-import com.wgzhao.addax.core.job.scheduler.processinner.StandAloneScheduler;
+import com.wgzhao.addax.core.job.scheduler.StandAloneScheduler;
 import com.wgzhao.addax.core.statistics.communication.Communication;
 import com.wgzhao.addax.core.statistics.communication.CommunicationTool;
 import com.wgzhao.addax.core.statistics.container.communicator.AbstractContainerCommunicator;
@@ -120,7 +119,7 @@ public class JobContainer
                 this.configuration.set(CoreConstant.JOB_CONTENT_WRITER_PARAMETER + ".dryRun", true);
                 // ensure a communicator exists for the job plugin collector
                 if (super.getContainerCommunicator() == null) {
-                    super.setContainerCommunicator(new StandAloneJobContainerCommunicator(configuration));
+                    super.setContainerCommunicator(new StandAloneJobContainerCommunicator());
                 }
                 this.init();
                 this.preCheck();
@@ -145,8 +144,6 @@ public class JobContainer
                 this.postHandle();
 
                 LOG.debug("The jobContainer completed successfully.");
-                // disable hook function
-                this.invokeHooks();
             }
         }
         catch (OutOfMemoryError e) {
@@ -165,7 +162,7 @@ public class JobContainer
                 // when an exception occurs before scheduler(), containerCollector needs to be initialized here.
                 AbstractContainerCommunicator tempContainerCollector;
                 // standalone
-                tempContainerCollector = new StandAloneJobContainerCommunicator(configuration);
+                tempContainerCollector = new StandAloneJobContainerCommunicator();
                 super.setContainerCommunicator(tempContainerCollector);
             }
 
@@ -440,7 +437,7 @@ public class JobContainer
 
         LOG.info("The Scheduler launches [{}] taskGroup(s).", taskGroupConfigs.size());
 
-        AbstractScheduler scheduler;
+        StandAloneScheduler scheduler;
         try {
             scheduler = initStandaloneScheduler(this.configuration);
             this.startTransferTimeStamp = System.currentTimeMillis();
@@ -460,9 +457,9 @@ public class JobContainer
         this.checkLimit();
     }
 
-    private AbstractScheduler initStandaloneScheduler(Configuration configuration)
+    private StandAloneScheduler initStandaloneScheduler(Configuration configuration)
     {
-        AbstractContainerCommunicator containerCommunicator = new StandAloneJobContainerCommunicator(configuration);
+        AbstractContainerCommunicator containerCommunicator = new StandAloneJobContainerCommunicator();
         super.setContainerCommunicator(containerCommunicator);
 
         return new StandAloneScheduler(containerCommunicator);
@@ -805,11 +802,4 @@ public class JobContainer
         }
     }
 
-    /**
-     * Invoke external hooks if any (currently noop).
-     */
-    private void invokeHooks()
-    {
-        // no-op
-    }
 }
