@@ -125,7 +125,7 @@ public class TaskGroupContainer
 
         long taskMaxWaitInMs = this.configuration.getLong(CoreConstant.CORE_CONTAINER_TASK_FAIL_OVER_MAX_WAIT_IN_MSEC, 60000);
 
-        List<Configuration> taskConfigs = this.configuration.getListConfiguration(CoreConstant.JOB_CONTENT);
+        List<Configuration> taskConfigs = this.configuration.getListConfiguration(CoreConstant.CORE_CONTAINER_TASK_CONFIGS);
 
         LOG.debug("The task configuration [{}] for taskGroup[{}]", JSON.toJSONString(taskConfigs), this.taskGroupId);
 

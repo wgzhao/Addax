@@ -165,7 +165,7 @@ public class StandAloneScheduler
         int totalTasks = 0;
         for (Configuration taskGroupConfiguration : configurations) {
             totalTasks += taskGroupConfiguration.getListConfiguration(
-                    CoreConstant.JOB_CONTENT).size();
+                    CoreConstant.CORE_CONTAINER_TASK_CONFIGS).size();
         }
         return totalTasks;
     }

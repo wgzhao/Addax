@@ -48,6 +48,9 @@ public class CoreConstant
 
     public static final String CORE_CONTAINER_TASK_FAIL_OVER_MAX_WAIT_IN_MSEC = "core.container.task.failOver.maxWaitInMsec";
 
+    // internal key for the post-split task list; job.content stays the user-facing dict
+    public static final String CORE_CONTAINER_TASK_CONFIGS = "core.container.taskConfigs";
+
     public static final String CORE_SERVER_ADDRESS = "core.server.address";
 
     public static final String CORE_SERVER_TIMEOUT_SEC = "core.server.timeout";
