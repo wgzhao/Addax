@@ -1,4 +1,9 @@
-# define an alias
+# Two entry points share one runtime base so the images they produce stay interchangeable:
+#   --target release      payload is the assembled distribution taken from the build
+#                         context; nothing is compiled. CI builds this from the tree it
+#                         just assembled, so the image content matches the release archive.
+#   default (from-source) full compilation inside the container, for `docker build .` from
+#                         a clone. Must stay the LAST stage: it is the default target.
 FROM maven:3.8.3-openjdk-17 AS build
 
 ARG use_cn=0
@@ -31,13 +36,21 @@ RUN <<EOF
     ./shrink_package.sh 
 EOF
 
-FROM eclipse-temurin:17-jre-noble
+FROM eclipse-temurin:17-jre-noble AS base
 LABEL maintainer="wgzhao <wgzhao@gmail.com>"
 LABEL version="latest"
 LABEL description="Actively maintained successor to Alibaba DataX — a fast, versatile, open-source ETL tool for 30+ RDBMS and NoSQL data sources."
 
-COPY --from=build  /src/target/addax-* /opt/addax/
-
 WORKDIR /opt/addax
 
+# release path: the context provides the assembled addax-<version>/ directory. The chmod
+# doubles as an assertion -- a context that only ships the tarball has no bin/ to chmod
+# and fails the build instead of producing a broken image.
+FROM base AS release
+COPY addax-* /opt/addax/
+RUN chmod 755 /opt/addax/bin/*
+
+# default path
+FROM base AS from-source
+COPY --from=build  /src/target/addax-* /opt/addax/
 RUN chmod 755 /opt/addax/bin/*

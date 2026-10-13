@@ -81,8 +81,10 @@ jobs:
       - name: Build and packaging
         run: |
           export MAVEN_OPTS="-DskipTests -Dmaven.javadoc.skip=true -Dmaven.source.skip=true -Dgpg.skip=true"
-          mvn -B -V -T 1 clean package
-          mvn package -Pdistribution
+          # keep both passes and their flags in sync with e2e.yml, where the constraint
+          # on the second pass (root package.xml consumes sibling target/ trees) is written down
+          mvn -B -V -T 1C clean package
+          mvn -B -V -T 1 package -Pdistribution
           bash shrink_package.sh y
 
       - name: Calculate SHA256SUM
@@ -110,6 +112,17 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
+      # Assemble the image from the distribution built above instead of recompiling inside
+      # the container (a second full reactor build plus a cold ~/.m2). The staged context
+      # carries a copy of the Dockerfile and the shrunken tree, so `--target release` only
+      # copies the tree and the image ends up with the same content as the release archive.
+      # Staging under target/ keeps it out of the repository and out of any other context.
+      - name: Stage docker context
+        run: |
+          mkdir -p target/docker-context
+          cp Dockerfile target/docker-context/
+          cp -al "target/addax-${{ steps.version.outputs.version }}" target/docker-context/
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
 
@@ -129,6 +142,8 @@ jobs:
       - name: Build and push Docker image to Docker Hub and Quay.io
         uses: docker/build-push-action@v7
         with:
+          context: target/docker-context
+          target: release
           push: true
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/addax:${{ steps.version.outputs.version }}
