@@ -76,7 +76,7 @@ public final class ConfigParser
     {
         Configuration configuration = ConfigParser.parseJobConfig(jobPath);
 
-        // Upgrade the new job format to the old one
+        // Normalize the legacy array forms to the dict form
         upgradeJobConfig(configuration);
         //validate job json
         validateJob(configuration);
@@ -105,52 +105,51 @@ public final class ConfigParser
     }
 
     /**
-     * Upgrade the new job format to the old one
-     * 1. The content of job.json is a map instead of list of a map
+     * Convert the legacy array forms to the dict form at read time:
+     * job.content, and the rdbms connection parameters may still arrive as a
+     * list of one or more maps in old job files. After this method, every
+     * downstream reader of job.content can assume it is a dict.
      *
      * @param configuration {@link Configuration}
      */
-    /**
-     * Bridge the raw Map element type inferred from {@code Map.class} to a
-     * parameterized map list.
-     */
-    @SuppressWarnings("unchecked")
-    private static List<Map<String, Object>> castList(List<Map> list)
-    {
-        return (List<Map<String, Object>>) (List<?>) list;
-    }
-
     private static void upgradeJobConfig(Configuration configuration)
     {
         configuration.getNecessaryValue(JOB_CONTENT);
-        if (configuration.getString(JOB_CONTENT).startsWith("[")) {
-            // get the first element
-            List<Map<String, Object>> contentList = castList(configuration.getList(JOB_CONTENT, Map.class));
-            if (contentList != null && !contentList.isEmpty()) {
-                configuration.set("job.content", contentList.get(0));
+        if (configuration.get(JOB_CONTENT) instanceof List<?> contentList) {
+            if (contentList.isEmpty()) {
+                throw AddaxException.asAddaxException(CONFIG_ERROR,
+                        "The configuration item '" + JOB_CONTENT + "' cannot be an empty list.");
             }
+            if (contentList.size() > 1) {
+                LOG.warn("The legacy array form of '{}' has {} elements; only the first one is used, the rest are ignored.",
+                        JOB_CONTENT, contentList.size());
+            }
+            configuration.set(JOB_CONTENT, contentList.get(0));
         }
+
         Configuration reader = configuration.getConfiguration(JOB_CONTENT_READER_PARAMETER);
         if (reader != null) {
-            if (reader.getString(CONNECTION, "").startsWith("[")) {
-                List<Map<String, Object>> connectionList = castList(configuration.getList(JOB_CONTENT_READER_PARAMETER_CONNECTION, Map.class));
-                if (connectionList != null && !connectionList.isEmpty()) {
-                    reader.set(CONNECTION, connectionList.get(0));
+            if (reader.get(CONNECTION) instanceof List<?> connectionList) {
+                if (connectionList.isEmpty()) {
+                    throw AddaxException.asAddaxException(CONFIG_ERROR,
+                            "The configuration item '" + JOB_CONTENT_READER_PARAMETER_CONNECTION + "' cannot be an empty list.");
                 }
+                reader.set(CONNECTION, connectionList.get(0));
             }
-            if (reader.getString("connection.jdbcUrl", "").startsWith("[")) {
-                reader.set("connection.jdbcUrl", reader.getList("connection.jdbcUrl", String.class).get(0));
+            if (reader.get("connection.jdbcUrl") instanceof List<?> jdbcUrlList) {
+                reader.set("connection.jdbcUrl", jdbcUrlList.get(0));
             }
             configuration.set(JOB_CONTENT_READER_PARAMETER, reader);
         }
-        // switch `write.connection` from list to map
+
         Configuration writer = configuration.getConfiguration(JOB_CONTENT_WRITER_PARAMETER);
         if (writer != null) {
-            if (writer.getString(CONNECTION, "").startsWith("[")) {
-                List<Map<String, Object>> connectionList = castList(configuration.getList(JOB_CONTENT_WRITER_PARAMETER + ".connection", Map.class));
-                if (connectionList != null && !connectionList.isEmpty()) {
-                    writer.set(CONNECTION, connectionList.get(0));
+            if (writer.get(CONNECTION) instanceof List<?> connectionList) {
+                if (connectionList.isEmpty()) {
+                    throw AddaxException.asAddaxException(CONFIG_ERROR,
+                            "The configuration item '" + JOB_CONTENT_WRITER_PARAMETER + ".connection' cannot be an empty list.");
                 }
+                writer.set(CONNECTION, connectionList.get(0));
             }
             configuration.set(JOB_CONTENT_WRITER_PARAMETER, writer);
         }

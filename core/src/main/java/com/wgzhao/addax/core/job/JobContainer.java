@@ -359,7 +359,7 @@ public class JobContainer
 
         LOG.debug("The contentConfig configuration:{} ", JSON.toJSONString(contentConfig));
 
-        this.configuration.set(CoreConstant.JOB_CONTENT, contentConfig);
+        this.configuration.set(CoreConstant.CORE_CONTAINER_TASK_CONFIGS, contentConfig);
 
         return contentConfig.size();
     }
@@ -424,7 +424,7 @@ public class JobContainer
          * The global and per-channel speed are in B/s
          */
         int channelsPerTaskGroup = this.configuration.getInt(CoreConstant.CORE_CONTAINER_TASK_GROUP_CHANNEL, 5);
-        int taskNumber = this.configuration.getList(CoreConstant.JOB_CONTENT).size();
+        int taskNumber = this.configuration.getList(CoreConstant.CORE_CONTAINER_TASK_CONFIGS).size();
 
         this.needChannelNumber = Math.min(this.needChannelNumber, taskNumber);
         PerfTrace.getInstance().setChannelNumber(needChannelNumber);

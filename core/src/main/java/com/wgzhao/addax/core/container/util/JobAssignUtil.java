@@ -33,9 +33,9 @@ import java.util.List;
 import java.util.Map;
 
 import static com.wgzhao.addax.core.base.Constant.LOAD_BALANCE_RESOURCE_MARK;
+import static com.wgzhao.addax.core.util.container.CoreConstant.CORE_CONTAINER_TASK_CONFIGS;
 import static com.wgzhao.addax.core.util.container.CoreConstant.CORE_CONTAINER_TASK_GROUP_CHANNEL;
 import static com.wgzhao.addax.core.util.container.CoreConstant.CORE_CONTAINER_TASK_GROUP_ID;
-import static com.wgzhao.addax.core.util.container.CoreConstant.JOB_CONTENT;
 import static com.wgzhao.addax.core.util.container.CoreConstant.JOB_READER_PARAMETER;
 import static com.wgzhao.addax.core.util.container.CoreConstant.JOB_WRITER_PARAMETER;
 
@@ -58,7 +58,7 @@ public final class JobAssignUtil
     {
         Validate.isTrue(configuration != null, "The `job.content` can not be null.");
 
-        List<Configuration> contentConfig = configuration.getListConfiguration(JOB_CONTENT);
+        List<Configuration> contentConfig = configuration.getListConfiguration(CORE_CONTAINER_TASK_CONFIGS);
         Validate.isTrue(!contentConfig.isEmpty(), "The `job.content` is empty");
 
         Validate.isTrue(channelNumber > 0 && channelsPerTaskGroup > 0,
@@ -177,10 +177,10 @@ public final class JobAssignUtil
      */
     private static List<Configuration> doAssign(LinkedHashMap<String, ArrayDeque<Integer>> resourceMarkAndTaskIdMap, Configuration jobConfiguration, int taskGroupNumber)
     {
-        List<Configuration> contentConfig = jobConfiguration.getListConfiguration(JOB_CONTENT);
+        List<Configuration> contentConfig = jobConfiguration.getListConfiguration(CORE_CONTAINER_TASK_CONFIGS);
 
         Configuration taskGroupTemplate = jobConfiguration.clone();
-        taskGroupTemplate.remove(JOB_CONTENT);
+        taskGroupTemplate.remove(CORE_CONTAINER_TASK_CONFIGS);
 
         List<Configuration> result = new ArrayList<>();
 
@@ -213,7 +213,7 @@ public final class JobAssignUtil
         Configuration tempTaskGroupConfig;
         for (int i = 0; i < taskGroupNumber; i++) {
             tempTaskGroupConfig = taskGroupTemplate.clone();
-            tempTaskGroupConfig.set(JOB_CONTENT, taskGroupConfigList.get(i));
+            tempTaskGroupConfig.set(CORE_CONTAINER_TASK_CONFIGS, taskGroupConfigList.get(i));
             tempTaskGroupConfig.set(CORE_CONTAINER_TASK_GROUP_ID, i);
 
             result.add(tempTaskGroupConfig);
