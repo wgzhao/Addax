@@ -59,7 +59,6 @@ public abstract class Channel
     protected long byteSpeed; // bps: bytes/s
     protected long recordSpeed; // tps: records/s
     protected long flowControlInterval;
-    protected volatile boolean isClosed = false;
     protected Configuration configuration;
     protected volatile AtomicLong waitReaderTime = new AtomicLong(0);
     protected volatile AtomicLong waitWriterTime = new AtomicLong(0);
@@ -89,11 +88,6 @@ public abstract class Channel
         this.flowControlInterval = configuration.getLong(CORE_TRANSPORT_CHANNEL_FLOW_CONTROL_INTERVAL, 1000);
         this.byteCapacity = configuration.getInt(CORE_TRANSPORT_CHANNEL_CAPACITY_BYTE, 8 * 1024 * 1024);
         this.configuration = configuration;
-    }
-
-    public void close()
-    {
-        this.isClosed = true;
     }
 
     public int getTaskGroupId()
@@ -127,13 +121,6 @@ public abstract class Channel
         this.waitCountersRegistered = false;
     }
 
-    public void push(Record r)
-    {
-        Validate.notNull(r, "The record cannot be empty.");
-        this.doPush(r);
-        this.statPush(1L, r.getByteSize());
-    }
-
     public void pushTerminate(TerminateRecord r)
     {
         Validate.notNull(r, "The record cannot be empty.");
@@ -148,13 +135,6 @@ public abstract class Channel
         this.statPush(rs.size(), this.getByteSize(rs));
     }
 
-    public Record pull()
-    {
-        Record record = this.doPull();
-        this.statPull(1L, record.getByteSize());
-        return record;
-    }
-
     public void pullAll(Collection<Record> rs)
     {
         Validate.notNull(rs, "The Record must not be empty");
@@ -165,8 +145,6 @@ public abstract class Channel
     protected abstract void doPush(Record r);
 
     protected abstract void doPushAll(Collection<Record> rs);
-
-    protected abstract Record doPull();
 
     protected abstract void doPullAll(Collection<Record> rs);
 
