@@ -22,7 +22,7 @@
 
     <groupId>com.wgzhao.addax</groupId>
     <artifactId>addax-all</artifactId>
-    <version>6.1.1-SNAPSHOT</version>
+    <version>6.2.0</version>
     <name>addax-all</name>
     <description>Actively maintained successor to Alibaba DataX — a fast, versatile, open-source ETL tool for 30+ RDBMS and NoSQL data sources.</description>
     <packaging>pom</packaging>
@@ -42,7 +42,7 @@
         <connection>scm:git:https://github.com/wgzhao/addax.git</connection>
         <developerConnection>scm:git:git@github.com:wgzhao/addax.git</developerConnection>
         <url>https://github.com/wgzhao/addax</url>
-        <tag>6.0.10</tag>
+        <tag>6.2.0</tag>
     </scm>
 
     <properties>
