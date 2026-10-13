@@ -32,6 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
+import static com.wgzhao.addax.core.spi.ErrorCode.OVER_LIMIT_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 import static com.wgzhao.addax.core.util.container.CoreConstant.CORE_TRANSPORT_EXCHANGER_BUFFER_SIZE;
 
@@ -77,7 +78,18 @@ public class MemoryChannel
     @Override
     public void clear()
     {
-        this.queue.clear();
+        lock.lock();
+        try {
+            this.queue.clear();
+            // the dropped records will never be repaid by the consumer, so the byte budget
+            // must be reset together with the queue it accounts for; otherwise a reused
+            // channel inherits their debt and blocks every later push
+            memoryBytes.set(0);
+            notInsufficient.signalAll();
+        }
+        finally {
+            lock.unlock();
+        }
     }
 
     @Override
@@ -103,16 +115,40 @@ public class MemoryChannel
     {
         try {
             long startTime = System.nanoTime();
-            lock.lockInterruptibly();
-            int bytes = getRecordBytes(rs);
-            while (memoryBytes.get() + bytes > this.byteCapacity || rs.size() > this.queue.remainingCapacity()) {
-                notInsufficient.await(200L, TimeUnit.MILLISECONDS);
+            // A record larger than the whole byte budget can never be queued; failing here
+            // turns a silent, permanent wait into a loud error (the exchanger rejects such
+            // records earlier with the same rule, this is the primitive's own guard)
+            for (Record r : rs) {
+                int bytes = r.getMemorySize();
+                if (bytes > this.byteCapacity) {
+                    throw AddaxException.asAddaxException(OVER_LIMIT_ERROR, String.format(
+                            "A single record requires %d bytes, which exceeds the transport channel byte capacity of %d. "
+                                    + "Raise core.transport.channel.byteCapacity to accept records of this size.",
+                            bytes, this.byteCapacity));
+                }
             }
-            this.queue.addAll(rs);
+
+            lock.lockInterruptibly();
+            // Enqueue record by record: requiring the whole batch to fit at once makes the
+            // wait unsatisfiable whenever the batch exceeds the queue or the byte budget,
+            // which hangs the producer forever. A draining consumer must always be able to
+            // let the producer make progress.
+            // One producer per channel and the consumer only removes records (clear()
+            // included), so the queue can only get emptier behind this check
+            for (Record r : rs) {
+                int bytes = r.getMemorySize();
+                while (memoryBytes.get() + bytes > this.byteCapacity || this.queue.remainingCapacity() == 0) {
+                    notInsufficient.await(200L, TimeUnit.MILLISECONDS);
+                }
+                this.queue.add(r);
+                memoryBytes.addAndGet(bytes);
+                // wake a consumer parked on an empty queue right away: with a queue smaller
+                // than the batch, the remaining records only arrive after it drains this one,
+                // and waiting for the end of the batch would stall it on the 200 ms timeout
+                notEmpty.signalAll();
+            }
             // blocked waiting for the writer to drain the queue
             waitWriterTime.addAndGet(System.nanoTime() - startTime);
-            memoryBytes.addAndGet(bytes);
-            notEmpty.signalAll();
         }
         catch (InterruptedException e) {
             throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
