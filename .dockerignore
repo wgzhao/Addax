@@ -1,0 +1,5 @@
+# For the default (from-source) build the container runs `mvn clean package` anyway, so
+# VCS metadata and previous build output only slow down the context transfer.
+# Not applied to CI: it stages its own context under target/docker-context/.
+.git
+**/target
