@@ -210,13 +210,7 @@ defect. The case still runs, and its result is reported as `XFAIL` instead of `F
 If it ever passes, the run **fails** with `XPASS`: the defect is gone, and the marker
 must be removed so the fix stays protected.
 
-Currently marked:
-
-- `110_mysql2txt_append` -- `txtfilewriter` with `writeMode: append` cannot work.
-  `TxtFileWriter.prepare()` deliberately keeps files matching `fileName`, then
-  `Task.startWrite()` calls `if (!newFile.createNewFile()) throw new IOException(...)`,
-  which returns false exactly when the file exists. Relaxing that check is not enough
-  either: `Files.newOutputStream(...)` truncates by default.
+No case is currently marked.
 
 ## The `-p` minefield
 
@@ -271,7 +265,7 @@ In CI the whole work directory is uploaded as the `e2e-logs` artifact on failure
 | 080_mysql2hdfs_parquet | mysqlreader + hdfsreader | hdfswriter | parquet round-trip |
 | 090_postgresql2hdfs_orc | postgresqlreader + hdfsreader | hdfswriter | ORC round-trip |
 | 100_mysql2hdfs_overwrite | mysqlreader | hdfswriter | `overwrite` replaces the previous file |
-| 110_mysql2txt_append | mysqlreader | txtfilewriter | append semantics (known defect) |
+| 110_mysql2txt_append | mysqlreader | txtfilewriter | append extends the file a previous run wrote |
 | 120_postgresql2txt_sql | postgresqlreader | txtfilewriter | `fileFormat: sql` |
 | 130_mysql_datetime | mysqlreader | mysqlwriter | DATE, TIME, DATETIME, TIMESTAMP round-trip |
 | 140_postgresql_datetime | postgresqlreader | postgresqlwriter | date, time, timestamp, timestamptz round-trip |
