@@ -19,8 +19,8 @@
 
 package com.wgzhao.addax.core.container.util;
 
-import com.wgzhao.addax.core.util.Configuration;
-import com.wgzhao.addax.core.util.container.CoreConstant;
+import com.wgzhao.addax.core.config.JobConfig;
+import com.wgzhao.addax.core.config.TaskConfig;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.StringUtils;
 
@@ -32,13 +32,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.wgzhao.addax.core.base.Constant.LOAD_BALANCE_RESOURCE_MARK;
-import static com.wgzhao.addax.core.util.container.CoreConstant.CORE_CONTAINER_TASK_CONFIGS;
-import static com.wgzhao.addax.core.util.container.CoreConstant.CORE_CONTAINER_TASK_GROUP_CHANNEL;
-import static com.wgzhao.addax.core.util.container.CoreConstant.CORE_CONTAINER_TASK_GROUP_ID;
-import static com.wgzhao.addax.core.util.container.CoreConstant.JOB_READER_PARAMETER;
-import static com.wgzhao.addax.core.util.container.CoreConstant.JOB_WRITER_PARAMETER;
-
 public final class JobAssignUtil
 {
     private JobAssignUtil()
@@ -49,16 +42,16 @@ public final class JobAssignUtil
      * Assign tasks to task groups fairly.
      * Fairness is reflected in the more balanced job distribution based on the load identification of the resource load in the task.
      *
-     * @param configuration configuration
+     * @param jobConfig job configuration
      * @param channelNumber the number of channel
      * @param channelsPerTaskGroup the channel of task group
-     * @return list of configuration
+     * @return list of job configuration
      */
-    public static List<Configuration> assignFairly(Configuration configuration, int channelNumber, int channelsPerTaskGroup)
+    public static List<JobConfig> assignFairly(JobConfig jobConfig, int channelNumber, int channelsPerTaskGroup)
     {
-        Validate.isTrue(configuration != null, "The `job.content` can not be null.");
+        Validate.isTrue(jobConfig != null, "The `job.content` can not be null.");
 
-        List<Configuration> contentConfig = configuration.getListConfiguration(CORE_CONTAINER_TASK_CONFIGS);
+        List<TaskConfig> contentConfig = jobConfig.getTaskConfigs();
         Validate.isTrue(!contentConfig.isEmpty(), "The `job.content` is empty");
 
         Validate.isTrue(channelNumber > 0 && channelsPerTaskGroup > 0,
@@ -67,28 +60,25 @@ public final class JobAssignUtil
 
         int taskGroupNumber = (int) Math.ceil(1.0 * channelNumber / channelsPerTaskGroup);
 
-        Configuration aTaskConfig = contentConfig.get(0);
+        TaskConfig aTaskConfig = contentConfig.get(0);
 
-        String readerResourceMark = aTaskConfig.getString(JOB_READER_PARAMETER + "." +
-                LOAD_BALANCE_RESOURCE_MARK);
-        String writerResourceMark = aTaskConfig.getString(JOB_WRITER_PARAMETER + "." +
-                LOAD_BALANCE_RESOURCE_MARK);
+        String readerResourceMark = aTaskConfig.getReaderResourceMark();
+        String writerResourceMark = aTaskConfig.getWriterResourceMark();
 
         boolean hasLoadBalanceResourceMark = StringUtils.isNotBlank(readerResourceMark) ||
                 StringUtils.isNotBlank(writerResourceMark);
 
         if (!hasLoadBalanceResourceMark) {
             // set a fake resource mark for load balance (can be set on reader or writer, here choose to fake on reader)
-            for (Configuration conf : contentConfig) {
-                conf.set(JOB_READER_PARAMETER + "." +
-                        LOAD_BALANCE_RESOURCE_MARK, "aFakeResourceMarkForLoadBalance");
+            for (TaskConfig conf : contentConfig) {
+                conf.setReaderResourceMark("aFakeResourceMarkForLoadBalance");
             }
             // to avoid some plugins not setting the resource mark and performing a random shuffle
             Collections.shuffle(contentConfig, new SecureRandom());
         }
 
         LinkedHashMap<String, ArrayDeque<Integer>> resourceMarkAndTaskIdMap = parseAndGetResourceMarkAndTaskIdMap(contentConfig);
-        List<Configuration> taskGroupConfig = doAssign(resourceMarkAndTaskIdMap, configuration, taskGroupNumber);
+        List<JobConfig> taskGroupConfig = doAssign(resourceMarkAndTaskIdMap, jobConfig, taskGroupNumber);
 
         // adjust channel number per task group
         adjustChannelNumPerTaskGroup(taskGroupConfig, channelNumber);
@@ -101,7 +91,7 @@ public final class JobAssignUtil
      * @param taskGroupConfig configuration
      * @param channelNumber the number of channel
      */
-    private static void adjustChannelNumPerTaskGroup(List<Configuration> taskGroupConfig, int channelNumber)
+    private static void adjustChannelNumPerTaskGroup(List<JobConfig> taskGroupConfig, int channelNumber)
     {
         int taskGroupNumber = taskGroupConfig.size();
         // indicates that there are remainderChannelCount taskGroups,
@@ -111,11 +101,11 @@ public final class JobAssignUtil
 
         int i = 0;
         for (; i < remainderChannelCount; i++) {
-            taskGroupConfig.get(i).set(CORE_CONTAINER_TASK_GROUP_CHANNEL, avgChannelsPerTaskGroup + 1);
+            taskGroupConfig.get(i).setTaskGroupChannel(avgChannelsPerTaskGroup + 1);
         }
 
         for (int j = 0; j < taskGroupNumber - remainderChannelCount; j++) {
-            taskGroupConfig.get(i + j).set(CORE_CONTAINER_TASK_GROUP_CHANNEL, avgChannelsPerTaskGroup);
+            taskGroupConfig.get(i + j).setTaskGroupChannel(avgChannelsPerTaskGroup);
         }
     }
 
@@ -126,21 +116,21 @@ public final class JobAssignUtil
      * @param contentConfig configuration
      * @return map of resource mark and taskId
      */
-    private static LinkedHashMap<String, ArrayDeque<Integer>> parseAndGetResourceMarkAndTaskIdMap(List<Configuration> contentConfig)
+    private static LinkedHashMap<String, ArrayDeque<Integer>> parseAndGetResourceMarkAndTaskIdMap(List<TaskConfig> contentConfig)
     {
         // key: resourceMark, value: taskId
         LinkedHashMap<String, ArrayDeque<Integer>> readerResourceMarkAndTaskIdMap = new LinkedHashMap<>();
         LinkedHashMap<String, ArrayDeque<Integer>> writerResourceMarkAndTaskIdMap = new LinkedHashMap<>();
 
-        for (Configuration aTaskConfig : contentConfig) {
-            int taskId = aTaskConfig.getInt(CoreConstant.TASK_ID);
+        for (TaskConfig aTaskConfig : contentConfig) {
+            int taskId = aTaskConfig.getTaskId();
             // Add readerResourceMark to readerResourceMarkAndTaskIdMap
-            String readerResourceMark = aTaskConfig.getString(JOB_READER_PARAMETER + "." + LOAD_BALANCE_RESOURCE_MARK);
+            String readerResourceMark = aTaskConfig.getReaderResourceMark();
             readerResourceMarkAndTaskIdMap.computeIfAbsent(readerResourceMark, k -> new ArrayDeque<>());
             readerResourceMarkAndTaskIdMap.get(readerResourceMark).add(taskId);
 
             // Add writerResourceMark to writerResourceMarkAndTaskIdMap
-            String writerResourceMark = aTaskConfig.getString(JOB_WRITER_PARAMETER + "." + LOAD_BALANCE_RESOURCE_MARK);
+            String writerResourceMark = aTaskConfig.getWriterResourceMark();
             writerResourceMarkAndTaskIdMap.computeIfAbsent(writerResourceMark, k -> new ArrayDeque<>());
             writerResourceMarkAndTaskIdMap.get(writerResourceMark).add(taskId);
         }
@@ -175,16 +165,16 @@ public final class JobAssignUtil
      * @param taskGroupNumber the number of group
      * @return list of configuration
      */
-    private static List<Configuration> doAssign(LinkedHashMap<String, ArrayDeque<Integer>> resourceMarkAndTaskIdMap, Configuration jobConfiguration, int taskGroupNumber)
+    private static List<JobConfig> doAssign(LinkedHashMap<String, ArrayDeque<Integer>> resourceMarkAndTaskIdMap, JobConfig jobConfiguration, int taskGroupNumber)
     {
-        List<Configuration> contentConfig = jobConfiguration.getListConfiguration(CORE_CONTAINER_TASK_CONFIGS);
+        List<TaskConfig> contentConfig = jobConfiguration.getTaskConfigs();
 
-        Configuration taskGroupTemplate = jobConfiguration.clone();
-        taskGroupTemplate.remove(CORE_CONTAINER_TASK_CONFIGS);
+        JobConfig taskGroupTemplate = jobConfiguration.copy();
+        taskGroupTemplate.removeTaskConfigs();
 
-        List<Configuration> result = new ArrayList<>();
+        List<JobConfig> result = new ArrayList<>();
 
-        List<List<Configuration>> taskGroupConfigList = new ArrayList<>(taskGroupNumber);
+        List<List<TaskConfig>> taskGroupConfigList = new ArrayList<>(taskGroupNumber);
         for (int i = 0; i < taskGroupNumber; i++) {
             taskGroupConfigList.add(new ArrayList<>());
         }
@@ -210,11 +200,11 @@ public final class JobAssignUtil
                 }
             }
         }
-        Configuration tempTaskGroupConfig;
+        JobConfig tempTaskGroupConfig;
         for (int i = 0; i < taskGroupNumber; i++) {
-            tempTaskGroupConfig = taskGroupTemplate.clone();
-            tempTaskGroupConfig.set(CORE_CONTAINER_TASK_CONFIGS, taskGroupConfigList.get(i));
-            tempTaskGroupConfig.set(CORE_CONTAINER_TASK_GROUP_ID, i);
+            tempTaskGroupConfig = taskGroupTemplate.copy();
+            tempTaskGroupConfig.setTaskConfigs(taskGroupConfigList.get(i));
+            tempTaskGroupConfig.setTaskGroupId(i);
 
             result.add(tempTaskGroupConfig);
         }

@@ -20,6 +20,8 @@
 package com.wgzhao.addax.core.job;
 
 import com.alibaba.fastjson2.JSON;
+import com.wgzhao.addax.core.config.JobConfig;
+import com.wgzhao.addax.core.config.TaskConfig;
 import com.wgzhao.addax.core.constant.PluginType;
 import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.plugin.AbstractJobPlugin;
@@ -41,7 +43,6 @@ import com.wgzhao.addax.core.statistics.container.communicator.job.StandAloneJob
 import com.wgzhao.addax.core.statistics.plugin.DefaultJobPluginCollector;
 import com.wgzhao.addax.core.util.ErrorRecordChecker;
 import com.wgzhao.addax.core.util.container.ClassLoaderSwapper;
-import com.wgzhao.addax.core.util.container.CoreConstant;
 import com.wgzhao.addax.core.util.container.LoadUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -78,6 +79,7 @@ public class JobContainer
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private final ClassLoaderSwapper classLoaderSwapper = ClassLoaderSwapper.newCurrentThreadClassLoaderSwapper();
+    private final JobConfig jobConfig;
     private final ErrorRecordChecker errorLimit;
     private String readerPluginName;
     private String writerPluginName;
@@ -95,7 +97,8 @@ public class JobContainer
     {
         super(configuration);
 
-        errorLimit = new ErrorRecordChecker(configuration);
+        this.jobConfig = new JobConfig(configuration);
+        errorLimit = new ErrorRecordChecker(jobConfig.getErrorLimitRecord(), jobConfig.getErrorLimitPercentage());
     }
 
     /**
@@ -111,12 +114,11 @@ public class JobContainer
         boolean isDryRun = false;
         try {
             this.startTimeStamp = System.currentTimeMillis();
-            isDryRun = configuration.getBool(CoreConstant.JOB_SETTING_DRY_RUN, false);
+            isDryRun = jobConfig.isDryRun();
             if (isDryRun) {
                 LOG.info("The jobContainer begins to perform pre-check ...");
                 // mark the config before init() so the plugin job confs carry the flag
-                this.configuration.set(CoreConstant.JOB_CONTENT_READER_PARAMETER + ".dryRun", true);
-                this.configuration.set(CoreConstant.JOB_CONTENT_WRITER_PARAMETER + ".dryRun", true);
+                jobConfig.markDryRun();
                 // ensure a communicator exists for the job plugin collector
                 if (super.getContainerCommunicator() == null) {
                     super.setContainerCommunicator(new StandAloneJobContainerCommunicator());
@@ -263,8 +265,7 @@ public class JobContainer
 
     private void preHandle()
     {
-        String handlerPluginTypeStr = this.configuration.getString(
-                CoreConstant.JOB_PRE_HANDLER_PLUGIN_TYPE);
+        String handlerPluginTypeStr = jobConfig.getPreHandlerPluginType();
         if (!StringUtils.isNotEmpty(handlerPluginTypeStr)) {
             return;
         }
@@ -278,8 +279,7 @@ public class JobContainer
                     String.format("The plugin type (%s) set for the pre-handler of job failed, reason: %s", handlerPluginTypeStr.toUpperCase(), e.getMessage()));
         }
 
-        String handlerPluginName = this.configuration.getString(
-                CoreConstant.JOB_PRE_HANDLER_PLUGIN_NAME);
+        String handlerPluginName = jobConfig.getPreHandlerPluginName();
 
         classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(handlerPluginType, handlerPluginName));
 
@@ -300,7 +300,7 @@ public class JobContainer
 
     private void postHandle()
     {
-        String handlerPluginTypeStr = this.configuration.getString(CoreConstant.JOB_POST_HANDLER_PLUGIN_TYPE);
+        String handlerPluginTypeStr = jobConfig.getPostHandlerPluginType();
 
         if (!StringUtils.isNotEmpty(handlerPluginTypeStr)) {
             return;
@@ -315,7 +315,7 @@ public class JobContainer
                     String.format("The plugin type (%s) set for the post-handler of job failed, reason: %s", handlerPluginTypeStr.toUpperCase(), e.getMessage()));
         }
 
-        String handlerPluginName = this.configuration.getString(CoreConstant.JOB_POST_HANDLER_PLUGIN_NAME);
+        String handlerPluginName = jobConfig.getPostHandlerPluginName();
 
         classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(handlerPluginType, handlerPluginName));
 
@@ -349,17 +349,18 @@ public class JobContainer
         int taskNumber = readerTaskConfigs.size();
         List<Configuration> writerTaskConfigs = this.doWriterSplit(taskNumber);
 
-        List<Configuration> transformerList = this.configuration.getListConfiguration(CoreConstant.JOB_CONTENT_TRANSFORMER);
+        List<Configuration> transformerList = jobConfig.getTransformers();
 
         LOG.debug("The transformer configuration:{} ", JSON.toJSONString(transformerList));
         /*
          * input is reader and writer parameter list, output is content list
          */
-        List<Configuration> contentConfig = mergeReaderAndWriterTaskConfigs(readerTaskConfigs, writerTaskConfigs, transformerList);
+        List<TaskConfig> contentConfig = mergeReaderAndWriterTaskConfigs(readerTaskConfigs, writerTaskConfigs, transformerList);
 
-        LOG.debug("The contentConfig configuration:{} ", JSON.toJSONString(contentConfig));
+        // keep serializing the raw task configurations so the debug output is unchanged
+        LOG.debug("The contentConfig configuration:{} ", JSON.toJSONString(contentConfig.stream().map(TaskConfig::getConfiguration).toList()));
 
-        this.configuration.set(CoreConstant.CORE_CONTAINER_TASK_CONFIGS, contentConfig);
+        jobConfig.setTaskConfigs(contentConfig);
 
         return contentConfig.size();
     }
@@ -369,12 +370,13 @@ public class JobContainer
         int needChannelNumberByByte = Integer.MAX_VALUE;
         int needChannelNumberByRecord = Integer.MAX_VALUE;
 
-        boolean isByteLimit = (this.configuration.getLong(CoreConstant.JOB_SETTING_SPEED_BYTE, 0) > 0);
+        Long byteSpeedLimit = jobConfig.getSpeedByte();
+        boolean isByteLimit = byteSpeedLimit != null && byteSpeedLimit > 0;
         if (isByteLimit) {
-            long globalLimitedByteSpeed = this.configuration.getLong(CoreConstant.JOB_SETTING_SPEED_BYTE, 10 * 1024 * 1024);
+            long globalLimitedByteSpeed = byteSpeedLimit;
 
             // Under byte-rate limit, the per-channel byte limit must be set, otherwise fail
-            Long channelLimitedByteSpeed = this.configuration.getLong(CoreConstant.CORE_TRANSPORT_CHANNEL_SPEED_BYTE, -1);
+            Long channelLimitedByteSpeed = jobConfig.getChannelSpeedByte();
             if (channelLimitedByteSpeed == null || channelLimitedByteSpeed <= 0) {
                 throw AddaxException.asAddaxException(
                         CONFIG_ERROR,
@@ -386,10 +388,11 @@ public class JobContainer
             LOG.info("Job set Max-Byte-Speed to {} bytes.", globalLimitedByteSpeed);
         }
 
-        boolean isRecordLimit = (this.configuration.getLong(CoreConstant.JOB_SETTING_SPEED_RECORD, 0)) > 0;
+        Long recordSpeedLimit = jobConfig.getSpeedRecord();
+        boolean isRecordLimit = recordSpeedLimit != null && recordSpeedLimit > 0;
         if (isRecordLimit) {
-            long globalLimitedRecordSpeed = this.configuration.getLong(CoreConstant.JOB_SETTING_SPEED_RECORD, 100000);
-            Long channelLimitedRecordSpeed = this.configuration.getLong(CoreConstant.CORE_TRANSPORT_CHANNEL_SPEED_RECORD, -1);
+            long globalLimitedRecordSpeed = recordSpeedLimit;
+            Long channelLimitedRecordSpeed = jobConfig.getChannelSpeedRecord();
             if (channelLimitedRecordSpeed == null || channelLimitedRecordSpeed <= 0) {
                 throw AddaxException.asAddaxException(CONFIG_ERROR,
                         "Under the condition of total tps limit, the tps value of a single channel cannot be empty or non-positive");
@@ -407,7 +410,7 @@ public class JobContainer
             return;
         }
 
-        this.needChannelNumber = this.configuration.getInt(CoreConstant.JOB_SETTING_SPEED_CHANNEL, 1);
+        this.needChannelNumber = jobConfig.getSpeedChannel();
         if (this.needChannelNumber <= 0) {
             this.needChannelNumber = 1;
         }
@@ -423,8 +426,9 @@ public class JobContainer
         /*
          * The global and per-channel speed are in B/s
          */
-        int channelsPerTaskGroup = this.configuration.getInt(CoreConstant.CORE_CONTAINER_TASK_GROUP_CHANNEL, 5);
-        int taskNumber = this.configuration.getList(CoreConstant.CORE_CONTAINER_TASK_CONFIGS).size();
+        Integer channelsPerTaskGroupCfg = jobConfig.getTaskGroupChannel();
+        int channelsPerTaskGroup = channelsPerTaskGroupCfg != null ? channelsPerTaskGroupCfg : 5;
+        int taskNumber = jobConfig.getTaskConfigs().size();
 
         this.needChannelNumber = Math.min(this.needChannelNumber, taskNumber);
         PerfTrace.getInstance().setChannelNumber(needChannelNumber);
@@ -433,7 +437,7 @@ public class JobContainer
          * Get which tasks each taskGroup should run from configuration
          */
 
-        List<Configuration> taskGroupConfigs = JobAssignUtil.assignFairly(this.configuration, this.needChannelNumber, channelsPerTaskGroup);
+        List<JobConfig> taskGroupConfigs = JobAssignUtil.assignFairly(this.jobConfig, this.needChannelNumber, channelsPerTaskGroup);
 
         LOG.info("The Scheduler launches [{}] taskGroup(s).", taskGroupConfigs.size());
 
@@ -517,14 +521,15 @@ public class JobContainer
         LOG.debug(CommunicationTool.Stringify.getSnapshot(communication));
 
         //try to report the job statistic to report server if present
-        String jobResultReportUrl = userConf.getString(CoreConstant.CORE_SERVER_ADDRESS);
+        JobConfig userJobConfig = new JobConfig(userConf);
+        String jobResultReportUrl = userJobConfig.getServerAddress();
         if (StringUtils.isNotBlank(jobResultReportUrl)) {
             String jobKey = "jobName";
             // Get the job name, there are two ways to get it:
             // 1. Pass it through the command line using -DjobName;
             // 2. Analyze the log writing path of the writer plugin and splice the 2nd and 3rd directories
-            String jobContentWriterPath = userConf.getString(CoreConstant.JOB_CONTENT_WRITER_PATH);
-            int timeoutMills = userConf.getInt(CoreConstant.CORE_SERVER_TIMEOUT_SEC, 2) * 1000;
+            String jobContentWriterPath = userJobConfig.getWriterPath();
+            int timeoutMills = userJobConfig.getServerTimeoutSec() * 1000;
             StringBuilder jobName = new StringBuilder();
             if (System.getProperty(jobKey) != null) {
                 jobName.append(System.getProperty(jobKey));
@@ -593,16 +598,16 @@ public class JobContainer
     private Reader.Job initJobReader(
             JobPluginCollector jobPluginCollector)
     {
-        this.readerPluginName = this.configuration.getString(CoreConstant.JOB_CONTENT_READER_NAME);
+        this.readerPluginName = jobConfig.getReaderName();
         classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(PluginType.READER, this.readerPluginName));
 
         try {
             Reader.Job jobReader = (Reader.Job) LoadUtil.loadJobPlugin(PluginType.READER, this.readerPluginName);
             // set job config for reader
-            jobReader.setPluginJobConf(this.configuration.getConfiguration(CoreConstant.JOB_CONTENT_READER_PARAMETER));
+            jobReader.setPluginJobConf(jobConfig.getReaderParameter());
 
             // set peer config (writer) for reader
-            jobReader.setPeerPluginJobConf(this.configuration.getConfiguration(CoreConstant.JOB_CONTENT_WRITER_PARAMETER));
+            jobReader.setPeerPluginJobConf(jobConfig.getWriterParameter());
 
             jobReader.setJobPluginCollector(jobPluginCollector);
             jobReader.init();
@@ -619,16 +624,16 @@ public class JobContainer
      */
     private Writer.Job initJobWriter(JobPluginCollector jobPluginCollector)
     {
-        this.writerPluginName = this.configuration.getString(CoreConstant.JOB_CONTENT_WRITER_NAME);
+        this.writerPluginName = jobConfig.getWriterName();
         classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(PluginType.WRITER, this.writerPluginName));
 
         try {
             Writer.Job jobWriter = (Writer.Job) LoadUtil.loadJobPlugin(PluginType.WRITER, this.writerPluginName);
             // set job config for writer
-            jobWriter.setPluginJobConf(this.configuration.getConfiguration(CoreConstant.JOB_CONTENT_WRITER_PARAMETER));
+            jobWriter.setPluginJobConf(jobConfig.getWriterParameter());
 
             // set peer config (reader) for writer
-            jobWriter.setPeerPluginJobConf(this.configuration.getConfiguration(CoreConstant.JOB_CONTENT_READER_PARAMETER));
+            jobWriter.setPeerPluginJobConf(jobConfig.getReaderParameter());
 
             jobWriter.setPeerPluginName(this.readerPluginName);
             jobWriter.setJobPluginCollector(jobPluginCollector);
@@ -701,7 +706,7 @@ public class JobContainer
     /*
      * Merge reader and writer task configs into full task content by index order.
      */
-    private List<Configuration> mergeReaderAndWriterTaskConfigs(
+    private List<TaskConfig> mergeReaderAndWriterTaskConfigs(
             List<Configuration> readerTasksConfigs,
             List<Configuration> writerTasksConfigs,
             List<Configuration> transformerConfigs)
@@ -714,20 +719,12 @@ public class JobContainer
             );
         }
 
-        List<Configuration> contentConfigs = new ArrayList<>();
+        List<TaskConfig> contentConfigs = new ArrayList<>();
         for (int i = 0; i < readerTasksConfigs.size(); i++) {
-            Configuration taskConfig = Configuration.newDefault();
-            taskConfig.set(CoreConstant.JOB_READER_NAME, this.readerPluginName);
-            taskConfig.set(CoreConstant.JOB_READER_PARAMETER, readerTasksConfigs.get(i));
-            taskConfig.set(CoreConstant.JOB_WRITER_NAME, this.writerPluginName);
-            taskConfig.set(CoreConstant.JOB_WRITER_PARAMETER, writerTasksConfigs.get(i));
-
-            // Avoid NPE if transformer list is null
-            if (transformerConfigs != null && !transformerConfigs.isEmpty()) {
-                taskConfig.set(CoreConstant.JOB_TRANSFORMER, transformerConfigs);
-            }
-
-            taskConfig.set(CoreConstant.TASK_ID, i);
+            TaskConfig taskConfig = TaskConfig.create(i,
+                    this.readerPluginName, readerTasksConfigs.get(i),
+                    this.writerPluginName, writerTasksConfigs.get(i),
+                    transformerConfigs);
             contentConfigs.add(taskConfig);
         }
 

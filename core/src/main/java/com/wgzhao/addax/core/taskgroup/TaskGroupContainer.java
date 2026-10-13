@@ -25,25 +25,23 @@ import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.spi.ErrorCode;
 import com.wgzhao.addax.core.plugin.RecordSender;
 import com.wgzhao.addax.core.plugin.TaskPluginCollector;
-import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.core.AbstractContainer;
+import com.wgzhao.addax.core.config.JobConfig;
+import com.wgzhao.addax.core.config.TaskConfig;
 import com.wgzhao.addax.core.meta.State;
 import com.wgzhao.addax.core.statistics.communication.Communication;
 import com.wgzhao.addax.core.statistics.communication.CommunicationTool;
 import com.wgzhao.addax.core.statistics.container.communicator.taskgroup.StandaloneTGContainerCommunicator;
 import com.wgzhao.addax.core.statistics.plugin.task.AbstractTaskPluginCollector;
-import com.wgzhao.addax.core.statistics.plugin.task.StdoutPluginCollector;
 import com.wgzhao.addax.core.taskgroup.runner.AbstractRunner;
 import com.wgzhao.addax.core.taskgroup.runner.ReaderRunner;
 import com.wgzhao.addax.core.taskgroup.runner.WriterRunner;
 import com.wgzhao.addax.core.transport.channel.Channel;
-import com.wgzhao.addax.core.transport.channel.memory.MemoryChannel;
 import com.wgzhao.addax.core.transport.exchanger.BufferedRecordExchanger;
 import com.wgzhao.addax.core.transport.exchanger.BufferedRecordTransformerExchanger;
 import com.wgzhao.addax.core.transport.transformer.TransformerExecution;
 import com.wgzhao.addax.core.util.ClassUtil;
 import com.wgzhao.addax.core.util.TransformerUtil;
-import com.wgzhao.addax.core.util.container.CoreConstant;
 import com.wgzhao.addax.core.util.container.LoadUtil;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -81,21 +79,26 @@ public class TaskGroupContainer
     // in AbstractContainer keeps pointing to the same instance
     private final StandaloneTGContainerCommunicator taskGroupCommunicator;
 
-    /**
-     * Construct a TaskGroupContainer with the given configuration.
-     *
-     * @param configuration task group configuration
-     */
-    public TaskGroupContainer(Configuration configuration)
-    {
-        super(configuration);
+    // typed view over this task group's configuration; the inherited raw configuration
+    // field in AbstractContainer keeps pointing to the same instance
+    private final JobConfig jobConfig;
 
-        this.taskGroupCommunicator = new StandaloneTGContainerCommunicator(configuration);
+    /**
+     * Construct a TaskGroupContainer with the given typed configuration view.
+     *
+     * @param jobConfig task group configuration view
+     */
+    public TaskGroupContainer(JobConfig jobConfig)
+    {
+        super(jobConfig.getConfiguration());
+
+        this.jobConfig = jobConfig;
+        this.taskGroupCommunicator = new StandaloneTGContainerCommunicator(jobConfig.getConfiguration());
         super.setContainerCommunicator(this.taskGroupCommunicator);
 
-        this.taskGroupId = this.configuration.getInt(CoreConstant.CORE_CONTAINER_TASK_GROUP_ID);
-        this.channelClazz = this.configuration.getString(CoreConstant.CORE_TRANSPORT_CHANNEL_CLASS, MemoryChannel.class.getName());
-        this.taskCollectorClass = this.configuration.getString(CoreConstant.CORE_STATISTICS_COLLECTOR_PLUGIN_TASK_CLASS, StdoutPluginCollector.class.getName());
+        this.taskGroupId = jobConfig.getTaskGroupId();
+        this.channelClazz = jobConfig.getChannelClass();
+        this.taskCollectorClass = jobConfig.getTaskCollectorClass();
     }
 
     public int getTaskGroupId()
@@ -111,32 +114,39 @@ public class TaskGroupContainer
     {
         // the interval time for checking the status of the task
         // it is short, so that the task can be distributed to the corresponding channel in time
-        int sleepIntervalInMillSec = this.configuration.getInt(CoreConstant.CORE_CONTAINER_TASK_GROUP_SLEEP_INTERVAL, 100);
+        int sleepIntervalInMillSec = this.jobConfig.getTaskGroupSleepInterval();
 
         // the interval time for reporting the status of the task
         // it is long to avoid a large number of reports
-        long reportIntervalInMillSec = this.configuration.getLong(CoreConstant.CORE_CONTAINER_TASK_GROUP_REPORT_INTERVAL, 10000);
+        long reportIntervalInMillSec = this.jobConfig.getTaskGroupReportInterval();
 
-        int channelNumber = this.configuration.getInt(CoreConstant.CORE_CONTAINER_TASK_GROUP_CHANNEL, 1);
+        // the channel number may be absent; callers apply their own default
+        Integer configuredChannelNumber = this.jobConfig.getTaskGroupChannel();
+        int channelNumber = configuredChannelNumber != null ? configuredChannelNumber : 1;
 
-        int taskMaxRetryTimes = this.configuration.getInt(CoreConstant.CORE_CONTAINER_TASK_FAIL_OVER_MAX_RETRY_TIMES, 1);
+        int taskMaxRetryTimes = this.jobConfig.getFailOverMaxRetryTimes();
 
-        long taskRetryIntervalInMs = this.configuration.getLong(CoreConstant.CORE_CONTAINER_TASK_FAIL_OVER_RETRY_INTERVAL_IN_MSEC, 10000);
+        long taskRetryIntervalInMs = this.jobConfig.getFailOverRetryIntervalMs();
 
-        long taskMaxWaitInMs = this.configuration.getLong(CoreConstant.CORE_CONTAINER_TASK_FAIL_OVER_MAX_WAIT_IN_MSEC, 60000);
+        long taskMaxWaitInMs = this.jobConfig.getFailOverMaxWaitMs();
 
-        List<Configuration> taskConfigs = this.configuration.getListConfiguration(CoreConstant.CORE_CONTAINER_TASK_CONFIGS);
+        List<TaskConfig> taskConfigs = this.jobConfig.getTaskConfigs();
 
-        LOG.debug("The task configuration [{}] for taskGroup[{}]", JSON.toJSONString(taskConfigs), this.taskGroupId);
+        // log the raw task configurations so the debug output keeps its original shape
+        LOG.debug("The task configuration [{}] for taskGroup[{}]",
+                JSON.toJSONString(taskConfigs.stream().map(TaskConfig::getConfiguration).toList()),
+                this.taskGroupId);
 
         int taskCountInThisTaskGroup = taskConfigs.size();
         LOG.info("The taskGroupId=[{}] started [{}] channels for [{}] tasks.", this.taskGroupId, channelNumber, taskCountInThisTaskGroup);
 
-        this.taskGroupCommunicator.registerCommunication(taskConfigs);
+        // the statistics register boundary still consumes raw configurations; the
+        // communicator API is unchanged in this round
+        this.taskGroupCommunicator.registerCommunication(taskConfigs.stream().map(TaskConfig::getConfiguration).toList());
         // set up the taskId and task configuration map
-        Map<Integer, Configuration> taskConfigMap = buildTaskConfigMap(taskConfigs);
+        Map<Integer, TaskConfig> taskConfigMap = buildTaskConfigMap(taskConfigs);
         // the task queue for the task that has not been executed
-        List<Configuration> taskQueue = buildRemainTasks(taskConfigs);
+        List<TaskConfig> taskQueue = buildRemainTasks(taskConfigs);
         // the map for the task that has failed
         Map<Integer, TaskExecutor> taskFailedExecutorMap = new HashMap<>();
         // the list for the task that is running
@@ -170,7 +180,7 @@ public class TaskGroupContainer
                         taskExecutor.shutdown();
                         // reset the task status
                         taskGroupCommunicator.resetCommunication(taskId);
-                        Configuration taskConfig = taskConfigMap.get(taskId);
+                        TaskConfig taskConfig = taskConfigMap.get(taskId);
                         taskQueue.add(taskConfig);
                     }
                     else {
@@ -198,10 +208,10 @@ public class TaskGroupContainer
             }
 
             // the task that has not been executed, and the number of running tasks is less than the channel number
-            Iterator<Configuration> iterator = taskQueue.iterator();
+            Iterator<TaskConfig> iterator = taskQueue.iterator();
             while (iterator.hasNext() && runTasks.size() < channelNumber) {
-                Configuration taskConfig = iterator.next();
-                Integer taskId = taskConfig.getInt(CoreConstant.TASK_ID);
+                TaskConfig taskConfig = iterator.next();
+                Integer taskId = taskConfig.getTaskId();
                 int attemptCount = 1;
                 TaskExecutor lastExecutor = taskFailedExecutorMap.get(taskId);
                 if (lastExecutor != null) {
@@ -229,7 +239,7 @@ public class TaskGroupContainer
                                 this.taskGroupId, taskId, lastExecutor.getAttemptCount());
                     }
                 }
-                Configuration taskConfigForRun = taskMaxRetryTimes > 1 ? taskConfig.clone() : taskConfig;
+                TaskConfig taskConfigForRun = taskMaxRetryTimes > 1 ? taskConfig.copy() : taskConfig;
                 TaskExecutor taskExecutor = new TaskExecutor(taskConfigForRun, attemptCount);
                 taskStartTimeMap.put(taskId, System.currentTimeMillis());
                 taskExecutor.doStart();
@@ -314,11 +324,11 @@ public class TaskGroupContainer
     /**
      * Build a map from taskId to task configuration.
      */
-    private Map<Integer, Configuration> buildTaskConfigMap(List<Configuration> configurations)
+    private Map<Integer, TaskConfig> buildTaskConfigMap(List<TaskConfig> taskConfigs)
     {
-        Map<Integer, Configuration> map = new HashMap<>();
-        for (Configuration taskConfig : configurations) {
-            int taskId = taskConfig.getInt(CoreConstant.TASK_ID);
+        Map<Integer, TaskConfig> map = new HashMap<>();
+        for (TaskConfig taskConfig : taskConfigs) {
+            int taskId = taskConfig.getTaskId();
             map.put(taskId, taskConfig);
         }
         return map;
@@ -327,9 +337,9 @@ public class TaskGroupContainer
     /**
      * Build a list of pending tasks (a shallow copy of input list).
      */
-    private List<Configuration> buildRemainTasks(List<Configuration> configurations)
+    private List<TaskConfig> buildRemainTasks(List<TaskConfig> taskConfigs)
     {
-        return new ArrayList<>(configurations);
+        return new ArrayList<>(taskConfigs);
     }
 
     /**
@@ -385,7 +395,7 @@ public class TaskGroupContainer
      */
     class TaskExecutor
     {
-        private final Configuration taskConfig;
+        private final TaskConfig taskConfig;
 
         private final int taskId;
 
@@ -405,14 +415,13 @@ public class TaskGroupContainer
         // and the taskPluginCollector of reader and writer
         private final Communication taskCommunication;
 
-        public TaskExecutor(Configuration taskConf, int attemptCount)
+        public TaskExecutor(TaskConfig taskConf, int attemptCount)
         {
             this.taskConfig = taskConf;
-            Validate.isTrue(null != this.taskConfig.getConfiguration(CoreConstant.JOB_READER)
-                            && null != this.taskConfig.getConfiguration(CoreConstant.JOB_WRITER),
+            Validate.isTrue(this.taskConfig.hasReader() && this.taskConfig.hasWriter(),
                     "The plugin parameters for reader and(or) writer cannot be empty!");
 
-            this.taskId = this.taskConfig.getInt(CoreConstant.TASK_ID);
+            this.taskId = this.taskConfig.getTaskId();
             this.attemptCount = attemptCount;
 
             // get the communication for the taskExecutor via taskId
@@ -428,12 +437,12 @@ public class TaskGroupContainer
             writerRunner = (WriterRunner) generateRunner(PluginType.WRITER, null);
             this.writerThread = new Thread(writerRunner, String.format("writer-%d-%d", taskGroupId, this.taskId));
             // through setting the contextClassLoader of the thread, we can achieve the synchronization and the main program
-            this.writerThread.setContextClassLoader(LoadUtil.getJarLoader(PluginType.WRITER, this.taskConfig.getString(CoreConstant.JOB_WRITER_NAME)));
+            this.writerThread.setContextClassLoader(LoadUtil.getJarLoader(PluginType.WRITER, this.taskConfig.getWriterName()));
 
             readerRunner = (ReaderRunner) generateRunner(PluginType.READER, transformerInfoExecs);
             this.readerThread = new Thread(readerRunner, String.format("reader-%d-%d", taskGroupId, this.taskId));
 
-            this.readerThread.setContextClassLoader(LoadUtil.getJarLoader(PluginType.READER, this.taskConfig.getString(CoreConstant.JOB_READER_NAME)));
+            this.readerThread.setContextClassLoader(LoadUtil.getJarLoader(PluginType.READER, this.taskConfig.getReaderName()));
         }
 
         public void doStart()
@@ -458,8 +467,8 @@ public class TaskGroupContainer
 
             switch (pluginType) {
                 case READER -> {
-                    newRunner = LoadUtil.loadPluginRunner(pluginType, this.taskConfig.getString(CoreConstant.JOB_READER_NAME));
-                    newRunner.setJobConf(this.taskConfig.getConfiguration(CoreConstant.JOB_READER_PARAMETER));
+                    newRunner = LoadUtil.loadPluginRunner(pluginType, this.taskConfig.getReaderName());
+                    newRunner.setJobConf(this.taskConfig.getReaderParameter());
 
                     pluginCollector = ClassUtil.instantiate(taskCollectorClass, AbstractTaskPluginCollector.class, configuration, this.taskCommunication, PluginType.READER);
 
@@ -477,8 +486,8 @@ public class TaskGroupContainer
                     newRunner.setTaskPluginCollector(pluginCollector);
                 }
                 case WRITER -> {
-                    newRunner = LoadUtil.loadPluginRunner(pluginType, this.taskConfig.getString(CoreConstant.JOB_WRITER_NAME));
-                    newRunner.setJobConf(this.taskConfig.getConfiguration(CoreConstant.JOB_WRITER_PARAMETER));
+                    newRunner = LoadUtil.loadPluginRunner(pluginType, this.taskConfig.getWriterName());
+                    newRunner.setJobConf(this.taskConfig.getWriterParameter());
 
                     pluginCollector = ClassUtil.instantiate(taskCollectorClass, AbstractTaskPluginCollector.class, configuration, this.taskCommunication, PluginType.WRITER);
                     ((WriterRunner) newRunner).setRecordReceiver(new BufferedRecordExchanger(this.channel, pluginCollector));

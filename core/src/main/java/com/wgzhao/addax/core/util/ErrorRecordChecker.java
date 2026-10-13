@@ -22,7 +22,6 @@ package com.wgzhao.addax.core.util;
 import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.statistics.communication.Communication;
 import com.wgzhao.addax.core.statistics.communication.CommunicationTool;
-import com.wgzhao.addax.core.util.container.CoreConstant;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,12 +42,6 @@ public final class ErrorRecordChecker
 
     private final Long recordLimit;
     private Double percentageLimit;
-
-    public ErrorRecordChecker(Configuration configuration)
-    {
-        this(configuration.getLong(CoreConstant.JOB_SETTING_ERROR_LIMIT_RECORD),
-                configuration.getDouble(CoreConstant.JOB_SETTING_ERROR_LIMIT_PERCENTAGE));
-    }
 
     public ErrorRecordChecker(Long rec, Double percentage)
     {

@@ -19,6 +19,7 @@
 
 package com.wgzhao.addax.core.util;
 
+import com.wgzhao.addax.core.config.TaskConfig;
 import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.transport.transformer.TransformerExecution;
 import com.wgzhao.addax.core.transport.transformer.TransformerExecutionParas;
@@ -48,9 +49,9 @@ public class TransformerUtil
 
     private static final Logger LOG = LoggerFactory.getLogger(TransformerUtil.class);
 
-    public static List<TransformerExecution> buildTransformerInfo(Configuration taskConfig)
+    public static List<TransformerExecution> buildTransformerInfo(TaskConfig taskConfig)
     {
-        List<Configuration> tfConfigs = taskConfig.getListConfiguration(CoreConstant.JOB_TRANSFORMER);
+        List<Configuration> tfConfigs = taskConfig.getTransformers();
         if (tfConfigs == null || tfConfigs.isEmpty()) {
             return null;
         }
