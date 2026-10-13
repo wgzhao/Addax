@@ -19,16 +19,15 @@
 
 package com.wgzhao.addax.core.job.scheduler;
 
+import com.wgzhao.addax.core.config.JobConfig;
 import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.taskgroup.TaskGroupContainer;
 import com.wgzhao.addax.core.taskgroup.runner.TaskGroupContainerRunner;
-import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.core.meta.State;
 import com.wgzhao.addax.core.statistics.communication.Communication;
 import com.wgzhao.addax.core.statistics.communication.CommunicationTool;
 import com.wgzhao.addax.core.statistics.container.communicator.AbstractContainerCommunicator;
 import com.wgzhao.addax.core.util.ErrorRecordChecker;
-import com.wgzhao.addax.core.util.container.CoreConstant;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,20 +57,22 @@ public class StandAloneScheduler
     }
 
     /** Schedule. */
-    public void schedule(List<Configuration> configurations)
+    public void schedule(List<JobConfig> configurations)
     {
         Validate.notNull(configurations, "The scheduler configuration cannot be empty");
-        int jobReportIntervalInMillSec = configurations.get(0).getInt(
-                CoreConstant.CORE_CONTAINER_JOB_REPORT_INTERVAL, 30000);
-        int jobSleepIntervalInMillSec = configurations.get(0).getInt(
-                CoreConstant.CORE_CONTAINER_JOB_SLEEP_INTERVAL, 10000);
+        int jobReportIntervalInMillSec = configurations.get(0).getJobReportInterval();
+        int jobSleepIntervalInMillSec = configurations.get(0).getJobSleepInterval();
 
-        ErrorRecordChecker errorLimit = new ErrorRecordChecker(configurations.get(0));
+        ErrorRecordChecker errorLimit = new ErrorRecordChecker(configurations.get(0).getErrorLimitRecord(),
+                configurations.get(0).getErrorLimitPercentage());
 
         /*
          * Register communication channels for TaskGroupContainers
          */
-        this.containerCommunicator.registerCommunication(configurations);
+        // the communicator registration boundary still speaks raw Configuration
+        this.containerCommunicator.registerCommunication(configurations.stream()
+                .map(JobConfig::getConfiguration)
+                .toList());
 
         int totalTasks = calculateTaskCount(configurations);
         startAllTaskGroup(configurations);
@@ -139,12 +140,12 @@ public class StandAloneScheduler
         }
     }
 
-    private void startAllTaskGroup(List<Configuration> configurations)
+    private void startAllTaskGroup(List<JobConfig> configurations)
     {
         this.taskGroupContainerExecutorService = Executors
                 .newFixedThreadPool(configurations.size());
 
-        for (Configuration taskGroupConfiguration : configurations) {
+        for (JobConfig taskGroupConfiguration : configurations) {
             TaskGroupContainer taskGroupContainer = new TaskGroupContainer(taskGroupConfiguration);
             TaskGroupContainerRunner taskGroupContainerRunner = new TaskGroupContainerRunner(taskGroupContainer);
             this.taskGroupContainerExecutorService.execute(taskGroupContainerRunner);
@@ -160,12 +161,11 @@ public class StandAloneScheduler
                 RUNTIME_ERROR, throwable);
     }
 
-    private int calculateTaskCount(List<Configuration> configurations)
+    private int calculateTaskCount(List<JobConfig> configurations)
     {
         int totalTasks = 0;
-        for (Configuration taskGroupConfiguration : configurations) {
-            totalTasks += taskGroupConfiguration.getListConfiguration(
-                    CoreConstant.CORE_CONTAINER_TASK_CONFIGS).size();
+        for (JobConfig taskGroupConfiguration : configurations) {
+            totalTasks += taskGroupConfiguration.getTaskConfigs().size();
         }
         return totalTasks;
     }
