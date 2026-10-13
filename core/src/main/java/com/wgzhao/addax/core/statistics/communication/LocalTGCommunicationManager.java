@@ -76,11 +76,6 @@ public final class LocalTGCommunicationManager
                 "Unable to update the information for this taskGroup");
     }
 
-    public static void clear()
-    {
-        taskGroupCommunicationMap.clear();
-    }
-
     public static Map<Integer, Communication> getTaskGroupCommunicationMap()
     {
         return Map.copyOf(taskGroupCommunicationMap);

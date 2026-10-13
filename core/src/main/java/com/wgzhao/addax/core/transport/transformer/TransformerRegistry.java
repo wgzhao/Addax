@@ -28,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -42,12 +41,6 @@ public class TransformerRegistry
     private static final Logger LOG = LoggerFactory.getLogger(TransformerRegistry.class);
     // written from task-group threads via buildTransformerInfo, read by the exchangers
     private static final Map<String, TransformerInfo> registeredTransformer = new ConcurrentHashMap<>();
-
-    public static void loadTransformerFromLocalStorage()
-    {
-        //add local_storage transformer
-        loadTransformerFromLocalStorage(null);
-    }
 
     public static void loadTransformerFromLocalStorage(List<String> transformers)
     {
@@ -210,11 +203,6 @@ public class TransformerRegistry
         transformerInfo.setIsNative(isNative);
         transformerInfo.setTransformer(complexTransformer);
         return transformerInfo;
-    }
-
-    public static List<String> getAllSupportTransformer()
-    {
-        return new ArrayList<>(registeredTransformer.keySet());
     }
 
     static {

@@ -103,9 +103,5 @@ public class TaskMonitor {
             return System.currentTimeMillis() - lastUpdateCommunicationTS > expiredTime;
         }
 
-        public Integer getTaskId() {
-            return taskId;
-        }
-
     }
 }

@@ -21,58 +21,15 @@ package com.wgzhao.addax.core.statistics.container.communicator;
 
 import com.wgzhao.addax.core.statistics.VMInfo;
 import com.wgzhao.addax.core.util.Configuration;
-import com.wgzhao.addax.core.meta.State;
 import com.wgzhao.addax.core.statistics.communication.Communication;
-import com.wgzhao.addax.core.statistics.container.collector.AbstractCollector;
-import com.wgzhao.addax.core.statistics.container.report.AbstractReporter;
 
 import java.util.List;
-import java.util.Map;
 
 /** Abstract Container Communicator. */
 public abstract class AbstractContainerCommunicator
 {
-    private final Configuration configuration;
     private final VMInfo vmInfo = VMInfo.getVmInfo();
-    private AbstractCollector collector;
-    private AbstractReporter reporter;
     private long lastReportTime = System.currentTimeMillis();
-
-    /** Abstractcontainercommunicator. */
-    public AbstractContainerCommunicator(Configuration configuration)
-    {
-        this.configuration = configuration;
-    }
-
-    /** Returns the configuration. */
-    public Configuration getConfiguration()
-    {
-        return this.configuration;
-    }
-
-    /** Returns the collector. */
-    public AbstractCollector getCollector()
-    {
-        return collector;
-    }
-
-    /** Sets the collector. */
-    public void setCollector(AbstractCollector collector)
-    {
-        this.collector = collector;
-    }
-
-    /** Returns the reporter. */
-    public AbstractReporter getReporter()
-    {
-        return reporter;
-    }
-
-    /** Sets the reporter. */
-    public void setReporter(AbstractReporter reporter)
-    {
-        this.reporter = reporter;
-    }
 
     /** Registercommunication. */
     public abstract void registerCommunication(List<Configuration> configurationList);
@@ -82,26 +39,6 @@ public abstract class AbstractContainerCommunicator
 
     /** Report. */
     public abstract void report(Communication communication);
-
-    /** Collectstate. */
-    public abstract State collectState();
-
-    /** Returns the communication. */
-    public abstract Communication getCommunication(Integer id);
-
-    /**
-     * When the implementation is TGContainerCommunicator, the returned Map: key=taskId, value=Communication
-     * When the implementation is JobContainerCommunicator, the returned Map: key=taskGroupId, value=Communication
-     * @return map
-     */
-    public abstract Map<Integer, Communication> getCommunicationMap();
-
-    /** Resetcommunication. */
-    public void resetCommunication(Integer id)
-    {
-        Map<Integer, Communication> map = getCommunicationMap();
-        map.put(id, new Communication());
-    }
 
     /** Reportvminfo. */
     public void reportVmInfo()

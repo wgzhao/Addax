@@ -20,22 +20,89 @@
 package com.wgzhao.addax.core.statistics.container.communicator.taskgroup;
 
 import com.wgzhao.addax.core.util.Configuration;
+import com.wgzhao.addax.core.meta.State;
 import com.wgzhao.addax.core.statistics.communication.Communication;
-import com.wgzhao.addax.core.statistics.container.report.ProcessInnerReporter;
+import com.wgzhao.addax.core.statistics.communication.LocalTGCommunicationManager;
+import com.wgzhao.addax.core.statistics.container.communicator.AbstractContainerCommunicator;
+import com.wgzhao.addax.core.util.container.CoreConstant;
+import org.apache.commons.lang3.Validate;
 
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+/**
+ * Task-group communicator: keeps the communication of each taskExecutor in this
+ * task group and publishes the group result to {@link LocalTGCommunicationManager}.
+ */
 public class StandaloneTGContainerCommunicator
-        extends AbstractTGContainerCommunicator
+        extends AbstractContainerCommunicator
 {
+    private final int taskGroupId;
+    private final Map<Integer, Communication> taskCommunicationMap = new ConcurrentHashMap<>();
+    // reused scratch instance: collectState runs on the task-group loop thread only
+    private final Communication stateScratch = new Communication();
 
     public StandaloneTGContainerCommunicator(Configuration configuration)
     {
-        super(configuration);
-        super.setReporter(new ProcessInnerReporter());
+        this.taskGroupId = configuration.getInt(CoreConstant.CORE_CONTAINER_TASK_GROUP_ID);
+    }
+
+    @Override
+    public void registerCommunication(List<Configuration> configurationList)
+    {
+        for (Configuration taskConfig : configurationList) {
+            int taskId = taskConfig.getInt(CoreConstant.TASK_ID);
+            this.taskCommunicationMap.put(taskId, new Communication());
+        }
+    }
+
+    @Override
+    public Communication collect()
+    {
+        Communication communication = new Communication();
+        communication.setState(State.SUCCEEDED);
+
+        for (Communication taskCommunication : this.taskCommunicationMap.values()) {
+            communication.mergeFrom(taskCommunication);
+        }
+
+        return communication;
+    }
+
+    public State collectState()
+    {
+        // reuse the scratch instance instead of allocating one per 100ms loop iteration
+        stateScratch.reset();
+        stateScratch.setState(State.SUCCEEDED);
+
+        for (Communication taskCommunication : this.taskCommunicationMap.values()) {
+            stateScratch.mergeStateFrom(taskCommunication);
+        }
+
+        return stateScratch.getState();
+    }
+
+    public Communication getCommunication(Integer taskId)
+    {
+        Validate.isTrue(taskId >= 0, "The taskId must not be less than 0");
+
+        return this.taskCommunicationMap.get(taskId);
+    }
+
+    public Map<Integer, Communication> getCommunicationMap()
+    {
+        return this.taskCommunicationMap;
+    }
+
+    public void resetCommunication(Integer taskId)
+    {
+        this.taskCommunicationMap.put(taskId, new Communication());
     }
 
     @Override
     public void report(Communication communication)
     {
-        super.getReporter().reportTGCommunication(super.taskGroupId, communication);
+        LocalTGCommunicationManager.updateTaskGroupCommunication(taskGroupId, communication);
     }
 }

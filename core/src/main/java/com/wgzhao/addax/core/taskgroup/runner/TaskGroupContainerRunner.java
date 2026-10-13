@@ -20,7 +20,6 @@
 package com.wgzhao.addax.core.taskgroup.runner;
 
 import com.wgzhao.addax.core.exception.AddaxException;
-import com.wgzhao.addax.core.meta.State;
 import com.wgzhao.addax.core.taskgroup.TaskGroupContainer;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
@@ -31,12 +30,9 @@ public class TaskGroupContainerRunner
 
     private final TaskGroupContainer taskGroupContainer;
 
-    private State state;
-
     public TaskGroupContainerRunner(TaskGroupContainer taskGroup)
     {
         this.taskGroupContainer = taskGroup;
-        this.state = State.SUCCEEDED;
     }
 
     @Override
@@ -45,21 +41,9 @@ public class TaskGroupContainerRunner
         try {
             Thread.currentThread().setName(String.format("taskGroup-%d", this.taskGroupContainer.getTaskGroupId()));
             this.taskGroupContainer.start();
-            this.state = State.SUCCEEDED;
         }
         catch (Throwable e) {
-            this.state = State.FAILED;
             throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
         }
-    }
-
-    public State getState()
-    {
-        return state;
-    }
-
-    public void setState(State state)
-    {
-        this.state = state;
     }
 }

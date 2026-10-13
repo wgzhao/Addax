@@ -20,66 +20,44 @@
 package com.wgzhao.addax.core.statistics.container.communicator.job;
 
 import com.wgzhao.addax.core.util.Configuration;
-import com.wgzhao.addax.core.meta.State;
 import com.wgzhao.addax.core.statistics.communication.Communication;
 import com.wgzhao.addax.core.statistics.communication.CommunicationTool;
-import com.wgzhao.addax.core.statistics.container.collector.ProcessInnerCollector;
+import com.wgzhao.addax.core.statistics.communication.LocalTGCommunicationManager;
 import com.wgzhao.addax.core.statistics.container.communicator.AbstractContainerCommunicator;
-import com.wgzhao.addax.core.statistics.container.report.ProcessInnerReporter;
+import com.wgzhao.addax.core.util.container.CoreConstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Map;
 
+/**
+ * Job-level communicator: aggregates statistics over the task-group communications
+ * kept in {@link LocalTGCommunicationManager}.
+ */
 public class StandAloneJobContainerCommunicator
         extends AbstractContainerCommunicator
 {
     private static final Logger LOG = LoggerFactory.getLogger(StandAloneJobContainerCommunicator.class);
 
-    public StandAloneJobContainerCommunicator(Configuration configuration)
-    {
-        super(configuration);
-        setCollector(new ProcessInnerCollector());
-        setReporter(new ProcessInnerReporter());
-    }
-
     @Override
     public void registerCommunication(List<Configuration> configurationList)
     {
-        getCollector().registerTGCommunication(configurationList);
+        for (Configuration config : configurationList) {
+            int taskGroupId = config.getInt(CoreConstant.CORE_CONTAINER_TASK_GROUP_ID);
+            LocalTGCommunicationManager.registerTaskGroupCommunication(taskGroupId, new Communication());
+        }
     }
 
     @Override
     public Communication collect()
     {
-        return getCollector().collectFromTaskGroup();
-    }
-
-    @Override
-    public State collectState()
-    {
-        return this.collect().getState();
+        return LocalTGCommunicationManager.getJobCommunication();
     }
 
     @Override
     public void report(Communication communication)
     {
-        getReporter().reportJobCommunication(communication);
-
         LOG.info(CommunicationTool.Stringify.getSnapshot(communication));
         reportVmInfo();
-    }
-
-    @Override
-    public Communication getCommunication(Integer taskGroupId)
-    {
-        return getCollector().getTGCommunication(taskGroupId);
-    }
-
-    @Override
-    public Map<Integer, Communication> getCommunicationMap()
-    {
-        return getCollector().getTGCommunicationMap();
     }
 }
