@@ -115,6 +115,8 @@ public class JobContainer
         try {
             this.startTimeStamp = System.currentTimeMillis();
             isDryRun = jobConfig.isDryRun();
+            LOG.info("The jobContainer begins to validate the plugins ...");
+            this.validatePlugins();
             if (isDryRun) {
                 LOG.info("The jobContainer begins to perform pre-check ...");
                 // mark the config before init() so the plugin job confs carry the flag
@@ -263,21 +265,51 @@ public class JobContainer
         this.prepareJobWriter();
     }
 
+    /**
+     * Resolve and validate the entry classes (the Job/Task nested classes) of every plugin the
+     * job references, before anything is instantiated or any task starts. The reader, the writer
+     * and both handlers are validated together so that a broken plugin fails the whole job early
+     * instead of failing one task group in the middle of a run.
+     */
+    private void validatePlugins()
+    {
+        LoadUtil.validatePlugin(PluginType.READER, jobConfig.getReaderName());
+        LoadUtil.validatePlugin(PluginType.WRITER, jobConfig.getWriterName());
+
+        String preHandlerTypeStr = jobConfig.getPreHandlerPluginType();
+        if (StringUtils.isNotEmpty(preHandlerTypeStr)) {
+            LoadUtil.validatePlugin(toPluginType(preHandlerTypeStr, "pre"), jobConfig.getPreHandlerPluginName());
+        }
+
+        String postHandlerTypeStr = jobConfig.getPostHandlerPluginType();
+        if (StringUtils.isNotEmpty(postHandlerTypeStr)) {
+            LoadUtil.validatePlugin(toPluginType(postHandlerTypeStr, "post"), jobConfig.getPostHandlerPluginName());
+        }
+    }
+
+    /**
+     * Parse the plugin type declared for a handler; {@code handlerKind} keeps the error message
+     * of the pre-handler and the post-handler distinct.
+     */
+    private static PluginType toPluginType(String pluginTypeStr, String handlerKind)
+    {
+        try {
+            return PluginType.valueOf(pluginTypeStr.toUpperCase());
+        }
+        catch (IllegalArgumentException e) {
+            throw AddaxException.asAddaxException(
+                    CONFIG_ERROR,
+                    String.format("The plugin type (%s) set for the %s-handler of job failed, reason: %s", pluginTypeStr.toUpperCase(), handlerKind, e.getMessage()));
+        }
+    }
+
     private void preHandle()
     {
         String handlerPluginTypeStr = jobConfig.getPreHandlerPluginType();
         if (!StringUtils.isNotEmpty(handlerPluginTypeStr)) {
             return;
         }
-        PluginType handlerPluginType;
-        try {
-            handlerPluginType = PluginType.valueOf(handlerPluginTypeStr.toUpperCase());
-        }
-        catch (IllegalArgumentException e) {
-            throw AddaxException.asAddaxException(
-                    CONFIG_ERROR,
-                    String.format("The plugin type (%s) set for the pre-handler of job failed, reason: %s", handlerPluginTypeStr.toUpperCase(), e.getMessage()));
-        }
+        PluginType handlerPluginType = toPluginType(handlerPluginTypeStr, "pre");
 
         String handlerPluginName = jobConfig.getPreHandlerPluginName();
 
@@ -305,15 +337,7 @@ public class JobContainer
         if (!StringUtils.isNotEmpty(handlerPluginTypeStr)) {
             return;
         }
-        PluginType handlerPluginType;
-        try {
-            handlerPluginType = PluginType.valueOf(handlerPluginTypeStr.toUpperCase());
-        }
-        catch (IllegalArgumentException e) {
-            throw AddaxException.asAddaxException(
-                    CONFIG_ERROR,
-                    String.format("The plugin type (%s) set for the post-handler of job failed, reason: %s", handlerPluginTypeStr.toUpperCase(), e.getMessage()));
-        }
+        PluginType handlerPluginType = toPluginType(handlerPluginTypeStr, "post");
 
         String handlerPluginName = jobConfig.getPostHandlerPluginName();
 
