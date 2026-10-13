@@ -38,6 +38,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -213,6 +214,7 @@ public class TxtFileWriter
         private String path;
         private String fileName;
         private String fileFormat;
+        private String writeMode;
         // add correspond compress suffix if compress is present
         private String suffix = "";
 
@@ -223,6 +225,7 @@ public class TxtFileWriter
             this.path = this.writerSliceConfig.getString(PATH);
             this.fileName = this.writerSliceConfig.getString(FILE_NAME);
             this.fileFormat = this.writerSliceConfig.getString(FILE_FORMAT, "txt");
+            this.writeMode = this.writerSliceConfig.getString(WRITE_MODE);
         }
 
         @Override
@@ -242,14 +245,34 @@ public class TxtFileWriter
             String fileFullPath = StorageWriterUtil.buildFilePath(this.path, this.fileName, this.suffix);
             LOG.info("write to file : [{}]", fileFullPath);
 
+            File newFile = new File(fileFullPath);
+            if ("append".equals(this.writeMode) && newFile.exists() && !this.suffix.isEmpty()) {
+                // each run emits one compressed stream: a zip archive cannot be extended at all,
+                // and a second gz/bzip2/xz stream is only read back by readers that handle
+                // concatenation -- refused uniformly rather than leaving output that some
+                // readers decode halfway (see the gz multi-member probe in the PR)
+                throw AddaxException.asAddaxException(CONFIG_ERROR, String.format(
+                        "Cannot append to the existing compressed file [%s]: compressed output is written as a single stream per run. "
+                                + "Remove the file, or use writeMode 'truncate' or 'nonConflict'.",
+                        fileFullPath));
+            }
+
             OutputStream outputStream = null;
 
             try {
-                File newFile = new File(fileFullPath);
-                if (!newFile.createNewFile()) {
+                if ("append".equals(this.writeMode)) {
+                    // Job.prepare() deliberately keeps the existing files in append mode, so extend
+                    // the file here: createNewFile() returns false exactly for the kept file, and a
+                    // plain open would silently truncate it (Files.newOutputStream truncates by default)
+                    outputStream = Files.newOutputStream(newFile.toPath(),
+                            StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+                }
+                else if (!newFile.createNewFile()) {
                     throw new IOException("Failed to create new file: " + fileFullPath);
                 }
-                outputStream = Files.newOutputStream(newFile.toPath());
+                else {
+                    outputStream = Files.newOutputStream(newFile.toPath());
+                }
                 StorageWriterUtil.writeToStream(lineReceiver, outputStream, this.writerSliceConfig, this.fileName,
                         this.getTaskPluginCollector());
             }
