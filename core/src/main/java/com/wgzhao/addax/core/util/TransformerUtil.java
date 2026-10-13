@@ -127,37 +127,19 @@ public class TransformerUtil
                 // No special parameters needed - processes all columns automatically
             }
             else {
-                String code = configuration.getString(CoreConstant.TRANSFORMER_PARAMETER_CODE);
-                String codeFile = configuration.getString(CoreConstant.TRANSFORMER_PARAMETER_CODE_FILE);
-                if (StringUtils.isAllEmpty(code, codeFile)) {
-                    throw AddaxException.asAddaxException(REQUIRED_VALUE,
-                            "groovy code or codeFile must be set by UDF: name=" + functionName);
-                }
-                // code and codeFile both setup, prefers to code , ignore codeFile
-                if (StringUtils.isNoneEmpty(code, codeFile)) {
-                    LOG.warn("Both setup code and codeFile, will pickup code, ignore the codeFile");
-                }
-                if (StringUtils.isNotEmpty(codeFile)) {
-                    // load groovy code from codeFile
-                    // the codeFile default relative path is the same of addax.home properties
-                    File file = new File(codeFile);
-                    if (!file.exists() || !file.isFile()) {
-                        throw AddaxException.asAddaxException(CONFIG_ERROR,
-                                "the codeFile [" + codeFile + "]does not exists or is unreadable!");
-                    }
-                    try {
-                        code = Files.readString(file.toPath());
-                    }
-                    catch (IOException e) {
-                        throw AddaxException.asAddaxException(IO_ERROR,
-                                "read codeFile [" + codeFile + "] failure:", e);
-                    }
-                }
-                transformerExecutionParas.setCode(code);
+                // native and UDF transformers take a columnIndex plus optional paras;
+                // only the groovy functions above carry code
+                Integer columnIndex = configuration.getInt(CoreConstant.TRANSFORMER_PARAMETER_COLUMN_INDEX);
 
-                List<String> extraPackage = configuration.getList(CoreConstant.TRANSFORMER_PARAMETER_EXTRA_PACKAGE, String.class);
-                if (extraPackage != null && !extraPackage.isEmpty()) {
-                    transformerExecutionParas.setExtraPackage(extraPackage);
+                if (columnIndex == null) {
+                    throw AddaxException.asAddaxException(REQUIRED_VALUE,
+                            "columnIndex must be set by UDF: name=" + functionName);
+                }
+
+                transformerExecutionParas.setColumnIndex(columnIndex);
+                List<String> paras = configuration.getList(CoreConstant.TRANSFORMER_PARAMETER_PARAS, String.class);
+                if (paras != null && !paras.isEmpty()) {
+                    transformerExecutionParas.setParas(paras.toArray(new String[0]));
                 }
             }
             transformerExecutionParas.settContext(configuration.getMap(CoreConstant.TRANSFORMER_PARAMETER_CONTEXT)
