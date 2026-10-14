@@ -91,9 +91,8 @@ public class MemoryChannel
         }
         catch (InterruptedException ex) {
             // propagate so the record is not counted as delivered; a silently
-            // swallowed interrupt would leave the reader flag set and lose data
-            Thread.currentThread().interrupt();
-            throw new IllegalStateException(ex);
+            // swallowed interrupt would leave the writer waiting for a marker nobody sent
+            throw interrupted(ex);
         }
     }
 
@@ -138,7 +137,7 @@ public class MemoryChannel
             waitWriterTime.addAndGet(System.nanoTime() - startTime);
         }
         catch (InterruptedException e) {
-            throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
+            throw interrupted(e);
         }
         finally {
             // lockInterruptibly may throw before the lock is acquired
@@ -166,7 +165,7 @@ public class MemoryChannel
             notInsufficient.signalAll();
         }
         catch (InterruptedException e) {
-            throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
+            throw interrupted(e);
         }
         finally {
             // lockInterruptibly may throw before the lock is acquired
@@ -174,6 +173,19 @@ public class MemoryChannel
                 lock.unlock();
             }
         }
+    }
+
+    /**
+     * Report an interrupt the way every other wait in the framework does: as the
+     * framework's error, with the interrupt status restored. The interrupt is addressed
+     * to this thread -- a cancellation -- and the plugin unwinding out of here must
+     * still be able to see it; swallowing the status makes a cancelled task
+     * indistinguishable from one that failed for its own reason.
+     */
+    private static AddaxException interrupted(InterruptedException cause)
+    {
+        Thread.currentThread().interrupt();
+        return AddaxException.asAddaxException(RUNTIME_ERROR, cause);
     }
 
     private int getRecordBytes(Collection<Record> rs)
