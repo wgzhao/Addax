@@ -28,7 +28,7 @@ job:
             -
               name: branch_name
               type: string
-          fieldDelimiter: 
+          fieldDelimiter: "\u0001"
           fileName: allbranch
           path: /tmp/out
           writeMode: truncate

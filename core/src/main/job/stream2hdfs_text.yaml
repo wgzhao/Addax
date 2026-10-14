@@ -47,7 +47,7 @@ job:
           defaultFS: hdfs://localhost:8020
           path: /tmp/out_text
           fileType: text
-          fieldDelimiter: 
+          fieldDelimiter: "\u0001"
           compress: GZIP
           fileName: test
           writeMode: overwrite

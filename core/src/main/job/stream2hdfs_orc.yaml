@@ -47,7 +47,7 @@ job:
           defaultFS: hdfs://localhost:8020
           path: /tmp/out_orc
           fileType: orc
-          fieldDelimiter: 
+          fieldDelimiter: "\u0001"
           compress: SNAPPY
           fileName: test
           writeMode: overwrite
