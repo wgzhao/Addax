@@ -21,6 +21,7 @@ package com.wgzhao.addax.core.statistics.container.communicator.taskgroup;
 
 import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.core.meta.State;
+import com.wgzhao.addax.core.meta.TaskState;
 import com.wgzhao.addax.core.statistics.communication.Communication;
 import com.wgzhao.addax.core.statistics.communication.LocalTGCommunicationManager;
 import com.wgzhao.addax.core.statistics.container.communicator.AbstractContainerCommunicator;
@@ -40,8 +41,6 @@ public class StandaloneTGContainerCommunicator
 {
     private final int taskGroupId;
     private final Map<Integer, Communication> taskCommunicationMap = new ConcurrentHashMap<>();
-    // reused scratch instance: collectState runs on the task-group loop thread only
-    private final Communication stateScratch = new Communication();
 
     public StandaloneTGContainerCommunicator(Configuration configuration)
     {
@@ -60,8 +59,7 @@ public class StandaloneTGContainerCommunicator
     @Override
     public Communication collect()
     {
-        Communication communication = new Communication();
-        communication.setState(State.SUCCEEDED);
+        Communication communication = Communication.newAggregate();
 
         for (Communication taskCommunication : this.taskCommunicationMap.values()) {
             communication.mergeFrom(taskCommunication);
@@ -70,17 +68,19 @@ public class StandaloneTGContainerCommunicator
         return communication;
     }
 
+    /**
+     * The state of the group alone, without merging the counters: this runs on every
+     * tick of the task-group loop.
+     */
     public State collectState()
     {
-        // reuse the scratch instance instead of allocating one per 100ms loop iteration
-        stateScratch.reset();
-        stateScratch.setState(State.SUCCEEDED);
+        TaskState aggregate = TaskState.EMPTY;
 
         for (Communication taskCommunication : this.taskCommunicationMap.values()) {
-            stateScratch.mergeStateFrom(taskCommunication);
+            aggregate = aggregate.merge(taskCommunication.getTaskState());
         }
 
-        return stateScratch.getState();
+        return aggregate.getStatus();
     }
 
     public Communication getCommunication(Integer taskId)

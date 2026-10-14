@@ -225,15 +225,17 @@ public class TaskGroupContainer
                 if (lastExecutor != null) {
                     attemptCount = lastExecutor.getAttemptCount() + 1;
                     long now = System.currentTimeMillis();
-                    long failedTime = lastExecutor.getTimeStamp();
+                    long failedTime = lastExecutor.getFailureTime();
                     if (now - failedTime < taskRetryIntervalInMs) {
                         continue;
                     }
                     if (!lastExecutor.isShutdown()) {
                         if (now - failedTime > taskMaxWaitInMs) {
-                            markCommunicationFailed(taskId);
+                            AddaxException waitTimeout = AddaxException.asAddaxException(ErrorCode.WAIT_TIME_EXCEED,
+                                    "The task fail over wait timed out.");
+                            markCommunicationFailed(taskId, waitTimeout);
                             reportTaskGroupCommunication(lastTaskGroupContainerCommunication, taskCountInThisTaskGroup);
-                            throw AddaxException.asAddaxException(ErrorCode.WAIT_TIME_EXCEED, "The task fail over wait timed out.");
+                            throw waitTimeout;
                         }
                         // the retry must not start while the previous attempt is still writing:
                         // a plugin that ignores interrupts would else run concurrently with it
@@ -290,10 +292,8 @@ public class TaskGroupContainer
             catch (InterruptedException e) {
                 Communication nowTaskGroupContainerCommunication = this.taskGroupCommunicator.collect();
 
-                if (nowTaskGroupContainerCommunication.getThrowable() == null) {
-                    nowTaskGroupContainerCommunication.setThrowable(e);
-                }
-                nowTaskGroupContainerCommunication.setState(State.FAILED);
+                // the first cause wins, so an error already merged from a task is kept
+                nowTaskGroupContainerCommunication.markFailure(e);
                 this.taskGroupCommunicator.report(nowTaskGroupContainerCommunication);
                 throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
             }
@@ -308,10 +308,7 @@ public class TaskGroupContainer
             // FAILED so the scheduler sees it within one collect cycle
             shutdownAll(runTasks, taskFailedExecutorMap);
             Communication comm = this.taskGroupCommunicator.collect();
-            if (comm.getThrowable() == null) {
-                comm.setThrowable(e);
-            }
-            comm.setState(State.FAILED);
+            comm.markFailure(e);
             this.taskGroupCommunicator.report(comm);
             throw e instanceof AddaxException
                     ? (AddaxException) e
@@ -395,10 +392,10 @@ public class TaskGroupContainer
         return reportCommunication;
     }
 
-    private void markCommunicationFailed(Integer taskId)
+    private void markCommunicationFailed(Integer taskId, Throwable cause)
     {
         Communication communication = taskGroupCommunicator.getCommunication(taskId);
-        communication.setState(State.FAILED);
+        communication.markFailure(cause);
     }
 
     /**
@@ -557,9 +554,13 @@ public class TaskGroupContainer
             return taskId;
         }
 
-        private long getTimeStamp()
+        /**
+         * When this attempt failed; the retry interval and the fail-over budget are
+         * measured from it.
+         */
+        private long getFailureTime()
         {
-            return taskCommunication.getTimestamp();
+            return taskCommunication.getTaskState().getChangedAt();
         }
 
         private int getAttemptCount()

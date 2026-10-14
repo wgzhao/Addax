@@ -21,7 +21,6 @@ package com.wgzhao.addax.core.taskgroup;
 
 import com.wgzhao.addax.core.spi.ErrorCode;
 import com.wgzhao.addax.core.exception.AddaxException;
-import com.wgzhao.addax.core.meta.State;
 import com.wgzhao.addax.core.statistics.communication.Communication;
 import com.wgzhao.addax.core.statistics.communication.CommunicationTool;
 import org.slf4j.Logger;
@@ -89,9 +88,9 @@ public class TaskMonitor {
                 lastAllReadRecords = CommunicationTool.getTotalReadRecords(communication);
                 lastUpdateCommunicationTS = ttl;
             } else if (isExpired(lastUpdateCommunicationTS)) {
-                communication.setState(State.FAILED);
-                communication.setTimestamp(ttl);
-                communication.setThrowable(AddaxException.asAddaxException(ErrorCode.TASK_HUNG_EXPIRED,
+                // status, reason and the moment of the failure are one value, so the
+                // task-group loop cannot observe the hang without its cause
+                communication.markFailure(AddaxException.asAddaxException(ErrorCode.TASK_HUNG_EXPIRED,
                         String.format("task(%s) hung expired [allReadRecord(%s), elapsed(%s)]", taskId,
                                 lastAllReadRecords, (ttl - lastUpdateCommunicationTS))));
             }

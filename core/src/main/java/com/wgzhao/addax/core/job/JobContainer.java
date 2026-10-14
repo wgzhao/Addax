@@ -172,7 +172,9 @@ public class JobContainer
 
             Communication communication = super.getContainerCommunicator().collect();
 
-            communication.setThrowable(e);
+            // decorate the reported snapshot with the reason the job died of; the
+            // status comes from the tasks and is never asserted here
+            communication.recordFailure(e);
             communication.setTimestamp(this.endTimeStamp);
 
             Communication tempComm = new Communication();

@@ -22,9 +22,7 @@ package com.wgzhao.addax.core.taskgroup.runner;
 import com.wgzhao.addax.core.plugin.AbstractTaskPlugin;
 import com.wgzhao.addax.core.plugin.TaskPluginCollector;
 import com.wgzhao.addax.core.util.Configuration;
-import com.wgzhao.addax.core.meta.State;
 import com.wgzhao.addax.core.statistics.communication.Communication;
-import com.wgzhao.addax.core.statistics.communication.CommunicationTool;
 import org.apache.commons.lang3.Validate;
 
 /**
@@ -100,22 +98,12 @@ public abstract class AbstractRunner
         this.plugin.setTaskPluginCollector(pluginCollector);
     }
 
-    private void mark(State state)
-    {
-        this.runnerCommunication.setState(state);
-        if (state == State.SUCCEEDED) {
-            // Increase the stage counter on success
-            this.runnerCommunication.setLongCounter(CommunicationTool.STAGE,
-                    this.runnerCommunication.getLongCounter(CommunicationTool.STAGE) + 1);
-        }
-    }
-
     /**
      * Mark the current task as successful.
      */
     public void markSuccess()
     {
-        mark(State.SUCCEEDED);
+        this.runnerCommunication.markSuccess();
     }
 
     /**
@@ -125,11 +113,10 @@ public abstract class AbstractRunner
      */
     public void markFail(final Throwable throwable)
     {
-        // publish timestamp/throwable before the FAILED state so the task-group loop
-        // that observes isFinished() is guaranteed to see them (no lost retry interval)
-        this.runnerCommunication.setTimestamp(System.currentTimeMillis());
-        this.runnerCommunication.setThrowable(throwable);
-        mark(State.FAILED);
+        // the runner only sends the event; the transition rules (FAILED is absorbing,
+        // the first cause wins, the status is published together with its reason) are
+        // in TaskState
+        this.runnerCommunication.markFailure(throwable);
     }
 
     /**
