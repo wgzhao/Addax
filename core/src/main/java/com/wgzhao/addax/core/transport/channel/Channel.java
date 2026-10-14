@@ -139,7 +139,7 @@ public abstract class Channel
     {
         Validate.notNull(rs, "The Record must not be empty");
         this.doPullAll(rs);
-        this.statPull(rs.size(), this.getByteSize(rs));
+        this.statPull(rs);
     }
 
     protected abstract void doPush(Record r);
@@ -223,8 +223,22 @@ public abstract class Channel
         }
     }
 
-    private void statPull(long recordSize, long byteSize)
+    private void statPull(Collection<Record> rs)
     {
+        long recordSize = 0;
+        long byteSize = 0;
+        for (Record each : rs) {
+            // the terminate marker is a control message, not a record the writer took
+            // delivery of; the push side does not count it either (pushTerminate bypasses
+            // statPush), and counting it here would report one record more than was read
+            // for every task of the job
+            if (each instanceof TerminateRecord) {
+                continue;
+            }
+            recordSize++;
+            byteSize += each.getByteSize();
+        }
+
         currentCommunication.increaseCounter(CommunicationTool.WRITE_RECEIVED_RECORDS, recordSize);
         currentCommunication.increaseCounter(CommunicationTool.WRITE_RECEIVED_BYTES, byteSize);
     }
