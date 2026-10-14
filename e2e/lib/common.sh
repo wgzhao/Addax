@@ -139,7 +139,6 @@ write_step_summary() { # total, passed, failed, xfailed, xpassed, skipped
         fi
         if [ "${6:-0}" -gt 0 ]; then
             printf '**%d** case(s) were skipped because a dependency of theirs is missing here.\n' "$6"
-            printf 'The S3 case needs `moto[server]`; see the Requirements section of `e2e/README.md`.\n\n'
         fi
         printf '| Case | Verify | Time | Result |\n|---|---|---|---|\n'
         local i
