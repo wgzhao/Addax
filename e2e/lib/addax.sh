@@ -78,71 +78,16 @@ build_addax_params() {
     # Where a case keeps its own files: a fixture a setup script wrote, for the cases whose
     # source is neither a database nor a test double.
     append_param e2e_case_work "$E2E_CASE_WORK"
-
-    # The S3 test double the object store cases run against. Its port is the same variable
-    # the case setup starts it on, so the job and the server cannot drift apart.
-    append_param s3_endpoint "http://127.0.0.1:${E2E_MOTO_PORT:-5111}"
-
-    # The elasticsearch cluster the case reads from. There is no throwaway cluster in this
-    # suite, so it is whatever E2E_ES_ENDPOINT points at (the same variable setup.sh checks
-    # the case's reachability with, and the one the README documents).
-    append_param es_endpoint "${E2E_ES_ENDPOINT:-http://127.0.0.1:9200}"
 }
 
 # Run one job file. The job path is a positional argument: `-job x.json` is NOT
 # supported (getopt consumes it as `-j ob`, silently injecting a bogus JVM option).
 # Exit codes from Engine.main: 0 success, 1 bad CLI, 2 job failure.
-# Runs one SQL statement against a DuckDB database file.
-#
-# DuckDB is embedded, so there is no server for start-db.sh to bring up and no fixture
-# directory to seed: a case that needs a table has to build the database file itself.
-# The table also has to exist before the job starts -- CommonRdbmsWriter.Job.init reads
-# its column metadata during pretreatment, while preSql only runs later, in the task.
-#
-# The statement is executed through the driver shipped in the distribution, so the setup
-# never depends on a duckdb CLI being installed. The scratch source file is reused across
-# calls within a case; JDK 17, which the suite already requires, compiles it on the fly.
-addax_duckdb_sql() { # database_file, sql
-    local db="$1" sql="$2" src
-    src="${E2E_CASE_WORK:-${TMPDIR:-/tmp}}/DuckDbSql.java"
-    if [ ! -f "$src" ]; then
-        cat >"$src" <<'JAVA'
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.Statement;
-
-public class DuckDbSql
-{
-    public static void main(String[] args) throws Exception
-    {
-        try (Connection conn = DriverManager.getConnection(args[0]);
-                Statement stmt = conn.createStatement()) {
-            stmt.execute(args[1]);
-        }
-    }
-}
-JAVA
-    fi
-    java --class-path "${ADDAX_HOME}/plugin/writer/duckdbwriter/libs/*" "$src" \
-        "jdbc:duckdb:${db}" "$sql" || die "failed to run against $db: $sql"
-}
-
 run_addax_job() { # job_file, log_dir
     local job="$1" logdir="$2"
     local base out rc=0
     base="$(basename "$job" .json)"
     out="$logdir/${base}.console.log"
-
-    # CASE_JVM_ARGS is passed as one -j argument and expanded by addax.sh inside `sh -c`,
-    # so a case must put its whole option string there (spaces and all). The elasticsearch
-    # case uses it to switch off the JVM proxy: a machine behind a system proxy would
-    # otherwise route the job's HTTP requests through it.
-    #
-    # Only when a case asks for it: -j replaces the launcher's own default JVM options.
-    # The ${a[@]+...} form is what keeps an empty array from tripping `set -u`, which
-    # bash 3.2 (macOS /bin/bash) treats as an unbound variable.
-    local jvm_args=()
-    [ -n "${CASE_JVM_ARGS:-}" ] && jvm_args=(-j "$CASE_JVM_ARGS")
 
     # TZ pins the JVM default timezone, which is what decides the wall clock for
     # every timestamp the RDBMS path handles (the reader converts through
@@ -156,13 +101,13 @@ run_addax_job() { # job_file, log_dir
     # change while the rendered wall clock does not.
     local tz="${CASE_TZ:-UTC}"
 
-    log "  addax.sh ${base}  (TZ=${tz}${CASE_JVM_ARGS:+  JVM=${CASE_JVM_ARGS}})"
+    log "  addax.sh ${base}  (TZ=${tz})"
     if command -v timeout >/dev/null 2>&1; then
         TZ="$tz" timeout "${E2E_JOB_TIMEOUT:-600}" "$ADDAX_HOME/bin/addax.sh" \
-            ${jvm_args[@]+"${jvm_args[@]}"} -p"$ADDAX_PARAMS" -l "$logdir" -L info "$job" >"$out" 2>&1 || rc=$?
+            -p"$ADDAX_PARAMS" -l "$logdir" -L info "$job" >"$out" 2>&1 || rc=$?
     else
         TZ="$tz" "$ADDAX_HOME/bin/addax.sh" \
-            ${jvm_args[@]+"${jvm_args[@]}"} -p"$ADDAX_PARAMS" -l "$logdir" -L info "$job" >"$out" 2>&1 || rc=$?
+            -p"$ADDAX_PARAMS" -l "$logdir" -L info "$job" >"$out" 2>&1 || rc=$?
     fi
 
     if [ "$rc" -ne 0 ]; then

@@ -16,17 +16,7 @@ handling and exit codes.
 - JDK 17 on `PATH` (the launcher enforces it)
 - A built distribution: `target/addax-<version>/`
 - A container runtime: Docker, or Apple's `container` on macOS — only for the cases that
-  read or write a database. A selection of file and object store cases runs without one.
-- Python with `moto[server]` for the S3 case (`pip install 'moto[server]'`); that case
-  asks to be skipped when the interpreter cannot import it, and `E2E_MOTO_PYTHON` points
-  the case at a different interpreter (a virtualenv, usually). It starts the test double
-  on `E2E_MOTO_PORT` (5111 by default) when nothing is listening there yet and leaves it
-  running, so consecutive runs reuse it.
-- An Elasticsearch cluster (7.0 or later) for the two elasticsearch cases, at
-  `E2E_ES_ENDPOINT` (`http://127.0.0.1:9200` by default). There is no throwaway cluster in
-  this suite: the reader case seeds an index of its own into whatever the variable points
-  at, the writer case writes into indices of its own, and both skip when nothing answers
-  there. They need `python3`, standard library only.
+  read or write a database. The file and HDFS cases run without one.
 
 ## Quick start
 
@@ -106,10 +96,7 @@ Adding a case means adding a directory under `cases/`. Nothing else needs editin
 \* exactly one of `verify.sh` / `verify.<db>.sql`.
 
 `case.env` may also set `CASE_TIMEOUT` (seconds, applied only where `timeout(1)`
-exists -- not on macOS by default) and `CASE_JVM_ARGS`, passed to `bin/addax.sh` as a
-single `-j` argument. The elasticsearch case uses it to switch off the JVM's proxy
-settings: the client is an HTTP client, so a proxy configured on the machine (macOS
-system settings, for instance) stands between the job and the cluster.
+exists -- not on macOS by default).
 
 A case runs when every database it lists in `DBS` is covered by `--dbs`, so
 `./e2e/run.sh --dbs mysql` skips anything needing PostgreSQL.
@@ -272,10 +259,7 @@ In CI the whole work directory is uploaded as the `e2e-logs` artifact on failure
 | 150_postgresql_datetime_tz | postgresqlreader | postgresqlwriter | same, run with a JVM zone 8 hours from UTC |
 | 160_mysql_datetime_to_txt | mysqlreader | txtfilewriter | writer-level `dateFormat` rendering |
 | 170_mysql_datetime_to_postgresql | mysqlreader | postgresqlwriter | the same values across dialects |
-| 250_s3reader_objects | s3reader | txtfilewriter | object patterns (literal `.` and `+`), duplicate names, gzip detection, against moto |
 | 260_hdfsreader_roundtrip | streamreader + hdfsreader | hdfswriter | parquet and ORC round-trip on `file:///`: decimal, date, timestamp, boolean, array, map, type aliases, `column: ["*"]` |
-| 270_elasticsearchreader_scroll | elasticsearchreader | txtfilewriter | scroll paging (`batchSize` and a `size` in the search body), `filter`, a document read exactly once, number handling at the long and Integer bounds, a number beyond the long range |
-| 280_elasticsearchwriter_types | streamreader + txtfilereader | elasticsearchwriter | index created with its mappings, every field type, a `pk` column as the document id, a record without one, `dynamic`, `alias`, a `geo_shape` without tree/precision |
 
 The fixture behind all of them is six rows carrying the values that readers and writers
 actually get wrong: CJK, an embedded delimiter and double quote, a backslash, leading
