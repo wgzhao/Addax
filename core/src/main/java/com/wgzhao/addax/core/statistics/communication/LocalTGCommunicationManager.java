@@ -19,7 +19,6 @@
 
 package com.wgzhao.addax.core.statistics.communication;
 
-import com.wgzhao.addax.core.meta.State;
 import org.apache.commons.lang3.Validate;
 
 import java.util.Map;
@@ -39,8 +38,7 @@ public final class LocalTGCommunicationManager
 
     public static Communication getJobCommunication()
     {
-        Communication communication = new Communication();
-        communication.setState(State.SUCCEEDED);
+        Communication communication = Communication.newAggregate();
 
         // use snapshot to prevent ConcurrentModificationException
         Communication[] snapshot = taskGroupCommunicationMap.values().toArray(new Communication[0]);

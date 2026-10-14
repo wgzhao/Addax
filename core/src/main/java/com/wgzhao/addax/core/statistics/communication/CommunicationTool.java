@@ -82,8 +82,11 @@ public final class CommunicationTool
         now.setLongCounter(RECORD_SPEED, recordsSpeed < 0 ? 0 : recordsSpeed);
         now.setDoubleCounter(PERCENTAGE, now.getLongCounter(STAGE) / (double) totalStage);
 
+        // a reported snapshot keeps the reason of the previous one: the task that failed
+        // may already have been reset for a retry, and the operator still has to see what
+        // went wrong. Only the reason is carried over, never the status.
         if (old.getThrowable() != null) {
-            now.setThrowable(old.getThrowable());
+            now.recordFailure(old.getThrowable());
         }
 
         return now;

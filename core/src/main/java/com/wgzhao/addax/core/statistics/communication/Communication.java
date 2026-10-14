@@ -21,16 +21,17 @@ package com.wgzhao.addax.core.statistics.communication;
 
 import com.wgzhao.addax.core.base.BaseObject;
 import com.wgzhao.addax.core.meta.State;
+import com.wgzhao.addax.core.meta.TaskState;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.DoubleAdder;
 
 public class Communication
@@ -45,67 +46,38 @@ public class Communication
     // (callers must not mix setLongCounter and setDoubleCounter on the same key).
     private final Map<String, AtomicLong> longCounters = new ConcurrentHashMap<>();
     private final Map<String, DoubleAdder> doubleCounters = new ConcurrentHashMap<>();
-    // Running status
-    // volatile: the timestamp/throwable written by a failing task thread must be
-    // visible to the task-group loop that observes state == FAILED
-    private volatile State state;
-    private volatile Throwable throwable;
+    // The lifecycle of the task, or of the aggregate this communication stands for,
+    // as one immutable value: a writer never mutates what a reader is looking at, and
+    // the status can never be observed without the reason that produced it.
+    // An atomic reference rather than a volatile field because a transition has to be
+    // a compare-and-set: FAILED is absorbing, and a plain read-modify-write would let
+    // a concurrent success overwrite a failure published in between.
+    private final AtomicReference<TaskState> taskState = new AtomicReference<>(TaskState.running());
+    // When this communication was last sampled, used for the speed and rate deltas of
+    // a reported aggregate. This is not part of the state machine: the reporting
+    // timestamp of a single task is never read.
     private volatile long timestamp;
 
     /**
-     * Create a new Communication with default values.
+     * Create a new Communication with default values: RUNNING, no counters, no messages.
      */
     public Communication()
     {
-        this.init();
+        this.timestamp = System.currentTimeMillis();
     }
 
     /**
-     * Deep-copy constructor. Clone all counters, state, throwable and messages
-     * from the given source communication into this instance.
-     *
-     * @param source the source communication to copy from
+     * A communication that has merged nothing yet: empty counters, no messages, and
+     * the identity state of {@link TaskState#EMPTY}. Merging the communications of a
+     * container into it yields that container's state, so the caller never has to
+     * remember which state to seed the aggregate with.
      */
-    public Communication(Communication source)
+    public static Communication newAggregate()
     {
-        this.init();
-        if (source == null) {
-            return;
-        }
-        // copy counters
-        for (Map.Entry<String, AtomicLong> entry : source.longCounters.entrySet()) {
-            this.setLongCounter(entry.getKey(), entry.getValue().get());
-        }
-        for (Map.Entry<String, DoubleAdder> entry : source.doubleCounters.entrySet()) {
-            this.setDoubleCounter(entry.getKey(), entry.getValue().doubleValue());
-        }
-        // copy state/throwable/timestamp
-        this.setState(source.getState(), true);
-        this.setThrowable(source.getThrowable(), true);
-        this.setTimestamp(source.getTimestamp());
+        Communication communication = new Communication();
+        communication.taskState.set(TaskState.EMPTY);
 
-        // clone messages
-        for (Map.Entry<String, List<String>> entry : source.message.entrySet()) {
-            String key = entry.getKey();
-            List<String> value = new ArrayList<>(entry.getValue());
-            this.getMessage().put(key, value);
-        }
-    }
-
-    public synchronized void reset()
-    {
-        this.init();
-    }
-
-    private void init()
-    {
-        // clear the maps instead of reassigning to keep the references final
-        this.longCounters.clear();
-        this.doubleCounters.clear();
-        this.state = State.RUNNING;
-        this.throwable = null;
-        this.message.clear();
-        this.timestamp = System.currentTimeMillis();
+        return communication;
     }
 
     /**
@@ -120,48 +92,55 @@ public class Communication
         return snapshot;
     }
 
-    public synchronized State getState()
+    /** The status of the task, or of the aggregate, that this communication stands for. */
+    public State getState()
     {
-        return this.state;
+        return this.taskState.get().getStatus();
     }
 
-    public synchronized void setState(State state)
+    /** The lifecycle value behind {@link #getState()}: status, reason and when. */
+    public TaskState getTaskState()
     {
-        setState(state, false);
+        return this.taskState.get();
     }
 
-    public synchronized void setState(State state, boolean isForce)
-    {
-        if (!isForce && this.state == State.FAILED) {
-            return;
-        }
-
-        this.state = state;
-    }
-
+    /** The reason of the first failure, or null if none was recorded. */
     public Throwable getThrowable()
     {
-        return this.throwable;
+        return this.taskState.get().getFailure();
     }
 
-    public void setThrowable(Throwable throwable)
+    /**
+     * Event: this side of the task finished its work.
+     *
+     * <p>The stage counter is a progress metric, not a verdict, so it counts a write
+     * stage that completed even when the other side had already failed the task.
+     */
+    public void markSuccess()
     {
-        setThrowable(throwable, false);
+        this.increaseCounter(CommunicationTool.STAGE, 1);
+        this.taskState.updateAndGet(TaskState::succeeded);
     }
 
-    public synchronized String getThrowableMessage()
+    /**
+     * Event: this side of the task failed.
+     *
+     * @param cause why it failed
+     */
+    public void markFailure(Throwable cause)
     {
-        return this.throwable == null ? "" : this.throwable.getMessage();
+        this.taskState.updateAndGet(state -> state.failed(cause));
     }
 
-    public synchronized void setThrowable(Throwable throwable, boolean isForce)
+    /**
+     * Record why, without deciding anything about the status. Only the reporting path
+     * needs this; the rules are in {@link TaskState#recordFailure(Throwable)}.
+     *
+     * @param cause the reason to record if none was recorded yet
+     */
+    public void recordFailure(Throwable cause)
     {
-        if (isForce) {
-            this.throwable = throwable;
-        }
-        else {
-            this.throwable = this.throwable == null ? throwable : this.throwable;
-        }
+        this.taskState.updateAndGet(state -> state.recordFailure(cause));
     }
 
     public long getTimestamp()
@@ -253,9 +232,9 @@ public class Communication
                     .add(entry.getValue().doubleValue());
         }
 
-        mergeStateFrom(otherComm);
-
-        this.throwable = this.throwable == null ? otherComm.getThrowable() : this.throwable;
+        // the merge rules live in TaskState; the counters above and the messages below
+        // have no ordering constraint against it, they are independent accumulators
+        this.taskState.updateAndGet(state -> state.merge(otherComm.getTaskState()));
 
         // combine all messages
         for (Map.Entry<String, List<String>> entry : otherComm.getMessage().entrySet()) {
@@ -266,30 +245,9 @@ public class Communication
         }
     }
 
-    /**
-     * Merge state, priority: Failed &gt; Running &gt; Success
-     *
-     * @param otherComm communication
-     */
-    public synchronized void mergeStateFrom(Communication otherComm)
+    /** Whether this task, or everything this aggregate covers, has finished. */
+    public boolean isFinished()
     {
-        State retState = this.getState();
-        if (otherComm == null) {
-            return;
-        }
-
-        if (this.state == State.FAILED || otherComm.getState() == State.FAILED) {
-            retState = State.FAILED;
-        }
-        else if (this.state.isRunning() || otherComm.state.isRunning()) {
-            retState = State.RUNNING;
-        }
-
-        this.setState(retState);
-    }
-
-    public synchronized boolean isFinished()
-    {
-        return this.state == State.SUCCEEDED || this.state == State.FAILED;
+        return this.taskState.get().isFinished();
     }
 }

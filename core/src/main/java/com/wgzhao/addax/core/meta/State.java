@@ -20,7 +20,9 @@
 package com.wgzhao.addax.core.meta;
 
 /**
- * Created by liupeng on 15/12/21.
+ * The status of a task, or of an aggregate of tasks. The rules that move a task
+ * between these statuses, and the priority with which two of them merge, are the
+ * state machine in {@link TaskState}.
  */
 public enum State
 {
@@ -39,10 +41,5 @@ public enum State
     public int value()
     {
         return this.value;
-    }
-
-    public boolean isRunning()
-    {
-        return this == RUNNING;
     }
 }
