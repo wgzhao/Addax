@@ -52,6 +52,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
@@ -74,6 +77,11 @@ public class TaskGroupContainer
     private final String taskCollectorClass;
 
     private final TaskMonitor taskMonitor = TaskMonitor.getInstance();
+
+    // wakes the scheduling loop as soon as some task reaches a finished state, so the next
+    // task is dispatched without waiting for the next tick. This is a hint only: the loop
+    // keeps deriving task state from the communication map, which stays the source of truth
+    private final Semaphore taskCompletionSignal = new Semaphore(0);
 
     // typed reference to the communicator; the inherited containerCommunicator field
     // in AbstractContainer keeps pointing to the same instance
@@ -227,10 +235,11 @@ public class TaskGroupContainer
                             reportTaskGroupCommunication(lastTaskGroupContainerCommunication, taskCountInThisTaskGroup);
                             throw AddaxException.asAddaxException(ErrorCode.WAIT_TIME_EXCEED, "The task fail over wait timed out.");
                         }
-                        // block deterministically until the previous attempt's threads are dead
-                        // before retrying, bounded by the remaining fail-over budget; a plugin
-                        // that ignores interrupts would otherwise keep writing concurrently
-                        // with the new attempt (duplicate writes)
+                        // the retry must not start while the previous attempt is still writing:
+                        // a plugin that ignores interrupts would else run concurrently with it
+                        // and duplicate rows. The wait is on the attempt's real termination and
+                        // is bounded by the remaining fail-over budget; when the budget is gone
+                        // this continues without waiting and the check above fails the task
                         lastExecutor.shutdownAndWait(Math.min(sleepIntervalInMillSec, taskMaxWaitInMs - (now - failedTime)));
                         continue;
                     }
@@ -274,7 +283,9 @@ public class TaskGroupContainer
                 }
             }
             try {
-                TimeUnit.MILLISECONDS.sleep(sleepIntervalInMillSec);
+                // the tick timeout keeps the periodic duties (reporting, retry pacing) on their
+                // original cadence, a finished task releases a permit and shortens the wait
+                taskCompletionSignal.tryAcquire(sleepIntervalInMillSec, TimeUnit.MILLISECONDS);
             }
             catch (InterruptedException e) {
                 Communication nowTaskGroupContainerCommunication = this.taskGroupCommunicator.collect();
@@ -391,7 +402,7 @@ public class TaskGroupContainer
     }
 
     /**
-     * Execute a task with paired reader/writer threads and a shared channel.
+     * Execute one attempt of a task: a paired reader/writer worker over a shared channel.
      */
     class TaskExecutor
     {
@@ -403,9 +414,15 @@ public class TaskGroupContainer
 
         private final Channel channel;
 
-        private final Thread readerThread;
+        // the attempt owns its executor: exactly the two workers it needs, and its termination is
+        // the only honest answer to "both sides have really stopped". A Future flips to done the
+        // moment cancel() interrupts the worker, long before the body returns, so it cannot stand
+        // in for termination; the executor can, and waiting on it is bounded (no join(0) hang)
+        private final ExecutorService workerExecutor;
 
-        private final Thread writerThread;
+        private final ClassLoader writerClassLoader;
+
+        private final ClassLoader readerClassLoader;
 
         private final ReaderRunner readerRunner;
 
@@ -435,29 +452,48 @@ public class TaskGroupContainer
             List<TransformerExecution> transformerInfoExecs = TransformerUtil.buildTransformerInfo(taskConfig);
 
             writerRunner = (WriterRunner) generateRunner(PluginType.WRITER, null);
-            this.writerThread = new Thread(writerRunner, String.format("writer-%d-%d", taskGroupId, this.taskId));
-            // through setting the contextClassLoader of the thread, we can achieve the synchronization and the main program
-            this.writerThread.setContextClassLoader(LoadUtil.getJarLoader(PluginType.WRITER, this.taskConfig.getWriterName()));
-
             readerRunner = (ReaderRunner) generateRunner(PluginType.READER, transformerInfoExecs);
-            this.readerThread = new Thread(readerRunner, String.format("reader-%d-%d", taskGroupId, this.taskId));
 
-            this.readerThread.setContextClassLoader(LoadUtil.getJarLoader(PluginType.READER, this.taskConfig.getReaderName()));
+            // resolve the plugin class loaders here, on the scheduling thread, and hand them to the
+            // workers: each side of the attempt runs under its own plugin's class loader, and the
+            // loaders of a pooled thread must not leak from one attempt into the next
+            this.writerClassLoader = LoadUtil.getJarLoader(PluginType.WRITER, this.taskConfig.getWriterName());
+            this.readerClassLoader = LoadUtil.getJarLoader(PluginType.READER, this.taskConfig.getReaderName());
+
+            this.workerExecutor = Executors.newFixedThreadPool(2);
         }
 
         public void doStart()
         {
-            this.writerThread.start();
+            // the writer goes first so it is ready to receive before the reader fills up the channel
+            this.workerExecutor.execute(newWorker(this.writerRunner, "writer", this.writerClassLoader));
+            this.workerExecutor.execute(newWorker(this.readerRunner, "reader", this.readerClassLoader));
+            // the attempt submits exactly these two workers; from here on the executor only
+            // tracks their termination, which is what isTaskFinished() and shutdownAndWait() wait for
+            this.workerExecutor.shutdown();
+        }
 
-            if (!this.writerThread.isAlive() || this.taskCommunication.getState() == State.FAILED) {
-                throw AddaxException.asAddaxException(RUNTIME_ERROR, this.taskCommunication.getThrowable());
-            }
-
-            this.readerThread.start();
-
-            if (!this.readerThread.isAlive() && this.taskCommunication.getState() == State.FAILED) {
-                throw AddaxException.asAddaxException(RUNTIME_ERROR, this.taskCommunication.getThrowable());
-            }
+        /**
+         * Wrap a runner into a worker of this attempt. The thread name and the plugin class loader
+         * have to be installed inside the task body, because the thread belongs to the pool and
+         * outlives nothing of its own.
+         */
+        private Runnable newWorker(Runnable runner, String side, ClassLoader pluginClassLoader)
+        {
+            return () -> {
+                Thread.currentThread().setName(String.format("%s-%d-%d", side, taskGroupId, taskId));
+                Thread.currentThread().setContextClassLoader(pluginClassLoader);
+                try {
+                    runner.run();
+                }
+                finally {
+                    // a task that reached a finished state wakes the scheduling loop right away;
+                    // the loop rereads the communication map, so a missed signal only costs a tick
+                    if (this.taskCommunication.isFinished()) {
+                        taskCompletionSignal.release();
+                    }
+                }
+            };
         }
 
         private AbstractRunner generateRunner(PluginType pluginType, List<TransformerExecution> transformerInfoExecs)
@@ -507,7 +543,9 @@ public class TaskGroupContainer
 
         private boolean isTaskFinished()
         {
-            if (readerThread.isAlive() || writerThread.isAlive()) {
+            // isTerminated() means both workers of the attempt have returned; the communication
+            // alone cannot tell that, it is marked finished before the worker's teardown runs
+            if (!this.workerExecutor.isTerminated()) {
                 return false;
             }
 
@@ -536,29 +574,24 @@ public class TaskGroupContainer
 
         private void shutdown()
         {
+            // shut the transfer ends down first: clearing the channel releases a worker parked on
+            // a full or empty queue, so the interrupt below lands on something that can react
             writerRunner.shutdown();
             readerRunner.shutdown();
-            if (writerThread.isAlive()) {
-                writerThread.interrupt();
-            }
-            if (readerThread.isAlive()) {
-                readerThread.interrupt();
-            }
+            this.workerExecutor.shutdownNow();
         }
 
         /**
-         * Shut down the attempt and wait up to {@code timeoutMs} for both threads to die.
+         * Shut down the attempt and wait up to {@code timeoutMs} for both workers to die.
          */
         private void shutdownAndWait(long timeoutMs)
         {
             this.shutdown();
             try {
-                if (writerThread.isAlive()) {
-                    writerThread.join(timeoutMs);
-                }
-                if (readerThread.isAlive()) {
-                    readerThread.join(timeoutMs);
-                }
+                // a retry must not start while the previous attempt is still writing, so the wait
+                // is on real termination; a timeout of zero returns at once and lets the caller
+                // re-check the remaining fail-over budget instead of blocking forever
+                this.workerExecutor.awaitTermination(timeoutMs, TimeUnit.MILLISECONDS);
             }
             catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
@@ -567,7 +600,7 @@ public class TaskGroupContainer
 
         private boolean isShutdown()
         {
-            return !readerThread.isAlive() && !writerThread.isAlive();
+            return this.workerExecutor.isTerminated();
         }
     }
 }
