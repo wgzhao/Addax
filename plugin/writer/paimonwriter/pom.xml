@@ -59,6 +59,14 @@
         </dependency>
 
         <dependency>
+            <!-- the HDFS client of hadoop-common needs protobuf at runtime, and nothing
+                 else on this plugin's classpath pulls it in: paimon excludes protobuf
+                 from its own Hadoop dependencies -->
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-mapreduce-client-core</artifactId>
         </dependency>
