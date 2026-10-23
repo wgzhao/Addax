@@ -29,15 +29,15 @@ import com.wgzhao.addax.core.element.DoubleColumn;
 import com.wgzhao.addax.core.element.LongColumn;
 import com.wgzhao.addax.core.element.Record;
 import com.wgzhao.addax.core.element.StringColumn;
+import com.wgzhao.addax.core.exception.AddaxException;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Locale;
 
 /**
  * Transformer that converts null values to type-appropriate defaults.
  *
- * Reads the writer's column config from parameter to determine target types.
- * For null values, creates a default column of the target type.
+ * Reads the writer's column config from the transformer parameter to determine
+ * target types. For null values, creates a default column of the target type.
  * Non-null values are passed through unchanged.
  *
  * Usage in job config:
@@ -57,8 +57,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class NullToDefaultTransformer
         extends Transformer
 {
-    // the column config JSON is fixed per job; parse it once per distinct parameter string
-    private final Map<String, String[]> columnTypesCache = new ConcurrentHashMap<>();
+    private String[] columnTypes;
 
     public NullToDefaultTransformer()
     {
@@ -66,24 +65,50 @@ public class NullToDefaultTransformer
     }
 
     @Override
+    protected void doInit(Object[] paras)
+    {
+        if (paras == null || paras.length != 1 || paras[0] == null) {
+            throw configError("requires one parameter: the column list of the target writer");
+        }
+
+        String paramJson = paras[0] instanceof JSONObject jsonObject
+                ? jsonObject.toJSONString()
+                : String.valueOf(paras[0]);
+        try {
+            JSONObject param = JSON.parseObject(paramJson);
+            JSONArray columns = param == null ? null : param.getJSONArray("column");
+            if (columns == null || columns.isEmpty()) {
+                throw configError("the parameter [column] is required and must not be empty");
+            }
+            columnTypes = new String[columns.size()];
+            for (int i = 0; i < columns.size(); i++) {
+                JSONObject column = columns.getJSONObject(i);
+                if (column == null || column.getString("type") == null) {
+                    throw configError("the parameter [column] entry at index " + i + " must have a [type]");
+                }
+                columnTypes[i] = column.getString("type");
+            }
+        }
+        catch (RuntimeException e) {
+            if (e instanceof AddaxException) {
+                throw e;
+            }
+            throw configError("the parameter [column] is invalid: " + e.getMessage());
+        }
+    }
+
+    @Override
     public Record evaluate(Record record, Object... paras)
     {
+        init(paras);
+
         if (record == null) {
             return null;
         }
 
-        // Parse writer column config from parameter
-        String[] columnTypes = parseColumnTypes(paras);
-        if (columnTypes == null) {
-            // No parameter, skip transformation
-            return record;
-        }
-
-        // Process all columns
         for (int i = 0; i < record.getColumnNumber(); i++) {
-            if (i < columnTypes.length && columnTypes[i] != null) {
+            if (i < columnTypes.length) {
                 if (record.getColumn(i) == null || record.getColumn(i).getRawData() == null) {
-                    // Convert null to default value based on writer type
                     record.setColumn(i, createDefaultColumn(columnTypes[i]));
                 }
             }
@@ -92,58 +117,9 @@ public class NullToDefaultTransformer
         return record;
     }
 
-    private String[] parseColumnTypes(Object... paras)
-    {
-        if (paras == null || paras.length == 0) {
-            return null;
-        }
-
-        try {
-            // paras[0] should be the parameter JSON string
-            String paramJson;
-            if (paras[0] instanceof String s) {
-                paramJson = s;
-            } else if (paras[0] instanceof JSONObject jsonObject) {
-                paramJson = jsonObject.toJSONString();
-            } else {
-                paramJson = null;
-            }
-
-            if (paramJson == null) {
-                return null;
-            }
-
-            // the config is immutable per job, so parsing it once per distinct
-            // parameter string avoids a JSON.parseObject on every record
-            return columnTypesCache.computeIfAbsent(paramJson, this::parseColumnTypesFromJson);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    private String[] parseColumnTypesFromJson(String paramJson)
-    {
-        JSONObject param = JSON.parseObject(paramJson);
-        JSONArray columns = param.getJSONArray("column");
-        if (columns == null || columns.isEmpty()) {
-            return null;
-        }
-
-        String[] types = new String[columns.size()];
-        for (int i = 0; i < columns.size(); i++) {
-            JSONObject col = columns.getJSONObject(i);
-            types[i] = col.getString("type");
-        }
-        return types;
-    }
-
     private Column createDefaultColumn(String type)
     {
-        if (type == null) {
-            return new StringColumn("");
-        }
-
-        return switch (type.toLowerCase()) {
+        return switch (type.toLowerCase(Locale.ROOT)) {
             case "string", "char", "varchar", "text" -> new StringColumn("");
 
             case "int", "integer", "tinyint", "smallint", "mediumint", "bigint", "long" -> new LongColumn(0L);

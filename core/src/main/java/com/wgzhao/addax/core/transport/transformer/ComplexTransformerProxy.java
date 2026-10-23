@@ -37,6 +37,11 @@ public class ComplexTransformerProxy
     }
 
     @Override
+    public void init(Object[] paras) {
+        this.realTransformer.init(paras);
+    }
+
+    @Override
     public Record evaluate(Record record, Map<String, Object> tContext, Object... paras) {
         return this.realTransformer.evaluate(record, paras);
     }

@@ -24,52 +24,59 @@ import com.wgzhao.addax.core.element.Record;
 import com.wgzhao.addax.core.element.StringColumn;
 import com.wgzhao.addax.core.exception.AddaxException;
 
-import java.util.Arrays;
-
-import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
 /**
- * no comments.
- * Created by liqiang on 16/3/4.
+ * Replaces a slice of the configured column with the given string.
  */
 public class ReplaceTransformer
         extends Transformer
 {
+    private int columnIndex;
+    private int startIndex;
+    private int length;
+    private String replaceString;
+
     public ReplaceTransformer()
     {
         setTransformerName("dx_replace");
     }
 
     @Override
+    protected void doInit(Object[] paras)
+    {
+        if (paras == null || paras.length != 4) {
+            throw configError("requires 4 parameters: idx, pos, length and str");
+        }
+        columnIndex = intParam(paras[0], "idx");
+        startIndex = intParam(paras[1], "pos");
+        length = intParam(paras[2], "length");
+        replaceString = stringParam(paras[3], "str");
+        if (columnIndex < 0) {
+            throw configError("the parameter [idx] must not be negative");
+        }
+        if (startIndex < 0) {
+            throw configError("the parameter [pos] must not be negative");
+        }
+        if (length < 0) {
+            throw configError("the parameter [length] must not be negative");
+        }
+    }
+
+    @Override
     public Record evaluate(Record record, Object... paras)
     {
+        init(paras);
 
-        int columnIndex;
-        int startIndex;
-        int length;
-        String replaceString;
         try {
-            if (paras.length != 4) {
-                throw new RuntimeException("The dx_replace parameters must be 4");
+            Column column = record.getColumn(columnIndex);
+            if (column == null) {
+                throw new RuntimeException(String.format("columnIndex[%d] out of bound[%d]",
+                        columnIndex, record.getColumnNumber()));
             }
-
-            columnIndex = (Integer) paras[0];
-            startIndex = Integer.parseInt((String) paras[1]);
-            length = Integer.parseInt((String) paras[2]);
-            replaceString = (String) paras[3];
-        }
-        catch (Exception e) {
-            throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                    "paras:" + Arrays.asList(paras) + " => " + e.getMessage());
-        }
-
-        Column column = record.getColumn(columnIndex);
-
-        try {
             String oriValue = column.asString();
 
-            //如果字段为空，跳过replace处理
+            // If the field is null, skip the replacement
             if (oriValue == null) {
                 return record;
             }
@@ -78,12 +85,13 @@ public class ReplaceTransformer
                 throw new RuntimeException(String.format("The dx_replace startIndex(%s) out of range(%s)",
                         startIndex, oriValue.length()));
             }
-            if (startIndex + length >= oriValue.length()) {
+            long endIndex = (long) startIndex + length;
+            if (endIndex >= oriValue.length()) {
                 newValue = oriValue.substring(0, startIndex) + replaceString;
             }
             else {
                 newValue = oriValue.substring(0, startIndex) + replaceString
-                        + oriValue.substring(startIndex + length);
+                        + oriValue.substring((int) endIndex);
             }
 
             record.setColumn(columnIndex, new StringColumn(newValue));

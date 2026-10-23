@@ -37,6 +37,17 @@ public abstract class ComplexTransformer
     }
 
     /**
+     * Parse and validate the configured parameters before any record is processed.
+     * The default implementation is a no-op for user-defined transformers.
+     *
+     * @param paras transformer parameters
+     */
+    public void init(Object[] paras)
+    {
+        // user-defined transformers keep the historical behavior of parsing in evaluate()
+    }
+
+    /**
      * abstract class
      * @param record record
      * @param tContext the transformer function context

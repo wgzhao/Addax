@@ -24,9 +24,8 @@ import com.wgzhao.addax.core.element.Record;
 import com.wgzhao.addax.core.element.StringColumn;
 import com.wgzhao.addax.core.exception.AddaxException;
 
-import java.util.Arrays;
+import java.util.List;
 
-import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 import static com.wgzhao.addax.core.util.MathUtil.add;
 import static com.wgzhao.addax.core.util.MathUtil.divide;
@@ -36,62 +35,83 @@ import static com.wgzhao.addax.core.util.MathUtil.pow;
 import static com.wgzhao.addax.core.util.MathUtil.subtract;
 
 /**
- * no comments.
- * Created by liqiang on 16/3/4.
+ * Applies an arithmetic operation to the configured numeric column.
  */
 public class MapTransformer
         extends Transformer
 {
+    private static final List<String> SUPPORTED_OPERATORS = List.of("+", "-", "*", "/", "%", "^");
+    private static final int DEFAULT_SCALE = 2;
+
+    private int columnIndex;
+    private String operator;
+    private String value;
+
     public MapTransformer()
     {
         setTransformerName("dx_map");
     }
 
     @Override
+    protected void doInit(Object[] paras)
+    {
+        if (paras == null || paras.length != 3) {
+            throw configError("requires 3 parameters: idx, operator and value");
+        }
+        columnIndex = intParam(paras[0], "idx");
+        operator = stringParam(paras[1], "operator").trim();
+        value = stringParam(paras[2], "value");
+
+        if (columnIndex < 0) {
+            throw configError("the parameter [idx] must not be negative");
+        }
+        if (!SUPPORTED_OPERATORS.contains(operator)) {
+            throw configError("the operator [" + operator + "] is unsupported, supported operators are "
+                    + SUPPORTED_OPERATORS);
+        }
+        try {
+            Double.valueOf(value);
+        }
+        catch (NumberFormatException e) {
+            throw configError("the parameter [value] must be a number, but was [" + value + "]");
+        }
+    }
+
+    @Override
     public Record evaluate(Record record, Object... paras)
     {
-
-        int columnIndex;
-        String code;
-        String value;
-        Column column;
-        int scale = 2; //默认精度
+        init(paras);
 
         try {
-            if (paras.length != 3) {
-                throw new RuntimeException("The dx_map parameters must be 3");
+            Column column = record.getColumn(columnIndex);
+            if (column == null) {
+                throw new RuntimeException(String.format("columnIndex[%d] out of bound[%d]",
+                        columnIndex, record.getColumnNumber()));
             }
-
-            columnIndex = (Integer) paras[0];
-            code = (String) paras[1];
-            value = (String) paras[2];
-            column = record.getColumn(columnIndex);
             if (column.getRawData() == null) {
                 return record;
             }
 
+            // the column value is data, not configuration: it still has to be checked
+            // for every record before the arithmetic helper is called
             Double.valueOf(column.asString());
-            Double.valueOf(value);
-        }
-        catch (Exception e) {
-            throw AddaxException.asAddaxException(
-                    ILLEGAL_VALUE,
-                    "paras:" + Arrays.asList(paras) + " => " + e.getMessage());
-        }
 
-        if (column.asString().split("\\.").length >= 2) {
-            scale = column.asString().split("\\.")[1].length();
-        }
+            int scale = DEFAULT_SCALE;
+            String oriValue = column.asString();
+            int dot = oriValue.indexOf('.');
+            // a trailing dot has no fractional digits, matching String.split(".") semantics
+            if (dot >= 0 && dot < oriValue.length() - 1) {
+                scale = oriValue.length() - dot - 1;
+            }
 
-        try {
-            String newValue = switch (code) {
-                case "+" -> add(column.asString(), value);
-                case "-" -> subtract(column.asString(), value);
-                case "*" -> multiply(column.asString(), value);
-                case "/" -> divide(column.asString(), value, scale);
-                case "%" -> mod(column.asString(), value);
-                case "^" -> pow(column.asString(), value);
-                default -> throw new RuntimeException("dx_map can't support code:" + code);
+            String newValue = switch (operator) {
+                case "+" -> add(oriValue, value);
+                case "-" -> subtract(oriValue, value);
+                case "*" -> multiply(oriValue, value);
+                case "/" -> divide(oriValue, value, scale);
+                case "%" -> mod(oriValue, value);
+                case "^" -> pow(oriValue, value);
+                default -> throw new RuntimeException("dx_map can't support code:" + operator);
             };
             record.setColumn(columnIndex, new StringColumn(newValue));
             return record;

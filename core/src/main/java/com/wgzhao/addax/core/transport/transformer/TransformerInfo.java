@@ -19,20 +19,28 @@
 
 package com.wgzhao.addax.core.transport.transformer;
 
+import java.util.function.Supplier;
+
+/**
+ * A registered transformer: the factory creates one instance per execution so that
+ * parsed parameters and any user state are never shared between tasks.
+ */
 public class TransformerInfo
 {
-    private ComplexTransformer transformer;
-    private ClassLoader classLoader;
-    private boolean isNative;
+    private final Supplier<ComplexTransformer> factory;
+    private final ClassLoader classLoader;
+    private final boolean nativeTransformer;
 
-    public ComplexTransformer getTransformer()
+    public TransformerInfo(Supplier<ComplexTransformer> factory, ClassLoader classLoader, boolean isNative)
     {
-        return transformer;
+        this.factory = factory;
+        this.classLoader = classLoader;
+        this.nativeTransformer = isNative;
     }
 
-    public void setTransformer(ComplexTransformer transformer)
+    public ComplexTransformer newTransformer()
     {
-        this.transformer = transformer;
+        return factory.get();
     }
 
     public ClassLoader getClassLoader()
@@ -40,18 +48,8 @@ public class TransformerInfo
         return classLoader;
     }
 
-    public void setClassLoader(ClassLoader classLoader)
-    {
-        this.classLoader = classLoader;
-    }
-
     public boolean isNative()
     {
-        return isNative;
-    }
-
-    public void setIsNative(boolean isNative)
-    {
-        this.isNative = isNative;
+        return nativeTransformer;
     }
 }

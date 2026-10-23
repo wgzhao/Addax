@@ -24,67 +24,73 @@ import com.wgzhao.addax.core.element.Record;
 import com.wgzhao.addax.core.element.StringColumn;
 import com.wgzhao.addax.core.exception.AddaxException;
 
-import java.util.Arrays;
-
-import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
 /**
- * no comments.
- * Created by liqiang on 16/3/4.
+ * Pads or truncates the configured column to a fixed length.
  */
 public class PadTransformer
         extends Transformer
 {
+    private int columnIndex;
+    private boolean padLeft;
+    private int length;
+    private String padString;
+
     public PadTransformer()
     {
         setTransformerName("dx_pad");
     }
 
     @Override
+    protected void doInit(Object[] paras)
+    {
+        if (paras == null || paras.length != 4) {
+            throw configError("requires 4 parameters: idx, flag, length and chr");
+        }
+        columnIndex = intParam(paras[0], "idx");
+        String padType = stringParam(paras[1], "flag");
+        length = intParam(paras[2], "length");
+        padString = stringParam(paras[3], "chr");
+
+        if (columnIndex < 0) {
+            throw configError("the parameter [idx] must not be negative");
+        }
+        if (length < 0) {
+            throw configError("the parameter [length] must not be negative");
+        }
+        if (!"l".equalsIgnoreCase(padType) && !"r".equalsIgnoreCase(padType)) {
+            throw configError("the parameter [flag] must be either l or r, but was [" + padType + "]");
+        }
+        if (padString.isEmpty()) {
+            // an empty pad string would never reduce the remaining length and hang the job
+            throw configError("the parameter [chr] must not be empty");
+        }
+        padLeft = "l".equalsIgnoreCase(padType);
+    }
+
+    @Override
     public Record evaluate(Record record, Object... paras)
     {
-
-        int columnIndex;
-        String padType;
-        int length;
-        String padString;
+        init(paras);
 
         try {
-            if (paras.length != 4) {
-                throw new RuntimeException("The dx_pad parameters must be 4");
+            Column column = record.getColumn(columnIndex);
+            if (column == null) {
+                throw new RuntimeException(String.format("columnIndex[%d] out of bound[%d]",
+                        columnIndex, record.getColumnNumber()));
             }
-
-            columnIndex = (Integer) paras[0];
-            padType = (String) paras[1];
-            length = Integer.parseInt((String) paras[2]);
-            padString = (String) paras[3];
-        }
-        catch (Exception e) {
-            throw AddaxException.asAddaxException(
-                    ILLEGAL_VALUE,
-                    "paras:" + Arrays.asList(paras) + " => " + e.getMessage());
-        }
-
-        Column column = record.getColumn(columnIndex);
-
-        try {
             String oriValue = column.asString();
 
             if (oriValue == null) {
                 oriValue = "";
             }
             String newValue;
-            if (!"r".equalsIgnoreCase(padType) && !"l".equalsIgnoreCase(padType)) {
-                throw new RuntimeException(String.format("The first parameter of dx_pad must be either l or r, " +
-                        "The current parameter is %s", padType));
-            }
             if (length <= oriValue.length()) {
                 newValue = oriValue.substring(0, length);
             }
             else {
-
-                newValue = doPad(padType, oriValue, length, padString);
+                newValue = doPad(oriValue);
             }
 
             record.setColumn(columnIndex, new StringColumn(newValue));
@@ -96,13 +102,11 @@ public class PadTransformer
         return record;
     }
 
-    private String doPad(String padType, String oriValue, int length, String padString)
+    private String doPad(String oriValue)
     {
-
         StringBuilder finalPad = new StringBuilder();
         int needLength = length - oriValue.length();
         while (needLength > 0) {
-
             if (needLength >= padString.length()) {
                 finalPad.append(padString);
                 needLength -= padString.length();
@@ -113,11 +117,6 @@ public class PadTransformer
             }
         }
 
-        if ("l".equalsIgnoreCase(padType)) {
-            return finalPad + oriValue;
-        }
-        else {
-            return oriValue + finalPad;
-        }
+        return padLeft ? finalPad + oriValue : oriValue + finalPad;
     }
 }
