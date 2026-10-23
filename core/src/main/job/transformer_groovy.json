@@ -1,0 +1,46 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 1
+      }
+    },
+    "content": {
+      "reader": {
+        "name": "streamreader",
+        "parameter": {
+          "column": [
+            {
+              "value": "zhangsan",
+              "type": "string"
+            },
+            {
+              "value": "13800138000",
+              "type": "string"
+            },
+            {
+              "value": "Passw0rd!",
+              "type": "string"
+            }
+          ],
+          "sliceRecordCount": 3
+        }
+      },
+      "writer": {
+        "name": "streamwriter",
+        "parameter": {
+          "print": true,
+          "encoding": "UTF-8"
+        }
+      },
+      "transformer": [
+        {
+          "name": "dx_groovy",
+          "parameter": {
+            "code": "Column password = record.getColumn(2)\nString value = password.asString()\nif (value != null) {\n    record.setColumn(2, new StringColumn(value.substring(0, 2) + \"****\"))\n}\nreturn record"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,83 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 1
+      }
+    },
+    "content": {
+      "reader": {
+        "name": "streamreader",
+        "parameter": {
+          "column": [
+            {
+              "value": "1001",
+              "type": "string"
+            },
+            {
+              "value": "null",
+              "type": "string"
+            },
+            {
+              "value": "null",
+              "type": "double"
+            },
+            {
+              "value": "null",
+              "type": "long"
+            },
+            {
+              "value": "null",
+              "type": "bool"
+            },
+            {
+              "value": "null",
+              "type": "bytes"
+            }
+          ],
+          "sliceRecordCount": 3
+        }
+      },
+      "writer": {
+        "name": "streamwriter",
+        "parameter": {
+          "print": true,
+          "encoding": "UTF-8"
+        }
+      },
+      "transformer": [
+        {
+          "name": "dx_null_to_default",
+          "parameter": {
+            "column": [
+              {
+                "name": "id",
+                "type": "string"
+              },
+              {
+                "name": "name",
+                "type": "string"
+              },
+              {
+                "name": "amount",
+                "type": "double"
+              },
+              {
+                "name": "count",
+                "type": "long"
+              },
+              {
+                "name": "active",
+                "type": "boolean"
+              },
+              {
+                "name": "payload",
+                "type": "bytes"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
