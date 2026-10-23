@@ -88,7 +88,7 @@
         <jest.version>6.3.1</jest.version>
         <junit.version>5.10.2</junit.version>
         <joda.time.version>2.15.0</joda.time.version>
-        <jackson.version>2.22.3</jackson.version>
+        <jackson.version>2.22.4</jackson.version>
         <!-- jackson-annotations stopped publishing patch releases at 2.20, so it tracks the minor line of
              jackson.version and stays a separate property. Any module that pins jackson-databind to
              jackson.version must declare this artifact too: the hadoop BOM manages jackson-annotations at
