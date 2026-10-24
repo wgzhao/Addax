@@ -49,7 +49,7 @@
 
 - **Transformer（数据转换）**
   - 可选模块，在 Reader 和 Writer 之间对数据进行转换
-  - 支持内置 UDF：`dx_substr` / `dx_pad` / `dx_replace` / `dx_filter` / `dx_groovy`
+  - 支持内置 UDF：`dx_substr` / `dx_pad` / `dx_replace` / `dx_filter` / `dx_map` / `dx_null_to_default` / `dx_groovy`
   - 可以做脱敏、字段裁剪、补全、过滤、自定义 Groovy 脚本转换等
 
 - **Channel（通道）**
@@ -155,7 +155,7 @@ Job JSON 顶层结构：
 
 - `job.content.transformer`
   - 可选，列表形式，每个元素为一个转换规则
-  - 典型片段（内置函数）：
+  - 内置函数使用命名参数（推荐）：
     ```json
     {
       "transformer": [
@@ -166,6 +166,7 @@ Job JSON 顶层结构：
       ]
     }
     ```
+  - 旧的 `columnIndex` + `paras` 位置参数仍然兼容，但已标记废弃，会在日志中提示迁移
 
 AI 在阅读/生成 Job 时，应显式区分：
 - 全局控制（settings） vs 数据流定义（reader/writer） vs 转换规则（transformer）

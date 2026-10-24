@@ -25,7 +25,6 @@ import com.wgzhao.addax.core.plugin.TaskPluginCollector;
 import com.wgzhao.addax.core.statistics.communication.Communication;
 import com.wgzhao.addax.core.statistics.communication.CommunicationTool;
 import com.wgzhao.addax.core.transport.transformer.TransformerExecution;
-import com.wgzhao.addax.core.util.container.ClassLoaderSwapper;
 
 import java.util.List;
 
@@ -44,7 +43,6 @@ public abstract class TransformerExchanger
     protected final int taskId;
     protected final Communication currentCommunication;
     private final List<TransformerExecution> transformerExecs;
-    private final ClassLoaderSwapper classLoaderSwapper = ClassLoaderSwapper.newCurrentThreadClassLoaderSwapper();
     private long totalExhaustedTime = 0;
     private long totalFilterRecords = 0;
     private long totalSuccessRecords = 0;
@@ -70,27 +68,27 @@ public abstract class TransformerExchanger
 
         Record result = record;
 
-        long diffExhaustedTime = 0;
         String errorMsg = null;
         boolean failed = false;
-        boolean loaderSwapped = false;
-        ClassLoader currentLoader = null;
+        boolean loaderChanged = false;
+        // restore the loader the task thread started with, not whatever intermediate
+        // user transformer happened to be active last
+        ClassLoader originalLoader = Thread.currentThread().getContextClassLoader();
+        long startTs = System.nanoTime();
         try {
             for (TransformerExecution transformerInfoExec : transformerExecs) {
-                long startTs = System.nanoTime();
-
-                // swap the thread context classloader only when it actually changes;
-                // native transformers (null loader) never trigger a swap
+                // native transformers (null loader) must not keep a user transformer's
+                // classloader installed after the user transformer has run
                 ClassLoader execLoader = transformerInfoExec.getClassLoader();
-                if (execLoader != null && execLoader != currentLoader) {
-                    classLoaderSwapper.setCurrentThreadClassLoader(execLoader);
-                    currentLoader = execLoader;
-                    loaderSwapped = true;
+                ClassLoader targetLoader = execLoader != null ? execLoader : originalLoader;
+                if (targetLoader != Thread.currentThread().getContextClassLoader()) {
+                    Thread.currentThread().setContextClassLoader(targetLoader);
+                    loaderChanged = true;
                 }
 
                 /*
-                 * Deferred validation of transformer parameters; throw directly if invalid rather than marking dirty.
-                 * No need to validate parameters inside plugins except for plugin-specific ones like parameter count.
+                 * Deferred validation of the column index; throw directly if invalid rather than marking dirty.
+                 * The negative range is already rejected while the configuration is parsed.
                  */
                 if (!transformerInfoExec.isChecked()) {
 
@@ -113,38 +111,34 @@ public abstract class TransformerExchanger
                 catch (Exception e) {
                     errorMsg = String.format("The transformer(%s) has encountered an exception(%s)",
                             transformerInfoExec.getTransformerName(),
-                            e.getMessage());
+                            e.getMessage() != null ? e.getMessage() : e.toString());
                     failed = true;
                     break;
                 }
 
                 if (result == null) {
-                    totalFilterRecords++;
                     break;
                 }
-
-                long diff = System.nanoTime() - startTs;
-                diffExhaustedTime += diff;
             }
         }
         finally {
-            // restore exactly once per call if any swap happened
-            if (loaderSwapped) {
-                classLoaderSwapper.restoreCurrentThreadClassLoader();
+            totalExhaustedTime += System.nanoTime() - startTs;
+            if (loaderChanged) {
+                Thread.currentThread().setContextClassLoader(originalLoader);
             }
         }
-
-        totalExhaustedTime += diffExhaustedTime;
 
         if (failed) {
             totalFailedRecords++;
             this.pluginCollector.collectDirtyRecord(record, errorMsg);
             return null;
         }
-        else {
-            totalSuccessRecords++;
-            return result;
+        if (result == null) {
+            totalFilterRecords++;
+            return null;
         }
+        totalSuccessRecords++;
+        return result;
     }
 
     public void doStat()

@@ -22,63 +22,79 @@ package com.wgzhao.addax.core.transport.transformer;
 import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.core.util.container.JarLoader;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.PLUGIN_INIT_ERROR;
 import static com.wgzhao.addax.core.util.container.CoreConstant.STORAGE_TRANSFORMER_HOME;
 
 public class TransformerRegistry
 {
-
     private static final Logger LOG = LoggerFactory.getLogger(TransformerRegistry.class);
-    // written from task-group threads via buildTransformerInfo, read by the exchangers
+
     private static final Map<String, TransformerInfo> registeredTransformer = new ConcurrentHashMap<>();
 
-    public static void loadTransformerFromLocalStorage(List<String> transformers)
+    /**
+     * Load the user transformer directories that the job references. Loading is
+     * idempotent: a transformer already in the registry is skipped, so the repeated
+     * calls made by the task executors do not re-instantiate user classes.
+     *
+     * @param transformers the transformer names the job needs, or null to load all
+     */
+    public static synchronized void loadTransformerFromLocalStorage(List<String> transformers)
     {
+        if (transformers != null && transformers.stream().allMatch(registeredTransformer::containsKey)) {
+            return;
+        }
 
         String[] paths = new File(STORAGE_TRANSFORMER_HOME).list();
         if (null == paths) {
+            LOG.debug("The transformer storage [{}] does not exist or is not readable.", STORAGE_TRANSFORMER_HOME);
             return;
         }
 
         for (String each : paths) {
+            if (transformers != null && !transformers.contains(each)) {
+                continue;
+            }
+            if (registeredTransformer.containsKey(each)) {
+                continue;
+            }
             try {
-                if (transformers == null || transformers.contains(each)) {
-                    loadTransformer(each);
-                }
+                loadTransformer(each);
             }
             catch (Exception e) {
-                LOG.error("Skip transformer [{}] LoadTransformer has encountered an exception [{}].",
+                LOG.error("Skip transformer [{}], loadTransformer has encountered an exception [{}].",
                         each, e.getMessage(), e);
             }
         }
     }
 
-    public static void loadTransformer(String each)
+    public static synchronized void loadTransformer(String each)
     {
         String transformerPath = STORAGE_TRANSFORMER_HOME + File.separator + each;
         Configuration transformerConfiguration;
         try {
-            transformerConfiguration = loadTransFormerConfig(transformerPath);
+            transformerConfiguration = loadTransformerConfig(transformerPath);
         }
         catch (Exception e) {
-            LOG.error("Skip transformer[{}],load transformer.json error, path = {}, ",
+            LOG.error("Skip transformer[{}], load transformer.json error, path = {}, ",
                     each, transformerPath, e);
             return;
         }
 
         String className = transformerConfiguration.getString("class");
         if (StringUtils.isEmpty(className)) {
-            LOG.error("Skip transformer[{}],class not config, path = {}, config = {}",
+            LOG.error("Skip transformer[{}], class not config, path = {}, config = {}",
                     each, transformerPath, transformerConfiguration.beautify());
             return;
         }
@@ -86,31 +102,42 @@ public class TransformerRegistry
         String funName = transformerConfiguration.getString("name");
         if (!each.equals(funName)) {
             LOG.warn("The transformer[{}] name not match transformer.json config name[{}], " +
-                            "will ignore json  name, path = {}, config = {}",
+                            "will ignore json name, path = {}, config = {}",
                     each, funName, transformerPath, transformerConfiguration.beautify());
+        }
+
+        try {
+            checkName(each, false);
+        }
+        catch (AddaxException e) {
+            LOG.error("Skip transformer[{}]: the user transformer name must not start with dx_, path = {}",
+                    each, transformerPath);
+            return;
         }
 
         JarLoader jarLoader = new JarLoader(new String[] {transformerPath});
         boolean registered = false;
         try {
             Class<?> transformerClass = jarLoader.loadClass(className);
-            Object transformer = transformerClass.getConstructor().newInstance();
-            if (ComplexTransformer.class.isAssignableFrom(transformer.getClass())) {
-                ((ComplexTransformer) transformer).setTransformerName(each);
-                registryComplexTransformer((ComplexTransformer) transformer, jarLoader, false);
+            validateTransformerClass(each, className, transformerPath, transformerClass);
+
+            if (ComplexTransformer.class.isAssignableFrom(transformerClass)) {
+                Class<? extends ComplexTransformer> clazz = transformerClass.asSubclass(ComplexTransformer.class);
+                register(each, jarLoader, false, () -> newComplexTransformer(clazz, each));
             }
-            else if (Transformer.class.isAssignableFrom(transformer.getClass())) {
-                ((Transformer) transformer).setTransformerName(each);
-                registryTransformer((Transformer) transformer, jarLoader, false);
+            else if (Transformer.class.isAssignableFrom(transformerClass)) {
+                Class<? extends Transformer> clazz = transformerClass.asSubclass(Transformer.class);
+                register(each, jarLoader, false, () -> newTransformer(clazz, each));
             }
             else {
                 LOG.error("Load Transformer class[{}] error, path = {}", className, transformerPath);
+                return;
             }
             registered = true;
         }
         catch (Exception e) {
-            //error, skip function
-            LOG.error("Skip transformer({}),load Transformer class error, path = {} ", each, transformerPath, e);
+            // error, skip function
+            LOG.error("Skip transformer({}), load Transformer class error, path = {} ", each, transformerPath, e);
         }
         finally {
             // keep the loader open for the registry lifetime so classes lazily
@@ -126,9 +153,53 @@ public class TransformerRegistry
         }
     }
 
-    private static Configuration loadTransFormerConfig(String transformerPath)
+    private static Configuration loadTransformerConfig(String transformerPath)
     {
-        return Configuration.from(new File(FilenameUtils.getPath(transformerPath) + File.separator + "transformer.json"));
+        return Configuration.from(new File(transformerPath, "transformer.json"));
+    }
+
+    private static void validateTransformerClass(String name, String className, String transformerPath, Class<?> clazz)
+    {
+        int modifiers = clazz.getModifiers();
+        if (!Modifier.isPublic(modifiers) || Modifier.isAbstract(modifiers)) {
+            throw AddaxException.asAddaxException(PLUGIN_INIT_ERROR, String.format(
+                    "The transformer [%s] cannot be loaded: the class [%s] in [%s] must be public and non-abstract.",
+                    name, className, transformerPath));
+        }
+        try {
+            clazz.getConstructor();
+        }
+        catch (NoSuchMethodException e) {
+            throw AddaxException.asAddaxException(PLUGIN_INIT_ERROR, String.format(
+                    "The transformer [%s] cannot be loaded: the class [%s] in [%s] must declare a public no-arg constructor.",
+                    name, className, transformerPath), e);
+        }
+    }
+
+    private static ComplexTransformer newTransformer(Class<? extends Transformer> clazz, String name)
+    {
+        try {
+            Transformer transformer = clazz.getConstructor().newInstance();
+            transformer.setTransformerName(name);
+            return new ComplexTransformerProxy(transformer);
+        }
+        catch (ReflectiveOperationException e) {
+            throw AddaxException.asAddaxException(PLUGIN_INIT_ERROR,
+                    "Failed to instantiate the transformer [" + name + "]", e);
+        }
+    }
+
+    private static ComplexTransformer newComplexTransformer(Class<? extends ComplexTransformer> clazz, String name)
+    {
+        try {
+            ComplexTransformer transformer = clazz.getConstructor().newInstance();
+            transformer.setTransformerName(name);
+            return transformer;
+        }
+        catch (ReflectiveOperationException e) {
+            throw AddaxException.asAddaxException(PLUGIN_INIT_ERROR,
+                    "Failed to instantiate the transformer [" + name + "]", e);
+        }
     }
 
     public static TransformerInfo getTransformer(String transformerName)
@@ -144,48 +215,41 @@ public class TransformerRegistry
     public static synchronized void registryTransformer(Transformer transformer,
             ClassLoader classLoader, boolean isNative)
     {
-
-        checkName(transformer.getTransformerName(), isNative);
-
-        if (registeredTransformer.containsKey(transformer.getTransformerName())) {
-            throw AddaxException.asAddaxException(
-                    CONFIG_ERROR,
-                    " name=" + transformer.getTransformerName());
-        }
-
-        registeredTransformer.put(transformer.getTransformerName(),
-                buildTransformerInfo(new ComplexTransformerProxy(transformer),
-                        isNative, classLoader));
+        String name = transformer.getTransformerName();
+        checkName(name, isNative);
+        Class<? extends Transformer> clazz = transformer.getClass();
+        register(name, classLoader, isNative, () -> newTransformer(clazz, name));
     }
 
     public static synchronized void registryComplexTransformer(ComplexTransformer complexTransformer,
             ClassLoader classLoader, boolean isNative)
     {
+        String name = complexTransformer.getTransformerName();
+        checkName(name, isNative);
+        Class<? extends ComplexTransformer> clazz = complexTransformer.getClass();
+        register(name, classLoader, isNative, () -> newComplexTransformer(clazz, name));
+    }
 
-        checkName(complexTransformer.getTransformerName(), isNative);
-
-        if (registeredTransformer.containsKey(complexTransformer.getTransformerName())) {
+    private static void register(String name, ClassLoader classLoader, boolean isNative,
+            Supplier<ComplexTransformer> factory)
+    {
+        if (registeredTransformer.containsKey(name)) {
             throw AddaxException.asAddaxException(
                     CONFIG_ERROR,
-                    " name=" + complexTransformer.getTransformerName());
+                    " name=" + name);
         }
 
-        registeredTransformer.put(complexTransformer.getTransformerName(),
-                buildTransformerInfo(complexTransformer, isNative, classLoader));
+        registeredTransformer.put(name, new TransformerInfo(factory, classLoader, isNative));
     }
 
     private static void checkName(String functionName, boolean isNative)
     {
-        boolean checkResult = true;
+        boolean checkResult;
         if (isNative) {
-            if (!functionName.startsWith("dx_")) {
-                checkResult = false;
-            }
+            checkResult = functionName.startsWith("dx_");
         }
         else {
-            if (functionName.startsWith("dx_")) {
-                checkResult = false;
-            }
+            checkResult = !functionName.startsWith("dx_");
         }
 
         if (!checkResult) {
@@ -193,16 +257,6 @@ public class TransformerRegistry
                     CONFIG_ERROR,
                     " name=" + functionName + ": isNative=" + isNative);
         }
-    }
-
-    private static TransformerInfo buildTransformerInfo(ComplexTransformer complexTransformer,
-            boolean isNative, ClassLoader classLoader)
-    {
-        TransformerInfo transformerInfo = new TransformerInfo();
-        transformerInfo.setClassLoader(classLoader);
-        transformerInfo.setIsNative(isNative);
-        transformerInfo.setTransformer(complexTransformer);
-        return transformerInfo;
     }
 
     static {

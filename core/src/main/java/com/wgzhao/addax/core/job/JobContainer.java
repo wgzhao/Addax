@@ -32,6 +32,7 @@ import com.wgzhao.addax.core.statistics.PerfTrace;
 import com.wgzhao.addax.core.statistics.VMInfo;
 import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.core.util.StrUtil;
+import com.wgzhao.addax.core.util.TransformerUtil;
 import com.wgzhao.addax.core.AbstractContainer;
 import com.wgzhao.addax.core.Engine;
 import com.wgzhao.addax.core.container.util.JobAssignUtil;
@@ -287,6 +288,10 @@ public class JobContainer
         if (StringUtils.isNotEmpty(postHandlerTypeStr)) {
             LoadUtil.validatePlugin(toPluginType(postHandlerTypeStr, "post"), jobConfig.getPostHandlerPluginName());
         }
+
+        // parse and validate the transformer configurations before the tasks start,
+        // so a typo fails the job instead of turning every record into dirty data
+        TransformerUtil.validateTransformers(jobConfig.getTransformers());
     }
 
     /**
@@ -590,7 +595,7 @@ public class JobContainer
             LOG.debug("The report contents: {}", jsonStr);
             postJobRunStatistic(jobResultReportUrl, timeoutMills, jsonStr);
         }
-        String statMsg = """
+        StringBuilder statMsg = new StringBuilder("""
                 %n%-26s: %-18s%n%-26s: %-18s%n%-26s: %19s%n%-26s: %19s%n%-26s: %19s%n%-26s: %19s%n%-26s: %19s%n%-26s: %19s%n"""
                 .formatted(
                         "Job start  at", dateFormat.format(startTimeStamp),
@@ -601,21 +606,22 @@ public class JobContainer
                         "Average   rps", recordSpeedPerSecond + "rec/s",
                         "Number of rec", totalReadRecords,
                         "Failed record", totalErrorRecords
-                );
-        LOG.info(statMsg);
+                ));
+
         final Long counterSucc = communication.getLongCounter(CommunicationTool.TRANSFORMER_SUCCEED_RECORDS);
         final Long counterFail = communication.getLongCounter(CommunicationTool.TRANSFORMER_FAILED_RECORDS);
         final Long counterFilter = communication.getLongCounter(CommunicationTool.TRANSFORMER_FILTER_RECORDS);
         if (counterSucc + counterFail + counterFilter > 0) {
-            String transStatMsg = """
-                    %n%-26s: %19s%n%-26s: %19s%n%-26s: %19s%n"""
+            // append to the same message so the whole report is emitted under one log line
+            statMsg.append("""
+                    %-26s: %19s%n%-26s: %19s%n%-26s: %19s%n"""
                     .formatted(
-                            "Transformer success records", counterSucc,
-                            "Transformer failed  records", counterFail,
-                            "Transformer filter  records", counterFilter
-                    );
-            LOG.info(transStatMsg);
+                            "Transformer success rec", counterSucc,
+                            "Transformer failed  rec", counterFail,
+                            "Transformer filter  rec", counterFilter
+                    ));
         }
+        LOG.info(statMsg.toString());
     }
 
     /*

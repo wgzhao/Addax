@@ -24,9 +24,6 @@ import com.wgzhao.addax.core.element.Record;
 import com.wgzhao.addax.core.element.StringColumn;
 import com.wgzhao.addax.core.exception.AddaxException;
 
-import java.util.Arrays;
-
-import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
 /**
@@ -35,9 +32,33 @@ import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 public class SubstrTransformer
         extends Transformer
 {
+    private int columnIndex;
+    private int startIndex;
+    private int length;
+
     public SubstrTransformer()
     {
         setTransformerName("dx_substr");
+    }
+
+    @Override
+    protected void doInit(Object[] paras)
+    {
+        if (paras == null || paras.length != 3) {
+            throw configError("requires 3 parameters: idx, pos and length");
+        }
+        columnIndex = intParam(paras[0], "idx");
+        startIndex = intParam(paras[1], "pos");
+        length = intParam(paras[2], "length");
+        if (columnIndex < 0) {
+            throw configError("the parameter [idx] must not be negative");
+        }
+        if (startIndex < 0) {
+            throw configError("the parameter [pos] must not be negative");
+        }
+        if (length < 0) {
+            throw configError("the parameter [length] must not be negative");
+        }
     }
 
     /**
@@ -50,28 +71,14 @@ public class SubstrTransformer
     @Override
     public Record evaluate(Record record, Object... paras)
     {
-
-        int columnIndex;
-        int startIndex;
-        int length;
+        init(paras);
 
         try {
-            if (paras.length != 3) {
-                throw new RuntimeException("The dx_substr parameters must be 3");
+            Column column = record.getColumn(columnIndex);
+            if (column == null) {
+                throw new RuntimeException(String.format("columnIndex[%d] out of bound[%d]",
+                        columnIndex, record.getColumnNumber()));
             }
-
-            columnIndex = (Integer) paras[0];
-            startIndex = Integer.parseInt((String) paras[1]);
-            length = Integer.parseInt((String) paras[2]);
-        }
-        catch (Exception e) {
-            throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                    "paras:" + Arrays.asList(paras) + " => " + e.getMessage());
-        }
-
-        Column column = record.getColumn(columnIndex);
-
-        try {
             String oriValue = column.asString();
             // If the field is null, skip substring processing
             if (oriValue == null) {
@@ -83,13 +90,10 @@ public class SubstrTransformer
                         "(%s) of (%s)", startIndex, oriValue.length(), oriValue));
             }
 
-            String newValue;
-            if (startIndex + length >= oriValue.length()) {
-                newValue = oriValue.substring(startIndex);
-            }
-            else {
-                newValue = oriValue.substring(startIndex, startIndex + length);
-            }
+            long endIndex = (long) startIndex + length;
+            String newValue = endIndex >= oriValue.length()
+                    ? oriValue.substring(startIndex)
+                    : oriValue.substring(startIndex, (int) endIndex);
 
             record.setColumn(columnIndex, new StringColumn(newValue));
         }

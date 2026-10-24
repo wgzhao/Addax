@@ -21,11 +21,15 @@ package com.wgzhao.addax.core.transport.transformer;
 
 import java.util.Map;
 
+/**
+ * One configured transformer of one task. The transformer instance is created here,
+ * not shared with the registry, so parsed parameters are private to this execution.
+ */
 public class TransformerExecution
 {
-
     private final TransformerExecutionParas transformerExecutionParas;
-    private final TransformerInfo transformerInfo;
+    private final ComplexTransformer transformer;
+    private final ClassLoader classLoader;
     private Object[] finalParas;
 
     private boolean isChecked = false;
@@ -34,16 +38,17 @@ public class TransformerExecution
             TransformerExecutionParas transformerExecutionParas)
     {
         this.transformerExecutionParas = transformerExecutionParas;
-        this.transformerInfo = transformerInfo;
+        this.transformer = transformerInfo.newTransformer();
+        this.classLoader = transformerInfo.getClassLoader();
     }
 
     public void genFinalParas()
     {
-
-        if ("dx_groovy".equals(transformerInfo.getTransformer().getTransformerName())) {
+        if ("dx_groovy".equals(transformer.getTransformerName())) {
             finalParas = new Object[2];
             finalParas[0] = transformerExecutionParas.getCode();
             finalParas[1] = transformerExecutionParas.getExtraPackage();
+            transformer.init(finalParas);
             return;
         }
 
@@ -60,13 +65,12 @@ public class TransformerExecution
             finalParas[0] = transformerExecutionParas.getColumnIndex();
         }
         else {
-            if (transformerExecutionParas.getParas() != null) {
-                finalParas = transformerExecutionParas.getParas();
-            }
-            else {
-                finalParas = null;
-            }
+            finalParas = transformerExecutionParas.getParas();
         }
+
+        // parse and validate the parameters now, so a bad configuration fails the
+        // job before the first record instead of turning every record into dirty data
+        transformer.init(finalParas);
     }
 
     public Object[] getFinalParas()
@@ -86,7 +90,7 @@ public class TransformerExecution
 
     public ClassLoader getClassLoader()
     {
-        return transformerInfo.getClassLoader();
+        return classLoader;
     }
 
     public Integer getColumnIndex()
@@ -96,12 +100,12 @@ public class TransformerExecution
 
     public String getTransformerName()
     {
-        return transformerInfo.getTransformer().getTransformerName();
+        return transformer.getTransformerName();
     }
 
     public ComplexTransformer getTransformer()
     {
-        return transformerInfo.getTransformer();
+        return transformer;
     }
 
     public Map<String, Object> getContext()

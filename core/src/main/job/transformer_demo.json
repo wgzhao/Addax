@@ -53,42 +53,34 @@
         {
           "name": "dx_replace",
           "parameter": {
-            "columnIndex": 0,
-            "paras": [
-              "11",
-              "6",
-              "wgzhao"
-            ]
+            "idx": 0,
+            "pos": 11,
+            "length": 6,
+            "str": "wgzhao"
           }
         },
         {
           "name": "dx_substr",
           "parameter": {
-            "columnIndex": 1,
-            "paras": [
-              "0",
-              "12"
-            ]
+            "idx": 1,
+            "pos": 0,
+            "length": 12
           }
         },
         {
           "name": "dx_map",
           "parameter": {
-            "columnIndex": 2,
-            "paras": [
-              "^",
-              "2"
-            ]
+            "idx": 2,
+            "operator": "^",
+            "value": 2
           }
         },
         {
           "name": "dx_filter",
           "parameter": {
-            "columnIndex": 6,
-            "paras": [
-              "<",
-              "5"
-            ]
+            "idx": 6,
+            "operator": "<",
+            "expr": 5
           }
         }
       ]

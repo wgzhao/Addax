@@ -1,0 +1,100 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 1
+      }
+    },
+    "content": {
+      "reader": {
+        "name": "streamreader",
+        "parameter": {
+          "column": [
+            {
+              "value": "addax",
+              "type": "string"
+            },
+            {
+              "value": "13800138000",
+              "type": "string"
+            },
+            {
+              "value": "abcdef",
+              "type": "string"
+            },
+            {
+              "value": 12.345,
+              "type": "double"
+            },
+            {
+              "random": "0,10",
+              "type": "long"
+            }
+          ],
+          "sliceRecordCount": 5
+        }
+      },
+      "writer": {
+        "name": "streamwriter",
+        "parameter": {
+          "print": true,
+          "encoding": "UTF-8"
+        }
+      },
+      "transformer": [
+        {
+          "name": "dx_pad",
+          "parameter": {
+            "columnIndex": 0,
+            "paras": [
+              "l",
+              "8",
+              "*"
+            ]
+          }
+        },
+        {
+          "name": "dx_substr",
+          "parameter": {
+            "columnIndex": 1,
+            "paras": [
+              "0",
+              "3"
+            ]
+          }
+        },
+        {
+          "name": "dx_replace",
+          "parameter": {
+            "columnIndex": 2,
+            "paras": [
+              "1",
+              "2",
+              "XY"
+            ]
+          }
+        },
+        {
+          "name": "dx_map",
+          "parameter": {
+            "columnIndex": 3,
+            "paras": [
+              "*",
+              "2"
+            ]
+          }
+        },
+        {
+          "name": "dx_filter",
+          "parameter": {
+            "columnIndex": 4,
+            "paras": [
+              "<",
+              "5"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

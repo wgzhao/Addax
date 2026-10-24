@@ -25,20 +25,26 @@ import groovy.lang.GroovyClassLoader;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.groovy.control.CompilationFailedException;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
 /**
- * no comments.
- * Created by liqiang on 16/3/4.
+ * Compiles a user supplied Groovy rule into a record transformer.
+ *
+ * <p>The rule is compiled when the transformer is built, so a syntax error fails the
+ * job before any record is read. Compiled classes are cached by source text: every
+ * task of a job reuses the class, but gets its own instance.
  */
 public class GroovyTransformer
         extends Transformer
 {
-    private Transformer groovyTransformer;
+    private static final Map<RuleKey, Class<? extends Transformer>> RULE_CLASSES = new ConcurrentHashMap<>();
+
+    private Transformer rule;
 
     public GroovyTransformer()
     {
@@ -46,67 +52,63 @@ public class GroovyTransformer
     }
 
     @Override
-    public Record evaluate(Record record, Object... paras)
+    protected void doInit(Object[] paras)
     {
-
-        if (groovyTransformer == null) {
-            // global unique initialization
-            if (paras.length < 1 || paras.length > 2) {
-                throw AddaxException.asAddaxException(
-                        ILLEGAL_VALUE,
-                        "The dx_groovy parameters must be 1 or 2. The current parameter is: " + Arrays.asList(paras));
-            }
-            synchronized (this) {
-
-                if (groovyTransformer == null) {
-                    String code = (String) paras[0];
-                    @SuppressWarnings("unchecked") List<String> extraPackage = paras.length == 2 ?
-                            (List<String>) paras[1] : null;
-                    initGroovyTransformer(code, extraPackage);
-                }
-            }
+        if (paras == null || paras.length < 1 || paras.length > 2) {
+            throw configError("requires 1 or 2 parameters: code and an optional extraPackage list");
+        }
+        if (!(paras[0] instanceof String code) || StringUtils.isBlank(code)) {
+            throw configError("the parameter [code] must be a non-empty string");
         }
 
-        return this.groovyTransformer.evaluate(record);
+        @SuppressWarnings("unchecked")
+        List<String> extraPackage = paras.length == 2 && paras[1] != null
+                ? (List<String>) paras[1]
+                : List.of();
+        RuleKey key = new RuleKey(code, List.copyOf(extraPackage));
+        Class<? extends Transformer> ruleClass = RULE_CLASSES.computeIfAbsent(key, this::compile);
+
+        try {
+            this.rule = ruleClass.getConstructor().newInstance();
+        }
+        catch (ReflectiveOperationException e) {
+            throw AddaxException.asAddaxException(RUNTIME_ERROR, "Failed to instantiate the Groovy rule", e);
+        }
     }
 
-    private void initGroovyTransformer(String code, List<String> extraPackage)
+    @Override
+    public Record evaluate(Record record, Object... paras)
+    {
+        init(paras);
+        return this.rule.evaluate(record);
+    }
+
+    private Class<? extends Transformer> compile(RuleKey key)
     {
         GroovyClassLoader loader = new GroovyClassLoader(GroovyTransformer.class.getClassLoader());
-        String groovyRule = getGroovyRule(code, extraPackage);
+        String groovyRule = getGroovyRule(key.code(), key.extraPackage());
 
         Class<?> groovyClass;
         try {
             groovyClass = loader.parseClass(groovyRule);
         }
-        catch (CompilationFailedException cfe) {
-            throw AddaxException.asAddaxException(
-                    RUNTIME_ERROR, cfe);
+        catch (CompilationFailedException e) {
+            throw AddaxException.asAddaxException(CONFIG_ERROR, "Failed to compile the Groovy rule: " + e.getMessage(), e);
         }
 
-        try {
-            Object t = groovyClass.getConstructor().newInstance();
-            if (!(t instanceof Transformer transformer)) {
-                throw AddaxException.asAddaxException(
-                        RUNTIME_ERROR,
-                        "Addax bug! ");
-            }
-            this.groovyTransformer = transformer;
+        if (!Transformer.class.isAssignableFrom(groovyClass)) {
+            throw AddaxException.asAddaxException(CONFIG_ERROR,
+                    "The Groovy rule must produce a Transformer, but produced " + groovyClass.getName());
         }
-        catch (Throwable ex) {
-            throw AddaxException.asAddaxException(
-                    RUNTIME_ERROR, ex);
-        }
+        return groovyClass.asSubclass(Transformer.class);
     }
 
     private String getGroovyRule(String expression, List<String> extraPackagesStrList)
     {
         StringBuilder sb = new StringBuilder();
-        if (extraPackagesStrList != null) {
-            for (String extraPackagesStr : extraPackagesStrList) {
-                if (StringUtils.isNotEmpty(extraPackagesStr)) {
-                    sb.append(extraPackagesStr);
-                }
+        for (String extraPackagesStr : extraPackagesStrList) {
+            if (StringUtils.isNotEmpty(extraPackagesStr)) {
+                sb.append(extraPackagesStr);
             }
         }
         sb.append("""
@@ -122,5 +124,10 @@ public class GroovyTransformer
         sb.append("}}");
 
         return sb.toString();
+    }
+
+    /** The compiled form only depends on the source text and the extra imports. */
+    private record RuleKey(String code, List<String> extraPackage)
+    {
     }
 }
