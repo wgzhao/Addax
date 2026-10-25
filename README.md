@@ -38,6 +38,7 @@ Detailed instructions on installation, configuration, and usage are available:
 - [Online Documentation](https://addax.wgzhao.com)
 - [GitHub Docs](https://github.com/wgzhao/addax-docs)
 - [Plugin Comparison](difference.md)
+- [Performance Baseline](PERFORMANCE.md) — measured DB → HDFS / DB → DB throughput and the method used to obtain it
 
 ---
 
