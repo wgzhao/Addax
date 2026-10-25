@@ -1,0 +1,45 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": ${perf_channel},
+        "byte": -1,
+        "record": -1
+      },
+      "errorLimit": {
+        "record": 0
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "streamreader",
+          "parameter": {
+            "column": [
+              { "type": "long", "rule": "incr", "value": "0,1" },
+              { "type": "string", "rule": "random", "value": "12,32" },
+              { "type": "string", "rule": "constant", "value": "addax-perf" },
+              { "type": "string", "rule": "constant", "value": "中文测试" },
+              { "type": "string", "rule": "random", "value": "32,64" },
+              { "type": "long", "rule": "random", "value": "0,1000000" },
+              { "type": "long", "rule": "incr", "value": "1000000,1" },
+              { "type": "double", "rule": "random", "value": "0,1000000,2" },
+              { "type": "date", "rule": "incr", "value": "2020-01-01,1,d", "dateFormat": "yyyy-MM-dd" },
+              { "type": "bool", "rule": "random", "value": "1,1" },
+              { "type": "timestamp", "rule": "random", "value": "0,1" },
+              { "type": "bytes", "rule": "random", "value": "8,16" }
+            ],
+            "sliceRecordCount": ${perf_slice_rows}
+          }
+        },
+        "writer": {
+          "name": "streamwriter",
+          "parameter": {
+            "print": true,
+            "fieldDelimiter": "\u0001"
+          }
+        }
+      }
+    ]
+  }
+}

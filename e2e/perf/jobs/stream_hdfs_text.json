@@ -1,0 +1,69 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": ${perf_channel},
+        "byte": -1,
+        "record": -1
+      },
+      "errorLimit": {
+        "record": 0
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "streamreader",
+          "parameter": {
+            "column": [
+              { "type": "long", "rule": "incr", "value": "0,1" },
+              { "type": "string", "rule": "random", "value": "12,32" },
+              { "type": "string", "rule": "constant", "value": "addax-perf" },
+              { "type": "string", "rule": "constant", "value": "中文测试" },
+              { "type": "string", "rule": "random", "value": "32,64" },
+              { "type": "long", "rule": "random", "value": "0,1000000" },
+              { "type": "long", "rule": "incr", "value": "1000000,1" },
+              { "type": "double", "rule": "random", "value": "0,1000000,2" },
+              { "type": "date", "rule": "incr", "value": "2020-01-01,1,d", "dateFormat": "yyyy-MM-dd" },
+              { "type": "bool", "rule": "random", "value": "1,1" },
+              { "type": "timestamp", "rule": "random", "value": "0,1" },
+              { "type": "bytes", "rule": "random", "value": "8,16" }
+            ],
+            "sliceRecordCount": ${perf_slice_rows}
+          }
+        },
+        "writer": {
+          "name": "hdfswriter",
+          "parameter": {
+            "defaultFS": "${hdfs_default_fs}",
+            "hdfsSitePath": "${hdfs_site_path}",
+            "path": "${hdfs_base}/${perf_run_id}/stream_text",
+            "fileName": "stream",
+            "fileType": "TEXT",
+            "fieldDelimiter": "\u0001",
+            "compress": "NONE",
+            "writeMode": "overwrite",
+            "createPath": true,
+            "skipTrash": true,
+            "encoding": "UTF-8",
+            "nullFormat": "\\N",
+            "column": [
+              { "name": "id", "type": "bigint" },
+              { "name": "c_str1", "type": "string" },
+              { "name": "c_str2", "type": "string" },
+              { "name": "c_str3", "type": "string" },
+              { "name": "c_str4", "type": "string" },
+              { "name": "c_int", "type": "int" },
+              { "name": "c_long", "type": "bigint" },
+              { "name": "c_double", "type": "double" },
+              { "name": "c_date", "type": "date" },
+              { "name": "c_bool", "type": "boolean" },
+              { "name": "c_ts", "type": "timestamp" },
+              { "name": "c_bytes", "type": "binary" }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

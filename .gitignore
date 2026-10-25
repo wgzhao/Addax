@@ -37,3 +37,6 @@ site
 .venv/
 .claude/settings.local.json
 .claude/worktrees/
+
+# Performance baseline output; the JFR/GC logs are large and machine-specific.
+e2e/perf/results/

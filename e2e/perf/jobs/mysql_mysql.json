@@ -1,0 +1,72 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": ${perf_channel},
+        "byte": -1,
+        "record": -1
+      },
+      "errorLimit": {
+        "record": 0
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "mysqlreader",
+          "parameter": {
+            "username": "${mysql_user}",
+            "password": "${mysql_password}",
+            "column": [
+              "id",
+              "c_str1",
+              "c_str2",
+              "c_str3",
+              "c_str4",
+              "c_int",
+              "c_long",
+              "c_double",
+              "c_date",
+              "c_bool",
+              "c_ts",
+              "c_bytes"
+            ],
+            "splitPk": "id",
+            "eachTableSplitSize": ${perf_channel},
+            "connection": {
+              "table": ["${perf_table}"],
+              "jdbcUrl": ["${mysql_jdbc_url}"]
+            }
+          }
+        },
+        "writer": {
+          "name": "mysqlwriter",
+          "parameter": {
+            "writeMode": "insert",
+            "batchSize": 2048,
+            "username": "${mysql_user}",
+            "password": "${mysql_password}",
+            "column": [
+              "id",
+              "c_str1",
+              "c_str2",
+              "c_str3",
+              "c_str4",
+              "c_int",
+              "c_long",
+              "c_double",
+              "c_date",
+              "c_bool",
+              "c_ts",
+              "c_bytes"
+            ],
+            "connection": {
+              "table": ["${perf_sink_table}"],
+              "jdbcUrl": "${mysql_jdbc_url}"
+            }
+          }
+        }
+      }
+    ]
+  }
+}
