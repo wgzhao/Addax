@@ -1,0 +1,75 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": ${perf_channel},
+        "byte": -1,
+        "record": -1
+      },
+      "errorLimit": {
+        "record": 0
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "mysqlreader",
+          "parameter": {
+            "username": "${mysql_user}",
+            "password": "${mysql_password}",
+            "column": [
+              "id",
+              "c_str1",
+              "c_str2",
+              "c_str3",
+              "c_str4",
+              "c_int",
+              "c_long",
+              "c_double",
+              "c_date",
+              "c_bool",
+              "c_ts",
+              "c_bytes"
+            ],
+            "splitPk": "id",
+            "eachTableSplitSize": ${perf_channel},
+            "connection": {
+              "table": ["${perf_table}"],
+              "jdbcUrl": ["${mysql_jdbc_url}"]
+            }
+          }
+        },
+        "writer": {
+          "name": "hdfswriter",
+          "parameter": {
+            "defaultFS": "${hdfs_default_fs}",
+            "hdfsSitePath": "${hdfs_site_path}",
+            "path": "${hdfs_base}/${perf_run_id}/mysql_orc",
+            "fileName": "perf_source",
+            "fileType": "ORC",
+            "compress": "SNAPPY",
+            "writeMode": "overwrite",
+            "createPath": true,
+            "skipTrash": true,
+            "encoding": "UTF-8",
+            "nullFormat": "\\N",
+            "column": [
+              { "name": "id", "type": "bigint" },
+              { "name": "c_str1", "type": "string" },
+              { "name": "c_str2", "type": "string" },
+              { "name": "c_str3", "type": "string" },
+              { "name": "c_str4", "type": "string" },
+              { "name": "c_int", "type": "int" },
+              { "name": "c_long", "type": "bigint" },
+              { "name": "c_double", "type": "double" },
+              { "name": "c_date", "type": "date" },
+              { "name": "c_bool", "type": "boolean" },
+              { "name": "c_ts", "type": "timestamp" },
+              { "name": "c_bytes", "type": "binary" }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

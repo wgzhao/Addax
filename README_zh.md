@@ -237,6 +237,7 @@ Failed record             :                   0
 
 - [在线文档](https://addax.wgzhao.com)
 - [项目内文档](https://github.com/wgzhao/addax-docs)
+- [性能基准报告](PERFORMANCE.md) — 2M 行 DB → HDFS / DB → DB 实测吞吐、测试方法与环境说明
 
 ## 相关项目
 
