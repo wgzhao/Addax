@@ -51,6 +51,22 @@ sh target/addax-<version>/bin/addax.sh /path/to/job.json
 
 程序运行的内部流程和新增插件的开发流程可以参考 [plugin development 文档](https://addax.wgzhao.com/plugin-development.html)
 
+## 关键运行时约定
+
+以下约定跨模块、不直观，改代码时最容易踩坑；细节以源码为准。
+
+- **配置优先级**：Job 文件 > `conf/core.json` > 插件 `plugin.json`（后两者只补缺失键，不覆盖）。`${name}` 在解析前从 JVM system property 替换，未知占位符原样保留；`-p` 经 `sh -c` 展开且不加引号，值里不能有空格、`&`、`;`、`$` 等 shell 元字符。`curr_*`/`biz_*` 日期变量由 `addax.sh` 注入。
+- **split 必须 1:1**：Reader `split(adviceNumber)` 的数量是建议值，Writer `split(mandatoryNumber)` 必须返回同样数量；`JobContainer` 对不一致直接报 `CONFIG_ERROR`，不补齐、不重采样。多表 RDBMS writer 要求表数 == 并发数。
+- **并发推导**：配置了 `speed.byte`/`speed.record` 时按“总速率/单通道速率”算 channel 数，`speed.channel` 被忽略；否则用 `speed.channel`（默认 1）。channel 数最终会被 task 数截断，taskGroup 数 = `ceil(channel / core.container.taskGroup.channel)`（默认 5）。
+- **一次 task = 一个 channel + 一对 reader/writer 线程**，writer 先启动。失败重试仅当 writer `supportFailOver()` 为 true 且未超过 `maxRetryTimes`（默认 1，即默认不重试）；重试间隔 10s、等待预算 60s，且必须等上一次线程真正退出后才允许重试，避免重复写入。
+- **状态机**：task 的 FAILED 不可逆，首个失败原因保留；只有 reader/writer 两个 worker 都终止且 `Communication` 进入终态，task 才算结束。
+- **errorLimit 陷阱**：`errorLimit.record` 优先于 `percentage`；两者都未配置时**不做任何错误检查**，即使所有行写入失败也可能退出 0。E2E 的 job 都显式设置 `"errorLimit": {"record": 0}`。
+- **脏数据**：reader/writer 转换或写入失败通过 `TaskPluginCollector.collectDirtyRecord` 计入 readFailed/writeFailed，默认最多打印 128 条（负数=不限）。Transformer 返回 null 表示过滤（不计错误），抛异常才计脏数据。
+- **RDBMS**：`splitPk`/`autoPk` 决定主键区间切分，单表默认切分数再 ×5；`querySql` 模式每个 SQL 一个 task。writeMode 支持 insert/replace/update(key)：MySQL `ON DUPLICATE KEY`、PostgreSQL/DuckDB `ON CONFLICT`、Oracle/SQL Server `MERGE`。批量失败会回滚并逐行重试，坏行记脏数据。连接池默认 maxTotal=32、borrow 等待 30s。
+- **文件/HDFS**：writeMode 为 truncate/append/nonConflict/overwrite。hdfswriter 先写隐藏 `.<uuid>` staging 目录，post 时 rename 到目标且拒绝覆盖同名文件，destroy 时清理 staging；压缩文件不支持 append。
+- **插件隔离**：每个插件由独立 `JarLoader` 加载 `plugin/<type>/<name>` 及其 `libs/`，Job/Task 调用期间切换线程 context classloader；入口类必须是 public、非抽象、静态嵌套的 `<class>$Job` / `<class>$Task`。
+- **发行版构建**：必须先 `mvn clean package` 再 `mvn package -Pdistribution`；第二遍不能 clean，因为 root assembly 读取各模块 `target/` 下的产物。
+- **验证方式**：无单元测试；改动的最终验证是 `e2e/` 的“打包发行版”端到端套件（真实 `bin/addax.sh` + `plugin/` + 容器数据库）。case 契约见 `e2e/README.md`；HDFS case 用 `file:///`，无需真实集群。
 
 ## 架构与设计宗旨
 
