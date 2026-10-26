@@ -38,6 +38,15 @@ updates:
         versions: ["4.x"]
       - dependency-name: "org.apache.hive.shims:*"
         versions: ["4.x"]
+      # MySQL 5.7 must stay supported, and Connector/J 8.2.0 is the last release
+      # that works with it (8.3.0+ requires MySQL 8.0 or later). Using update-types
+      # instead of a version range keeps Dependabot security updates enabled, so a
+      # CVE still produces a PR for review; routine version bumps are ignored.
+      - dependency-name: "com.mysql:mysql-connector-j"
+        update-types:
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
+          - "version-update:semver-patch"
   # Maintain dependencies for GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
