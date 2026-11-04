@@ -42,6 +42,10 @@ public class SqliteWriter
 {
     private static final DataBaseType DATABASE_TYPE = DataBaseType.SQLite;
 
+    // milliseconds are part of the value the reader can produce from a TEXT DATETIME,
+    // so the text form has to carry them too
+    private static final String TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
+
     /** Job. */
     public static class Job
             extends Writer.Job
@@ -120,6 +124,20 @@ public class SqliteWriter
                         // TEXT, REAL, or INTEGER values: https://www.sqlite.org/datatype3.html
                         SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_DATE_FORMAT);
                         preparedStatement.setString(columnIndex, sdf.format(column.asDate()));
+                        return preparedStatement;
+                    }
+                    if (columnSqlType == Types.TIMESTAMP) {
+                        // the driver binds a Timestamp as epoch milliseconds, which turns a DATETIME
+                        // column into INTEGER data and mixes it with the TEXT values written by
+                        // earlier driver versions; keep TEXT and preserve the milliseconds
+                        SimpleDateFormat sdf = new SimpleDateFormat(TIMESTAMP_FORMAT);
+                        preparedStatement.setString(columnIndex, sdf.format(column.asTimestamp()));
+                        return preparedStatement;
+                    }
+                    if (columnSqlType == Types.DECIMAL || columnSqlType == Types.NUMERIC) {
+                        // a scale-less NUMERIC target makes the driver report scale 0, so the
+                        // shared writer takes its integer branch and silently drops the fraction
+                        preparedStatement.setBigDecimal(columnIndex, column.asBigDecimal());
                         return preparedStatement;
                     }
                     return super.fillPreparedStatementColumnType(preparedStatement, columnIndex, columnSqlType, column);

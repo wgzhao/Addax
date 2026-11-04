@@ -1,0 +1,40 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 2
+      },
+      "errorLimit": {
+        "record": 0
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "sqlitereader",
+          "parameter": {
+            "username": "",
+            "password": "",
+            "column": ["*"],
+            "splitPk": "id",
+            "connection": {
+              "table": ["src"],
+              "jdbcUrl": "jdbc:sqlite:${e2e_case_work}/src.db"
+            }
+          }
+        },
+        "writer": {
+          "name": "sqlitewriter",
+          "parameter": {
+            "writeMode": "insert",
+            "column": ["*"],
+            "connection": {
+              "table": ["dst"],
+              "jdbcUrl": "jdbc:sqlite:${e2e_case_work}/dst.db"
+            }
+          }
+        }
+      }
+    ]
+  }
+}

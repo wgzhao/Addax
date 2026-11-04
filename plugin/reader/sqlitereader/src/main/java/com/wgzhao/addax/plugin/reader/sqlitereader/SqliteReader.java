@@ -48,6 +48,10 @@ public class SqliteReader
         public void init()
         {
             this.originalConfig = getPluginJobConf();
+            // SQLite authenticates nobody, but the shared reader rejects a blank username,
+            // which is what the plugin template configures
+            this.originalConfig.set(Key.USERNAME, "addax");
+            this.originalConfig.set(Key.PASSWORD, "");
             this.commonRdbmsReaderJob = new CommonRdbmsReader.Job(DATABASE_TYPE);
             this.originalConfig = this.commonRdbmsReaderJob.init(this.originalConfig);
         }
@@ -89,7 +93,7 @@ public class SqliteReader
         public void init()
         {
             this.readerSliceConfig = getPluginJobConf();
-            this.commonRdbmsReaderTask = new CommonRdbmsReader.Task(DATABASE_TYPE, getTaskGroupId(), getTaskId());
+            this.commonRdbmsReaderTask = new SqliteReaderTask(DATABASE_TYPE, getTaskGroupId(), getTaskId());
             this.commonRdbmsReaderTask.init(this.readerSliceConfig);
         }
 
