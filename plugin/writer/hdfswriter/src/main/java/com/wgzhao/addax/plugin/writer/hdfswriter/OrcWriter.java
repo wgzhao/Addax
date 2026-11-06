@@ -24,7 +24,6 @@ import com.alibaba.fastjson2.JSONObject;
 import com.wgzhao.addax.core.base.Constant;
 import com.wgzhao.addax.core.base.Key;
 import com.wgzhao.addax.core.element.Column;
-import com.wgzhao.addax.core.element.DateColumn;
 import com.wgzhao.addax.core.element.Record;
 import com.wgzhao.addax.core.element.StringColumn;
 import com.wgzhao.addax.core.exception.AddaxException;
@@ -69,8 +68,6 @@ public class OrcWriter
 {
     private static final Logger logger = LoggerFactory.getLogger(OrcWriter.class);
     private static final int DEFAULT_BATCH_SIZE = 1024;
-    private static final ThreadLocal<SimpleDateFormat> DATE_FORMAT =
-            ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd"));
     private static final ThreadLocal<SimpleDateFormat> TIMESTAMP_FORMAT =
             ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
 
@@ -284,12 +281,10 @@ public class OrcWriter
             buffer = Base64.getEncoder().encode((byte[]) column.getRawData());
         }
         else if (colType == Column.Type.DATE) {
-            if (((DateColumn) column).getSubType() == DateColumn.DateType.TIME) {
-                buffer = formatTimeWithNanos(column, columnTimeZone).getBytes(StandardCharsets.UTF_8);
-            }
-            else {
-                buffer = DATE_FORMAT.get().format(column.asDate()).getBytes(StandardCharsets.UTF_8);
-            }
+            // asString() renders DATE/DATETIME with common.column.dateFormat/datetimeFormat in
+            // common.column.timeZone; only TIME needs the nanos-aware special case, so a DATETIME
+            // must not fall into the date-only formatter
+            buffer = formatTimeWithNanos(column, columnTimeZone).getBytes(StandardCharsets.UTF_8);
         }
         else if (column.getRawData() instanceof java.sql.Timestamp ts) {
             buffer = TIMESTAMP_FORMAT.get().format(ts).getBytes(StandardCharsets.UTF_8);

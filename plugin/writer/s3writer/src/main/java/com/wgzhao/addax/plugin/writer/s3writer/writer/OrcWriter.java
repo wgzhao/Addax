@@ -22,7 +22,6 @@ package com.wgzhao.addax.plugin.writer.s3writer.writer;
 import com.wgzhao.addax.core.base.Constant;
 import com.wgzhao.addax.core.base.Key;
 import com.wgzhao.addax.core.element.Column;
-import com.wgzhao.addax.core.element.DateColumn;
 import com.wgzhao.addax.core.element.Record;
 import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.plugin.RecordReceiver;
@@ -53,7 +52,6 @@ import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Base64;
 import java.util.List;
@@ -267,13 +265,10 @@ public class OrcWriter
                             buffer = Base64.getEncoder().encode((byte[]) column.getRawData());
                         }
                         else if (colType == Column.Type.DATE) {
-                            if (((DateColumn) column).getSubType() == DateColumn.DateType.TIME) {
-                                buffer = column.asString().getBytes(StandardCharsets.UTF_8);
-                            }
-                            else {
-                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                                buffer = sdf.format(record.getColumn(i).asDate()).getBytes(StandardCharsets.UTF_8);
-                            }
+                            // asString() renders DATE/DATETIME with common.column.dateFormat/
+                            // datetimeFormat, so a DATETIME keeps its time-of-day instead of being
+                            // truncated to a date-only string
+                            buffer = column.asString().getBytes(StandardCharsets.UTF_8);
                         }
                         else {
                             buffer = record.getColumn(i).getRawData().toString().getBytes(StandardCharsets.UTF_8);
