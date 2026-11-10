@@ -29,40 +29,6 @@ SCRIPT_PATH="$(
 ADDAX_HOME=$(dirname "$SCRIPT_PATH")
 DEBUG_PORT=9999
 
-
-# common constants for job
-CUR_DATE_SHORT=$(date +"%Y%m%d")
-CUR_DATE_DASH=$(date +"%Y-%m-%d")
-CUR_DATETIME_SHORT=$(date +"%Y%m%d%H%M%S")
-CUR_DATETIME_DASH=$(date +"%Y-%m-%d %H:%M:%S")
-
-# the command date in different OS has different parameters
-if command -v gdate >/dev/null 2>&1; then
-    DATE_CMD=gdate
-elif date --version >/dev/null 2>&1; then
-    DATE_CMD=date
-else
-    DATE_CMD=date
-    BSD_DATE=1
-fi
-
-if [ "${BSD_DATE}" = "1" ]; then
-    # macOS / BSD date using -v -1d to get yesterday
-    BIZ_DATE_SHORT=$($DATE_CMD -v -1d +"%Y%m%d")
-    BIZ_DATE_DASH=$($DATE_CMD -v -1d +"%Y-%m-%d")
-    BIZ_DATETIME_SHORT=$($DATE_CMD -v -1d +"%Y%m%d%H%M%S")
-    BIZ_DATETIME_DASH=$($DATE_CMD -v -1d +"%Y-%m-%dT%H:%M:%S")
-else
-    # GNU date or gdate using --date='1 day ago' to get yesterday
-    BIZ_DATE_SHORT=$($DATE_CMD --date='1 day ago' +"%Y%m%d")
-    BIZ_DATE_DASH=$($DATE_CMD --date='1 day ago' +"%Y-%m-%d")
-    BIZ_DATETIME_SHORT=$($DATE_CMD --date='1 day ago' +"%Y%m%d%H%M%S")
-    BIZ_DATETIME_DASH=$($DATE_CMD --date='1 day ago' +"%Y-%m-%dT%H:%M:%S")
-fi
-
-BIZ_DATETIME_0_SHORT="${BIZ_DATE_SHORT}000000"
-BIZ_DATETIME_0_DASH="${BIZ_DATE_DASH} 00:00:00"
-
 CLASS_PATH=".:/etc/hbase/conf:${ADDAX_HOME}/lib/*"
 LOGBACK_FILE="${ADDAX_HOME}/conf/logback.xml"
 CORE_JSON="${ADDAX_HOME}/conf/core.json"
@@ -415,9 +381,6 @@ if [ -z "${LOG_FILE_FROM_USER}" ]; then
     JVM_LOG_FILE_OPT="-Dlog.file.name=${LOG_FILE}"
 fi
 
-PARAMS="${PARAMS} -Dcurr_date_short='${CUR_DATE_SHORT}' -Dcurr_date_dash='${CUR_DATE_DASH}' -Dcurr_datetime_short='${CUR_DATETIME_SHORT}' -Dcurr_datetime_dash='${CUR_DATETIME_DASH}'"
-PARAMS="${PARAMS} -Dbiz_date_short='${BIZ_DATE_SHORT}' -Dbiz_date_dash='${BIZ_DATE_DASH}' -Dbiz_datetime_short='${BIZ_DATETIME_SHORT}' -Dbiz_datetime_dash='${BIZ_DATETIME_DASH}'"
-PARAMS="${PARAMS} -Dbiz_datetime_0_short='${BIZ_DATETIME_0_SHORT}' -Dbiz_datetime_0_dash='${BIZ_DATETIME_0_DASH}'"
 PARAMS=" ${DEFAULT_PROPERTY_CONF} -Dloglevel=${LOG_LEVEL} -Daddax.log=${LOG_DIR} ${JVM_LOG_FILE_OPT} ${PARAMS}"
 cmd="java -server ${DEFAULT_JVM} -classpath ${CLASS_PATH} $JAVA_OPTS ${CUST_JVM} ${PARAMS}"
 [ ${DEBUG} -eq 1 ] && cmd="${cmd} ${REMOTE_DEBUG_CONFIG}"
