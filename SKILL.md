@@ -273,12 +273,7 @@ bin/addax.sh job/test.json \
 
 Job JSON 中可以通过 `${param}` 访问这些值，比如 `${username}`。
 
-内置时间变量（示例时间 `2025-07-16 12:13:14`）：
-- `${curr_date_short}` → `20250716`
-- `${curr_date_dash}` → `2025-07-16`
-- `${curr_datetime_short}` → `20250716121314`
-- `${curr_datetime_dash}` → `2025-07-16 12:13:14`
-- `${biz_date_short}` / `${biz_date_dash}` / `${biz_datetime_*}` 等
+日期变量（`${curr_*}` / `${biz_*}`）不再由 `addax.sh` 注入：经 addax-admin 调度时由管理端按任务业务日填充；直接运行 `addax.sh` 时需通过 `-p` 显式传入，例如 `-p "-Dbiz_date_short=20250716"`。
 
 ### 4.3 Server 模块（HTTP 提交任务）
 

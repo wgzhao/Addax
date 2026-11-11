@@ -55,7 +55,7 @@ sh target/addax-<version>/bin/addax.sh /path/to/job.json
 
 以下约定跨模块、不直观，改代码时最容易踩坑；细节以源码为准。
 
-- **配置优先级**：Job 文件 > `conf/core.json` > 插件 `plugin.json`（后两者只补缺失键，不覆盖）。`${name}` 在解析前从 JVM system property 替换，未知占位符原样保留；`-p` 经 `sh -c` 展开且不加引号，值里不能有空格、`&`、`;`、`$` 等 shell 元字符。`curr_*`/`biz_*` 日期变量由 `addax.sh` 注入。
+- **配置优先级**：Job 文件 > `conf/core.json` > 插件 `plugin.json`（后两者只补缺失键，不覆盖）。`${name}` 在解析前从 JVM system property 替换，未知占位符原样保留；`-p` 经 `sh -c` 展开且不加引号，值里不能有空格、`&`、`;`、`$` 等 shell 元字符。`curr_*`/`biz_*` 日期变量不由 `addax.sh` 注入，需由调用方（addax-admin 或 `-p`）显式传入。
 - **split 必须 1:1**：Reader `split(adviceNumber)` 的数量是建议值，Writer `split(mandatoryNumber)` 必须返回同样数量；`JobContainer` 对不一致直接报 `CONFIG_ERROR`，不补齐、不重采样。多表 RDBMS writer 要求表数 == 并发数。
 - **并发推导**：配置了 `speed.byte`/`speed.record` 时按“总速率/单通道速率”算 channel 数，`speed.channel` 被忽略；否则用 `speed.channel`（默认 1）。channel 数最终会被 task 数截断，taskGroup 数 = `ceil(channel / core.container.taskGroup.channel)`（默认 5）。
 - **一次 task = 一个 channel + 一对 reader/writer 线程**，writer 先启动。失败重试仅当 writer `supportFailOver()` 为 true 且未超过 `maxRetryTimes`（默认 1，即默认不重试）；重试间隔 10s、等待预算 60s，且必须等上一次线程真正退出后才允许重试，避免重复写入。
