@@ -94,7 +94,7 @@
              jackson.version must declare this artifact too: the hadoop BOM manages jackson-annotations at
              2.12.7, and a newer jackson-databind fails to initialize against it (its annotation
              introspector references annotation classes that version does not have) -->
-        <jackson.annotations.version>2.22</jackson.annotations.version>
+        <jackson.annotations.version>2.23</jackson.annotations.version>
         <jedis.version>3.7.0</jedis.version>
         <jsch.version>2.28.8</jsch.version>
         <jts.version>1.20.0</jts.version>
