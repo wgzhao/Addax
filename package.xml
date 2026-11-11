@@ -107,6 +107,14 @@
             <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
+            <directory>plugin/reader/dorisreader/target/dorisreader-${project.version}/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <fileMode>0644</fileMode>
+            <outputDirectory>/</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>plugin/reader/duckdbreader/target/duckdbreader-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
