@@ -92,10 +92,25 @@
             <groupId>org.apache.avro</groupId>
             <artifactId>avro</artifactId>
         </dependency>
+        <!-- S3AFileSystem brings up a metrics2 system, which reads hadoop-metrics2.properties through
+             commons-configuration2, and the latter initializes commons-text; the root pom excludes
+             commons-text from hadoop-common, so an s3a job dies with NoClassDefFoundError:
+             org/apache/commons/text/lookup/StringLookupFactory before it reaches the bucket -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+            <version>${commons.text.version}</version>
+        </dependency>
+        <!-- s3a:// warehouses resolve through hadoop's S3AFileSystem, so only a job that writes to
+             S3 needs this at runtime. It stays off the distribution because it drags in
+             aws-java-sdk-bundle, a 297 MB jar holding every AWS SDK v1 service, which would grow
+             this plugin's libs from about 95 MB to about 392 MB for hdfs and local jobs too. An S3
+             job drops hadoop-aws and aws-java-sdk-bundle into plugin/writer/icebergwriter/libs -->
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-aws</artifactId>
             <version>${hadoop.version}</version>
+            <scope>provided</scope>
             <exclusions>
                 <exclusion>
                     <groupId>com.fasterxml.jackson.core</groupId>
