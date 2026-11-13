@@ -40,6 +40,8 @@
              versions it was tested with -->
         <parquet.version>1.17.1</parquet.version>
         <orc.version>1.9.8</orc.version>
+        <!-- the AWS SDK v1 version hadoop-aws 3.3.6 was built against -->
+        <aws.java.sdk.version>1.12.367</aws.java.sdk.version>
     </properties>
 
     <dependencies>
@@ -51,6 +53,37 @@
         <dependency>
             <groupId>com.wgzhao.addax</groupId>
             <artifactId>addax-storage</artifactId>
+        </dependency>
+        <!-- hadoop-aws used to declare aws-java-sdk-bundle, a 297 MB jar of every AWS SDK v1 service,
+             while S3AFileSystem loads only core, s3, sts and kms. Ship those modules instead: hadoop
+             3.3.2+ supports the unshaded SDK, and the bundle's only shaded reference,
+             ConfigureShadedAWSSocketFactory, is resolved reflectively and skipped when absent -->
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-s3</artifactId>
+            <version>${aws.java.sdk.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
+                </exclusion>
+                <!-- unused on the s3a path, and 2.12.7 would sit next to this plugin's jackson 2.2x -->
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.dataformat</groupId>
+                    <artifactId>jackson-dataformat-cbor</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-sts</artifactId>
+            <version>${aws.java.sdk.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- jackson-core and jackson-databind below are pinned to jackson.version, so annotations has to
              follow: reading iceberg table metadata builds an ObjectMapper, and its annotation
@@ -101,17 +134,18 @@
             <artifactId>commons-text</artifactId>
             <version>${commons.text.version}</version>
         </dependency>
-        <!-- s3a:// warehouses resolve through hadoop's S3AFileSystem, so only a job that writes to
-             S3 needs this at runtime. It stays off the distribution because it drags in
-             aws-java-sdk-bundle, a 297 MB jar holding every AWS SDK v1 service, which would grow
-             this plugin's libs from about 95 MB to about 392 MB for hdfs and local jobs too. An S3
-             job drops hadoop-aws and aws-java-sdk-bundle into plugin/writer/icebergwriter/libs -->
+        <!-- s3a:// warehouses resolve through hadoop's S3AFileSystem. Shipping this keeps the
+             protocol working out of the box and costs only the small modules it actually loads,
+             now that the 297 MB aws-java-sdk-bundle is excluded -->
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-aws</artifactId>
             <version>${hadoop.version}</version>
-            <scope>provided</scope>
             <exclusions>
+                <exclusion>
+                    <groupId>com.amazonaws</groupId>
+                    <artifactId>aws-java-sdk-bundle</artifactId>
+                </exclusion>
                 <exclusion>
                     <groupId>com.fasterxml.jackson.core</groupId>
                     <artifactId>jackson-databind</artifactId>
