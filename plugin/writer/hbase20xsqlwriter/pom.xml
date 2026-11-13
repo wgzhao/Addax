@@ -39,9 +39,27 @@
             <artifactId>addax-core</artifactId>
         </dependency>
 
+        <!-- UGI is only touched on the thick kerberos path; the user-supplied thick
+             client jar carries the Hadoop classes it needs, so nothing is bundled here -->
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-common</artifactId>
+            <scope>provided</scope>
+            <exclusions>
+                <!-- only UserGroupInformation is used; drop the SPNEGO stack that would
+                     otherwise leak nimbus-jose-jwt into the plugin libs -->
+                <exclusion>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-auth</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- thin mode is the default and the only client shipped; the thick client
+             (jdbc:phoenix:<quorum>:2181) is a 144 MB bundle and stays user-supplied -->
         <dependency>
             <groupId>org.apache.phoenix</groupId>
-            <artifactId>phoenix-client-hbase-2.1</artifactId>
+            <artifactId>phoenix-queryserver-client</artifactId>
         </dependency>
 
         <dependency>

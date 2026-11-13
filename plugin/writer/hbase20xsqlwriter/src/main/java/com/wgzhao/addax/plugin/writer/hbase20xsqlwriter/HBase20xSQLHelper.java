@@ -75,19 +75,17 @@ public class HBase20xSQLHelper
         if (originalConfig.getBool(HBaseKey.HAVE_KERBEROS, false)) {
             String principal = originalConfig.getNecessaryValue(HBaseKey.KERBEROS_PRINCIPAL, REQUIRED_VALUE);
             String keytab = originalConfig.getNecessaryValue(HBaseKey.KERBEROS_KEYTAB_FILE_PATH, REQUIRED_VALUE);
-            kerberosAuthentication(principal, keytab);
             if (isThinMode) {
-                connStr = connStr + "authentication=SPENGO;principal=" + principal + ";keytab=" + keytab;
+                // the thin driver runs its own JAAS login from these connection properties
+                connStr = connStr + ";authentication=SPNEGO;principal=" + principal + ";keytab=" + keytab;
             } else {
+                // the thick driver reuses the subject that UGI logs in and caches
+                kerberosAuthentication(principal, keytab);
                 connStr = connStr + ":" + principal + ":" + keytab;
             }
         }
-        Connection conn;
-        if (jdbcUrl.contains(":thin:")) {
-             conn = getClientConnection(connStr, PHOENIX_JDBC_THIN_DRIVER);
-        } else {
-            conn = getClientConnection(connStr, PHOENIX_JDBC_THICK_DRIVER);
-        }
+        Connection conn = getClientConnection(connStr,
+                isThinMode ? PHOENIX_JDBC_THIN_DRIVER : PHOENIX_JDBC_THICK_DRIVER);
 
         List<String> columnNames = originalConfig.getList(HBaseKey.COLUMN, String.class);
         if (columnNames == null || columnNames.isEmpty()) {
@@ -109,6 +107,14 @@ public class HBase20xSQLHelper
             Class.forName(driverName);
             conn = DriverManager.getConnection(connStr);
             conn.setAutoCommit(false);
+        }
+        catch (ClassNotFoundException e) {
+            String hint = PHOENIX_JDBC_THICK_DRIVER.equals(driverName)
+                    ? " The thick Phoenix client is not bundled; add phoenix-client-hbase-2.1-<version>.jar "
+                    + "to plugin/writer/hbase20xsqlwriter/libs to use a jdbc:phoenix:<quorum> URL."
+                    : "";
+            throw AddaxException.asAddaxException(CONNECT_ERROR,
+                    "JDBC driver " + driverName + " not found." + hint, e);
         }
         catch (Throwable e) {
             throw AddaxException.asAddaxException(CONNECT_ERROR, "Failed to connect the QueryServer", e);
