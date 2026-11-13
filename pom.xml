@@ -125,6 +125,10 @@
         <clickhouse.jdbc.version>0.11.1</clickhouse.jdbc.version>
         <databend.jdbc.version>0.4.8</databend.jdbc.version>
         <duckdb.jdbc.version>2.0.0.1</duckdb.jdbc.version>
+        <!-- DuckDB publishes one jar per OS/arch on top of the 77MB all-platform fat jar.
+             The profiles at the bottom of this file point this at the build host so each
+             plugin bundles a single ~24MB native library. Override with -D for musl builds. -->
+        <duckdb.jdbc.classifier>linux_amd64</duckdb.jdbc.classifier>
         <hive.jdbc.version>3.1.3</hive.jdbc.version>
         <influxdbClient.version>2.25</influxdbClient.version>
         <mongodb.jdbc.version>3.12.14</mongodb.jdbc.version>
@@ -1201,6 +1205,7 @@
                 <groupId>org.duckdb</groupId>
                 <artifactId>duckdb_jdbc</artifactId>
                 <version>${duckdb.jdbc.version}</version>
+                <classifier>${duckdb.jdbc.classifier}</classifier>
             </dependency>
 
             <dependency>
@@ -1455,6 +1460,71 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+
+        <!-- Only the native library of the build host is bundled, so these must follow the
+             os.arch spellings the JVM reports: amd64 on Linux/Windows, x86_64 on macOS.
+             Linux musl is indistinguishable from glibc here; pass
+             -Dduckdb.jdbc.classifier=linux_amd64_musl (or arm64 variant) on Alpine. -->
+        <profile>
+            <id>duckdb-native-linux-arm64</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                    <arch>aarch64</arch>
+                </os>
+            </activation>
+            <properties>
+                <duckdb.jdbc.classifier>linux_arm64</duckdb.jdbc.classifier>
+            </properties>
+        </profile>
+        <profile>
+            <id>duckdb-native-macos-amd64</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                    <arch>x86_64</arch>
+                </os>
+            </activation>
+            <properties>
+                <duckdb.jdbc.classifier>macos_amd64</duckdb.jdbc.classifier>
+            </properties>
+        </profile>
+        <profile>
+            <id>duckdb-native-macos-arm64</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                    <arch>aarch64</arch>
+                </os>
+            </activation>
+            <properties>
+                <duckdb.jdbc.classifier>macos_arm64</duckdb.jdbc.classifier>
+            </properties>
+        </profile>
+        <profile>
+            <id>duckdb-native-windows-amd64</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                    <arch>amd64</arch>
+                </os>
+            </activation>
+            <properties>
+                <duckdb.jdbc.classifier>windows_amd64</duckdb.jdbc.classifier>
+            </properties>
+        </profile>
+        <profile>
+            <id>duckdb-native-windows-arm64</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                    <arch>aarch64</arch>
+                </os>
+            </activation>
+            <properties>
+                <duckdb.jdbc.classifier>windows_arm64</duckdb.jdbc.classifier>
+            </properties>
         </profile>
     </profiles>
 </project>
