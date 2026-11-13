@@ -33,6 +33,11 @@
     <description>Amazon AWS S3 and variant writer plugin for Addax</description>
     <packaging>jar</packaging>
 
+    <properties>
+        <!-- the AWS SDK v1 version hadoop-aws 3.3.6 was built against -->
+        <aws.java.sdk.version>1.12.367</aws.java.sdk.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.wgzhao.addax</groupId>
@@ -50,6 +55,33 @@
         <dependency>
             <groupId>at.yawk.lz4</groupId>
             <artifactId>lz4-java</artifactId>
+        </dependency>
+
+        <!-- hadoop-aws declares aws-java-sdk-bundle, a 297 MB jar of every AWS SDK v1 service,
+             while its S3AFileSystem only loads core, s3 and sts. Ship those three modules instead:
+             the bundle references it makes, ConfigureShadedAWSSocketFactory, are resolved
+             reflectively and skipped when absent (hadoop 3.3.2+ supports the unshaded SDK) -->
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-s3</artifactId>
+            <version>${aws.java.sdk.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-sts</artifactId>
+            <version>${aws.java.sdk.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -80,6 +112,10 @@
             <artifactId>hadoop-aws</artifactId>
             <version>${hadoop.version}</version>
             <exclusions>
+                <exclusion>
+                    <groupId>com.amazonaws</groupId>
+                    <artifactId>aws-java-sdk-bundle</artifactId>
+                </exclusion>
                 <exclusion>
                     <groupId>com.fasterxml.jackson.core</groupId>
                     <artifactId>jackson-databind</artifactId>
