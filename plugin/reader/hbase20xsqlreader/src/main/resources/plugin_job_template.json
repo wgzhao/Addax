@@ -1,7 +1,7 @@
 {
   "name": "hbase20xsqlreader",
   "parameter": {
-    "queryserverAddress": "",
+    "queryServerAddress": "http://<query-server>:8765",
     "serialization": "PROTOBUF",
     "schema": "",
     "table": "TABLE1",

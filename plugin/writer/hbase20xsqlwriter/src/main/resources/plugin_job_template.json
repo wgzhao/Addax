@@ -1,7 +1,7 @@
 {
   "name": "hbase20xsqlwriter",
   "parameter": {
-    "queryServerAddress": "jdbc:phoenix[:thin]:<pointer>",
+    "jdbcUrl": "jdbc:phoenix:thin:url=http://<query-server>:8765",
     "table": "",
     "serialization": "PROTOBUF",
     "haveKerberos": false,
