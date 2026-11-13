@@ -50,15 +50,11 @@
             <artifactId>commons-lang3</artifactId>
         </dependency>
 
+        <!-- the reader only speaks the Query Server thin protocol; the thick client
+             (144 MB of shaded HBase/Hadoop) does not even contain the thin driver -->
         <dependency>
             <groupId>org.apache.phoenix</groupId>
-            <artifactId>phoenix-client-hbase-2.1</artifactId>
-            <version>${phoenix2.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.zookeeper</groupId>
-            <artifactId>zookeeper</artifactId>
+            <artifactId>phoenix-queryserver-client</artifactId>
         </dependency>
 
         <dependency>
