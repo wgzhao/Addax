@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SplittableRandom;
 import java.util.random.RandomGenerator;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
@@ -175,7 +176,8 @@ public class StreamReader
         /** True when every column of the record is a constant, the record is built only once. */
         private boolean fixedValue;
 
-        private final RandomGenerator rng = RandomGenerator.of("Xoroshiro128PlusPlus");
+        // SplittableRandom is in java.base; jdk.random is missing from jlink-trimmed JREs.
+        private final RandomGenerator rng = new SplittableRandom();
 
         @Override
         public void init()
