@@ -10,6 +10,9 @@ Addax is an actively maintained successor to Alibaba's <a href="https://github.c
 It provides a growing ecosystem of plugins and offers easy-to-follow configuration for data integrations.
 </p>
 <p align="center">
+  <b>Want a UI?</b> The companion <a href="https://github.com/wgzhao/addax-admin"><b>Addax Admin</b></a> adds a web console on top of the engine — collection-table onboarding, scheduling, backfill, reconciliation, and alerting in one place.
+</p>
+<p align="center">
    <a href="https://github.com/wgzhao/Addax/releases">
       <img src="https://img.shields.io/github/release/wgzhao/addax.svg" alt="Release Version" />
    </a>
@@ -176,12 +179,6 @@ Explore more [example jobs](docs/assets/jobs)
 - **Java Runtime**:  JDK 17
 - **Python Version**: Python 2.7+ / 3.7+ (Windows only)
 
----
-
-## 🔗 Related Projects
-
-- [addax-admin](https://github.com/wgzhao/addax-admin) - A web-based management tool for administering Addax data collection tasks
-- [addax-docs](https://github.com/wgzhao/addax-docs) - Comprehensive documentation for Addax, including user guides and API references
 ---
 
 ## 🧩 Developing Addax

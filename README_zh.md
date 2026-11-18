@@ -14,6 +14,8 @@
 
 Addax 是阿里开源 [DataX](https://github.com/alibaba/datax) 的活跃维护继任者（DataX 官方仓库自 2023 年后已停止更新）—— 一个快速、通用的开源 ETL 工具，支持 30+ 关系型与非关系型数据源。在此基础上经过了大量的改进，持续活跃维护，并提供了更多的读写插件，详细情况可参考[与DataX的主要区别](difference.md)
 
+<p align="center"><b>需要可视化界面？</b> 配套的 <a href="https://github.com/wgzhao/addax-admin"><b>Addax Admin</b></a> 是面向 T+1 ODS 采集的 Web 管理控制台，在同一个界面里完成采集表管理、调度执行、历史补数、数据对账与告警。</p>
+
 ## 项目状态
 
 **Addax 处于积极的维护中。** 项目有意进入成熟的维护阶段：
@@ -238,11 +240,6 @@ Failed record             :                   0
 - [在线文档](https://addax.wgzhao.com)
 - [项目内文档](https://github.com/wgzhao/addax-docs)
 - [性能基准报告](PERFORMANCE.md) — 2M 行 DB → HDFS / DB → DB 实测吞吐、测试方法与环境说明
-
-## 相关项目
-
-- [addax-admin](https://github.com/wgzhao/addax-admin) - 基于web的管理工具，用于管理基于Addax的数据采集任务
-- [addax-docs](https://github.com/wgzhao/addax-docs) - Addax的文档资源库，包含使用指南、插件开发文档、示例配置等
 
 ## 代码风格
 
