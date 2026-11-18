@@ -136,7 +136,7 @@
              8.0+, so only a security-driven upgrade may bump this (see dependabot.yml) -->
         <mysql.jdbc.version>8.2.0</mysql.jdbc.version>
         <mssql.jdbc.version>9.2.1.jre8</mssql.jdbc.version>
-        <ngdbc.version>2.30.11</ngdbc.version>
+        <ngdbc.version>2.30.12</ngdbc.version>
         <oracle.jdbc.version>21.5.0.0</oracle.jdbc.version>
         <!-- thin JDBC client for the Phoenix Query Server; PQS 6.0.0 wraps Phoenix 5.1.x,
              so it matches the 5.x clusters these plugins talk to -->
