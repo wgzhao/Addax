@@ -49,7 +49,7 @@ public class DorisWriterManager {
     private final LinkedBlockingDeque< WriterTuple > flushQueue;
     private final ScheduledExecutorService scheduler;
     private int batchCount = 0;
-    private long batchSize = 0;
+    private long batchBytes = 0;
     private volatile boolean closed = false;
     private volatile Throwable flushException;
 
@@ -78,7 +78,7 @@ public class DorisWriterManager {
                 }
                 try {
                     String label = createBatchLabel();
-                    LOG.debug("Doris interval Sinking triggered: rows[{}] bytes[{}] label[{}].", batchCount, batchSize, label);
+                    LOG.debug("Doris interval Sinking triggered: rows[{}] bytes[{}] label[{}].", batchCount, batchBytes, label);
                     flush(label);
                 } catch (Throwable e) {
                     flushException = e;
@@ -99,10 +99,10 @@ public class DorisWriterManager {
             byte[] bts = record.getBytes(StandardCharsets.UTF_8);
             buffer.add(bts);
             batchCount++;
-            batchSize += bts.length;
-            if (batchCount >= options.getBatchSize()) {
+            batchBytes += bts.length;
+            if (batchCount >= options.getBatchSize() || batchBytes >= options.getBatchByteSize()) {
                 String label = createBatchLabel();
-                LOG.debug("Doris buffer Sinking triggered: rows[{}] bytes[{}] label[{}].", batchCount, batchSize, label);
+                LOG.debug("Doris buffer Sinking triggered: rows[{}] bytes[{}] label[{}].", batchCount, batchBytes, label);
                 flush(label);
             }
         } catch (InterruptedException e) {
@@ -122,10 +122,10 @@ public class DorisWriterManager {
         if (batchCount == 0) {
             return;
         }
-        flushQueue.put(new WriterTuple (label, batchSize,  new ArrayList<>(buffer)));
+        flushQueue.put(new WriterTuple (label, batchBytes,  new ArrayList<>(buffer)));
         buffer.clear();
         batchCount = 0;
-        batchSize = 0;
+        batchBytes = 0;
     }
 
     /** Close. */

@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.wgzhao.addax.core.base.Constant.DEFAULT_BATCH_BYTE_SIZE;
 import static com.wgzhao.addax.core.base.Constant.DEFAULT_BATCH_SIZE;
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
@@ -211,6 +212,18 @@ public class DorisKey
     public long getBatchSize()
     {
         return options.getLong(BATCH_SIZE, DEFAULT_BATCH_SIZE);
+    }
+
+    /**
+     * Returns the max encoded bytes buffered before a stream load batch is triggered.
+     *
+     * <p>The row-count limit alone cannot bound memory because a single row may be
+     * arbitrarily large, so a batch is also flushed once this byte threshold is
+     * reached.</p>
+     */
+    public long getBatchByteSize()
+    {
+        return options.getLong(BATCH_BYTE_SIZE, DEFAULT_BATCH_BYTE_SIZE);
     }
 
     /** Returns the connecttimeout. */

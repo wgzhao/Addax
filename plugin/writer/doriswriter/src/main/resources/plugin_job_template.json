@@ -7,7 +7,8 @@
       "col1",
       "col2"
     ],
-    "batchSize": 102400,
+    "batchSize": 2048,
+    "batchByteSize": 33554432,
     "flushInterval": 3000,
     "flushQueueLength": 1,
     "loadUrl": [
