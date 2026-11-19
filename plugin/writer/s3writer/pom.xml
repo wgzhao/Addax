@@ -35,7 +35,7 @@
 
     <properties>
         <!-- the AWS SDK v1 version hadoop-aws 3.3.6 was built against -->
-        <aws.java.sdk.version>1.12.367</aws.java.sdk.version>
+        <aws.java.sdk.version>1.12.797</aws.java.sdk.version>
     </properties>
 
     <dependencies>
