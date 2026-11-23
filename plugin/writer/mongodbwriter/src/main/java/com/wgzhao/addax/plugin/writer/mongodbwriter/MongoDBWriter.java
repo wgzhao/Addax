@@ -26,9 +26,11 @@ import com.mongodb.bulk.BulkWriteError;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.BulkWriteOptions;
+import com.mongodb.client.model.DeleteOneModel;
 import com.mongodb.client.model.InsertManyOptions;
 import com.mongodb.client.model.ReplaceOneModel;
 import com.mongodb.client.model.ReplaceOptions;
+import com.mongodb.client.model.WriteModel;
 import com.wgzhao.addax.core.base.Constant;
 import com.wgzhao.addax.core.element.Column;
 import com.wgzhao.addax.core.element.Record;
@@ -41,12 +43,15 @@ import com.wgzhao.addax.core.util.EncryptUtil;
 import com.wgzhao.addax.plugin.writer.mongodbwriter.util.MongoUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
+import org.bson.types.Decimal128;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -218,14 +223,20 @@ public class MongoDBWriter
         private boolean wildcardMode = false;
         private List<ColumnPlan> columnPlans = null;
         private boolean update = false;
+        private boolean merge = false;
         private String updateKey = null;
         private String[] updateKeyPath = null;
+        private String opColumn = null;
+        private String[] opColumnPath = null;
 
         /** Buffered documents together with their source records, so a failed write can be reported as a dirty record. */
         private final List<Pending> buffer = new ArrayList<>();
 
         /** A converted document and the record it was built from. */
         private record Pending(Record record, Document data) {}
+
+        /** A buffered document together with the write its op column asks for. */
+        private record MergeEntry(Pending pending, WriteModel<Document> model) {}
 
         @Override
         public void init()
@@ -249,6 +260,7 @@ public class MongoDBWriter
 
             buildColumnPlans(writerSliceConfig);
             parseWriteMode(writerSliceConfig);
+            validateMergeConfiguration();
         }
 
         /**
@@ -283,25 +295,105 @@ public class MongoDBWriter
 
         private void parseWriteMode(Configuration writerSliceConfig)
         {
-            String writeMode = writerSliceConfig.getString(WRITE_MODE, "insert");
+            String writeMode = writerSliceConfig.getString(WRITE_MODE, "insert").trim();
             if ("insert".equalsIgnoreCase(writeMode)) {
                 return;
             }
-            if (!writeMode.startsWith("update")) {
-                // anything else used to be taken as an insert without saying so
-                LOG.warn("Unsupported writeMode [{}], the documents are inserted, only [insert] and [update(field)] are understood",
-                        writeMode);
-                return;
+            // the mode name is matched case-insensitively, but the whole value has to be the mode:
+            // a typo or trailing text must fail the job instead of writing every record as an insert
+            String modeName = writeMode.toLowerCase(Locale.ROOT);
+            if (modeName.startsWith("update(")) {
+                parseUpdateMode(writeMode);
             }
+            else if (modeName.startsWith("merge(")) {
+                parseMergeMode(writeMode);
+            }
+            else {
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                        String.format("Unsupported writeMode [%s], expected insert, update(field) or merge(key, opColumn)",
+                                writeMode));
+            }
+        }
+
+        /**
+         * Parse update(field). The value has to end with the closing parenthesis, so neither
+         * update(field)junk nor a second field is mistaken for the mode.
+         */
+        private void parseUpdateMode(String writeMode)
+        {
             int begin = writeMode.indexOf('(');
             int end = writeMode.lastIndexOf(')');
-            if (begin < 0 || end <= begin + 1) {
+            if (end != writeMode.length() - 1 || end <= begin + 1) {
                 throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                         "When specifying the mode is update, you MUST both specify the field to be updated, for example update(unique_id)");
             }
+            String key = writeMode.substring(begin + 1, end).trim();
+            if (key.isEmpty() || key.contains(",")) {
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                        "The update mode takes exactly one non empty field, for example update(unique_id)");
+            }
             this.update = true;
-            this.updateKey = writeMode.substring(begin + 1, end).trim();
-            this.updateKeyPath = ColumnPlan.splitPath(this.updateKey);
+            this.updateKey = key;
+            this.updateKeyPath = ColumnPlan.splitPath(key);
+        }
+
+        /**
+         * Parse merge(key, opColumn). Every record names its operation in the op column: A, I, U,
+         * INSERT or UPDATE writes the document matched by the key, D or DELETE deletes it, and any
+         * other value including null is a dirty record. Both parameters are required so the
+         * configuration always says which column drives the operation, and the op column itself is
+         * never stored in the collection.
+         */
+        private void parseMergeMode(String writeMode)
+        {
+            int begin = writeMode.indexOf('(');
+            int end = writeMode.lastIndexOf(')');
+            if (end != writeMode.length() - 1 || end <= begin + 1) {
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                        "When specifying the mode is merge, you MUST specify both the merge key and the op column, "
+                                + "for example merge(unique_id, op)");
+            }
+            String[] parts = writeMode.substring(begin + 1, end).split(",", -1);
+            if (parts.length != 2) {
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                        "The merge mode takes exactly two parameters, the merge key and the op column, "
+                                + "for example merge(unique_id, op)");
+            }
+            String key = parts[0].trim();
+            String op = parts[1].trim();
+            if (key.isEmpty() || op.isEmpty()) {
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                        "The merge mode requires a non empty merge key and op column, for example merge(unique_id, op)");
+            }
+            this.merge = true;
+            this.updateKey = key;
+            this.updateKeyPath = ColumnPlan.splitPath(key);
+            this.opColumn = op;
+            this.opColumnPath = ColumnPlan.splitPath(op);
+        }
+
+        /**
+         * Fail fast when the merge key or the op column is not part of the configured column list:
+         * every record would be reported as dirty instead, which hides a plain configuration
+         * mistake. A key may name the parent of configured leaf columns. A wildcard record carries
+         * its own keys, so only the records themselves can tell.
+         */
+        private void validateMergeConfiguration()
+        {
+            if (!merge || wildcardMode) {
+                return;
+            }
+            boolean keyConfigured = columnPlans.stream()
+                    .anyMatch(plan -> plan.name().equals(updateKey) || plan.name().startsWith(updateKey + "."));
+            if (!keyConfigured) {
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                        String.format("The merge key [%s] must be part of the configured column list", updateKey));
+            }
+            boolean opConfigured = columnPlans.stream().anyMatch(plan -> plan.name().equals(opColumn));
+            if (!opConfigured) {
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                        String.format("The merge op column [%s] must be part of the configured column list", opColumn));
+            }
         }
 
         @Override
@@ -334,7 +426,10 @@ public class MongoDBWriter
                 return;
             }
             try {
-                if (update) {
+                if (merge) {
+                    flushMerge(collection);
+                }
+                else if (update) {
                     List<ReplaceOneModel<Document>> models = new ArrayList<>(buffer.size());
                     for (Pending pending : buffer) {
                         models.add(new ReplaceOneModel<>(buildUpdateQuery(pending.data()), pending.data(), UPSERT));
@@ -350,7 +445,7 @@ public class MongoDBWriter
                 }
             }
             catch (MongoBulkWriteException e) {
-                collectRejected(e);
+                collectRejected(e, buffer);
             }
             catch (MongoException e) {
                 // a failure below the write protocol leaves it unknown which documents of the batch
@@ -366,29 +461,29 @@ public class MongoDBWriter
 
         /**
          * Report the documents a batch write rejected as dirty records. Their position within the
-         * batch is the position in the buffer, the driver keeps the index of the original request.
+         * request is the position in [sources], the driver keeps the index of the original request.
          */
-        private void collectRejected(MongoBulkWriteException e)
+        private void collectRejected(MongoBulkWriteException e, List<Pending> sources)
         {
             List<BulkWriteError> errors = e.getWriteErrors();
             if (!errors.isEmpty()) {
                 LOG.warn("MongoDB rejected [{}] of [{}] documents of a batch, they are collected as dirty records",
-                        errors.size(), buffer.size());
+                        errors.size(), sources.size());
             }
             for (BulkWriteError error : errors) {
                 int index = error.getIndex();
-                if (index < 0 || index >= buffer.size()) {
+                if (index < 0 || index >= sources.size()) {
                     // the driver named a position outside of the batch, the document cannot be identified
                     LOG.error("MongoDB rejected a document at position [{}] of a batch of [{}] documents: {}",
-                            index, buffer.size(), error.getMessage());
+                            index, sources.size(), error.getMessage());
                     continue;
                 }
-                super.getTaskPluginCollector().collectDirtyRecord(buffer.get(index).record(),
+                super.getTaskPluginCollector().collectDirtyRecord(sources.get(index).record(),
                         String.format("MongoDB rejected the document, code [%d]: %s", error.getCode(), error.getMessage()));
             }
             if (e.getWriteConcernError() != null) {
                 LOG.error("The write concern was not met for a batch of [{}] documents: {}",
-                        buffer.size(), e.getWriteConcernError().getMessage());
+                        sources.size(), e.getWriteConcernError().getMessage());
             }
         }
 
@@ -411,11 +506,98 @@ public class MongoDBWriter
             }
         }
 
+        /**
+         * Write the buffered documents according to their op column: A, I, U, INSERT or UPDATE
+         * replaces the document named by the merge key with an upsert, D or DELETE deletes it, any
+         * other value including null is a dirty record. The op column is a control field and never
+         * reaches the collection. A key that appears more than once in a batch keeps its last
+         * operation, so the final state does not depend on the order an unordered batch happens to
+         * run in.
+         */
+        private void flushMerge(MongoCollection<Document> collection)
+        {
+            Map<String, MergeEntry> entries = new LinkedHashMap<>(buffer.size());
+            for (Pending pending : buffer) {
+                Document data = pending.data();
+                if (!containsNestedField(data, opColumnPath)) {
+                    super.getTaskPluginCollector().collectDirtyRecord(pending.record(),
+                            String.format("The merge op column [%s] is missing, the record does not name its operation",
+                                    opColumn));
+                    continue;
+                }
+                Object rawOp = removeNestedField(data, opColumnPath);
+                String op = rawOp == null ? "" : rawOp.toString().trim();
+                if (StringUtils.isBlank(op)) {
+                    super.getTaskPluginCollector().collectDirtyRecord(pending.record(),
+                            String.format("The merge op column [%s] is empty, it does not name an operation", opColumn));
+                    continue;
+                }
+                boolean delete;
+                if ("D".equalsIgnoreCase(op) || "DELETE".equalsIgnoreCase(op)) {
+                    delete = true;
+                }
+                else if ("A".equalsIgnoreCase(op) || "I".equalsIgnoreCase(op) || "U".equalsIgnoreCase(op)
+                        || "INSERT".equalsIgnoreCase(op) || "UPDATE".equalsIgnoreCase(op)) {
+                    delete = false;
+                }
+                else {
+                    super.getTaskPluginCollector().collectDirtyRecord(pending.record(),
+                            String.format("Unknown merge op [%s], only [A], [I], [U], [D], [INSERT], [UPDATE] "
+                                    + "and [DELETE] are understood", op));
+                    continue;
+                }
+
+                Object keyValue = getNestedValue(data, updateKeyPath);
+                if (keyValue == null) {
+                    // processRecord rejects such a record already, the guard keeps a null key from becoming a {key: null} filter
+                    super.getTaskPluginCollector().collectDirtyRecord(pending.record(),
+                            String.format("The record carries no value at the merge key [%s]", updateKey));
+                    continue;
+                }
+                // a subdocument filter matches the whole subdocument, the dotted path names the field
+                Document query = new Document(String.join(".", updateKeyPath), keyValue);
+                WriteModel<Document> model = delete
+                        ? new DeleteOneModel<>(query)
+                        : new ReplaceOneModel<>(query, data, UPSERT);
+                entries.put(foldKey(keyValue), new MergeEntry(pending, model));
+            }
+
+            if (entries.isEmpty()) {
+                return;
+            }
+            List<MergeEntry> mergeEntries = new ArrayList<>(entries.values());
+            List<WriteModel<Document>> models = mergeEntries.stream().map(MergeEntry::model).toList();
+            try {
+                collection.bulkWrite(models, UNORDERED_BULK);
+            }
+            catch (MongoBulkWriteException e) {
+                collectRejected(e, mergeEntries.stream().map(MergeEntry::pending).toList());
+            }
+            catch (MongoException e) {
+                LOG.warn("Failed to write a merge batch of [{}] documents, try to write them one at a time. reason: {}",
+                        models.size(), e.getMessage());
+                writeMergeOneByOne(collection, mergeEntries);
+            }
+        }
+
+        /** Write the merge documents one by one, collecting each document the server rejects. */
+        private void writeMergeOneByOne(MongoCollection<Document> collection, List<MergeEntry> entries)
+        {
+            for (MergeEntry entry : entries) {
+                try {
+                    collection.bulkWrite(List.of(entry.model()), UNORDERED_BULK);
+                }
+                catch (MongoException ex) {
+                    LOG.debug("Failed to write one document: {}", ex.getMessage());
+                    super.getTaskPluginCollector().collectDirtyRecord(entry.pending().record(), ex);
+                }
+            }
+        }
+
         private Document buildUpdateQuery(Document data)
         {
-            Document query = new Document();
-            setNestedField(query, updateKeyPath, getNestedValue(data, updateKeyPath));
-            return query;
+            // a subdocument filter matches the whole subdocument, the dotted path names the field
+            return new Document(String.join(".", updateKeyPath), getNestedValue(data, updateKeyPath));
         }
 
         private Document processRecord(Record record)
@@ -438,12 +620,12 @@ public class MongoDBWriter
                     }
                 }
                 // a whole document carries its own keys, so the check belongs to both paths
-                if (update && getNestedValue(data, updateKeyPath) == null) {
+                if ((update || merge) && getNestedValue(data, updateKeyPath) == null) {
                     // the query of such a record would be {key: null}, which matches every document
-                    // where the field is missing or null, and the upsert would overwrite the first of them
+                    // where the field is missing or null, and the write would overwrite the first of them
                     throw new IllegalArgumentException(String.format(
-                            "The record carries no value at the update key [%s], it does not name the document to replace",
-                            updateKey));
+                            "The record carries no value at the %s key [%s], it does not name the document to write",
+                            merge ? "merge" : "update", updateKey));
                 }
                 return data;
             }
@@ -545,6 +727,56 @@ public class MongoDBWriter
                 }
             }
             return current;
+        }
+
+        /**
+         * The identity of a key in one batch, following MongoDB equality where the numeric types of
+         * the same value match each other. The class name still separates values MongoDB compares
+         * unequal, such as an ObjectId and the string of its hexadecimal form.
+         */
+        private String foldKey(Object keyValue)
+        {
+            if (keyValue instanceof Number number) {
+                try {
+                    return "number:" + new BigDecimal(number.toString()).stripTrailingZeros().toPlainString();
+                }
+                catch (NumberFormatException e) {
+                    // NaN and the infinities have no decimal form, their printed value is used below
+                }
+            }
+            if (keyValue instanceof Decimal128 decimal) {
+                return "number:" + decimal.bigDecimalValue().stripTrailingZeros().toPlainString();
+            }
+            return keyValue.getClass().getSimpleName() + ":" + keyValue;
+        }
+
+        /** Whether the document carries the field of a dotted path, which tells a blank op from a missing op column. */
+        private boolean containsNestedField(Document root, String[] path)
+        {
+            Object current = root;
+            for (int i = 0; i < path.length - 1; i++) {
+                if (!(current instanceof Document currentDoc)) {
+                    return false;
+                }
+                current = currentDoc.get(path[i]);
+            }
+            return current instanceof Document currentDoc && currentDoc.containsKey(path[path.length - 1]);
+        }
+
+        /** Remove the field of a dotted path, returns its value or null when the path does not lead to a field. */
+        private Object removeNestedField(Document root, String[] path)
+        {
+            if (path.length == 1) {
+                return root.remove(path[0]);
+            }
+            Document current = root;
+            for (int i = 0; i < path.length - 1; i++) {
+                if (!(current.get(path[i]) instanceof Document child)) {
+                    return null;
+                }
+                current = child;
+            }
+            return current.remove(path[path.length - 1]);
         }
 
         @Override
