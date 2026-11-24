@@ -34,7 +34,8 @@
     <packaging>jar</packaging>
 
     <properties>
-        <!-- the AWS SDK v1 version hadoop-aws 3.3.6 was built against -->
+        <!-- hadoop-aws 3.3.6 was built against AWS SDK v1 1.12.367; this pins a later
+             patch of the same 1.12 line, whose S3/STS API stays binary compatible -->
         <aws.java.sdk.version>1.12.797</aws.java.sdk.version>
     </properties>
 
