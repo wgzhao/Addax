@@ -124,7 +124,7 @@
         <cassandra.jdbc.version>3.11.5</cassandra.jdbc.version>
         <clickhouse.jdbc.version>0.11.2</clickhouse.jdbc.version>
         <databend.jdbc.version>0.4.8</databend.jdbc.version>
-        <duckdb.jdbc.version>2.0.0.1</duckdb.jdbc.version>
+        <duckdb.jdbc.version>2.0.1.0</duckdb.jdbc.version>
         <!-- DuckDB publishes one jar per OS/arch on top of the 77MB all-platform fat jar.
              The profiles at the bottom of this file point this at the build host so each
              plugin bundles a single ~24MB native library. Override with -D for musl builds. -->
