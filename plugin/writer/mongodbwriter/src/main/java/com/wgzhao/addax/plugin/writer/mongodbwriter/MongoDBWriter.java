@@ -56,6 +56,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.wgzhao.addax.core.base.Constant.DEFAULT_BATCH_SIZE;
@@ -75,6 +76,16 @@ public class MongoDBWriter
         extends Writer
 {
     private static final Logger LOG = LoggerFactory.getLogger(MongoDBWriter.class);
+
+    /**
+     * The whole writeMode value has to match exactly. A prefix-only check would accept trailing
+     * text after the closing parenthesis and let update(id)) produce the key id), so the pattern
+     * excludes parentheses and commas inside the parameters.
+     */
+    private static final Pattern UPDATE_MODE_PATTERN =
+            Pattern.compile("(?i)^update\\(\\s*([^(),]+?)\\s*\\)$");
+    private static final Pattern MERGE_MODE_PATTERN =
+            Pattern.compile("(?i)^merge\\(\\s*([^(),]+?)\\s*,\\s*([^(),]+?)\\s*\\)$");
 
     /** Job. */
     public static class Job
@@ -260,7 +271,7 @@ public class MongoDBWriter
 
             buildColumnPlans(writerSliceConfig);
             parseWriteMode(writerSliceConfig);
-            validateMergeConfiguration();
+            validateKeyConfiguration();
         }
 
         /**
@@ -316,25 +327,26 @@ public class MongoDBWriter
         }
 
         /**
-         * Parse update(field). The value has to end with the closing parenthesis, so neither
-         * update(field)junk nor a second field is mistaken for the mode.
+         * Parse update(field). The whole value has to match the mode exactly: trailing text, a
+         * second field or a parenthesis inside the field name make the configuration fail instead
+         * of quietly turning into a key like "id)".
          */
         private void parseUpdateMode(String writeMode)
         {
-            int begin = writeMode.indexOf('(');
-            int end = writeMode.lastIndexOf(')');
-            if (end != writeMode.length() - 1 || end <= begin + 1) {
+            Matcher matcher = UPDATE_MODE_PATTERN.matcher(writeMode);
+            if (!matcher.matches()) {
                 throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                        "When specifying the mode is update, you MUST both specify the field to be updated, for example update(unique_id)");
+                        String.format("Unsupported writeMode [%s], the update mode must be written as update(field), "
+                                + "for example update(unique_id)", writeMode));
             }
-            String key = writeMode.substring(begin + 1, end).trim();
-            if (key.isEmpty() || key.contains(",")) {
+            String key = matcher.group(1).trim();
+            if (key.isEmpty()) {
                 throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                        "The update mode takes exactly one non empty field, for example update(unique_id)");
+                        "The update mode takes exactly one non-empty field, for example update(unique_id)");
             }
             this.update = true;
             this.updateKey = key;
-            this.updateKeyPath = ColumnPlan.splitPath(key);
+            this.updateKeyPath = ColumnPlan.splitPath(this.updateKey);
         }
 
         /**
@@ -342,57 +354,54 @@ public class MongoDBWriter
          * INSERT or UPDATE writes the document matched by the key, D or DELETE deletes it, and any
          * other value including null is a dirty record. Both parameters are required so the
          * configuration always says which column drives the operation, and the op column itself is
-         * never stored in the collection.
+         * never stored in the collection. The whole value has to match the mode exactly.
          */
         private void parseMergeMode(String writeMode)
         {
-            int begin = writeMode.indexOf('(');
-            int end = writeMode.lastIndexOf(')');
-            if (end != writeMode.length() - 1 || end <= begin + 1) {
+            Matcher matcher = MERGE_MODE_PATTERN.matcher(writeMode);
+            if (!matcher.matches()) {
                 throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                        "When specifying the mode is merge, you MUST specify both the merge key and the op column, "
-                                + "for example merge(unique_id, op)");
+                        String.format("Unsupported writeMode [%s], the merge mode must be written as merge(key, opColumn), "
+                                + "for example merge(unique_id, op)", writeMode));
             }
-            String[] parts = writeMode.substring(begin + 1, end).split(",", -1);
-            if (parts.length != 2) {
-                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                        "The merge mode takes exactly two parameters, the merge key and the op column, "
-                                + "for example merge(unique_id, op)");
-            }
-            String key = parts[0].trim();
-            String op = parts[1].trim();
+            String key = matcher.group(1).trim();
+            String op = matcher.group(2).trim();
             if (key.isEmpty() || op.isEmpty()) {
                 throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                        "The merge mode requires a non empty merge key and op column, for example merge(unique_id, op)");
+                        "The merge mode requires a non-empty merge key and op column, for example merge(unique_id, op)");
             }
             this.merge = true;
             this.updateKey = key;
-            this.updateKeyPath = ColumnPlan.splitPath(key);
+            this.updateKeyPath = ColumnPlan.splitPath(this.updateKey);
             this.opColumn = op;
-            this.opColumnPath = ColumnPlan.splitPath(op);
+            this.opColumnPath = ColumnPlan.splitPath(this.opColumn);
         }
 
         /**
-         * Fail fast when the merge key or the op column is not part of the configured column list:
-         * every record would be reported as dirty instead, which hides a plain configuration
-         * mistake. A key may name the parent of configured leaf columns. A wildcard record carries
-         * its own keys, so only the records themselves can tell.
+         * Fail fast when the merge key / update field or the op column is not part of the
+         * configured column list: every record would be reported as dirty instead, which hides a
+         * plain configuration mistake. A key may name the parent of configured leaf columns. A
+         * wildcard record carries its own keys, so only the records themselves can tell.
          */
-        private void validateMergeConfiguration()
+        private void validateKeyConfiguration()
         {
-            if (!merge || wildcardMode) {
+            if (wildcardMode || (!merge && !update)) {
                 return;
             }
+            String keyKind = merge ? "merge" : "update";
             boolean keyConfigured = columnPlans.stream()
                     .anyMatch(plan -> plan.name().equals(updateKey) || plan.name().startsWith(updateKey + "."));
             if (!keyConfigured) {
                 throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                        String.format("The merge key [%s] must be part of the configured column list", updateKey));
+                        String.format("The %s key [%s] must be part of the configured column list",
+                                keyKind, updateKey));
             }
-            boolean opConfigured = columnPlans.stream().anyMatch(plan -> plan.name().equals(opColumn));
-            if (!opConfigured) {
-                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                        String.format("The merge op column [%s] must be part of the configured column list", opColumn));
+            if (merge) {
+                boolean opConfigured = columnPlans.stream().anyMatch(plan -> plan.name().equals(opColumn));
+                if (!opConfigured) {
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                            String.format("The merge op column [%s] must be part of the configured column list", opColumn));
+                }
             }
         }
 
@@ -517,6 +526,7 @@ public class MongoDBWriter
         private void flushMerge(MongoCollection<Document> collection)
         {
             Map<String, MergeEntry> entries = new LinkedHashMap<>(buffer.size());
+            int classified = 0;
             for (Pending pending : buffer) {
                 Document data = pending.data();
                 if (!containsNestedField(data, opColumnPath)) {
@@ -560,6 +570,13 @@ public class MongoDBWriter
                         ? new DeleteOneModel<>(query)
                         : new ReplaceOneModel<>(query, data, UPSERT);
                 entries.put(foldKey(keyValue), new MergeEntry(pending, model));
+                classified++;
+            }
+
+            if (entries.size() < classified) {
+                // folded duplicates are invisible to the framework statistics, the debug log is the only trace of them
+                LOG.debug("folded [{}] of [{}] classified records into their key's last operation; only that operation is written",
+                        classified - entries.size(), classified);
             }
 
             if (entries.isEmpty()) {
@@ -738,14 +755,29 @@ public class MongoDBWriter
         {
             if (keyValue instanceof Number number) {
                 try {
-                    return "number:" + new BigDecimal(number.toString()).stripTrailingZeros().toPlainString();
+                    // floating-point values fold by their exact binary value: NumberDecimal("0.1")
+                    // and the double 0.1 print the same but MongoDB compares them unequal, while
+                    // 1, 1L and 1.0 and 0.5/NumberDecimal("0.5") compare equal and have to fold
+                    BigDecimal value;
+                    if (keyValue instanceof Decimal128 decimal) {
+                        value = decimal.bigDecimalValue();
+                    }
+                    else if (keyValue instanceof BigDecimal bigDecimal) {
+                        value = bigDecimal;
+                    }
+                    else if (keyValue instanceof Double || keyValue instanceof Float) {
+                        value = new BigDecimal(number.doubleValue());
+                    }
+                    else {
+                        value = BigDecimal.valueOf(number.longValue());
+                    }
+                    return "number:" + value.stripTrailingZeros().toPlainString();
                 }
-                catch (NumberFormatException e) {
-                    // NaN and the infinities have no decimal form, their printed value is used below
+                catch (NumberFormatException | ArithmeticException e) {
+                    // NaN and the infinities have no decimal form; they compare equal across
+                    // double and decimal in MongoDB, so the printed value folds them together
+                    return "number:" + number;
                 }
-            }
-            if (keyValue instanceof Decimal128 decimal) {
-                return "number:" + decimal.bigDecimalValue().stripTrailingZeros().toPlainString();
             }
             return keyValue.getClass().getSimpleName() + ":" + keyValue;
         }
