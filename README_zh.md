@@ -120,113 +120,30 @@ mvn package -Pdistribution
 
 ### 开始第一个任务
 
-`job` 子目录包含了大量的任务样本，其中 `job.json` 可以作为冒烟测试，执行如下
+发行版 `job/` 目录下有 30+ 个任务样本（多数同时提供 YAML 版本），其中 `job.json` 用作冒烟测试，进入发行版目录执行：
 
 ```shell
+cd target/addax-<version>
 bin/addax.sh job/job.json
 ```
 
-上述命令的输出大致如下：
-<details>
-<summary>点击展开</summary>
+该任务只搬 10 行生成数据，下面的耗时和速率仅用于确认任务跑通，不代表真实性能（见 [性能基准报告](PERFORMANCE.md)）。输出已省略中间日志，关键行如下：
 
-```shell
-$bin/addax.sh job/job.json
-
- ___      _     _
- / _ \    | |   | |
-/ /_\ \ __| | __| | __ ___  __
-|  _  |/ _` |/ _` |/ _` \ \/ /
-| | | | (_| | (_| | (_| |>  <
-\_| |_/\__,_|\__,_|\__,_/_/\_\
-
-:: Addax version ::    (v4.0.13-SNAPSHOT)
-
-2023-05-14 11:43:38.040 [        main] INFO  VMInfo               - VMInfo# operatingSystem class => sun.management.OperatingSystemImpl
-2023-05-14 11:43:38.062 [        main] INFO  Engine               -
-{
-	"setting":{
-		"speed":{
-			"byte":-1,
-			"channel":1,
-			"record":-1
-		}
-	},
-	"content":{
-		"reader":{
-			"name":"streamreader",
-			"parameter":{
-				"sliceRecordCount":10,
-				"column":[
-					{
-						"value":"addax",
-						"type":"string"
-					},
-					{
-						"value":19890604,
-						"type":"long"
-					},
-					{
-						"value":"1989-06-04 11:22:33 123456",
-						"type":"date",
-						"dateFormat":"yyyy-MM-dd HH:mm:ss SSSSSS"
-					},
-					{
-						"value":true,
-						"type":"bool"
-					},
-					{
-						"value":"test",
-						"type":"bytes"
-					}
-				]
-			}
-		},
-		"writer":{
-			"name":"streamwriter",
-			"parameter":{
-				"print":true,
-				"encoding":"UTF-8"
-			}
-		}
-	}
-}
-
-2023-05-14 11:43:38.092 [        main] INFO  JobContainer         - The jobContainer begins to process the job.
-2023-05-14 11:43:38.107 [       job-0] INFO  JobContainer         - The Reader.Job [streamreader] perform prepare work .
-2023-05-14 11:43:38.107 [       job-0] INFO  JobContainer         - The Writer.Job [streamwriter] perform prepare work .
-2023-05-14 11:43:38.108 [       job-0] INFO  JobContainer         - Job set Channel-Number to 1 channel(s).
-2023-05-14 11:43:38.108 [       job-0] INFO  JobContainer         - The Reader.Job [streamreader] is divided into [1] task(s).
-2023-05-14 11:43:38.108 [       job-0] INFO  JobContainer         - The Writer.Job [streamwriter] is divided into [1] task(s).
-2023-05-14 11:43:38.130 [       job-0] INFO  JobContainer         - The Scheduler launches [1] taskGroup(s).
-2023-05-14 11:43:38.138 [ taskGroup-0] INFO  TaskGroupContainer   - The taskGroupId=[0] started [1] channels for [1] tasks.
-2023-05-14 11:43:38.141 [ taskGroup-0] INFO  Channel              - The Channel set byte_speed_limit to -1, No bps activated.
-2023-05-14 11:43:38.141 [ taskGroup-0] INFO  Channel              - The Channel set record_speed_limit to -1, No tps activated.
-addax  19890604	1989-06-04 11:24:36	true	test
-addax  19890604	1989-06-04 11:24:36	true	test
-addax  19890604	1989-06-04 11:24:36	true	test
-addax  19890604	1989-06-04 11:24:36	true	test
-addax  19890604	1989-06-04 11:24:36	true	test
-addax  19890604	1989-06-04 11:24:36	true	test
-addax  19890604	1989-06-04 11:24:36	true	test
-addax  19890604	1989-06-04 11:24:36	true	test
-addax  19890604	1989-06-04 11:24:36	true	test
-addax  19890604	1989-06-04 11:24:36	true	test
-2023-05-14 11:43:41.157 [       job-0] INFO  AbstractScheduler    - The scheduler has completed all tasks.
-2023-05-14 11:43:41.158 [       job-0] INFO  JobContainer         - The Writer.Job [streamwriter] perform post work.
-2023-05-14 11:43:41.159 [       job-0] INFO  JobContainer         - The Reader.Job [streamreader] perform post work.
-2023-05-14 11:43:41.162 [       job-0] INFO  StandAloneJobContainerCommunicator - Total 10 records, 260 bytes | Speed 86B/s, 3 records/s | Error 0 records, 0 bytes |  All Task WaitWriterTime 0.000s |  All Task WaitReaderTime 0.000s | Percentage 100.00%
-2023-05-14 11:43:41.596 [       job-0] INFO  JobContainer         -
-Job start  at             : 2023-05-14 11:43:38
-Job end    at             : 2023-05-14 11:43:41
-Job took secs             :                  3ss
+```text
+2026-11-26 17:18:58.839 [       job-0] INFO  JobContainer         - The Reader.Job [streamreader] perform prepare work .
+2026-11-26 17:18:58.839 [       job-0] INFO  JobContainer         - The Writer.Job [streamwriter] perform prepare work .
+2026-11-26 17:18:58.839 [       job-0] INFO  JobContainer         - Job set Channel-Number to 1 channel(s).
+addax	19890604	1989-06-04 00:00:00	true	0x74657374
+...
+Job start  at             : 2026-11-26 17:18:58
+Job end    at             : 2026-11-26 17:19:01
+Job took secs             :                  3s
+Total   bytes             :                 260
 Average   bps             :               86B/s
 Average   rps             :              3rec/s
 Number of rec             :                  10
 Failed record             :                   0
 ```
-
-</details>
 
 [这里](core/src/main/job) 以及[文档中心](https://github.com/wgzhao/addax-docs/tree/master/docs/public/assets/jobs) 提供了大量作业配置样例
 

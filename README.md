@@ -164,13 +164,32 @@ The compiled binary will be in `target/addax-<version>`.
 
 ### 4. Run Your First Task
 
-Load sample job configuration and test the setup:
+Run the bundled smoke job from the distribution directory:
 
 ```bash
+cd target/addax-<version>
 bin/addax.sh job/job.json
 ```
 
-Explore more [example jobs](docs/assets/jobs)
+`job.json` pushes 10 generated rows through the engine and prints them, so the timings below are a smoke test, not a benchmark — see [Performance Baseline](PERFORMANCE.md) for real throughput. Output trimmed to the key lines:
+
+```text
+2026-11-26 17:18:58.839 [       job-0] INFO  JobContainer         - The Reader.Job [streamreader] perform prepare work .
+2026-11-26 17:18:58.839 [       job-0] INFO  JobContainer         - The Writer.Job [streamwriter] perform prepare work .
+2026-11-26 17:18:58.839 [       job-0] INFO  JobContainer         - Job set Channel-Number to 1 channel(s).
+addax	19890604	1989-06-04 00:00:00	true	0x74657374
+...
+Job start  at             : 2026-11-26 17:18:58
+Job end    at             : 2026-11-26 17:19:01
+Job took secs             :                  3s
+Total   bytes             :                 260
+Average   bps             :               86B/s
+Average   rps             :              3rec/s
+Number of rec             :                  10
+Failed record             :                   0
+```
+
+The distribution ships 30+ sample jobs under `job/` (each also available as YAML); the full list is in [core/src/main/job](core/src/main/job).
 
 ---
 
