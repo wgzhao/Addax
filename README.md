@@ -114,6 +114,7 @@ Addax supports a wide range of database systems and file sources. Below is a sel
 <tr>
 <td><img src="./images/logos/iceberg.svg" height="50px" alt="Iceberg" style="border: 1px solid #ddd;"></td>
 <td><img src="./images/logos/duckdb.svg" height="50px" alt="DuckDB" style="border: 1px solid #ddd;"></td>
+<td><img src="./images/logos/iotdb.svg" height="50px" alt="Apache IoTDB" style="border: 1px solid #ddd;"></td>
 </tr>
 </table>
 

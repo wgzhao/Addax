@@ -83,6 +83,7 @@ Addax 支持超过 30 种[关系型和非关系型数据库](support_data_source
 <tr>
 <td><img src="./images/logos/iceberg.svg" height="50px" alt="Iceberg" style="border: 1px solid #ddd;"></td>
 <td><img src="./images/logos/duckdb.svg" height="50px" alt="DuckDB" style="border: 1px solid #ddd;"></td>
+<td><img src="./images/logos/iotdb.svg" height="50px" alt="Apache IoTDB" style="border: 1px solid #ddd;"></td>
 </tr>
 </table>
 
