@@ -165,9 +165,10 @@ public class SingleTableSplitUtil
         String jdbcURL = configuration.getString(Key.JDBC_URL);
         String username = configuration.getString(Key.USERNAME);
         String password = configuration.getString(Key.PASSWORD);
+        String driverClass = configuration.getString(Key.DRIVER_CLASS);
 
         LOG.info("Get split pk min and max value sql [{}] is running...", pkRangeSQL);
-        try (Connection conn = DBUtil.getConnection(dataBaseType, jdbcURL, username, password);
+        try (Connection conn = DBUtil.getConnection(dataBaseType, driverClass, jdbcURL, username, password);
                 ResultSet rs = DBUtil.query(conn, pkRangeSQL, 1)) {
 
             MinMaxPackage minMaxPackage = new MinMaxPackage();
@@ -241,11 +242,12 @@ public class SingleTableSplitUtil
         String jdbcURL = configuration.getString(Key.JDBC_URL);
         String username = configuration.getString(Key.USERNAME);
         String password = configuration.getString(Key.PASSWORD);
+        String driverClass = configuration.getString(Key.DRIVER_CLASS);
 
         LOG.info("split pk [sql={}] is running... ", splitSql);
 
         rangeValue = new ArrayList<>();
-        try (Connection conn = DBUtil.getConnection(dataBaseType, jdbcURL, username, password);
+        try (Connection conn = DBUtil.getConnection(dataBaseType, driverClass, jdbcURL, username, password);
                 ResultSet rs = DBUtil.query(conn, splitSql, adviceNum)) {
 
             while (DBUtil.asyncResultSetNext(rs)) {

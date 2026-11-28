@@ -78,7 +78,7 @@ public class DorisWriter
             String jdbcUrl = options.getJdbcUrl();
             List<String> renderedPreSqls = DorisUtil.renderPreOrPostSqls(options.getPreSqlList(), options.getTable());
             // check username and password is valid
-            Connection conn = DBUtil.getConnection(DataBaseType.MySql, jdbcUrl, username, password);
+            Connection conn = DBUtil.getConnection(DataBaseType.MySql, DataBaseType.MySql.getDriverClassName(), jdbcUrl, username, password);
             if (!renderedPreSqls.isEmpty()) {
                 LOG.info("Begin to execute preSqls:[{}]. context info:{}.", String.join(";", renderedPreSqls), jdbcUrl);
                 DorisUtil.executeSqls(conn, renderedPreSqls);
@@ -104,7 +104,7 @@ public class DorisWriter
             String jdbcUrl = options.getJdbcUrl();
             List<String> renderedPostSqls = DorisUtil.renderPreOrPostSqls(options.getPostSqlList(), options.getTable());
             if (!renderedPostSqls.isEmpty()) {
-                Connection conn = DBUtil.getConnection(DataBaseType.MySql, jdbcUrl, username, password);
+                Connection conn = DBUtil.getConnection(DataBaseType.MySql, DataBaseType.MySql.getDriverClassName(), jdbcUrl, username, password);
                 LOG.info("Start to execute preSqls:[{}]. context info:{}.", String.join(";", renderedPostSqls), jdbcUrl);
                 DorisUtil.executeSqls(conn, renderedPostSqls);
                 DBUtil.closeDBResources(null, null, conn);

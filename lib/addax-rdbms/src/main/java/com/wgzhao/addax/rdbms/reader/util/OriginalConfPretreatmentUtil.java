@@ -137,6 +137,7 @@ public final class OriginalConfPretreatmentUtil
 
         Configuration connConf = originalConfig.getConfiguration(Key.CONNECTION);
         List<String> preSql = originalConfig.getList(Key.PRE_SQL, String.class);
+        String driverClass = originalConfig.getString(Key.DRIVER_CLASS);
 
         int tableNum = 0;
 
@@ -148,14 +149,14 @@ public final class OriginalConfPretreatmentUtil
             throw AddaxException.asAddaxException(REQUIRED_VALUE, "The parameter [connection.jdbcUrl] is not set.");
         }
 
-        jdbcUrl = dataBaseType.appendJDBCSuffixForReader(jdbcUrl);
+        jdbcUrl = dataBaseType.appendJDBCSuffixForReader(jdbcUrl, driverClass);
 
         // Validate JDBC URL with or without retry based on preCheck flag
         if (isPreCheck) {
-            DBUtil.validJdbcUrlWithoutRetry(dataBaseType, jdbcUrl, username, password, preSql);
+            DBUtil.validJdbcUrlWithoutRetry(dataBaseType, driverClass, jdbcUrl, username, password, preSql);
         }
         else {
-            DBUtil.validJdbcUrl(dataBaseType, jdbcUrl, username, password, preSql);
+            DBUtil.validJdbcUrl(dataBaseType, driverClass, jdbcUrl, username, password, preSql);
         }
 
         // Write back the connection.jdbcUrl item
@@ -198,6 +199,7 @@ public final class OriginalConfPretreatmentUtil
             String jdbcUrl = originalConfig.getString(Key.CONNECTION + "." + Key.JDBC_URL);
             String username = originalConfig.getString(Key.USERNAME);
             String password = originalConfig.getString(Key.PASSWORD);
+            String driverClass = originalConfig.getString(Key.DRIVER_CLASS);
             String tableName = originalConfig.getString(Key.CONNECTION + "." + Key.TABLE + "[0]");
 
             // Handle special case with '*' column
@@ -213,7 +215,7 @@ public final class OriginalConfPretreatmentUtil
                     // Get all columns of table and exclude the excludeColumns
                     // Note: getTableColumns returns already-quoted column names,
                     // so we need to quote excludeColumns the same way for comparison
-                    List<String> allColumns = new ArrayList<>(DBUtil.getTableColumns(dataBaseType, jdbcUrl, username, password, tableName));
+                    List<String> allColumns = new ArrayList<>(DBUtil.getTableColumns(dataBaseType, driverClass, jdbcUrl, username, password, tableName));
                     var quotedExcludeColumns = excludeColumns.stream()
                             .map(r -> dataBaseType.quoteColumnName(r, true))
                             .toList();
@@ -227,7 +229,7 @@ public final class OriginalConfPretreatmentUtil
                 }
             }
             else {
-                final List<String> allColumns = ListUtil.valueToLowerCase(DBUtil.getTableColumns(dataBaseType, jdbcUrl, username, password, tableName));
+                final List<String> allColumns = ListUtil.valueToLowerCase(DBUtil.getTableColumns(dataBaseType, driverClass, jdbcUrl, username, password, tableName));
                 LOG.info("The table [{}] has columns [{}].", tableName, StringUtils.join(allColumns, ","));
 
                 // Quote all user configured columns

@@ -106,13 +106,14 @@ public final class OriginalConfPretreatmentUtil
     public static void simplifyConf(Configuration originalConfig, DataBaseType dataBaseType)
     {
         Configuration connConf = originalConfig.getConfiguration(Key.CONNECTION);
+        String driverClass = originalConfig.getString(Key.DRIVER_CLASS);
 
         String jdbcUrl = connConf.getString(Key.JDBC_URL);
         if (StringUtils.isBlank(jdbcUrl)) {
             throw AddaxException.missingConfig(Key.JDBC_URL);
         }
 
-        jdbcUrl = dataBaseType.appendJDBCSuffixForWriter(jdbcUrl);
+        jdbcUrl = dataBaseType.appendJDBCSuffixForWriter(jdbcUrl, driverClass);
         originalConfig.set(jdbcUrlPath, jdbcUrl);
 
         List<String> tables = connConf.getList(Key.TABLE, String.class);
@@ -144,6 +145,7 @@ public final class OriginalConfPretreatmentUtil
         String jdbcUrl = originalConfig.getString(jdbcUrlPath);
         String username = originalConfig.getString(Key.USERNAME);
         String password = originalConfig.getString(Key.PASSWORD);
+        String driverClass = originalConfig.getString(Key.DRIVER_CLASS);
         String oneTable = originalConfig.getString(Key.CONNECTION + "." + Key.TABLE + "[0]");
 
         List<String> userConfiguredColumns = originalConfig.getList(Key.COLUMN, String.class);
@@ -151,7 +153,7 @@ public final class OriginalConfPretreatmentUtil
             throw AddaxException.illegalConfigValue(Key.COLUMN, userConfiguredColumns);
         }
         else {
-            Connection connection = DBUtil.getConnectionWithoutRetry(dataBaseType, jdbcUrl, username, password);
+            Connection connection = DBUtil.getConnectionWithoutRetry(dataBaseType, driverClass, jdbcUrl, username, password);
             try {
                 List<String> allColumns = DBUtil.getTableColumnsByConn(connection, oneTable, dataBaseType);
 

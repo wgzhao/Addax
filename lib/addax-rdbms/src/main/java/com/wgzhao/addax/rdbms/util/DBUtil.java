@@ -76,17 +76,18 @@ public final class DBUtil
      * Validates JDBC URL connectivity with retry mechanism.
      *
      * @param dataBaseType The database type
+     * @param driverClassName The configured driver class, or null to use the type's built-in driver
      * @param jdbcUrl The JDBC URL to validate
      * @param username Database username
-     * @param password Database password 
+     * @param password Database password
      * @param preSql List of pre-SQL statements to execute during validation
      * @throws AddaxException if connection validation fails after retries
      */
-    public static void validJdbcUrl(DataBaseType dataBaseType, String jdbcUrl, String username, String password, List<String> preSql)
+    public static void validJdbcUrl(DataBaseType dataBaseType, String driverClassName, String jdbcUrl, String username, String password, List<String> preSql)
     {
         try {
             RetryUtil.executeWithRetry(() -> {
-                testConnWithoutRetry(dataBaseType, jdbcUrl, username, password, preSql);
+                testConnWithoutRetry(dataBaseType, driverClassName, jdbcUrl, username, password, preSql);
                 return null;
             }, 3, 1000L, true);
         }
@@ -100,16 +101,17 @@ public final class DBUtil
      * Validates JDBC URL connectivity without retry mechanism.
      *
      * @param dataBaseType The database type
+     * @param driverClassName The configured driver class, or null to use the type's built-in driver
      * @param jdbcUrl The JDBC URL to validate
      * @param username Database username
      * @param password Database password
      * @param preSql List of pre-SQL statements to execute during validation
      * @throws AddaxException if connection validation fails
      */
-    public static void validJdbcUrlWithoutRetry(DataBaseType dataBaseType, String jdbcUrl, String username, String password, List<String> preSql)
+    public static void validJdbcUrlWithoutRetry(DataBaseType dataBaseType, String driverClassName, String jdbcUrl, String username, String password, List<String> preSql)
     {
         try {
-            testConnWithoutRetry(dataBaseType, jdbcUrl, username, password, preSql);
+            testConnWithoutRetry(dataBaseType, driverClassName, jdbcUrl, username, password, preSql);
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(
@@ -121,15 +123,16 @@ public final class DBUtil
      * Checks if the specified user has INSERT privileges on the given tables.
      *
      * @param dataBaseType The database type
+     * @param driverClassName The configured driver class, or null to use the type's built-in driver
      * @param jdbcURL The JDBC URL for connection
      * @param userName Database username
      * @param password Database password
      * @param tableList List of table names to check privileges for
      * @return true if user has INSERT privilege on all tables, false otherwise
      */
-    public static boolean checkInsertPrivilege(DataBaseType dataBaseType, String jdbcURL, String userName, String password, List<String> tableList)
+    public static boolean checkInsertPrivilege(DataBaseType dataBaseType, String driverClassName, String jdbcURL, String userName, String password, List<String> tableList)
     {
-        try (Connection connection = getConnection(dataBaseType, jdbcURL, userName, password)) {
+        try (Connection connection = getConnection(dataBaseType, driverClassName, jdbcURL, userName, password)) {
             String insertTemplate = "INSERT INTO %s (SELECT * FROM %s WHERE 1 = 2)";
 
             boolean hasInsertPrivilege = true;
@@ -157,15 +160,16 @@ public final class DBUtil
      * Checks if the specified user has DELETE privileges on the given tables.
      *
      * @param dataBaseType The database type
+     * @param driverClassName The configured driver class, or null to use the type's built-in driver
      * @param jdbcURL The JDBC URL for connection
      * @param userName Database username
      * @param password Database password
      * @param tableList List of table names to check privileges for
      * @return true if user has DELETE privilege on all tables, false otherwise
      */
-    public static boolean checkDeletePrivilege(DataBaseType dataBaseType, String jdbcURL, String userName, String password, List<String> tableList)
+    public static boolean checkDeletePrivilege(DataBaseType dataBaseType, String driverClassName, String jdbcURL, String userName, String password, List<String> tableList)
     {
-        try (Connection connection = getConnection(dataBaseType, jdbcURL, userName, password)) {
+        try (Connection connection = getConnection(dataBaseType, driverClassName, jdbcURL, userName, password)) {
             String deleteTemplate = "DELETE FROM %s WHERE 1 = 2";
 
             boolean hasDeletePrivilege = true;
@@ -225,21 +229,23 @@ public final class DBUtil
      * </p>
      *
      * @param dataBaseType Database type
+     * @param driverClassName The configured driver class, or null to use the type's built-in driver
      * @param jdbcUrl JDBC URL for connection
      * @param username Username for login
      * @param password Password to use when connecting to server
      * @return Connection instance
      * @throws RdbmsException if connection fails
      */
-    public static Connection getConnection(DataBaseType dataBaseType, String jdbcUrl, String username, String password)
+    public static Connection getConnection(DataBaseType dataBaseType, String driverClassName, String jdbcUrl, String username, String password)
     {
-        return getConnection(dataBaseType, jdbcUrl, username, password, DEFAULT_QUERY_TIMEOUT_SEC);
+        return getConnection(dataBaseType, driverClassName, jdbcUrl, username, password, DEFAULT_QUERY_TIMEOUT_SEC);
     }
 
     /**
      * Get a pooled JDBC connection with the specified query timeout.
      *
      * @param dataBaseType Database type
+     * @param driverClassName The configured driver class, or null to use the type's built-in driver
      * @param jdbcUrl JDBC URL for connection
      * @param username Username for login
      * @param password Password to use when connecting to server
@@ -247,14 +253,14 @@ public final class DBUtil
      * @return Connection instance
      * @throws RdbmsException if connection fails
      */
-    public static Connection getConnection(DataBaseType dataBaseType, String jdbcUrl, String username, String password, int timeoutSeconds)
+    public static Connection getConnection(DataBaseType dataBaseType, String driverClassName, String jdbcUrl, String username, String password, int timeoutSeconds)
     {
         try {
             if (jdbcUrl == null) {
                 throw new IllegalArgumentException("jdbcUrl must not be null");
             }
             // Use shared cached datasource
-            BasicDataSource ds = getOrCreateDataSource(dataBaseType, jdbcUrl, username, password, timeoutSeconds);
+            BasicDataSource ds = getOrCreateDataSource(dataBaseType, driverClassName, jdbcUrl, username, password, timeoutSeconds);
             return ds.getConnection();
         }
         catch (Exception e) {
@@ -265,25 +271,27 @@ public final class DBUtil
     /**
      * Get a pooled JDBC connection with the default timeout.
      * <p>
-     * Kept for compatibility; identical to {@link #getConnection(DataBaseType, String, String, String)}.
+     * Kept for compatibility; identical to {@link #getConnection(DataBaseType, String, String, String, String)}.
      * </p>
      *
      * @param dataBaseType The database type
+     * @param driverClassName The configured driver class, or null to use the type's built-in driver
      * @param jdbcUrl JDBC URL for connection
      * @param username Username for login
      * @param password Password to use when connecting to server
      * @return Connection instance
      * @throws RdbmsException if connection fails
      */
-    public static Connection getConnectionWithoutRetry(DataBaseType dataBaseType, String jdbcUrl, String username, String password)
+    public static Connection getConnectionWithoutRetry(DataBaseType dataBaseType, String driverClassName, String jdbcUrl, String username, String password)
     {
-        return getConnectionWithoutRetry(dataBaseType, jdbcUrl, username, password, DEFAULT_QUERY_TIMEOUT_SEC);
+        return getConnectionWithoutRetry(dataBaseType, driverClassName, jdbcUrl, username, password, DEFAULT_QUERY_TIMEOUT_SEC);
     }
 
     /**
      * Get a pooled JDBC connection with the specified query timeout.
      *
      * @param dataBaseType The database type
+     * @param driverClassName The configured driver class, or null to use the type's built-in driver
      * @param jdbcUrl JDBC URL for connection
      * @param username Username for login
      * @param password Password to use when connecting to server
@@ -291,9 +299,9 @@ public final class DBUtil
      * @return Connection instance
      * @throws RdbmsException if connection fails
      */
-    public static Connection getConnectionWithoutRetry(DataBaseType dataBaseType, String jdbcUrl, String username, String password, int timeoutSeconds)
+    public static Connection getConnectionWithoutRetry(DataBaseType dataBaseType, String driverClassName, String jdbcUrl, String username, String password, int timeoutSeconds)
     {
-        return DBUtil.getConnection(dataBaseType, jdbcUrl, username, password, timeoutSeconds);
+        return DBUtil.getConnection(dataBaseType, driverClassName, jdbcUrl, username, password, timeoutSeconds);
     }
 
     /**
@@ -410,15 +418,16 @@ public final class DBUtil
      * Returns the column names of a table.
      *
      * @param dataBaseType the database type
+     * @param driverClassName the configured driver class, or null to use the type's built-in driver
      * @param jdbcUrl the JDBC URL to connect with
      * @param user the database user name
      * @param pass the database password
      * @param tableName the table to inspect
      * @return the column names of the table
      */
-    public static List<String> getTableColumns(DataBaseType dataBaseType, String jdbcUrl, String user, String pass, String tableName)
+    public static List<String> getTableColumns(DataBaseType dataBaseType, String driverClassName, String jdbcUrl, String user, String pass, String tableName)
     {
-        try (Connection conn = getConnection(dataBaseType, jdbcUrl, user, pass)) {
+        try (Connection conn = getConnection(dataBaseType, driverClassName, jdbcUrl, user, pass)) {
             return getTableColumnsByConn(conn, tableName, dataBaseType);
         }
         catch (SQLException e) {
@@ -493,15 +502,16 @@ public final class DBUtil
      * Tests database connection and executes pre-SQL statements without retry mechanism.
      *
      * @param dataBaseType Database type
+     * @param driverClassName The configured driver class, or null to use the type's built-in driver
      * @param url JDBC URL
      * @param user Database username
      * @param pass Database password
      * @param preSql List of pre-SQL statements to execute
      * @throws AddaxException if connection test fails
      */
-    public static void testConnWithoutRetry(DataBaseType dataBaseType, String url, String user, String pass, List<String> preSql)
+    public static void testConnWithoutRetry(DataBaseType dataBaseType, String driverClassName, String url, String user, String pass, List<String> preSql)
     {
-        try (Connection connection = getConnection(dataBaseType, url, user, pass)) {
+        try (Connection connection = getConnection(dataBaseType, driverClassName, url, user, pass)) {
             if (preSql != null && !preSql.isEmpty()) {
                 for (String pre : preSql) {
                     if (!doPreCheck(connection, pre)) {
@@ -734,56 +744,56 @@ public final class DBUtil
     }
 
     /**
-     * Overrides the JDBC driver class of the database type with the one configured in the job.
-     * Must run before any connection is opened, including the DDL executed by the writer.
+     * Resolves the JDBC driver class configured for a job and stores it as the internal
+     * {@link Key#DRIVER_CLASS} item, so that it survives the removal of {@code connection}
+     * during split/prepare and reaches every task without touching shared state.
      * <p>
-     * {@code connection.driver} is the canonical key. The legacy top-level {@code driver} is
-     * still honored: when it is the only one configured it is moved into {@code connection},
-     * so that every later stage sees exactly one location. When both are configured,
-     * {@code connection.driver} wins.
+     * {@code connection.driver} is the canonical key. The legacy top-level {@code driver}
+     * is still honored with a deprecation warning and, like before, is moved into
+     * {@code connection.driver}; when both are configured, {@code connection.driver} wins
+     * and the legacy key is removed. The user-facing keys are resolved on every call, so
+     * the internal item can never outrank {@code connection.driver}; it is only returned
+     * when neither user-facing key exists (the generic reader's URL guess, for example).
      *
-     * @param dataBaseType the database type whose driver class should be overridden
-     * @param originalConfig the plugin job configuration
+     * @param originalConfig the plugin job configuration (modified in-place)
+     * @return the configured driver class, or null when the built-in driver should be used
      */
-    public static void applyConfiguredDriverClass(DataBaseType dataBaseType, Configuration originalConfig)
+    public static String resolveDriverClass(Configuration originalConfig)
     {
         Configuration connConf = originalConfig.getConfiguration(Key.CONNECTION);
         String connDriver = connConf == null ? null : connConf.getString(Key.JDBC_DRIVER);
         String legacyDriver = originalConfig.getString(Key.JDBC_DRIVER);
 
-        String driverClass = StringUtils.isBlank(connDriver) ? legacyDriver : connDriver;
-        if (StringUtils.isBlank(driverClass)) {
-            return;
+        String driverClass;
+        if (StringUtils.isNotBlank(connDriver)) {
+            if (StringUtils.isNotBlank(legacyDriver)) {
+                if (!connDriver.equals(legacyDriver)) {
+                    LOG.warn("Both 'driver' [{}] and 'connection.driver' [{}] are configured, 'connection.driver' takes precedence.",
+                            legacyDriver, connDriver);
+                }
+                originalConfig.remove(Key.JDBC_DRIVER);
+            }
+            driverClass = connDriver;
         }
-
-        if (connConf != null && StringUtils.isNotBlank(legacyDriver)) {
-            if (StringUtils.isBlank(connDriver)) {
-                LOG.warn("The top-level 'driver' is deprecated, move it to 'connection.driver'.");
+        else if (StringUtils.isNotBlank(legacyDriver)) {
+            LOG.warn("The top-level 'driver' is deprecated, move it to 'connection.driver'.");
+            driverClass = legacyDriver;
+            if (connConf != null) {
+                // keep the connection.driver contract for outside readers; the internal item
+                // below is what actually carries the value past the removal of 'connection'
                 originalConfig.set(Key.CONNECTION + "." + Key.JDBC_DRIVER, legacyDriver);
+                originalConfig.remove(Key.JDBC_DRIVER);
             }
-            else if (!connDriver.equals(legacyDriver)) {
-                LOG.warn("Both 'driver' [{}] and 'connection.driver' [{}] are configured, 'connection.driver' takes precedence.",
-                        legacyDriver, connDriver);
-            }
-            originalConfig.remove(Key.JDBC_DRIVER);
+        }
+        else {
+            return originalConfig.getString(Key.DRIVER_CLASS);
         }
 
-        LOG.warn("Use specified driver class [{}]", driverClass);
-        dataBaseType.setDriverClassName(driverClass);
-    }
-
-    /**
-     * Checks whether a JDBC driver class is configured, either as {@code connection.driver}
-     * or as the legacy top-level {@code driver}.
-     *
-     * @param originalConfig the plugin job configuration
-     * @return true if a driver class is configured
-     */
-    public static boolean hasConfiguredDriverClass(Configuration originalConfig)
-    {
-        Configuration connConf = originalConfig.getConfiguration(Key.CONNECTION);
-        return (connConf != null && StringUtils.isNotBlank(connConf.getString(Key.JDBC_DRIVER)))
-                || StringUtils.isNotBlank(originalConfig.getString(Key.JDBC_DRIVER));
+        if (!driverClass.equals(originalConfig.getString(Key.DRIVER_CLASS))) {
+            LOG.warn("Use specified driver class [{}]", driverClass);
+            originalConfig.set(Key.DRIVER_CLASS, driverClass);
+        }
+        return driverClass;
     }
 
     private static String dsKey(String driver, String url, String user, String password) {
@@ -792,26 +802,26 @@ public final class DBUtil
         return driver + "|" + url + "|" + (user == null ? "" : user) + "|" + (password == null ? "" : password);
     }
 
-    private static BasicDataSource getOrCreateDataSource(DataBaseType dataBaseType, String jdbcUrl, String username, String password, int timeoutSeconds) {
-        String driverClassName;
+    private static BasicDataSource getOrCreateDataSource(DataBaseType dataBaseType, String driverClassName, String jdbcUrl, String username, String password, int timeoutSeconds) {
+        String effectiveDriver;
         String effectiveUrl = jdbcUrl;
         if (effectiveUrl != null && effectiveUrl.contains("inceptor2")) {
             LOG.warn("Detected 'inceptor2' in jdbcUrl; replacing with 'hive2' and using HiveDriver.");
             effectiveUrl = effectiveUrl.replace("inceptor2", "hive2");
-            driverClassName = "org.apache.hive.jdbc.HiveDriver";
+            effectiveDriver = "org.apache.hive.jdbc.HiveDriver";
         } else if (effectiveUrl != null && effectiveUrl.startsWith("jdbc:hive2")) {
-            driverClassName = "org.apache.hive.jdbc.HiveDriver";
+            effectiveDriver = "org.apache.hive.jdbc.HiveDriver";
         } else {
-            driverClassName = dataBaseType.getDriverClassName();
+            effectiveDriver = dataBaseType.effectiveDriverClass(driverClassName);
         }
-        String key = dsKey(driverClassName, effectiveUrl, username, password);
+        String key = dsKey(effectiveDriver, effectiveUrl, username, password);
         // the cache lookup stays lock-free; only pool creation is serialized
         BasicDataSource ds = DS_CACHE.get(key);
         if (ds == null) {
             synchronized (DS_CACHE) {
                 ds = DS_CACHE.get(key);
                 if (ds == null) {
-                    ds = buildDataSource(dataBaseType, driverClassName, effectiveUrl, username, password, timeoutSeconds);
+                    ds = buildDataSource(dataBaseType, effectiveDriver, effectiveUrl, username, password, timeoutSeconds);
                     DS_CACHE.put(key, ds);
                     registerShutdownHookOnce();
                 }

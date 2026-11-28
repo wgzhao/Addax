@@ -1,20 +1,22 @@
 # shellcheck shell=bash
 #
-# Assertions for case verify scripts. Each returns non-zero on failure and prints
-# a readable reason; case scripts run under `set -e`, so the first failure ends the
-# case and run.sh records it as FAIL.
+# Assertions for case verify scripts. Each prints a readable reason and exits non-zero
+# on failure. Assertions terminate instead of returning because the runner invokes a
+# case as `( run_case ... ) || rc=$?` and verify.sh as `( . verify.sh ) || die`; bash
+# ignores errexit for the body of a compound command used in an `||` list, so a mere
+# non-zero return would be swallowed and a later passing assertion would mask it.
 
 assert_eq() { # actual, expected, what
     if [ "$1" != "$2" ]; then
         printf 'ASSERT FAILED: %s\n  actual:   [%s]\n  expected: [%s]\n' "$3" "$1" "$2" >&2
-        return 1
+        exit 1
     fi
 }
 
 assert_file_exists() { # file, what
     if [ ! -f "$1" ]; then
         printf 'ASSERT FAILED: %s: file does not exist: %s\n' "$2" "$1" >&2
-        return 1
+        exit 1
     fi
 }
 
@@ -23,31 +25,31 @@ assert_file_exists() { # file, what
 assert_file_matches() { # actual_file, golden_file
     local actual="$1" golden="$2"
     if [ "${E2E_UPDATE_EXPECT:-0}" = 1 ]; then
-        cp "$actual" "$golden" || return 1
+        cp "$actual" "$golden" || exit 1
         log "  updated golden: $(basename "$golden")"
         return 0
     fi
     if [ ! -f "$golden" ]; then
         printf 'ASSERT FAILED: golden file not found: %s\n' "$golden" >&2
-        return 1
+        exit 1
     fi
     if ! LC_ALL=C diff -u "$golden" "$actual"; then
         printf 'ASSERT FAILED: output differs from %s (- expected, + actual)\n' "$golden" >&2
-        return 1
+        exit 1
     fi
 }
 
 assert_files_equal() { # file_a, file_b, what
     if ! LC_ALL=C diff -u "$1" "$2"; then
         printf 'ASSERT FAILED: %s: %s and %s differ\n' "$3" "$1" "$2" >&2
-        return 1
+        exit 1
     fi
 }
 
 assert_contains() { # file, pattern, what
     if ! LC_ALL=C grep -q -- "$2" "$1"; then
         printf 'ASSERT FAILED: %s: %s does not contain [%s]\n' "$3" "$1" "$2" >&2
-        return 1
+        exit 1
     fi
 }
 
@@ -86,7 +88,7 @@ assert_file_count() { # directory, glob, expected count, what
         printf 'ASSERT FAILED: %s: expected %s file(s) matching %s in %s, found %s\n' \
             "$what" "$want" "$pattern" "$dir" "$got" >&2
         ls -la "$dir" >&2 || true
-        return 1
+        exit 1
     fi
 }
 

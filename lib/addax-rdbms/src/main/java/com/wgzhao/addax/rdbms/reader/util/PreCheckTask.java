@@ -46,6 +46,7 @@ public class PreCheckTask
     private final String splitPkId;
     private final Configuration connection;
     private final DataBaseType dataBaseType;
+    private final String driverClass;
 
     /**
      * Constructs a new PreCheckTask with the specified parameters.
@@ -54,14 +55,17 @@ public class PreCheckTask
      * @param password Database password
      * @param connection Configuration containing connection details
      * @param dataBaseType The database type
+     * @param driverClass The configured driver class, or null to use the built-in driver
      * @param splitPkId The primary key column name for table splitting
      */
-    public PreCheckTask(String userName, String password, Configuration connection, DataBaseType dataBaseType, String splitPkId)
+    public PreCheckTask(String userName, String password, Configuration connection, DataBaseType dataBaseType,
+            String driverClass, String splitPkId)
     {
         this.connection = connection;
         this.userName = userName;
         this.password = password;
         this.dataBaseType = dataBaseType;
+        this.driverClass = driverClass;
         this.splitPkId = splitPkId;
     }
 
@@ -79,7 +83,7 @@ public class PreCheckTask
         String jdbcUrl = this.connection.getString(Key.JDBC_URL);
         List<Object> querySqls = this.connection.getList(Key.QUERY_SQL, Object.class);
         List<Object> splitPkSqls = this.connection.getList(Key.SPLIT_PK_SQL, Object.class);
-        Connection conn = DBUtil.getConnectionWithoutRetry(this.dataBaseType, jdbcUrl, this.userName, password);
+        Connection conn = DBUtil.getConnectionWithoutRetry(this.dataBaseType, this.driverClass, jdbcUrl, this.userName, password);
         int fetchSize = 1;
         if (DataBaseType.MySql == dataBaseType) {
             fetchSize = Integer.MIN_VALUE;

@@ -78,7 +78,7 @@ public class StarRocksWriter
             String jdbcUrl = options.getJdbcUrl();
             List<String> renderedPreSqls = StarRocksWriterUtil.renderPreOrPostSqls(options.getPreSqlList(), options.getTable());
             if (!renderedPreSqls.isEmpty()) {
-                Connection conn = DBUtil.getConnection(DataBaseType.MySql, jdbcUrl, username, password);
+                Connection conn = DBUtil.getConnection(DataBaseType.MySql, DataBaseType.MySql.getDriverClassName(), jdbcUrl, username, password);
                 LOG.info("Begin to execute preSqls:[{}]. context info:{}.", String.join(";", renderedPreSqls), jdbcUrl);
                 StarRocksWriterUtil.executeSqls(conn, renderedPreSqls);
                 DBUtil.closeDBResources(null, null, conn);
@@ -103,7 +103,7 @@ public class StarRocksWriter
             String jdbcUrl = options.getJdbcUrl();
             List<String> renderedPostSqls = StarRocksWriterUtil.renderPreOrPostSqls(options.getPostSqlList(), options.getTable());
             if (!renderedPostSqls.isEmpty()) {
-                Connection conn = DBUtil.getConnection(DataBaseType.MySql, jdbcUrl, username, password);
+                Connection conn = DBUtil.getConnection(DataBaseType.MySql, DataBaseType.MySql.getDriverClassName(), jdbcUrl, username, password);
                 LOG.info("Begin to execute postSqls:[{}]. context info:{}.", String.join(";", renderedPostSqls), jdbcUrl);
                 StarRocksWriterUtil.executeSqls(conn, renderedPostSqls);
                 DBUtil.closeDBResources(null, null, conn);
@@ -129,7 +129,7 @@ public class StarRocksWriter
         {
             options = new StarRocksWriterOptions(super.getPluginJobConf());
             if (options.isWildcardColumn()) {
-                Connection conn = DBUtil.getConnection(DataBaseType.MySql, options.getJdbcUrl(), options.getUsername(), options.getPassword());
+                Connection conn = DBUtil.getConnection(DataBaseType.MySql, DataBaseType.MySql.getDriverClassName(), options.getJdbcUrl(), options.getUsername(), options.getPassword());
                 List<String> columns = StarRocksWriterUtil.getStarRocksColumns(conn, options.getDatabase(), options.getTable());
                 options.setInfoCchemaColumns(columns);
             }
