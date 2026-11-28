@@ -114,7 +114,7 @@ public class DorisKey
                 database + "' AND `TABLE_NAME` = '" + table + "' ORDER BY `ORDINAL_POSITION` ASC;";
         List<String> columns = new ArrayList<>();
         ResultSet rs = null;
-        try (Connection conn = DBUtil.getConnection(DataBaseType.MySql, jdbcUrl, options.getString(USERNAME), options.getString(PASSWORD))) {
+        try (Connection conn = DBUtil.getConnection(DataBaseType.MySql, DataBaseType.MySql.getDriverClassName(), jdbcUrl, options.getString(USERNAME), options.getString(PASSWORD))) {
             Statement stmt = conn.createStatement();
             rs = stmt.executeQuery(currentSql);
             while (rs.next()) {

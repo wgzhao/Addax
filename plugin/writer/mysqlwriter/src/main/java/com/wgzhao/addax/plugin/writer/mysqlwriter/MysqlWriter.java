@@ -203,7 +203,7 @@ public class MysqlWriter
                         schema = "schema()";
                         tableName = this.table;
                     }
-                    try (Connection connection = DBUtil.getConnection(this.dataBaseType, this.jdbcUrl, this.username, this.password)) {
+                    try (Connection connection = DBUtil.getConnection(this.dataBaseType, this.driverClass, this.jdbcUrl, this.username, this.password)) {
                         String sql = String.format("""
                                 SELECT SRS_ID
                                 FROM INFORMATION_SCHEMA.ST_GEOMETRY_COLUMNS

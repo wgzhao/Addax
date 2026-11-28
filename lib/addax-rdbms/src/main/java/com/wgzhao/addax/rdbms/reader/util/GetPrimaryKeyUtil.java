@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Set;
 
 import static com.wgzhao.addax.core.base.Key.CONNECTION;
+import static com.wgzhao.addax.core.base.Key.DRIVER_CLASS;
 import static com.wgzhao.addax.core.base.Key.JDBC_URL;
 import static com.wgzhao.addax.core.base.Key.PASSWORD;
 import static com.wgzhao.addax.core.base.Key.TABLE;
@@ -71,6 +72,7 @@ public class GetPrimaryKeyUtil
         String jdbcUrl = connConf.getString(JDBC_URL);
         String username = readConf.getString(USERNAME, null);
         String password = readConf.getString(PASSWORD, null);
+        String driverClass = readConf.getString(DRIVER_CLASS);
         String schema = null;
         if (table.contains(".")) {
             schema = table.split("\\.")[0];
@@ -83,7 +85,7 @@ public class GetPrimaryKeyUtil
             return null;
         }
 
-        try (Connection connection = DBUtil.getConnection(dataBaseType, jdbcUrl, username, password);
+        try (Connection connection = DBUtil.getConnection(dataBaseType, driverClass, jdbcUrl, username, password);
                 Statement statement = connection.createStatement();
                 ResultSet resultSet = statement.executeQuery(sql)) {
 

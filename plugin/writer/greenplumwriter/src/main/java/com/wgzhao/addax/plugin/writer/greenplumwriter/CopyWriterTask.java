@@ -69,7 +69,7 @@ public class CopyWriterTask
     public Connection createConnection()
     {
         String basicMsg = String.format("jdbcUrl:[%s]", this.jdbcUrl);
-        Connection connection = DBUtil.getConnection(this.dataBaseType, this.jdbcUrl, username, password);
+        Connection connection = DBUtil.getConnection(this.dataBaseType, this.driverClass, this.jdbcUrl, username, password);
         DBUtil.dealWithSessionConfig(connection, writerSliceConfig, this.dataBaseType, basicMsg);
         return connection;
     }

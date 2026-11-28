@@ -92,7 +92,7 @@ public class CommonRdbmsReader
          */
         public Configuration init(Configuration originalConfig)
         {
-            DBUtil.applyConfiguredDriverClass(dataBaseType, originalConfig);
+            DBUtil.resolveDriverClass(originalConfig);
             OriginalConfPretreatmentUtil.doPretreatment(dataBaseType, originalConfig);
             if (Objects.equals(originalConfig.getString(Key.SPLIT_PK, ""), "") && originalConfig.getBool(Key.AUTO_PK, false)) {
                 LOG.info("The split key is not configured, try to guess the split key.");
@@ -125,7 +125,8 @@ public class CommonRdbmsReader
             Configuration connConf = queryConf.getConfiguration(Key.CONNECTION);
             String username = queryConf.getString(Key.USERNAME);
             String password = queryConf.getString(Key.PASSWORD);
-            new PreCheckTask(username, password, connConf, dataBaseType, splitPK).call();
+            String driverClass = queryConf.getString(Key.DRIVER_CLASS);
+            new PreCheckTask(username, password, connConf, dataBaseType, driverClass, splitPK).call();
         }
 
         /**
@@ -178,6 +179,7 @@ public class CommonRdbmsReader
         private final DataBaseType dataBaseType;
         private final int taskGroupId;
         private final int taskId;
+        private String driverClass;
 
         private String username;
         private String password;
@@ -234,6 +236,7 @@ public class CommonRdbmsReader
             this.username = readerSliceConfig.getString(Key.USERNAME);
             this.password = readerSliceConfig.getString(Key.PASSWORD);
             this.jdbcUrl = readerSliceConfig.getString(Key.JDBC_URL);
+            this.driverClass = readerSliceConfig.getString(Key.DRIVER_CLASS);
 
             this.mandatoryEncoding = readerSliceConfig.getString(Key.MANDATORY_ENCODING, "");
 
@@ -257,7 +260,7 @@ public class CommonRdbmsReader
             LOG.info("Begin reading records by executing SQL query: [{}].", logSql);
             PerfRecord queryPerfRecord = new PerfRecord(taskGroupId, taskId, PerfRecord.PHASE.SQL_QUERY);
             queryPerfRecord.start();
-            Connection conn = DBUtil.getConnection(this.dataBaseType, jdbcUrl, username, password);
+            Connection conn = DBUtil.getConnection(this.dataBaseType, this.driverClass, jdbcUrl, username, password);
 
             // session config related
             DBUtil.dealWithSessionConfig(conn, readerSliceConfig, this.dataBaseType, basicMsg);

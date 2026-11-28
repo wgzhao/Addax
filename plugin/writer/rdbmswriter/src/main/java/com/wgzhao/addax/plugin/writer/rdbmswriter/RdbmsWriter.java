@@ -58,9 +58,10 @@ public class RdbmsWriter
             if (null != writeMode) {
                 LOG.warn("The writeMode is not supported in RdbmsWriter, ignore it.");
             }
-            if (!DBUtil.hasConfiguredDriverClass(this.originalConfig)) {
+            if (DBUtil.resolveDriverClass(this.originalConfig) == null) {
                 throw AddaxException.asAddaxException(REQUIRED_VALUE,
-                        "config 'connection.driver' is required and must not be empty");
+                        "A JDBC driver class is required, configure it as 'connection.driver' "
+                                + "(or the deprecated top-level 'driver')");
             }
             this.commonRdbmsWriterJob = new CommonRdbmsWriter.Job(DATABASE_TYPE);
             commonRdbmsWriterJob.init(originalConfig);

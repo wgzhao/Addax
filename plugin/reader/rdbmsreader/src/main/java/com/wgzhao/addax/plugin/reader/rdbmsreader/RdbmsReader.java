@@ -64,12 +64,12 @@ public class RdbmsReader
             if (connection == null) {
                 throw AddaxException.asAddaxException(REQUIRED_VALUE, "The config 'connection' is required and must not be empty");
             }
-            if (!DBUtil.hasConfiguredDriverClass(this.originalConfig)) {
+            if (DBUtil.resolveDriverClass(this.originalConfig) == null) {
                 // guess the jdbc driver name from the jdbc url when no driver is configured
                 final String jdbcType = connection.getString(Key.JDBC_URL).split(":")[1];
                 Arrays.stream(DataBaseType.values()).filter(
                         dataBaseType -> dataBaseType.getTypeName().equals(jdbcType)).findFirst().ifPresent(dataBaseType ->
-                        DATABASE_TYPE.setDriverClassName(dataBaseType.getDriverClassName()));
+                        this.originalConfig.set(Key.DRIVER_CLASS, dataBaseType.getDriverClassName()));
             }
             this.commonRdbmsReaderMaster = new SubCommonRdbmsReader.Job(DATABASE_TYPE);
             this.originalConfig = this.commonRdbmsReaderMaster.init(this.originalConfig);

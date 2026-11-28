@@ -86,8 +86,8 @@ public class CommonRdbmsWriter
          */
         public void init(Configuration originalConfig)
         {
-            // the ddl below may open a connection, so the configured driver has to be in place first
-            DBUtil.applyConfiguredDriverClass(dataBaseType, originalConfig);
+            // the ddl below may open a connection, so the configured driver has to be resolved first
+            DBUtil.resolveDriverClass(originalConfig);
             ddlValid(originalConfig, dataBaseType);
             OriginalConfPretreatmentUtil.doPretreatment(originalConfig, this.dataBaseType);
             LOG.debug("After job init(), originalConfig now is:[\n{}\n]", originalConfig.toJSON());
@@ -133,15 +133,16 @@ public class CommonRdbmsWriter
             String password = originalConfig.getString(Key.PASSWORD);
             Configuration connConf = originalConfig.getConfiguration(Key.CONNECTION);
             String jdbcUrl = connConf.getString(Key.JDBC_URL);
+            String driverClass = originalConfig.getString(Key.DRIVER_CLASS);
             List<String> expandedTables = connConf.getList(Key.TABLE, String.class);
-            boolean hasInsertPri = DBUtil.checkInsertPrivilege(dataBaseType, jdbcUrl, username, password, expandedTables);
+            boolean hasInsertPri = DBUtil.checkInsertPrivilege(dataBaseType, driverClass, jdbcUrl, username, password, expandedTables);
 
             if (!hasInsertPri) {
                 throw RdbmsException.asInsertPriException(originalConfig.getString(Key.USERNAME), jdbcUrl);
             }
 
             if (DBUtil.needCheckDeletePrivilege(originalConfig)) {
-                boolean hasDeletePri = DBUtil.checkDeletePrivilege(dataBaseType, jdbcUrl, username, password, expandedTables);
+                boolean hasDeletePri = DBUtil.checkDeletePrivilege(dataBaseType, driverClass, jdbcUrl, username, password, expandedTables);
                 if (!hasDeletePri) {
                     throw RdbmsException.asDeletePriException(originalConfig.getString(Key.USERNAME), jdbcUrl);
                 }
@@ -161,8 +162,9 @@ public class CommonRdbmsWriter
                 String password = originalConfig.getString(Key.PASSWORD);
                 Configuration connConf = originalConfig.getConfiguration(Key.CONNECTION);
                 String jdbcUrl = connConf.getString(Key.JDBC_URL);
+                String driverClass = originalConfig.getString(Key.DRIVER_CLASS);
                 String ddl = originalConfig.getString("ddl");
-                Connection connection = DBUtil.getConnection(dataBaseType, jdbcUrl, username, password);
+                Connection connection = DBUtil.getConnection(dataBaseType, driverClass, jdbcUrl, username, password);
                 LOG.info("Executing DDL: {}. context info:{}.", ddl, jdbcUrl);
                 WriterUtil.executeSqls(connection, Collections.singletonList(ddl));
                 DBUtil.closeDBResources(null, connection);
@@ -181,6 +183,7 @@ public class CommonRdbmsWriter
             if (tableNumber == 1) {
                 String username = originalConfig.getString(Key.USERNAME);
                 String password = originalConfig.getString(Key.PASSWORD);
+                String driverClass = originalConfig.getString(Key.DRIVER_CLASS);
 
                 Configuration connConf = originalConfig.getConfiguration(Key.CONNECTION);
 
@@ -197,7 +200,7 @@ public class CommonRdbmsWriter
                 originalConfig.remove(Key.CONNECTION);
                 if (!renderedPreSqls.isEmpty()) {
                     originalConfig.remove(Key.PRE_SQL);
-                    Connection conn = DBUtil.getConnection(dataBaseType, jdbcUrl, username, password);
+                    Connection conn = DBUtil.getConnection(dataBaseType, driverClass, jdbcUrl, username, password);
                     LOG.info("Begin to execute preSqls:[{}]. context info:{}.", StringUtils.join(renderedPreSqls, ";"), jdbcUrl);
 
                     WriterUtil.executeSqls(conn, renderedPreSqls);
@@ -231,6 +234,7 @@ public class CommonRdbmsWriter
             if (tableNumber == 1) {
                 String username = originalConfig.getString(Key.USERNAME);
                 String password = originalConfig.getString(Key.PASSWORD);
+                String driverClass = originalConfig.getString(Key.DRIVER_CLASS);
 
                 // jdbcUrl already has appendJDBCSuffix applied by prepare
                 String jdbcUrl = originalConfig.getString(Key.JDBC_URL);
@@ -242,7 +246,7 @@ public class CommonRdbmsWriter
 
                 if (!renderedPostSqls.isEmpty()) {
                     originalConfig.remove(Key.POST_SQL);
-                    Connection conn = DBUtil.getConnection(this.dataBaseType, jdbcUrl, username, password);
+                    Connection conn = DBUtil.getConnection(this.dataBaseType, driverClass, jdbcUrl, username, password);
                     LOG.info("Begin to execute postSqls:[{}]. context info:{}.", StringUtils.join(renderedPostSqls, ";"), jdbcUrl);
                     WriterUtil.executeSqls(conn, renderedPostSqls);
                     DBUtil.closeDBResources(null, null, conn);
@@ -286,6 +290,9 @@ public class CommonRdbmsWriter
 
         /** Database type for this task */
         protected DataBaseType dataBaseType;
+
+        /** Configured driver class for this task, or null to use the built-in driver */
+        protected String driverClass;
 
         /** Database username for authentication */
         protected String username;
@@ -376,6 +383,7 @@ public class CommonRdbmsWriter
             this.username = writerSliceConfig.getString(Key.USERNAME);
             this.password = writerSliceConfig.getString(Key.PASSWORD);
             this.jdbcUrl = writerSliceConfig.getString(Key.JDBC_URL);
+            this.driverClass = writerSliceConfig.getString(Key.DRIVER_CLASS);
 
             this.table = writerSliceConfig.getString(Key.TABLE);
 
@@ -401,7 +409,7 @@ public class CommonRdbmsWriter
          */
         public void prepare(Configuration writerSliceConfig)
         {
-            Connection connection = DBUtil.getConnection(this.dataBaseType, this.jdbcUrl, username, password);
+            Connection connection = DBUtil.getConnection(this.dataBaseType, this.driverClass, this.jdbcUrl, username, password);
 
             DBUtil.dealWithSessionConfig(connection, writerSliceConfig, this.dataBaseType, basicMessage);
 
@@ -529,7 +537,7 @@ public class CommonRdbmsWriter
          */
         public void startWrite(RecordReceiver recordReceiver, Configuration writerSliceConfig, TaskPluginCollector taskPluginCollector)
         {
-            Connection connection = DBUtil.getConnection(dataBaseType, jdbcUrl, username, password);
+            Connection connection = DBUtil.getConnection(dataBaseType, driverClass, jdbcUrl, username, password);
             DBUtil.dealWithSessionConfig(connection, writerSliceConfig, dataBaseType, basicMessage);
             startWriteWithConnection(recordReceiver, taskPluginCollector, connection, true);
         }
@@ -544,7 +552,7 @@ public class CommonRdbmsWriter
          */
         public void startWrite(RecordReceiver recordReceiver, Configuration writerSliceConfig, TaskPluginCollector taskPluginCollector, boolean supportCommit)
         {
-            Connection connection = DBUtil.getConnection(dataBaseType, jdbcUrl, username, password);
+            Connection connection = DBUtil.getConnection(dataBaseType, driverClass, jdbcUrl, username, password);
             DBUtil.dealWithSessionConfig(connection, writerSliceConfig, dataBaseType, basicMessage);
             startWriteWithConnection(recordReceiver, taskPluginCollector, connection, supportCommit);
         }
@@ -563,7 +571,7 @@ public class CommonRdbmsWriter
                 return;
             }
 
-            Connection connection = DBUtil.getConnection(dataBaseType, jdbcUrl, username, password);
+            Connection connection = DBUtil.getConnection(dataBaseType, driverClass, jdbcUrl, username, password);
 
             LOG.info("Begin to execute postSqls:[{}]. context info:{}.", StringUtils.join(postSqls, ";"), basicMessage);
             WriterUtil.executeSqls(connection, postSqls);

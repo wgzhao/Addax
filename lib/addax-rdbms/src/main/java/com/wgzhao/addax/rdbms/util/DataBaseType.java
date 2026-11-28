@@ -106,7 +106,7 @@ public enum DataBaseType
     /** Digit-only column names are never quoted */
     private static final Pattern DIGIT_ONLY = Pattern.compile("\\d+");
 
-    private String driverClassName;
+    private final String driverClassName;
     private final String typeName;
 
     /**
@@ -157,13 +157,28 @@ public enum DataBaseType
     }
 
     /**
+     * Returns the driver class configured for the job, falling back to this type's built-in driver.
+     *
+     * @param driverClassName the configured driver class, or null/blank to use the built-in driver
+     * @return the driver class to load
+     */
+    String effectiveDriverClass(String driverClassName)
+    {
+        if (driverClassName != null && !driverClassName.isBlank()) {
+            return driverClassName;
+        }
+        return this.driverClassName;
+    }
+
+    /**
      * Appends MySQL-specific JDBC parameters for reader operations.
      * Includes timezone, SSL, and date handling configurations.
      *
      * @param jdbc Original JDBC URL
+     * @param driverClassName the driver class configured for the job, or null to use this type's built-in driver
      * @return JDBC URL with appended reader-specific parameters
      */
-    public String appendJDBCSuffixForReader(String jdbc)
+    public String appendJDBCSuffixForReader(String jdbc, String driverClassName)
     {
         if (this == DuckDB) {
             return appendDuckDbStreaming(jdbc);
@@ -171,7 +186,7 @@ public enum DataBaseType
 
         if (this == MySql) {
             String suffix = "yearIsDateType=false&zeroDateTimeBehavior=convertToNull&tinyInt1isBit=false&rewriteBatchedStatements=true";
-            if (!"com.mysql.jdbc.Driver".equals(this.driverClassName) && !jdbc.contains("useSSL=")) {
+            if (!"com.mysql.jdbc.Driver".equals(effectiveDriverClass(driverClassName)) && !jdbc.contains("useSSL=")) {
                 suffix += "&useSSL=false";
             }
 
@@ -190,9 +205,10 @@ public enum DataBaseType
      * Optimizes for batch operations and data consistency.
      *
      * @param jdbc Original JDBC URL
+     * @param driverClassName the driver class configured for the job, or null to use this type's built-in driver
      * @return JDBC URL with appended writer-specific parameters
      */
-    public String appendJDBCSuffixForWriter(String jdbc)
+    public String appendJDBCSuffixForWriter(String jdbc, String driverClassName)
     {
         if (this == DuckDB) {
             return appendDuckDbStreaming(jdbc);
@@ -218,7 +234,8 @@ public enum DataBaseType
 
         if (this == MySql) {
             String suffix;
-            if ("com.mysql.jdbc.Driver".equals(this.driverClassName) || "com.mysql.cj.jdbc.Driver".equals(this.driverClassName)) {
+            String effectiveDriver = effectiveDriverClass(driverClassName);
+            if ("com.mysql.jdbc.Driver".equals(effectiveDriver) || "com.mysql.cj.jdbc.Driver".equals(effectiveDriver)) {
                 suffix = "yearIsDateType=false&zeroDateTimeBehavior=convertToNull&rewriteBatchedStatements=true&tinyInt1isBit=false";
             }
             else {
@@ -345,14 +362,4 @@ public enum DataBaseType
         return typeName;
     }
 
-    /**
-     * Sets the JDBC driver class name for this database type.
-     * Used for runtime driver configuration overrides.
-     *
-     * @param driverClassName The new driver class name
-     */
-    public void setDriverClassName(String driverClassName)
-    {
-        this.driverClassName = driverClassName;
-    }
 }
