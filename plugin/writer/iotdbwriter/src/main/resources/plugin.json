@@ -1,0 +1,6 @@
+{
+  "name": "iotdbwriter",
+  "class": "com.wgzhao.addax.plugin.writer.iotdbwriter.IotdbWriter",
+  "description": "Write data to Apache IoTDB",
+  "developer": "wgzhao"
+}

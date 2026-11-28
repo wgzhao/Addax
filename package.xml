@@ -155,6 +155,14 @@
             <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
+            <directory>plugin/reader/iotdbreader/target/iotdbreader-${project.version}/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <fileMode>0644</fileMode>
+            <outputDirectory>/</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>plugin/reader/hanareader/target/hanareader-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
@@ -460,6 +468,17 @@
         </fileSet>
         <fileSet>
             <directory>plugin/writer/influxdb2writer/target/influxdb2writer-${project.version}/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <excludes>
+                <exclude>**/addax-common*.jar</exclude>
+            </excludes>
+            <fileMode>0644</fileMode>
+            <outputDirectory>/</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>plugin/writer/iotdbwriter/target/iotdbwriter-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>

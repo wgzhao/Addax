@@ -1,0 +1,22 @@
+{
+  "name": "iotdbreader",
+  "parameter": {
+    "username": "root",
+    "password": "root",
+    "connection": {
+      "jdbcUrl": "jdbc:iotdb://127.0.0.1:6667/"
+    },
+    "sqlDialect": "tree",
+    "device": "root.demo.device1",
+    "measurements": [
+      "s1",
+      "s2"
+    ],
+    "where": "",
+    "timeColumnPosition": 0,
+    "fetchSize": 10000,
+    "beginDateTime": "",
+    "endDateTime": "",
+    "splitInterval": ""
+  }
+}

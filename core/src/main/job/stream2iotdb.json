@@ -1,0 +1,53 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 1
+      },
+      "errorLimit": {
+        "record": 0
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "streamreader",
+          "parameter": {
+            "column": [
+              {
+                "value": 1000,
+                "type": "long"
+              },
+              {
+                "value": 11,
+                "type": "long"
+              },
+              {
+                "value": 1.5,
+                "type": "double"
+              }
+            ],
+            "sliceRecordCount": 10
+          }
+        },
+        "writer": {
+          "name": "iotdbwriter",
+          "parameter": {
+            "username": "root",
+            "password": "root",
+            "connection": {
+              "jdbcUrl": "jdbc:iotdb://127.0.0.1:6667/"
+            },
+            "device": "root.demo.d1",
+            "measurements": [
+              "s1",
+              "s2"
+            ],
+            "timeColumnPosition": 0,
+            "batchSize": 1000
+          }
+        }
+      }
+    ]
+  }
+}

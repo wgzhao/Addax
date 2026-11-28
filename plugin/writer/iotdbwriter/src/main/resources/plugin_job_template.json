@@ -1,0 +1,21 @@
+{
+  "name": "iotdbwriter",
+  "parameter": {
+    "username": "root",
+    "password": "root",
+    "connection": {
+      "jdbcUrl": "jdbc:iotdb://127.0.0.1:6667/"
+    },
+    "sqlDialect": "tree",
+    "device": "root.demo.device1",
+    "measurements": [
+      "s1",
+      "s2"
+    ],
+    "timeColumnPosition": 0,
+    "batchSize": 1000,
+    "columnType": [],
+    "preSql": [],
+    "postSql": []
+  }
+}
