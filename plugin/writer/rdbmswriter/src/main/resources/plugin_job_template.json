@@ -13,8 +13,8 @@
       "jdbcUrl": "jdbc:<dbtype>://<host>:<port>/<database>",
       "table": [
         "addax_table"
-      ]
-    },
-    "driver": ""
+      ],
+      "driver": ""
+    }
   }
 }

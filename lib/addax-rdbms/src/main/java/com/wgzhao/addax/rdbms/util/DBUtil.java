@@ -733,6 +733,59 @@ public final class DBUtil
         }
     }
 
+    /**
+     * Overrides the JDBC driver class of the database type with the one configured in the job.
+     * Must run before any connection is opened, including the DDL executed by the writer.
+     * <p>
+     * {@code connection.driver} is the canonical key. The legacy top-level {@code driver} is
+     * still honored: when it is the only one configured it is moved into {@code connection},
+     * so that every later stage sees exactly one location. When both are configured,
+     * {@code connection.driver} wins.
+     *
+     * @param dataBaseType the database type whose driver class should be overridden
+     * @param originalConfig the plugin job configuration
+     */
+    public static void applyConfiguredDriverClass(DataBaseType dataBaseType, Configuration originalConfig)
+    {
+        Configuration connConf = originalConfig.getConfiguration(Key.CONNECTION);
+        String connDriver = connConf == null ? null : connConf.getString(Key.JDBC_DRIVER);
+        String legacyDriver = originalConfig.getString(Key.JDBC_DRIVER);
+
+        String driverClass = StringUtils.isBlank(connDriver) ? legacyDriver : connDriver;
+        if (StringUtils.isBlank(driverClass)) {
+            return;
+        }
+
+        if (connConf != null && StringUtils.isNotBlank(legacyDriver)) {
+            if (StringUtils.isBlank(connDriver)) {
+                LOG.warn("The top-level 'driver' is deprecated, move it to 'connection.driver'.");
+                originalConfig.set(Key.CONNECTION + "." + Key.JDBC_DRIVER, legacyDriver);
+            }
+            else if (!connDriver.equals(legacyDriver)) {
+                LOG.warn("Both 'driver' [{}] and 'connection.driver' [{}] are configured, 'connection.driver' takes precedence.",
+                        legacyDriver, connDriver);
+            }
+            originalConfig.remove(Key.JDBC_DRIVER);
+        }
+
+        LOG.warn("Use specified driver class [{}]", driverClass);
+        dataBaseType.setDriverClassName(driverClass);
+    }
+
+    /**
+     * Checks whether a JDBC driver class is configured, either as {@code connection.driver}
+     * or as the legacy top-level {@code driver}.
+     *
+     * @param originalConfig the plugin job configuration
+     * @return true if a driver class is configured
+     */
+    public static boolean hasConfiguredDriverClass(Configuration originalConfig)
+    {
+        Configuration connConf = originalConfig.getConfiguration(Key.CONNECTION);
+        return (connConf != null && StringUtils.isNotBlank(connConf.getString(Key.JDBC_DRIVER)))
+                || StringUtils.isNotBlank(originalConfig.getString(Key.JDBC_DRIVER));
+    }
+
     private static String dsKey(String driver, String url, String user, String password) {
         // the password is part of the key so that a rotated credential no longer
         // silently borrows a connection authenticated with the old one

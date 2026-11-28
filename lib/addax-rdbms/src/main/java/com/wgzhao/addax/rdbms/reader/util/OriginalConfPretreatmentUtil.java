@@ -140,13 +140,6 @@ public final class OriginalConfPretreatmentUtil
 
         int tableNum = 0;
 
-        // Set driver class if specified
-        Optional.ofNullable(connConf.getString(Key.JDBC_DRIVER))
-                .ifPresent(driverClass -> {
-                    LOG.warn("Use specified driver class: {}", driverClass);
-                    dataBaseType.setDriverClassName(driverClass);
-                });
-
         connConf.getNecessaryValue(Key.JDBC_URL, REQUIRED_VALUE);
 
         String jdbcUrl = connConf.getString(Key.JDBC_URL);

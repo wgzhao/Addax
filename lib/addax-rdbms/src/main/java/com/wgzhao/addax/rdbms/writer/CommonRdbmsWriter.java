@@ -86,6 +86,8 @@ public class CommonRdbmsWriter
          */
         public void init(Configuration originalConfig)
         {
+            // the ddl below may open a connection, so the configured driver has to be in place first
+            DBUtil.applyConfiguredDriverClass(dataBaseType, originalConfig);
             ddlValid(originalConfig, dataBaseType);
             OriginalConfPretreatmentUtil.doPretreatment(originalConfig, this.dataBaseType);
             LOG.debug("After job init(), originalConfig now is:[\n{}\n]", originalConfig.toJSON());

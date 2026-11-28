@@ -98,7 +98,7 @@ public final class OriginalConfPretreatmentUtil
 
     /**
      * Simplifies and validates connection configuration.
-     * Processes JDBC URL, driver settings, and table expansion.
+     * Processes JDBC URL and table expansion.
      *
      * @param originalConfig The configuration to simplify
      * @param dataBaseType the database type, passed in instead of being shared statically
@@ -107,11 +107,6 @@ public final class OriginalConfPretreatmentUtil
     {
         Configuration connConf = originalConfig.getConfiguration(Key.CONNECTION);
 
-        String driverClass = connConf.getString(Key.JDBC_DRIVER, null);
-        if (driverClass != null && !driverClass.isEmpty()) {
-            LOG.warn("Use specified driver class [{}]", driverClass);
-            dataBaseType.setDriverClassName(driverClass);
-        }
         String jdbcUrl = connConf.getString(Key.JDBC_URL);
         if (StringUtils.isBlank(jdbcUrl)) {
             throw AddaxException.missingConfig(Key.JDBC_URL);
