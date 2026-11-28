@@ -27,13 +27,11 @@ import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.rdbms.util.DBUtil;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.writer.CommonRdbmsWriter;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-import static com.wgzhao.addax.core.base.Key.JDBC_DRIVER;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
 /** Rdbms Writer. */
@@ -60,12 +58,10 @@ public class RdbmsWriter
             if (null != writeMode) {
                 LOG.warn("The writeMode is not supported in RdbmsWriter, ignore it.");
             }
-            String jdbcDriver = this.originalConfig.getString(JDBC_DRIVER, null);
-            if (jdbcDriver == null || StringUtils.isBlank(jdbcDriver)) {
-                throw AddaxException.asAddaxException(REQUIRED_VALUE, "config 'driver' is required and must not be empty");
+            if (!DBUtil.hasConfiguredDriverClass(this.originalConfig)) {
+                throw AddaxException.asAddaxException(REQUIRED_VALUE,
+                        "config 'connection.driver' is required and must not be empty");
             }
-            // use special jdbc driver class
-            DATABASE_TYPE.setDriverClassName(jdbcDriver);
             this.commonRdbmsWriterJob = new CommonRdbmsWriter.Job(DATABASE_TYPE);
             commonRdbmsWriterJob.init(originalConfig);
         }

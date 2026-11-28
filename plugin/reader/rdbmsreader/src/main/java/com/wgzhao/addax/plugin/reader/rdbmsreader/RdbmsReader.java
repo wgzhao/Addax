@@ -25,8 +25,8 @@ import com.wgzhao.addax.core.plugin.RecordSender;
 import com.wgzhao.addax.core.spi.Reader;
 import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.rdbms.reader.CommonRdbmsReader;
+import com.wgzhao.addax.rdbms.util.DBUtil;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -34,7 +34,6 @@ import java.util.List;
 import static com.wgzhao.addax.core.base.Constant.DEFAULT_FETCH_SIZE;
 import static com.wgzhao.addax.core.base.Key.CONNECTION;
 import static com.wgzhao.addax.core.base.Key.FETCH_SIZE;
-import static com.wgzhao.addax.core.base.Key.JDBC_DRIVER;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
 /** Rdbms Reader. */
@@ -65,17 +64,12 @@ public class RdbmsReader
             if (connection == null) {
                 throw AddaxException.asAddaxException(REQUIRED_VALUE, "The config 'connection' is required and must not be empty");
             }
-            String jdbcDriver = this.originalConfig.getString(JDBC_DRIVER, null);
-            if (jdbcDriver == null || StringUtils.isBlank(jdbcDriver)) {
-                // guess jdbc driver name from jdbc url if not set
+            if (!DBUtil.hasConfiguredDriverClass(this.originalConfig)) {
+                // guess the jdbc driver name from the jdbc url when no driver is configured
                 final String jdbcType = connection.getString(Key.JDBC_URL).split(":")[1];
                 Arrays.stream(DataBaseType.values()).filter(
                         dataBaseType -> dataBaseType.getTypeName().equals(jdbcType)).findFirst().ifPresent(dataBaseType ->
                         DATABASE_TYPE.setDriverClassName(dataBaseType.getDriverClassName()));
-            }
-            else {
-                // use custom jdbc driver
-                DATABASE_TYPE.setDriverClassName(jdbcDriver);
             }
             this.commonRdbmsReaderMaster = new SubCommonRdbmsReader.Job(DATABASE_TYPE);
             this.originalConfig = this.commonRdbmsReaderMaster.init(this.originalConfig);

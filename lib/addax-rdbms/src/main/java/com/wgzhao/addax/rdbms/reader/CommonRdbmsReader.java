@@ -92,6 +92,7 @@ public class CommonRdbmsReader
          */
         public Configuration init(Configuration originalConfig)
         {
+            DBUtil.applyConfiguredDriverClass(dataBaseType, originalConfig);
             OriginalConfPretreatmentUtil.doPretreatment(dataBaseType, originalConfig);
             if (Objects.equals(originalConfig.getString(Key.SPLIT_PK, ""), "") && originalConfig.getBool(Key.AUTO_PK, false)) {
                 LOG.info("The split key is not configured, try to guess the split key.");
