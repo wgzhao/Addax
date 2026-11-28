@@ -259,6 +259,10 @@ In CI the whole work directory is uploaded as the `e2e-logs` artifact on failure
 | 150_postgresql_datetime_tz | postgresqlreader | postgresqlwriter | same, run with a JVM zone 8 hours from UTC |
 | 160_mysql_datetime_to_txt | mysqlreader | txtfilewriter | writer-level `dateFormat` rendering |
 | 170_mysql_datetime_to_postgresql | mysqlreader | postgresqlwriter | the same values across dialects |
+| 180_bit_mysql2postgresql | mysqlreader | postgresqlwriter | BIT widths 1/3/8/16/64 and NULL survive MySQL -> PostgreSQL |
+| 190_bit_postgresql2mysql | postgresqlreader | mysqlwriter | the same widths in the opposite direction |
+| 200_sqlite2sqlite | sqlitereader | sqlitewriter | embedded SQLite: dynamic typing, DECIMAL and DATETIME fidelity, `splitPk` |
+| 210_driver_isolation | mysqlreader | mysqlwriter | the reader's `connection.driver` must not leak into the writer (deprecated Connector/J shim load count) |
 | 260_hdfsreader_roundtrip | streamreader + hdfsreader | hdfswriter | parquet and ORC round-trip on `file:///`: decimal, date, timestamp, boolean, array, map, type aliases, `column: ["*"]` |
 
 The fixture behind all of them is six rows carrying the values that readers and writers
