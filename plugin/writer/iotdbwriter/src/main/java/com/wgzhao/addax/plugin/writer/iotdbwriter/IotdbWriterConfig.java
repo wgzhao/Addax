@@ -127,11 +127,11 @@ final class IotdbWriterConfig
             expectedColumns = measurements.size() + 1;
 
             List<String> configuredTypes = IotdbWriterUtil.nonBlank(
-                    IotdbWriterUtil.stringList(conf, IotdbKey.COLUMN_TYPES));
+                    IotdbWriterUtil.stringList(conf, IotdbKey.COLUMN_TYPE));
             if (!configuredTypes.isEmpty()) {
                 if (configuredTypes.size() != measurements.size()) {
                     throw AddaxException.asAddaxException(CONFIG_ERROR,
-                            "The parameter [" + IotdbKey.COLUMN_TYPES + "] has " + configuredTypes.size()
+                            "The parameter [" + IotdbKey.COLUMN_TYPE + "] has " + configuredTypes.size()
                                     + " type(s), but " + measurements.size() + " measurement(s) were configured.");
                 }
                 columnTypes = parseTypes(configuredTypes);
@@ -152,8 +152,8 @@ final class IotdbWriterConfig
                         "The wildcard '*' cannot be used as a writer column.");
             }
             expectedColumns = columns.size();
-            if (!IotdbWriterUtil.stringList(conf, IotdbKey.COLUMN_TYPES).isEmpty()) {
-                LOG.warn("columnTypes is only used by the tree model; it is ignored in table mode.");
+            if (!IotdbWriterUtil.stringList(conf, IotdbKey.COLUMN_TYPE).isEmpty()) {
+                LOG.warn("columnType is only used by the tree model; it is ignored in table mode.");
             }
         }
 
@@ -192,7 +192,7 @@ final class IotdbWriterConfig
                 case "TIMESTAMP" -> TSDataType.TIMESTAMP;
                 case "BLOB" -> TSDataType.BLOB;
                 default -> throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                        "Unsupported IoTDB data type in columnTypes: " + name);
+                        "Unsupported IoTDB data type in columnType: " + name);
             };
             result.add(type);
         }

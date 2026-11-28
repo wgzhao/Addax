@@ -99,7 +99,7 @@ public class IotdbReader
             }
             this.where = IotdbReaderUtil.stripSemicolon(this.originalConfig.getString(Key.WHERE));
 
-            this.querySqls = configuredQuerySqls(this.originalConfig, connection);
+            this.querySqls = configuredQuerySqls(connection);
             this.ranges = IotdbReaderUtil.parseRanges(this.originalConfig);
 
             if (IotdbReaderUtil.isTable(this.dialect)) {
@@ -122,12 +122,12 @@ public class IotdbReader
                 this.device = StringUtils.trimToNull(this.originalConfig.getString(IotdbKey.DEVICE));
                 if (this.device == null) {
                     throw AddaxException.asAddaxException(REQUIRED_VALUE,
-                            "The parameter [" + IotdbKey.DEVICE + "] is required when querySqls is empty.");
+                            "The parameter [" + IotdbKey.DEVICE + "] is required when querySql is not configured.");
                 }
                 this.measurements = IotdbReaderUtil.stringList(this.originalConfig, IotdbKey.MEASUREMENTS);
                 if (this.measurements.isEmpty()) {
                     throw AddaxException.asAddaxException(REQUIRED_VALUE,
-                            "The parameter [" + IotdbKey.MEASUREMENTS + "] is required when querySqls is empty.");
+                            "The parameter [" + IotdbKey.MEASUREMENTS + "] is required when querySql is not configured.");
                 }
                 if (this.measurements.size() > 1 && this.measurements.contains("*")) {
                     throw AddaxException.asAddaxException(ILLEGAL_VALUE,
@@ -143,26 +143,16 @@ public class IotdbReader
             }
 
             if (!this.querySqls.isEmpty() && !this.ranges.isEmpty()) {
-                LOG.warn("querySqls is configured, the time range split parameters are ignored.");
+                LOG.warn("querySql is configured, the time range split parameters are ignored.");
                 this.ranges = new ArrayList<>();
             }
-            LOG.info("IoTDB reader initialized, dialect={}, fetchSize={}, time ranges={}, querySqls={}.",
+            LOG.info("IoTDB reader initialized, dialect={}, fetchSize={}, time ranges={}, querySql={}.",
                     this.dialect, this.fetchSize, this.ranges.size(), this.querySqls.size());
         }
 
-        private static List<String> configuredQuerySqls(Configuration conf, Configuration connection)
+        private static List<String> configuredQuerySqls(Configuration connection)
         {
-            List<String> sqls = IotdbReaderUtil.stringList(conf, IotdbKey.QUERY_SQLS);
-            if (sqls.isEmpty()) {
-                sqls = IotdbReaderUtil.stringList(conf, Key.QUERY_SQL);
-            }
-            // connection.querySql is the shape used by the RDBMS readers; accept it as well
-            if (sqls.isEmpty()) {
-                sqls = IotdbReaderUtil.stringList(connection, IotdbKey.QUERY_SQLS);
-            }
-            if (sqls.isEmpty()) {
-                sqls = IotdbReaderUtil.stringList(connection, Key.QUERY_SQL);
-            }
+            List<String> sqls = IotdbReaderUtil.stringList(connection, Key.QUERY_SQL);
             List<String> result = new ArrayList<>();
             for (String sql : sqls) {
                 if (StringUtils.isNotBlank(sql)) {
@@ -238,9 +228,6 @@ public class IotdbReader
             slice.set(Key.JDBC_URL, this.jdbcUrl);
             if (slice.get(Key.CONNECTION) != null) {
                 slice.remove(Key.CONNECTION);
-            }
-            if (slice.get(IotdbKey.QUERY_SQLS) != null) {
-                slice.remove(IotdbKey.QUERY_SQLS);
             }
             slice.set(Key.QUERY_SQL, querySql);
             slice.set(IotdbKey.SQL_DIALECT, this.dialect);

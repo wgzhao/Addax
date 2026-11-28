@@ -72,6 +72,12 @@ final class IotdbReaderUtil
     {
     }
 
+    /**
+     * IoTDB's JDBC jar has no META-INF/services/java.sql.Driver entry, so DriverManager
+     * cannot discover it through the plugin class loader. Class.forName triggers the
+     * driver's static DriverManager.registerDriver call; the TDengine and HBase SQL
+     * plugins load their drivers explicitly for the same reason.
+     */
     static void loadDriver()
     {
         try {

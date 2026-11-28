@@ -15,7 +15,6 @@
     "where": "",
     "timeColumnPosition": 0,
     "fetchSize": 10000,
-    "querySqls": [],
     "beginDateTime": "",
     "endDateTime": "",
     "splitInterval": ""

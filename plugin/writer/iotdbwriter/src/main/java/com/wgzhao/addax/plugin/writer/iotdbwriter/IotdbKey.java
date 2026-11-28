@@ -34,7 +34,7 @@ public final class IotdbKey
     /** Position of the time column in the incoming record. */
     public static final String TIME_COLUMN_POSITION = "timeColumnPosition";
     /** Optional TSDataType names for the tree model measurements. */
-    public static final String COLUMN_TYPES = "columnTypes";
+    public static final String COLUMN_TYPE = "columnType";
 
     private IotdbKey()
     {

@@ -31,8 +31,6 @@ public final class IotdbKey
     public static final String DEVICE = "device";
     /** Measurements to read in the tree model. */
     public static final String MEASUREMENTS = "measurements";
-    /** Alias for querySql when several statements are read in parallel. */
-    public static final String QUERY_SQLS = "querySqls";
     /** Position of the implicit time column in the output record. */
     public static final String TIME_COLUMN_POSITION = "timeColumnPosition";
     /** Start of a time range split, inclusive. */

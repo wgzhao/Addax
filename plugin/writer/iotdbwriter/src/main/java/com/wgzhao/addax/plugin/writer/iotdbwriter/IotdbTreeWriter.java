@@ -155,7 +155,7 @@ final class IotdbTreeWriter
 
     /**
      * A measurement whose values are all null in the first batch still needs a type for the
-     * Session API. A configured columnTypes wins; otherwise the first non-null value decides,
+     * Session API. A configured columnType wins; otherwise the first non-null value decides,
      * and TEXT is the fallback so that an all-null column still creates a usable measurement.
      */
     private void resolveTypes(List<Record> records)
@@ -173,7 +173,7 @@ final class IotdbTreeWriter
             }
             if (type == null) {
                 LOG.warn("Measurement {} is null in the first batch and defaults to TEXT; "
-                        + "set columnTypes if another type is required.", config.measurements().get(i));
+                        + "set columnType if another type is required.", config.measurements().get(i));
                 type = TSDataType.TEXT;
             }
             this.measurementTypes[i] = type;

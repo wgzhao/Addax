@@ -14,7 +14,7 @@
     ],
     "timeColumnPosition": 0,
     "batchSize": 1000,
-    "columnTypes": [],
+    "columnType": [],
     "preSql": [],
     "postSql": []
   }
