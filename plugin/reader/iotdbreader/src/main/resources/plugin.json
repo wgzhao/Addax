@@ -1,0 +1,6 @@
+{
+  "name": "iotdbreader",
+  "class": "com.wgzhao.addax.plugin.reader.iotdbreader.IotdbReader",
+  "description": "Read data from Apache IoTDB",
+  "developer": "wgzhao"
+}

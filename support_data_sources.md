@@ -23,6 +23,7 @@
 | Greenplum           | :white_check_mark: | :white_check_mark: | postgresqlreader/greenplumwriter        |                                 |
 | InfluxDB            | :white_check_mark: | :white_check_mark: | influxdbreader/influxdbwriter           | Removed since 6.0.11       |
 | InfluxDB2           | :white_check_mark: | :white_check_mark: | influxdb2reader/influxdb2writer         | ONLY InfluxDB 2.0 or later      |
+| IoTDB               | :white_check_mark: | :white_check_mark: | iotdbreader/iotdbwriter                 | [Apache IoTDB][10] tree 1.3.7+, table 2.x |
 | json                | :white_check_mark: | :x:                | jsonfilereader                          |                                 |
 | Kafka               | :white_check_mark: | :white_check_mark: | kafkareader/kafkawriter                 |                                 |
 | kudu                | :white_check_mark: | :white_check_mark: | kudureader/kuduwriter                   |                                 |
@@ -57,3 +58,5 @@
 [8]: https://databend.rs
 
 [9]: https://en.wikipedia.org/wiki/Microsoft_Access
+
+[10]: https://iotdb.apache.org

@@ -1,0 +1,44 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 1
+      },
+      "errorLimit": {
+        "record": 0
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "iotdbreader",
+          "parameter": {
+            "username": "root",
+            "password": "root",
+            "connection": {
+              "jdbcUrl": "jdbc:iotdb://127.0.0.1:6667/"
+            },
+            "device": "root.demo.d1",
+            "measurements": [
+              "s1",
+              "s2"
+            ],
+            "timeColumnPosition": 0,
+            "fetchSize": 10000
+          }
+        },
+        "writer": {
+          "name": "streamwriter",
+          "parameter": {
+            "print": true,
+            "column": [
+              "time",
+              "s1",
+              "s2"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

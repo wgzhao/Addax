@@ -44,12 +44,13 @@
 9. httpreader（HTTP 接口，支持鉴权与 JSON 请求体）
 10. influxdbreader（InfluxDB）
 11. influxdb2reader（InfluxDB 2.x）
-12. jsonfilereader（JSON 文件）
-13. kafkareader（Kafka）
-14. kudureader（Kudu，DataX 仅有 writer）
-15. redisreader（Redis）
-16. s3reader（Amazon S3 及兼容对象存储）
-17. sqlitereader（SQLite）
+12. iotdbreader（Apache IoTDB）
+13. jsonfilereader（JSON 文件）
+14. kafkareader（Kafka）
+15. kudureader（Kudu，DataX 仅有 writer）
+16. redisreader（Redis）
+17. s3reader（Amazon S3 及兼容对象存储）
+18. sqlitereader（SQLite）
 
 ### Writer
 
@@ -61,11 +62,12 @@
 6. icebergwriter（Apache Iceberg）
 7. influxdbwriter（InfluxDB）
 8. influxdb2writer（InfluxDB 2.x）
-9. kafkawriter（Kafka）
-10. paimonwriter（Apache Paimon）
-11. rediswriter（Redis）
-12. s3writer（S3，支持 ORC/Parquet 存储格式）
-13. sqlitewriter（SQLite）
+9. iotdbwriter（Apache IoTDB）
+10. kafkawriter（Kafka）
+11. paimonwriter（Apache Paimon）
+12. rediswriter（Redis）
+13. s3writer（S3，支持 ORC/Parquet 存储格式）
+14. sqlitewriter（SQLite）
 
 > 注：部分插件 DataX 后来也提供（如 clickhouse、tdengine、starrocks、databendwriter 等），但实现各自独立演进，Addax 的版本仍在持续维护和增强。
 
